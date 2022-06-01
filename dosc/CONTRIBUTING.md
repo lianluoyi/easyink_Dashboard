@@ -2,17 +2,17 @@
 
 这篇指南会指导你如何为 easyWeCom 贡献一份自己的力量，请在提 issue 或者 pull request 之前仔细阅读一遍这篇指南。
 
-**行为准则**
+#### **行为准则**
 
-我们有一份[行为准则](https://github.com/easywecom/easyWeCom_Dashboard/docs/CODE_OF_CONDUCT.md)，希望所有的贡献者都能遵守，请花时间阅读一遍全文以确保你能明白哪些是可以做的，哪些是不可以做的。
+我们有一份[行为准则](https://github.com/easywecom/easyWeCom_Dashboard/blob/main/dosc/CODE_OF_CONDUCT.md)，希望所有的贡献者都能遵守，请花时间阅读一遍全文以确保你能明白哪些是可以做的，哪些是不可以做的。
 
-**开发流程**
+#### **开发流程**
 
 我们所有的工作都会放在 [GitHub](https://github.com/easywecom/easyWeCom_Dashboard)上。不管是核心团队的成员还是外部贡献者的 pull request 都需要经过同样流程的 review，也非常欢迎各位开发者 Review 并参与讨论。
 
-参考资料： [代码规范与审核流程](https://github.com/easywecom/easyWeCom_Dashboard/docs/代码规范与审核流程.md)
+参考资料： [代码规范与审核流程](https://github.com/easywecom/easyWeCom_Dashboard/blob/main/dosc/%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83%E4%B8%8E%E5%AE%A1%E6%A0%B8%E6%B5%81%E7%A8%8B.md)
 
-**分支管理**
+#### **分支管理**
 
 我们的主要维护三个分支 ：master fix feature 。
 
@@ -22,7 +22,7 @@
 
 我们每月定期合并 fix feature 到 master ，并发布一个正式版本。
 
-**Bugs**
+#### **Bugs**
 
 我们使用 [GitHub Issues](https://github.com/easywecom/easyWeCom_Dashboard/issues)来做 bug 追踪。 如果你想要你发现的 bug 被快速解决，最好的办法就是使用这个 [模板](https://easywecom.github.io) 提供bug相关信息，为了bug能够快速被解决，我们希望 **信息提供得尽可能完整** 。
 
@@ -32,13 +32,13 @@
 
 1. 阅读我们的 [常见问题解答](https://www.yuque.com/docs/share/9217b462-a4c2-4d4a-97cb-48eebf800784#Ydt5N)，确认不是由于配置问题导致功能使用异常。
 
-**新增功能**
+#### **新增功能**
 
 如果你有改进我们现有的功能或者新增功能的想法，我们同样推荐你使用我们提供的 [模板](https://easywecom.github.io) 来新建一个添加新功能的 issue 。
 
 在新建 issue 之前，需要先搜索已有的issue，确认这是首次提出的优化建议或新增功能，避免出现两个或多个相同描述的issue 。
 
-**Pull Request**
+#### **Pull Request**
 
 请按照下面的步骤发送 Pull Request ：
 
@@ -50,7 +50,7 @@
 
 1. 提交代码，请求合并到对应分支。
 
-**参与讨论**
+#### **参与讨论**
 
 可以到 easyWeCom 的 Discussions 板块参与讨论。
 
