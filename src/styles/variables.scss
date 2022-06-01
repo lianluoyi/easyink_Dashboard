@@ -1,0 +1,78 @@
+$color-theme1-1: #66BFBF;
+$color-theme1-2: #47A9A9;
+$color-theme1-3: #BCE1E1;
+$color-theme1-4: #DFF1F1;
+$color-theme2-1: #6BB4AB;
+$color-theme2-2: #3AB2A6;
+$color-theme2-3: #C1DDD8;
+$color-theme2-4: #F0F8F7;
+$color-theme3-1: #196B69;
+$color-theme3-2: #259D9B;
+$color-theme3-3: #CDE9E9;
+$color-theme3-4: #DFF1F1;
+$color-theme4-1: #3498DB;
+$color-theme4-2: #CBE5F6;
+$color-theme4-3: #E1F0FA;
+$color-theme5-1: #3F72AF;
+$color-theme5-2: #A9C2DF;
+$color-theme5-3: #CEDCED;
+$color-theme6-1: #112D4E;
+$color-theme6-2: #BCD4F0;
+$color-theme6-3: #D2E2F4;
+$color-theme7-1: #090723;
+$color-theme7-2: #37ADFF;
+$color-theme7-3: #B8E4FF;
+$color-theme7-4: #D1EDFF;
+$color-theme8-1: #3A4750;
+$color-theme8-2: #37ADFF;
+$color-theme8-3: #B8E4FF;
+$color-theme8-4: #D1EDFF;
+
+// base color
+$blue: #0079de;
+$light-blue: #4ca1e8;
+$red: #e74e59;
+$pink: #e65d6e;
+$green: #6BB4AB;
+// $green: #06c160;
+$tiffany: #4ab7bd;
+$yellow: #ffcf0e;
+$orange: #F59A23;
+$panGreen: #30b08f;
+$deepGreen: #3AB2A6;
+$grayBg: #efeff4;
+$baseColor: $green;
+$bgBaseColor: #C1DDD8;
+$bgLightBaseColor: #F0F8F7;
+$grayColor: #999999;
+$borderColor: #D7D7D7;
+$black: #333;
+$wxGreen: #38AF70;
+
+// sidebar
+$menuText: #333;
+$menuActiveText: #333;
+$subMenuActiveText: #333; // https://github.com/ElemeFE/element/issues/12951
+
+$menuBg: #fff;
+$menuActiveBg: #fafafa;
+$menuHover: #fafafa;
+
+$subMenuBg: #fff;
+$subMenuActiveBg: #fafafa;
+$subMenuHover: #fafafa;
+
+$sideBarWidth: 250px;
+
+// the :export directive is the magic sauce for webpack
+// https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass
+:export {
+  menuText: $menuText;
+  menuActiveText: $menuActiveText;
+  subMenuActiveText: $subMenuActiveText;
+  menuBg: $menuBg;
+  menuHover: $menuHover;
+  subMenuBg: $subMenuBg;
+  subMenuHover: $subMenuHover;
+  sideBarWidth: $sideBarWidth;
+}
