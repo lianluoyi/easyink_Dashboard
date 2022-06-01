@@ -1,0 +1,64 @@
+.enterprise-wechat-demo {
+  .part {
+    margin-bottom: 5px;
+  }
+  .step-div {
+    margin-bottom: 40px;
+  }
+  .step-div .is-horizontal .el-step__main .el-step__description {
+    padding-left: 10%;
+    padding-right: 10%;
+  }
+  .content-text {
+    text-indent: 2em;
+    line-height: 20px;
+    color: #333;
+  }
+  .content-text .el-link:hover, .content-title .el-link:hover {
+    color: #66b1ff;
+  }
+  .el-link.el-link--primary.is-underline:hover:after {
+    border-bottom: 1px solid #66b1ff;
+  }
+  .content-text .el-link, .content-title .el-link {
+    color: #409eff;
+    text-indent: 0em;
+  }
+  .content-text div, .content-text span {
+    text-indent: 0em;
+    line-height: 20px;
+  }
+  .content-title {
+    margin: 5px 0;
+    line-height: 20px;
+    font-size: 14px;
+  }
+  .content-title .red {
+    color: #e74e59;
+  }
+  
+  .content-text a, .content-title a {
+    vertical-align: inherit;
+  }
+  .content-text-box {
+    border: 1px solid #d7d7d7;
+    padding: 10px;
+    overflow-wrap: break-word;
+  }
+  .part-img {
+    margin: 10px 0;
+  }
+  .btn-div {
+    text-align: right;
+    padding-bottom: 20px;
+  }
+  .content-div {
+    flex: 1;
+    overflow: auto;
+  }
+}
+.contact-demo {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
