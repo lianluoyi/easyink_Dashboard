@@ -1,0 +1,34 @@
+@import '~@/styles/mixin.scss';
+.config-tab {
+    .tab-title {
+        border-left-width: 5px;
+        border-left-style: solid;
+        @include border_color(!important);
+        font-size: 18px;
+        padding-left: 15px;
+        margin: 20px 0;
+        font-weight: bold;
+    }
+    .tab-des {
+        font-size: 14px;
+        margin-bottom: 15px;
+        padding-left: 20px;
+    }
+    .tab-tip {
+        color: $grayColor;
+    }
+    .tab-img img{
+        width: 150px;
+        height: 150px;
+    }
+    .tab-img p{
+        color: #7F7F7F;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+    .tab-img p{
+        width: 150px;
+        text-align: center;
+    }
+    
+}
