@@ -1,3 +1,8 @@
+/*
+ * @Description: 企微后台接口
+ * @Author: wJiaaa
+ * @LastEditors: wJiaaa
+ */
 import request from '@/utils/request';
 
 const service = window.CONFIG.services.wecom + '/admin';
@@ -45,5 +50,30 @@ export function autoConfig(data) {
 export function getDefaultDomainConfig() {
   return request({
     url: service + '/getDefaultDomainConfig'
+  });
+}
+
+/**
+ * 扫码登录企微后台验证手机短信验证码
+ * @param {*} params
+ * @returns
+ */
+export function confirmMobileCaptcha(params) {
+  return request({
+    url: service + '/confirmMobileCaptcha',
+    method: 'get',
+    params
+  });
+}
+/**
+ * 重新发送手机验证码
+ * @param {*} params
+ * @returns
+ */
+export function sendCaptcha(params) {
+  return request({
+    url: service + '/sendCaptcha',
+    method: 'get',
+    params
   });
 }
