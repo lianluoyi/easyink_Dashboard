@@ -1,4 +1,4 @@
 /README.md merge=ours
 .gitignore merge=ours
-.github/* merge=ours
-.gitee/* merge=ours
+.github/** merge=ours
+.gitee/** merge=ours
