@@ -23,6 +23,6 @@ package-lock.json
 yarn.lock
 .yarnrc
 
-README.md
-.gitee/
-.github/
+/README.md
+.gitee/*
+.github/*
