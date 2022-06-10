@@ -1,0 +1,34 @@
+.timeline-list {
+    padding-left: 4px;
+    .step-dot {
+      background-color: #E0E3EA;
+      border-radius: 50%;
+      color: #fff;
+      height: 20px;
+      width: 20px;
+      text-align: center;
+      position: relative;
+      left: -5px;
+      line-height: 18px;
+    }
+    .timeline-div {
+      /deep/ .el-timeline-item__timestamp {
+        display: none;
+      }
+      .custom-timestamp {
+        margin-bottom: 8px;
+        padding-top: 4px;
+        color: #AEAEAE;
+      }
+      .rule-content {
+        display: flex;
+        align-items: flex-end;
+        .tool-div {
+            .iconfont {
+              cursor: pointer;
+              margin-left: 5px;
+            }
+        }
+      }
+    }
+}
