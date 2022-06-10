@@ -6,10 +6,10 @@
 <template>
   <div class="tel-validation">
     <span>为确保企业帐号安全，请输入发送至
-      {{ dealTel(tel) }} 的6位验证码。如未收到，请尝试重新获取验证码</span>
+      {{ tel }}  的6位验证码。如未收到，请尝试重新获取验证码</span>
     <div class="input-countdown">
       <el-input
-        v-model="validateCode"
+        v-model="captcha"
         maxlength="6"
         class="code-input"
         placeholder="请输入6位验证码"
@@ -28,27 +28,34 @@
 
 <script>
 import RequestButton from '@/components/Button/RequestButton.vue';
+import { confirmMobileCaptcha, sendCaptcha } from '@/api/admin';
 import { changeButtonLoading } from '@/utils/common';
 // 定时器定时1s
 const GET_CODE_TIME = 1000;
 // 倒计时
 const AGAIN_GET_CODE = 60;
-// eslint-disable-next-line no-magic-numbers
-const CONTRAST_ARR = [3, 4, 5, 6];
 export default {
   components: { RequestButton },
   props: {
     tel: {
-      type: Number,
+      type: String,
       default: null
+    },
+    tlKey: {
+      type: String,
+      default: ''
+    },
+    qrcodeKey: {
+      type: String,
+      default: ''
     }
   },
   data() {
     return {
       // 短信验证码
-      validateCode: '123456',
+      captcha: '',
       // 重新获取
-      isAgainGetCode: true,
+      isAgainGetCode: false,
       // 倒计时
       codeTime: AGAIN_GET_CODE,
       // 倒计时定时器
@@ -57,42 +64,28 @@ export default {
   },
   watch: {
   },
+  mounted() {
+    this.countDownTime();
+  },
   methods: {
-    /**
-     * 处理手机号,将部分位数隐藏，仅展示前后几位
-     */
-    dealTel(tel) {
-      let newTel = '';
-      for (let i = 0; i < tel.toString().length; i++) {
-        if (!CONTRAST_ARR.includes(i)) {
-          newTel = newTel + tel.toString()[i];
-        } else {
-          newTel = newTel + '*';
-        }
-      }
-      return newTel;
-    },
     /**
      * 验证短信验证码是否正确
      */
     validate() {
-      if (!this.validateCode) {
+      if (!this.captcha) {
         changeButtonLoading(this.$store, 'validate');
         return this.msgWarn('验证码不能为空');
       }
-      //   在此处判断验证码是否正确
-      // setTimeout(() => {
-      //   this.msgError('短信验证码错误');
-      //   changeButtonLoading(this.$store, 'validate');
-      // }, GET_CODE_TIME);
-      setTimeout(() => {
-        this.$emit('loginSuccessAndConfig');
+      const params = {
+        captcha: this.captcha,
+        tlKey: this.tlKey,
+        qrcodeKey: this.qrcodeKey
+      };
+      confirmMobileCaptcha(params).then((res) => {
         changeButtonLoading(this.$store, 'validate');
-      }, GET_CODE_TIME);
-      // setTimeout(() => {
-      // this.countDownTime();
-      //   changeButtonLoading(this.$store, 'validate');
-      // }, GET_CODE_TIME);
+        this.$emit('loginSuccessAndConfig');
+        this.closeTime();
+      });
     },
     // 关闭定时器
     closeTime() {
@@ -115,7 +108,9 @@ export default {
       this.codeTime = AGAIN_GET_CODE;
       this.isAgainGetCode = false;
       this.countDownTime();
-      //   触发接口获取验证码
+      sendCaptcha({ tlKey: this.tlKey, qrcodeKey: this.qrcodeKey }).then(() => {
+        this.msgSuccess('发送成功');
+      });
     }
   }
 };

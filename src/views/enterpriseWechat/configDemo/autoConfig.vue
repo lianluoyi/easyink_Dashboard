@@ -6,13 +6,13 @@ import ClipboardJS from 'clipboard';
 import { Notification } from 'element-ui';
 import { SERVER_TYPE_THIRD } from '@/utils/constant';
 import { getDefaultDomainConfig } from '@/api/admin';
-// import CodeValidata from '../codeValidata.vue';
+import CodeValidata from '../codeValidata.vue';
 let qrcodeTimer = null;
 const TIMER_COUNT = 200;
 const PERCENTAGE = 100;
 const STEP_OF_PERCENTAGE = 10;
 export default {
-  components: { },
+  components: { CodeValidata },
   props: {
     configId: {
       type: String,
@@ -55,11 +55,13 @@ export default {
       configLoad: false,
       checkTimeStart: true,
       // 是否为第三方应用
-      isThirdType: this.$store.state.serverInfo && this.$store.state.serverInfo.serverType === SERVER_TYPE_THIRD
+      isThirdType: this.$store.state.serverInfo && this.$store.state.serverInfo.serverType === SERVER_TYPE_THIRD,
       // eslint-disable-next-line no-magic-numbers
-      // tel: 123456789011,
+      tel: '',
       // // 是否需要验证码
-      // needCode: true
+      needCode: false,
+      tlKey: '',
+      refresh: false
     };
   },
   computed: {},
@@ -127,6 +129,23 @@ export default {
             this.dealScanInconformity();
             break;
           }
+          // 扫码登录时需要验证码
+          case 'NEED_MOBILE_CONFIRM': {
+            this.stopTimer();
+            this.refresh = true;
+            this.scanLoginError = true;
+            this.scanLoginErrText = '登录中';
+            this.needCode = true;
+            this.tlKey = res.data.tlKey;
+            this.tel = res.data.tel;
+            break;
+          }
+          // 等待验证码
+          case 'WAIT_MOBILE_CONFIRM': {
+            this.stopTimer();
+            this.needCode = true;
+            break;
+          }
           default: {
             break;
           }
@@ -138,7 +157,7 @@ export default {
             this.checkQrcode(qrcodeKey);
             clearTimeout(qrcodeTimer);
           // eslint-disable-next-line no-magic-numbers
-          }, 1500);
+          }, 2500);
         }
       });
     },
@@ -355,7 +374,7 @@ export default {
                   <div><i class="el-icon-warning" /></div>
                   <div class="overdue-tip">
                     <span>{{ scanLoginErrText }}</span>
-                    <span class="reGet" @click="reGetQrcode">刷新</span>
+                    <span v-if="!refresh" class="reGet" @click="reGetQrcode">刷新</span>
                   </div>
                 </div>
                 <img :src="qrcodeUrl">
@@ -364,12 +383,12 @@ export default {
                 <div><i class="el-icon-loading" /></div>
               </div>
               <!-- 二维码校验 -->
-              <!-- <CodeValidata v-if="needCode" :tel="tel" @loginSuccessAndConfig="loginSuccessAndConfig" /> -->
+              <CodeValidata v-if="needCode" :qrcode-key="qrcodeKey" :tl-key="tlKey" :tel="tel" @loginSuccessAndConfig="loginSuccessAndConfig" />
             </template>
           </el-step>
           <el-step v-if="active > 0 " title="自动化配置">
             <template slot="description" class="auto-config">
-              <div v-if="active===1">
+              <div v-if="active === 1">
                 <div class="orange tip">自动化配置期间，请勿关闭当前界面</div>
                 <div class="config-progress">
                   <el-progress type="circle" :percentage="configPercentage" :status="configStatus" />
