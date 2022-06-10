@@ -1,0 +1,427 @@
+// cover some element-ui styles
+@import '~@/styles/mixin.scss';
+.el-button {
+  [class^='el-icon-'],
+  [class*=' el-icon-'] {
+    vertical-align: top;
+  }
+}
+
+.el-input.el-input--small {
+  line-height: 30px;
+}
+
+.top-search {
+  .el-input,
+  .el-select {
+    width: 240px;
+  }
+
+  .el-date-editor--daterange.el-input__inner {
+    width: 240px;
+  }
+}
+
+.el-tag + .el-tag {
+  margin-right: 10px;
+}
+.el-tag:last-of-type(1) {
+  margin-right: 0px;
+}
+.el-tag:nth-of-type(1) {
+  margin-right: 10px;
+}
+
+.el-breadcrumb__inner,
+.el-breadcrumb__inner a {
+  font-weight: 400 !important;
+}
+
+.el-upload {
+  input[type='file'] {
+    display: none !important;
+  }
+}
+
+.el-upload__input {
+  display: none;
+}
+
+.small-padding {
+  .cell {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+.fixed-width {
+  .el-button--mini {
+    padding: 7px 10px;
+    width: 60px;
+  }
+}
+
+.status-col {
+  .cell {
+    padding: 0 10px;
+    text-align: center;
+
+    .el-tag {
+      margin-right: 0px;
+    }
+  }
+}
+
+// to fixed https://github.com/ElemeFE/element/issues/2461
+.el-dialog {
+  width: 700px;
+  transform: none;
+  left: 0;
+  position: relative;
+  margin: 0 auto;
+}
+
+// refine element ui upload
+.upload-container {
+  .el-upload {
+    width: 100%;
+
+    .el-upload-dragger {
+      width: 100%;
+      height: 200px;
+    }
+  }
+}
+
+// dropdown
+.el-dropdown-menu {
+  a {
+    display: block;
+  }
+}
+
+// fix date-picker ui bug in filter-item
+.el-range-editor.el-input__inner {
+  display: inline-flex !important;
+}
+
+// to fix el-date-picker css style
+.el-range-separator {
+  box-sizing: content-box;
+}
+
+.el-table .el-table__body-wrapper tr {
+  height: 50px;
+}
+.el-table th.is-leaf,
+.el-table td {
+  border-bottom: 0;
+}
+// .el-table tr td {
+//   &:first-of-type,
+//   &:first-of-type {
+//     border-radius: 4px;
+//   }
+// }
+
+.el-form-item {
+  margin: 0 !important;
+  padding: 10px;
+  &:hover {
+    background: #e5f1fc;
+    border-radius: 10px;
+  }
+}
+
+
+.login-form {
+  .el-form-item__content {
+    height: 36px;
+    .el-form-item__error{
+      display: none;
+    }
+  }
+  .el-form-item:nth-of-type(4) .el-input__inner{
+    width: 210px;
+  }
+  .el-form-item {
+    &:not(:nth-child(4)) .el-input input{
+      height: 36px!important;
+      width: 280px!important;
+      line-height: 36px!important;
+      padding: 5px 10px 5px 35px;
+    }
+    &:nth-child(4) {
+      margin-top: 8px!important;
+      width: 294px;
+      .el-input input{
+        width: 180px!important;
+        padding: 5px 10px 5px 35px;
+      }
+    }
+  }
+}
+
+.el-button--primary, .el-button--primary:hover, .el-button--primary:focus {
+  @include btn_color($color-theme2-1);
+}
+
+.el-button.is-plain, .el-button.is-plain:hover, .el-button--default:hover {
+  @include btn_reset_color($color-theme2-1);
+}
+
+.el-button--text, .el-upload-dragger .el-upload__text em,
+.el-radio-button:not(.is-active) .el-radio-button__inner:hover,
+.el-transfer-panel__item.el-checkbox:hover, .el-upload:focus {
+  @include text_btn_color($color-theme2-1);
+}
+
+.el-radio-button__orig-radio:checked + .el-radio-button__inner:hover,
+.el-button--primary:not(.is-plain):hover span {
+  color: #fff !important;
+}
+
+.el-input__inner, .el-textarea__inner, .el-select .el-input.is-focus .el-input__inner,
+.el-range-editor.is-active {
+  border-color: #d9d9d9;
+  &:focus, &:hover {
+  @include border_color();
+  }
+}
+
+.group-member-search label {
+  width: 55px!important;
+}
+
+.el-dialog__body {
+  max-height: 672px;
+  overflow: auto;
+  padding: 20px;
+}
+
+.txt-uploader {
+  position: relative;
+  .el-upload-list {
+    position: absolute;
+    left: -5px;
+    top: -4px;
+    li {
+      transition: none;
+    }
+  }
+  .el-upload-list__item.is-success .el-upload-list__item-name:hover, .el-upload-list__item.is-success .el-upload-list__item-name:focus {
+    color: #606266;
+  }
+}
+
+.staff-top-search {
+  .el-form-item__label {
+    width: auto!important;
+  }
+}
+
+.el-message {
+  top: 50%!important;
+}
+.el-step__title.is-success, .el-step__description.is-success, .el-step__head.is-success,
+.el-step__title.is-process, .el-step__head.is-process, .el-step__description.is-process {
+  @include step_label_color($color-theme2-1);
+}
+.el-step__head.is-process, .el-step__head.is-success {
+  @include border_color();
+}
+
+.el-table .cell.el-tooltip {
+  white-space: unset;
+}
+
+.tag-wrapper .cell{
+  display: -webkit-box !important;
+  overfLow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.foot-button-reverse-dialog-wrapper {
+  .dialog-footer {
+    display: flex;
+    flex-direction: row-reverse;
+    .el-button--primary {
+      margin-left: 10px;
+    }
+  }
+}
+
+.select-user-tree {
+  .el-tree-node__content {
+    height: 30px;
+  }
+  .el-tree-node {
+    margin-bottom: 5px;
+  }
+  // 扩大员工多选框点击区域
+  .is-leaf+.el-checkbox {
+    position: relative;
+    &:before {
+      content: '';
+      position: absolute;
+      top: -10px; bottom: -10px; left: -40px; right: -260px;
+    };
+  }
+}
+.conversation-user-tree {
+  .custom-tree-node {
+    text-align: left;
+  }
+  .el-tree-node__content {
+    height: 36px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+  .selected span{
+    // color: #6BB4AB!important;
+  }
+}
+
+.customer-info {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  height: 35px;
+  img {
+    width: 35px;
+    height: 35px;
+    border-radius: 3px;
+    margin-right: 5px;
+  }
+  .customer-name {
+    width: calc(100% - 40px);
+    height: 100%;
+    font-size: 14px;
+    color: #333;
+    text-align: left;
+    >div:first-child {
+      margin-top: -2px;
+    }
+  }
+  .customer-real-name {
+    font-size: 12px;
+    color: #666;
+    line-height: 16px;
+  }
+}
+
+.tag-dialog {
+  .el-icon-info {
+    color: #6BB4AB;
+    transform: rotateZ(-15deg);
+  }
+  .el-input__suffix {
+    line-height: 32px;
+    font-size: 14px;
+  }
+}
+
+.search-area {
+  .el-select input {
+    border-radius: 3px 0 0 3px;
+    border-right-width: 0;
+  }
+  >.el-input input {
+    border-radius: 0 3px 3px 0;
+  }
+}
+
+.tag-group-dialog {
+  .el-icon-close {
+    &:hover {
+      color: #6bb4ab;
+      background: transparent;
+    }
+  }
+  .el-form-item:nth-child(2)  {
+    height: auto;
+    .el-form-item__content {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      .el-form-item__error {
+        position: unset;
+        width: 100%;
+        height: 16px;
+      }
+    }
+  }
+  .el-form-item__label {
+    line-height: 28px;
+  }
+}
+// 白色背景的tabs
+.white-tabs {
+  .el-tabs__header {
+    background-color: #fff;
+    margin-bottom: 15px;
+    .el-tabs__item {
+      padding: 0 20px !important;
+    }
+  }
+}
+
+.el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  @include radio_btn_color($color-theme2-1)
+}
+.el-checkbox__input.is-checked+.el-checkbox__label {
+  @include radio_label_color($color-theme2-1)
+}
+
+.el-tabs__item.is-active {
+  @include text_btn_color($color-theme2-1)
+}
+.el-tabs__active-bar {
+  @include tab_bg_color($color-theme2-1)
+}
+
+.el-tabs__item:hover,
+.el-pagination.is-background .el-pager li:not(.active):hover,
+.el-select-dropdown__item.selected,
+.el-dialog__headerbtn .el-dialog__close:hover {
+    @include text_btn_color($color-theme2-1)
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+  @include bg_primary_color($color-theme2-1)
+}
+
+.el-dropdown-menu__item {
+  &:hover {
+    @include list_item_hover_color($color-theme2-4);
+    @include text_btn_color($color-theme2-2);
+  }
+}
+
+.el-switch.is-checked .el-switch__core {
+  @include btn_color($color-theme2-1);
+}
+
+.el-radio-button__orig-radio:checked+.el-radio-button__inner {
+  @include radio_btn_color($color-theme2-1);
+}
+
+.el-radio {
+  .el-radio__input.is-checked .el-radio__inner {
+    @include radio_btn_color($color-theme2-1);
+  }
+  .el-radio__input.is-checked+.el-radio__label {
+    @include radio_label_color($color-theme2-1);
+  }
+}
+
+// 步骤条
+.el-step__title.is-finish, .el-step__description.is-finish, .el-step__head.is-finish {
+  @include text_btn_color($color-theme2-2);
+  @include border_color($color-theme2-2);
+}

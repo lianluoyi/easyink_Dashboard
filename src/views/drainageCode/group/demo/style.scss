@@ -1,0 +1,44 @@
+.get-qrcode-drawer {
+    /deep/ .el-tabs__content {
+        padding-right: 20px;
+    }
+    .step-title {
+        font-size: 20px;
+        color: $black;
+        margin-bottom: 15px;
+    }
+    .second-title {
+        color: $black;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    .section-item {
+        margin-bottom: 10px;
+        .content-text {
+            font-size: 14px;
+            color: #606266;
+            >span {
+                color: #FA7419;
+            }
+            .el-link {
+                color: #409eff !important;
+                text-indent: 0em;
+            }
+        }
+        .part-div {
+            display: flex;
+            align-items: center;
+            .part-img {
+                width: 143px;
+            }
+            .el-icon-d-arrow-right {
+                margin: 15px;
+                font-size: 24px;
+            }
+        }
+        .part-img {
+            margin-top: 10px;
+            border: 1px solid $borderColor;
+        }
+    }
+}
