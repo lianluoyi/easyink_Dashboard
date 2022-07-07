@@ -4,16 +4,19 @@ import { getQrcode } from '@/api/drainageCode/staff';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
 import PhoneDialog from '@/components/PhoneDialog';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import SelectQrCode from '@/components/SelectQrCode';
+import { SCOPELIST_TYPE } from '@/utils/constant';
+import TagUserShow from '@/components/TagUserShow';
 
 const businessIdTypeOfUser = 2;
 const SELECT_TIME_TYPE = 2;
 const CODE_TYPE_MANY = 2;
 const MAX_WELCOME_MSG_LENGTH = 2000;
+const DEPARTMENT_ID_KEY = 'businessId';
 export default {
-  components: { PhoneDialog, SelectTag, SelectUser, SelectQrCode, RequestButton },
+  components: { PhoneDialog, SelectTag, SelectUser, SelectQrCode, RequestButton, TagUserShow },
   data() {
     return {
       newGroupId: '',
@@ -56,7 +59,10 @@ export default {
             trigger: 'blur'
           }
         ]
-      })
+      }),
+      // 使用员工类型
+      SCOPELIST_TYPE,
+      DEPARTMENT_ID_KEY
     };
   },
   watch: {
@@ -64,11 +70,13 @@ export default {
       this.form.weEmpleCodeTags = [...tags];
     },
     users(users) {
-      this.form.weEmpleCodeUseScops = users.map((u) => {
+      this.form.weEmpleCodeUseScops = users.map((user) => {
         return {
-          businessId: u.businessId,
-          businessIdType: u.businessIdType,
-          businessName: u.businessName
+          ...user,
+          id: undefined,
+          businessId: user.businessId,
+          businessIdType: user.businessIdType,
+          businessName: user.businessName
         };
       });
       // 需要延迟 否则会先弹出提示
@@ -90,6 +98,12 @@ export default {
         this.form.scenario = data.scenario || '';
         this.form.skipVerify = data.skipVerify || 0;
         this.form.welcomeMsg = data.welcomeMsg || '';
+        this.form.weEmpleCodeUseScops = data?.weEmpleCodeUseScops?.map(item => {
+          return {
+            ...item,
+            name: item.businessName, userId: item.businessIdType === SCOPELIST_TYPE['USER'] ? item.businessId : undefined
+          };
+        });
         this.time = [data.effectTimeOpen || '00:00', data.effectTimeClose || '00:00'];
         if (data.weGroupCode && data.weGroupCode.id) {
           this.codes = [data.weGroupCode];
@@ -111,15 +125,16 @@ export default {
     // 选择人员变化事件
     submitSelectUser(users) {
       const params = { userIds: [], departmentIds: [] };
-      this.users = users.map((d) => {
-        d.userId && params.userIds.push(d.userId);
-        d.id && params.departmentIds.push(d.id);
+      this.users = users.map((user) => {
+        user.userId && params.userIds.push(user.userId);
+        !user.userId && params.departmentIds.push(user[DEPARTMENT_ID_KEY]);
         return {
-          businessId: d.id || d.userId,
-          businessName: d.name,
-          businessIdType: d.userId ? businessIdTypeOfUser : 1,
-          mobile: d.mobile,
-          empleCodeId: d.empleCodeId
+          ...user,
+          businessId: user[DEPARTMENT_ID_KEY] || user.userId,
+          businessName: user.name,
+          businessIdType: user.userId ? businessIdTypeOfUser : 1,
+          mobile: user.mobile,
+          empleCodeId: user.empleCodeId
         };
       });
       params.userIds += '';
@@ -143,9 +158,6 @@ export default {
       this.groupQrCode = data;
       this.form.groupCodeId = data.id;
       this.$refs.form.validateField('groupCodeId');
-    },
-    handlleReturn() {
-      this.$router.go(-1);
     },
     handeAddTextClick(text) {
       if (this.form.welcomeMsg.length + text.length <= this.welMsgMaxlength) {
@@ -199,12 +211,7 @@ export default {
 
 <template>
   <div v-loading="loading" class="wrap">
-    <div class="wrap-head">
-      <el-button type="text" size="medium" @click="handlleReturn">
-        <svg class="icon-restore" :width="18" :height="18">
-          <use href="#icon-restore" /></svg>返回
-      </el-button>
-    </div>
+    <ReturnPage />
     <div class="wrap-body">
       <el-alert
         title="功能说明"
@@ -226,16 +233,18 @@ export default {
             />
           </el-form-item>
           <el-form-item label="使用员工" prop="weEmpleCodeUseScops">
-            <el-button
-              class="mr10"
-              plain
-              icon="el-icon-plus"
-              size="mini"
-              @click="dialogVisibleSelectUser = true"
-            >{{ users.length ? '修改' : '添加' }}成员</el-button>
-            <el-tag v-for="(user, index) in users" :key="index" class="user-tag" size="medium">{{
-              user.businessName
-            }}</el-tag>
+            <div class="flexw">
+              <el-button
+                class="mr10 mb5"
+                plain
+                icon="el-icon-plus"
+                size="mini"
+                @click="dialogVisibleSelectUser = true"
+              >{{ users.length ? '修改' : '添加' }}成员</el-button>
+              <el-tag v-for="(user, index) in users" :key="index" class="user-tag aic mb5" size="medium">
+                <TagUserShow :name="user.businessName" :show-icon="user.businessIdType === SCOPELIST_TYPE.DEPARTMENT" />
+              </el-tag>
+            </div>
           </el-form-item>
           <el-form-item label="客户标签">
             <el-switch v-model="form.tagFlag" :active-value="1" :inactive-value="0" />
@@ -387,6 +396,7 @@ export default {
       :is-only-leaf="form.codeType !== 2"
       :is-sigle-select="form.codeType == 1"
       :selected-user-list="form.weEmpleCodeUseScops || []"
+      :department-id-key="DEPARTMENT_ID_KEY"
       @success="submitSelectUser"
     />
 

@@ -1,7 +1,7 @@
 <script>
 import { add, update, getSendSize } from '@/api/groupMessage';
 import PhoneDialog from '@/components/PhoneDialog';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import {
   GROUP_MESSAGE_PUSH_TYPE,
@@ -31,9 +31,10 @@ import { getFileName, changeButtonLoading } from '@/utils/common';
 import NoConfigInfo from '@/components/NoConfigInfo';
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
 import RequestButton from '@/components/Button/RequestButton.vue';
+import TagUserShow from '@/components/TagUserShow';
 
 export default {
-  components: { PhoneDialog, SelectTag, SelectUser, NoConfigInfo, AddAppendixBtn, RequestButton },
+  components: { PhoneDialog, SelectTag, SelectUser, NoConfigInfo, AddAppendixBtn, RequestButton, TagUserShow },
   props: {},
   data() {
     return {
@@ -189,8 +190,6 @@ export default {
               this.form[key] = Number(query[key]);
             } else if (key === 'tag' || key === 'filterTags') {
               this.initTagList(key);
-            } else if (key === 'staffId') {
-              this.initUserList();
             } else {
               this.form[key] = query[key];
             }
@@ -212,26 +211,6 @@ export default {
       } else {
         setTimeout(() => {
           this.initTagList(tagType);
-          // eslint-disable-next-line no-magic-numbers
-        }, 100);
-      }
-    },
-    initUserList() {
-      const query = this.$route.query;
-      const { userList } = this.$store.state.listInfo;
-      if (userList.length > 0) {
-        const fieldName = query.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'groupOwner' : 'userParty';
-        this[fieldName] = query.staffId.split(',').map((userId) => {
-          const user = userList.find((tag) => tag.userId === userId);
-          return {
-            name: user && user.name,
-            userId,
-            businessId: userId
-          };
-        });
-      } else {
-        setTimeout(() => {
-          this.initUserList();
           // eslint-disable-next-line no-magic-numbers
         }, 100);
       }
@@ -382,12 +361,16 @@ export default {
           form.tag = form.tag.map((d) => d.tagId) + '';
           form.filterTags = form.filterTags.map((d) => d.tagId) + '';
           form.staffId = [];
+          let departmentList = [];
+          let staffIdList = [];
           this[this.form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'groupOwner' : 'userParty'].map((d) => {
-            d.userId && form.staffId.push(d.userId);
-            d.id && form.department.push(d.id);
+            d.userId && staffIdList.push(d.userId);
+            d.id && departmentList.push(d.id);
           });
-          form.department += '';
-          form.staffId += '';
+          departmentList += '';
+          staffIdList += '';
+          form.department = departmentList;
+          form.staffId = staffIdList;
           return form.messageId ? update(form) : add(form);
         })
         .then(({ data }) => {
@@ -541,7 +524,9 @@ export default {
                     <el-button icon="el-icon-plus" @click="dialogVisibleSelectUser = true">{{
                       userParty.length === 0 ? '添加成员' : '修改成员'
                     }}</el-button>
-                    <el-tag v-for="(unit, unique) in userParty" :key="unique" class="user-tag">{{ unit.name }}</el-tag>
+                    <el-tag v-for="(unit, unique) in userParty" :key="unique" class="user-tag">
+                      <TagUserShow :name="unit.name" :show-icon="!unit.userId" />
+                    </el-tag>
                   </el-form-item>
                   <el-form-item
                     v-if="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER"

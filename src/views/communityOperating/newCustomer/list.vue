@@ -11,9 +11,10 @@ import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
 import ClipboardJS from 'clipboard';
 import { Notification } from 'element-ui';
+import ListUserShow from '@/components/ListUserShow';
 
 export default {
-  components: { EmptyDefaultIcon, RightContainer },
+  components: { EmptyDefaultIcon, RightContainer, ListUserShow },
   props: {},
   data() {
     return {
@@ -340,9 +341,7 @@ export default {
             :class-name="'tag-wrapper'"
           >
             <template slot-scope="{ row }">
-              <el-tooltip :content="getString(row.weEmpleCodeUseScops, 'businessName')" placement="bottom-end" effect="dark">
-                <p class="ellipsis-style">{{ getString(row.weEmpleCodeUseScops, 'businessName') }}</p>
-              </el-tooltip>
+              <ListUserShow :use-user-name="row.useUserName" :department-name="row.departmentName" />
             </template>
           </el-table-column>
           <el-table-column

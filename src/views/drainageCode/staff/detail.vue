@@ -8,15 +8,16 @@ import {
 import ClipboardJS from 'clipboard';
 import echarts from 'echarts';
 import { Notification } from 'element-ui';
-import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE } from '@/utils/constant';
+import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE, SCOPELIST_TYPE } from '@/utils/constant';
 import PhoneDialog from '@/components/PhoneDialog';
+import TagUserShow from '@/components/TagUserShow';
 
 const DEFAULT_TIME_RANGE = 7;
 const DEFAULT_SLICE_LENGHT = 3;
 const ITEM_GAP = 50;
 export default {
   name: 'CodeDetail',
-  components: { PhoneDialog },
+  components: { PhoneDialog, TagUserShow },
   data() {
     return {
       // 遮罩层
@@ -47,7 +48,9 @@ export default {
       selectedUser: null,
       MESSAGE_MEDIA_TYPE,
       // 欢迎语预览弹窗
-      previewVisible: false
+      previewVisible: false,
+      // 员工类型(员工/部门)
+      SCOPELIST_TYPE
     };
   },
   created() {
@@ -224,12 +227,17 @@ export default {
         <el-form ref="form" label-width="100px">
           <el-form-item label="活动场景：">{{ form.scenario }}</el-form-item>
           <el-form-item label="使用员工：">
-            <el-tag
-              v-for="(item, index) in form.weEmpleCodeUseScops"
-              :key="index"
-              class="user-tag"
-              size="small"
-            >{{ item.businessName }}</el-tag>
+            <div class="flexw" style="max-width:600px">
+              <el-tag
+                v-for="(item, index) in form.weEmpleCodeUseScops"
+                :key="index"
+                class="user-tag aic"
+                size="small"
+                style="margin-bottom:5px"
+              >
+                <TagUserShow :name="item.businessName" :show-icon="item.businessIdType === SCOPELIST_TYPE.DEPARTMENT" />
+              </el-tag>
+            </div>
           </el-form-item>
           <el-form-item
             label="客户标签："

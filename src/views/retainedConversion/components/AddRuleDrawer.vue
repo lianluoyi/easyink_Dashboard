@@ -4,6 +4,8 @@
  * @LastEditors: wJiaaa
 -->
 <template>
+  <!-- :wrapper-closable="false" -->
+  <!-- :close-on-press-escape="false" -->
   <el-drawer
     v-bind="$attrs"
     :before-close="handleClose"
@@ -96,7 +98,6 @@ const RULE_PERFORM_FIELD_TYPE = {
   [RULE_PERFORM_TYPE['everyMonthTime']]: 'everyMonthTime',
   [RULE_PERFORM_TYPE['time']]: 'time'
 };
-
 export default {
   name: '',
   components: { VerbalTrickItem, AddVerbalTrickButton, AlertTimeEditItem },

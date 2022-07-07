@@ -13,21 +13,13 @@ export default {
     this.groupCodeId = this.$route.query.groupCodeId;
   },
   methods: {
-    handlleReturn() {
-      this.$router.go(-1);
-    }
   }
 };
 </script>
 
 <template>
   <div class="page">
-    <div class="wrap-head">
-      <el-button type="text" size="medium" @click="handlleReturn">
-        <svg class="icon-restore" :width="18" :height="18">
-          <use href="#icon-restore" /></svg>返回
-      </el-button>
-    </div>
+    <ReturnPage />
     <div class="wrap-body">
       <el-alert
         title="功能说明"

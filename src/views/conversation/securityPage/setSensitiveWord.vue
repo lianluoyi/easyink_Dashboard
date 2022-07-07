@@ -72,7 +72,7 @@
         <el-form-item label="审计范围">
           <div class="tag-input" @click="openAuditUserRange">
             <span
-              v-if="!auditUserRange.length"
+              v-if="!auditUserRange.length || (auditUserRange.length === 1 && auditUserRange[0].department === SCOPELIST_TYPE.ALL_USER )"
               class="tag-place"
             >请选择<span
               class="prompt-title"
@@ -83,7 +83,10 @@
                 v-for="(unit, unique) in auditUserRange"
                 :key="unique"
                 type="info"
-              >{{ unit.name }}</el-tag>
+                class="aic"
+              >
+                <TagUserShow :name="unit.name" :show-icon="!!unit.id" />
+              </el-tag>
             </template>
           </div>
         </el-form-item>
@@ -121,7 +124,7 @@
       :visible.sync="dialogVisibleSelectUser"
       title="选择审计范围"
       :ignore-permission="true"
-      :select-user-list="auditUserRange"
+      :select-user-list="auditUserRange.filter(item => item.department !== SCOPELIST_TYPE.ALL_USER)"
       @success="selectedUser"
     />
     <!-- 选择审计人弹窗 -->
@@ -137,16 +140,18 @@
 </template>
 <script>
 import * as sensitiveApis from '@/api/conversation/security';
-import SelectUser from '@/components/SelectUser';
-import { PAGE_LIMIT_INFINITE, SCOPE_TYPE } from '@/utils/constant';
+import SelectUser from '@/components/SelectUser/index.vue';
+import { PAGE_LIMIT_INFINITE, SCOPE_TYPE, SCOPELIST_TYPE } from '@/utils/constant';
 import StrategyItem from './strategyItem.vue';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
+import TagUserShow from '@/components/TagUserShow';
 const ALL_USERID = '-1';
 export default {
   components: {
     SelectUser,
     StrategyItem,
-    EmptyDefaultIcon
+    EmptyDefaultIcon,
+    TagUserShow
   },
   data() {
     return {
@@ -178,7 +183,9 @@ export default {
         patternWords: [
           { required: true, message: '敏感词不能为空', trigger: 'blur' }
         ]
-      }
+      },
+      // 使用员工类型
+      SCOPELIST_TYPE
     };
   },
   mounted() {
@@ -215,8 +222,8 @@ export default {
           } else {
             this.auditUserRange.map(item => {
               const obj = {
-                scopeType: SCOPE_TYPE['personal'],
-                auditScopeId: item.userId,
+                scopeType: item.userId ? SCOPE_TYPE['personal'] : SCOPE_TYPE['department'],
+                auditScopeId: item.userId || item.id,
                 auditScopeName: item.name
               };
               auditUserScope.push(obj);
@@ -302,8 +309,9 @@ export default {
         res.data.auditUserScope.map(item => {
           newAuditUserRange.push({
             name: item.auditScopeName,
-            userId: item.auditScopeId,
-            department: item.scopeType
+            userId: item.scopeType === SCOPE_TYPE['personal'] && item.auditScopeId,
+            department: item.scopeType,
+            id: item.scopeType === SCOPE_TYPE['department'] && item.auditScopeId
           });
         });
         this.auditUserRange = newAuditUserRange;

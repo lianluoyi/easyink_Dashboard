@@ -4,7 +4,7 @@
  * @LastEditors: wJiaaa
 -->
 <script>
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { PAGE_LIMIT, WX_TYPE, AUTOLABEL_TYPE } from '@/utils/constant';

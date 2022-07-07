@@ -627,3 +627,15 @@ export const NEWCUSOMTER_SCENE_TYPE = {
 
 export const PUBLIC_KEY_BEGIN = '-----BEGIN PUBLIC KEY-----';
 export const PUBLIC_KEY_END = '-----END PUBLIC KEY-----';
+
+/**
+ * 使用员工的类型
+ * 1为部门，2为员工,3为全部员工
+ */
+export const SCOPELIST_TYPE = {
+  // eslint-disable-next-line no-magic-numbers
+  ALL_USER: 3,
+  // eslint-disable-next-line no-magic-numbers
+  USER: 2,
+  DEPARTMENT: 1
+};

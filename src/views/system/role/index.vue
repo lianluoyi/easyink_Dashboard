@@ -521,6 +521,12 @@ export default {
      * 选中某个角色
      */
     selectRole(roleId) {
+      // roleId !== this.nowSelectedRole &&
+      // this.confirmModal({
+      //   msg: '离开后，当前编辑内容不会保存，是否继续？'
+      // }, async() => {
+      //   this.nowSelectedRole = roleId;
+      // });
       this.nowSelectedRole = roleId;
     },
     /**

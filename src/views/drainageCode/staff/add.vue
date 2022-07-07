@@ -2,7 +2,7 @@
 import { getDetail, add, update, getQrcode } from '@/api/drainageCode/staff';
 import { getList } from '@/api/drainageCode/welcome';
 import PhoneDialog from '@/components/PhoneDialog';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
@@ -15,14 +15,17 @@ import {
   SKIP_VERIFY,
   BUSINESS_ID_TYPE_MULTIPLE_USER,
   BUSINESS_ID_TYPE_SINGLE_USER,
-  MAX_APPENDIX_NUM
+  MAX_APPENDIX_NUM,
+  SCOPELIST_TYPE
 } from '@/utils/constant';
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
+import TagUserShow from '@/components/TagUserShow';
 
 const SELECT_TIME_TYPE = 2;
 const MAX_WELCOME_MSG_LENGTH = 2000;
+const DEPARTMENT_ID_KEY = 'businessId';
 export default {
-  components: { PhoneDialog, SelectTag, SelectUser, AddAppendixBtn, RequestButton },
+  components: { PhoneDialog, SelectTag, SelectUser, AddAppendixBtn, RequestButton, TagUserShow },
   data() {
     return {
       MAX_APPENDIX_NUM,
@@ -91,7 +94,9 @@ export default {
       SKIP_VERIFY,
       qrCode: '',
       dragSource: undefined,
-      dragTarget: undefined
+      dragTarget: undefined,
+      SCOPELIST_TYPE,
+      DEPARTMENT_ID_KEY
     };
   },
   watch: {
@@ -109,6 +114,13 @@ export default {
     getDetail(id) {
       this.loading = true;
       getDetail(id).then(({ data }) => {
+        data.weEmpleCodeUseScops = data.weEmpleCodeUseScops.map((user) => {
+          return {
+            ...user,
+            userId: user.businessIdType === SCOPELIST_TYPE.USER ? user.businessId : undefined,
+            name: user.businessName
+          };
+        });
         this.form = data;
         this.appendixList = data.materialList || [];
         this.time[0] = data.effectTimeOpen ? data.effectTimeOpen : '00:00';
@@ -116,7 +128,6 @@ export default {
         this.materialSelected = data.weMaterial == null ? '' : data.weMaterial.materialUrl;
         this.loading = false;
         this.qrCode = data.qrCode;
-
         // 编辑的活码是单人类型时，不允许修改为多人类型
         if (data.id && data.codeType === BUSINESS_ID_TYPE_SINGLE_USER) {
           this.disableMultipleUserRadio = true;
@@ -141,12 +152,13 @@ export default {
       const params = { userIds: [], departmentIds: [] };
       this.form.weEmpleCodeUseScops = users.map((user) => {
         user.userId && params.userIds.push(user.userId);
-        user.id && params.departmentIds.push(user.id);
+        !user.userId && params.departmentIds.push(user[DEPARTMENT_ID_KEY]);
         return {
-          businessId: user.id || user.userId,
+          ...user,
+          businessId: user.userId || user[DEPARTMENT_ID_KEY],
+          id: undefined,
           businessName: user.name,
-          // eslint-disable-next-line no-magic-numbers
-          businessIdType: user.userId ? 2 : 1
+          businessIdType: user.userId ? this.SCOPELIST_TYPE['USER'] : this.SCOPELIST_TYPE['DEPARTMENT']
         };
       });
       params.userIds += '';
@@ -183,9 +195,6 @@ export default {
       if (val) {
         this.welSelected = val;
       }
-    },
-    handlleReturn() {
-      this.$router.go(-1);
     },
     handleDeleteAppendix(index) {
       this.appendixList.splice(index, 1);
@@ -253,12 +262,7 @@ export default {
 </script>
 <template>
   <div v-loading="loading" class="wrap">
-    <div class="wrap-head">
-      <el-button type="text" size="medium" @click="handlleReturn">
-        <svg class="icon-restore" :width="18" :height="18">
-          <use href="#icon-restore" /></svg>返回
-      </el-button>
-    </div>
+    <ReturnPage />
     <div class="wrap-body">
       <el-alert
         title="功能说明"
@@ -291,16 +295,18 @@ export default {
           </el-form-item>
           <el-form-item label="使用员工" prop="weEmpleCodeUseScops">
             <!-- closable -->
-            <el-button
-              class="mr10"
-              plain
-              icon="el-icon-plus"
-              size="mini"
-              @click="dialogVisibleSelectUser = true"
-            >{{ form.weEmpleCodeUseScops.length ? '修改' : '添加' }}成员</el-button>
-            <el-tag v-for="(item, index) in form.weEmpleCodeUseScops" :key="index" class="user-tag" size="medium">{{
-              item.businessName
-            }}</el-tag>
+            <div class="flexw">
+              <el-button
+                class="mr10 mb5"
+                plain
+                icon="el-icon-plus"
+                size="mini"
+                @click="dialogVisibleSelectUser = true"
+              >{{ form.weEmpleCodeUseScops.length ? '修改' : '添加' }}成员</el-button>
+              <el-tag v-for="(item, index) in form.weEmpleCodeUseScops" :key="index" class="user-tag aic mb5" size="medium">
+                <TagUserShow :name="item.businessName" :show-icon="item.businessIdType === SCOPELIST_TYPE.DEPARTMENT" />
+              </el-tag>
+            </div>
           </el-form-item>
           <el-form-item label="客户标签">
             <el-switch v-model="form.tagFlag" :active-value="1" :inactive-value="0" />
@@ -435,6 +441,7 @@ export default {
       :is-only-leaf="form.codeType !== 2"
       :is-sigle-select="form.codeType == 1"
       :selected-user-list="form.weEmpleCodeUseScops || []"
+      :department-id-key="DEPARTMENT_ID_KEY"
       @success="selectedUser"
     />
 
