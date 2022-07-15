@@ -1,7 +1,7 @@
 <!--
  * @Description: 返回组件
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="return-page-div" v-bind="$attrs">
@@ -16,7 +16,13 @@
 export default {
   name: '',
   components: {},
-  props: {},
+  props: {
+    // 组件若接受path，则路由返回到该path
+    path: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
     };
@@ -25,7 +31,21 @@ export default {
   mounted() {},
   methods: {
     handlleReturn() {
-      this.$router.go(-1);
+      if (this.path) {
+        this.$router.push(this.path);
+      } else {
+        this.$router.go(-1);
+      }
+      // 后面重新修改
+      // if (window.sessionStorage.getItem('labelType') && this.$route.query.labelType) { // 自动标签路由携带的参数
+      //   this.$router.push({ path: window.sessionStorage.getItem('from'), query: { labelType: this.$route.query.labelType }});
+      // } else if (window.sessionStorage.getItem('sopType') && this.$route.query.sopType) { // SOP路由携带参数
+      //   this.$router.push({ path: window.sessionStorage.getItem('from'), query: { sopType: this.$route.query.sopType }});
+      // } else if (window.sessionStorage.getItem('welcomeMsgTplType') && this.$route.query.welcomeMsgTplType) { // 欢迎语路由携带参数
+      //   this.$router.push({ path: window.sessionStorage.getItem('from'), query: { welcomeMsgTplType: this.$route.query.welcomeMsgTplType }});
+      // } else {
+      //   this.$router.push(window.sessionStorage.getItem('from'));
+      // }
     }
   }
 

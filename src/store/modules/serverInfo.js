@@ -18,6 +18,9 @@ const serverInfo = {
     },
     SET_DK_CORP: (state, dkCorp) => {
       state.dkCorp = dkCorp;
+    },
+    SET_SERVER_ICP: (state, icp) => {
+      state.icp = icp;
     }
   },
 
@@ -28,6 +31,7 @@ const serverInfo = {
         getServerType().then(res => {
           try {
             commit('SET_SERVER_TYPE', res.data.serverType);
+            commit('SET_SERVER_ICP', res.data.icp);
             resolve(res);
           } catch (err) {
             throw new Error();

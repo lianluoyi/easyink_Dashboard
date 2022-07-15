@@ -4,7 +4,6 @@
     <el-tab-pane label="敏感消息记录" name="record">
       <RightContainer>
         <template v-slot:search>
-
           <el-form :inline="true" :model="form" class="demo-form-inline">
             <el-form-item>
               <div class="tag-input" @click="dialogVisibleSelectUser = true">
@@ -126,7 +125,7 @@
 </template>
 <script>
 import * as sensitiveApis from '@/api/conversation/security';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import { PAGE_LIMIT, SCOPE_TYPE, WX_TYPE } from '@/utils/constant';
 import setSensitiveWord from './setSensitiveWord';
 import RightContainer from '@/components/RightContainer';

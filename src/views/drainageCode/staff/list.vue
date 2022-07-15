@@ -6,17 +6,18 @@ import {
   downloadBatch,
   download
 } from '@/api/drainageCode/staff';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import ClipboardJS from 'clipboard';
 import { Notification } from 'element-ui';
 import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT, STAFF_CODE_TYPE } from '@/utils/constant';
 import RightContainer from '@/components/RightContainer';
+import ListUserShow from '@/components/ListUserShow';
 
 export default {
   name: 'CodeStaff',
-  components: { SelectUser, EmptyDefaultIcon, RightContainer },
+  components: { SelectUser, EmptyDefaultIcon, RightContainer, ListUserShow },
   data() {
     return {
       // 查询参数
@@ -343,9 +344,14 @@ export default {
           <el-table-column
             label="员工"
             align="center"
-            prop="useUserName"
+            prop="useUserName,departmentName"
             show-overflow-tooltip
-          />
+          >
+            <template slot-scope="scope">
+              <ListUserShow :use-user-name="scope.row.useUserName" :department-name="scope.row.departmentName" />
+            </template>
+          </el-table-column>
+
           <el-table-column
             label="活动场景"
             align="center"

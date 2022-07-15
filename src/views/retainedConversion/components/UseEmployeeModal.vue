@@ -1,7 +1,7 @@
 <!--
  * @Description: 使用员工弹窗
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <el-dialog v-bind="$attrs" width="500px" class="use-employee-modal" v-on="$listeners" @close="onClose">
@@ -81,7 +81,11 @@
               text="暂无数据"
             />
           </template>
-          <el-table-column v-if="!isActivity" key="row-1" label="员工" prop="userName" align="left" />
+          <el-table-column v-if="!isActivity" key="row-1" label="员工" prop="userName,departmentName" align="left">
+            <template slot-scope="{ row }">
+              <TagUserShow :name="row.userName ? row.userName : row.departmentName" :show-icon="row.departmentName ? true : false" :margin-right="2" />
+            </template>
+          </el-table-column>
           <el-table-column v-if="!isActivity" key="row-2" label="所属部门" prop="mainDepartmentName" align="left" />
           <el-table-column v-if="isActivity" key="row-3" label="客户" prop="name" align="left">
             <template #default="{ row }">
@@ -115,14 +119,19 @@
 <script>
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
+import TagUserShow from '@/components/TagUserShow';
 import { PAGE_LIMIT, SOP_TYPE, WX_TYPE } from '@/utils/constant';
 import { dealAtInfo } from '@/utils/common';
 
 export default {
   name: '',
-  components: { RightContainer, EmptyDefaultIcon },
+  components: { RightContainer, EmptyDefaultIcon, TagUserShow },
   props: {
     userList: {
+      type: Array,
+      default: () => []
+    },
+    departmentList: {
       type: Array,
       default: () => []
     },
@@ -154,12 +163,16 @@ export default {
   },
   watch: {
     userList(val) {
-      this.list = [...val];
-      this.total = this.list.length;
+      this.list = [...this.list, ...val];
+      this.total = this.total ? this.total + this.list.length : this.list.length;
+    },
+    departmentList(val) {
+      this.list = [...this.list, ...val];
+      this.total = this.total ? this.total + this.list.length : this.list.length;
     }
   },
   created() {
-    this.list = [...this.userList];
+    this.list = [...this.userList, ...this.departmentList];
   },
   mounted() {},
   methods: {
@@ -172,9 +185,11 @@ export default {
     onSearch() {
       let field = this.isGroup ? 'groupName' : 'userName';
       if (this.isActivity) field = 'name';
+
       const list = this.userList.filter(item => item[field].includes(this.query.name));
+      const dlist = this.departmentList.filter(item => item['departmentName'].includes(this.query.name));
       this.query.pageNum = 1;
-      this.list = [...list];
+      this.list = [...list, ...dlist];
     },
     renderUserInfo(item) {
       return dealAtInfo(item);

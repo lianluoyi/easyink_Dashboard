@@ -161,6 +161,18 @@ const specialRoute = {
       path: '/operationsCenter/retainedConversion/groupSOP',
       type: 'groupSOP'
     }
+  ],
+  '/operationsCenter/marketingActivities/conversionCodeAdd': [
+    {
+      title: '兑换码',
+      path: '/operationsCenter/marketingActivities/conversionCode'
+    }
+  ],
+  '/operationsCenter/marketingActivities/conversionCodeDetail': [
+    {
+      title: '兑换码',
+      path: '/operationsCenter/marketingActivities/conversionCode'
+    }
   ]
 };
 

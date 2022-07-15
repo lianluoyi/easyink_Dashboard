@@ -1,7 +1,7 @@
 <!--
  * @Description: sop详情tab页
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <template>
   <div class="sop-detail-tab">
@@ -31,13 +31,27 @@
         </div>
         <div class="mt5 flex task-item">
           <div class="label">{{ dealUserTitle() }}</div>
-          <div v-if="userOrGroupList && userOrGroupList.length" class="message-content">
-            <span v-for="(userItem, userIndex) in userOrGroupList.slice(0, maxShowLength)" :key="userIndex">
-              {{ dealName(userOrGroupList, userItem, userIndex) }}</span>
-            <span v-if="userOrGroupList && userOrGroupList.length > maxShowLength">
-              等{{ userOrGroupList.length }}{{ isGroup ? '个群' : '人' }}
-              <span class="look-more ml10 theme-text-color" @click="onShowMore">查看</span>
-            </span>
+          <div v-if="(userOrGroupList && userOrGroupList.length) || (getDepartmentList && getDepartmentList.length)" class="message-content">
+            <div v-if="!isGroup" class="flex">
+              <ByLengthUserShow
+                :max-length="maxShowLength"
+                :user-list="userOrGroupList.filter(item => item.userId)"
+                :department-list="getDepartmentList.filter(item => item.departmentId)"
+                :usename="isActivity ? 'name' : 'userName'"
+              />
+              <span v-if="userAndDetList.length > maxShowLength">
+                等{{ userAndDetList.length }}{{ isGroup ? '个群' : '个' }}
+                <span class="look-more ml10 theme-text-color" @click="onShowMore">查看</span>
+              </span>
+            </div>
+            <template v-else>
+              <span v-for="(userItem, userIndex) in userOrGroupList.slice(0, maxShowLength)" :key="userIndex">
+                {{ dealName(userOrGroupList, userItem, userIndex) }}</span>
+              <span v-if="userOrGroupList && userOrGroupList.length > maxShowLength">
+                等{{ userOrGroupList.length }}{{ isGroup ? '个群' : '个' }}
+                <span class="look-more ml10 theme-text-color" @click="onShowMore">查看</span>
+              </span>
+            </template>
           </div>
         </div>
         <div v-if="showCustomerTag" class="mt15 flex task-item">
@@ -75,6 +89,7 @@
       :title="isGroup ? '使用群聊' : isActivity ? '客户范围' : '使用员工'"
       :visible.sync="useEmployeeVisible"
       :user-list="userOrGroupList"
+      :department-list="getDepartmentList"
       :is-group="isGroup"
       :sop-type="sopType"
       :is-activity="isActivity"
@@ -93,12 +108,13 @@ import { RULE_PERFORM_TYPE, SOP_TYPE } from '@/utils/constant';
 import UseEmployeeModal from '../components/UseEmployeeModal.vue';
 import SopCalendar from './sopCalendar.vue';
 import AddRuleDrawer from '../components/AddRuleDrawer.vue';
+import ByLengthUserShow from '@/components/ByLengthUserShow';
 
 const MAX_CUSTOMER_SHOW_LENGTH = 5;
 const MAX_GROUP_SHOW_LENGTH = 3;
 export default {
   name: '',
-  components: { SOPRuleList, UseEmployeeModal, SopCalendar, AddRuleDrawer },
+  components: { SOPRuleList, UseEmployeeModal, SopCalendar, AddRuleDrawer, ByLengthUserShow },
   props: {
     sopDetail: {
       type: Object,
@@ -126,6 +142,12 @@ export default {
     },
     isGroup() {
       return [SOP_TYPE['timing'], SOP_TYPE['cycle'], SOP_TYPE['groupCalendar']].includes(this.sopType);
+    },
+    /**
+     * 员工和部门列表
+     */
+    userAndDetList() {
+      return [...this.userOrGroupList, ...this.getDepartmentList];
     },
     ruleList() {
       let ruleList = [];
@@ -185,6 +207,14 @@ export default {
      */
     userOrGroupList() {
       const list = this.isGroup ? this.sopDetail.groupSopList : this.sopDetail.userList;
+      return (list && [...list]) || [];
+    },
+    /**
+     * @description: 获得使用员工的部门
+     * @return {*}
+     */
+    getDepartmentList() {
+      const list = this.sopDetail.departmentList;
       return (list && [...list]) || [];
     },
     showCustomerTag() {

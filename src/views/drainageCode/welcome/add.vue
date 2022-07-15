@@ -2,7 +2,7 @@
 import { addEmployWelMsg, getWelcomeDetaiById, editEmployWel } from '@/api/tlp';
 import { EMPLOYEES_WELCOME, MAX_APPENDIX_NUM, MEDIA_TO_WELCOME_TYPE, WELCOME_APPENDIX_TYPE } from '@/utils/constant';
 import ReturnPage from '@/components/ReturnPage.vue';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
 import SpecialWelStep from './components/SpecialWelStep.vue';
 import { getRepeatItem, dealAppendixType, dealAppendixTypeToMaterial } from '@/utils/index';
@@ -216,6 +216,7 @@ export default {
         user.userId && params.userIds.push(user.userId);
         user.id && params.departmentIds.push(user.id);
         return {
+          ...user,
           userId: user.id || user.userId,
           userName: user.name
         };
@@ -273,11 +274,10 @@ export default {
     getDetail(id) {
       getWelcomeDetaiById(id).then((res) => {
         const resData = { ...res.data };
-        this.form.weEmpleCodeUseScops = resData.useUsers;
 
         this.form = {
           ...this.form,
-          weEmpleCodeUseScops: resData.useUsers,
+          weEmpleCodeUseScops: resData.useUsers?.map(item => { return { ...item, name: item.userName }; }),
           defaultWelcomeMsg: resData.defaultWelcomeMsg,
           welcomeSwitch: resData.weMsgTlpSpecialRules.length !== 0
         };
@@ -342,7 +342,7 @@ export default {
                 @click="dialogVisibleSelectUser = true"
               >{{ form.weEmpleCodeUseScops.length ? '修改' : '添加' }}成员</el-button>
               <el-tag v-for="(item, index) in form.weEmpleCodeUseScops" :key="index" class="user-tag" size="medium">{{
-                item.userName
+                item && item.userName
               }}</el-tag>
             </el-form-item>
             <el-form-item label="默认欢迎语" prop="defaultWelcomeMsg" style="width: 550px">

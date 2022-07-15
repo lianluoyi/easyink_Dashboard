@@ -77,6 +77,11 @@ li {
   display: flex;
 }
 
+.flexw {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .fxbw {
   display: flex;
   align-items: flex-start;
@@ -89,6 +94,12 @@ li {
 }
 
 .aic {
+  display: flex;
+  align-items: center;
+}
+
+.iaic{
+  display: inline-flex;
   align-items: center;
 }
 
@@ -182,6 +193,10 @@ li {
 .mt5 {
   margin-top: 5px;
 }
+
+.mr2{
+  margin-right: 2px;
+} 
 
 .mr5 {
   margin-right: 5px;
@@ -380,4 +395,8 @@ li {
   width: 6px;
   height: 6px;
   border-radius: 50%;
+}
+
+.f14 {
+  font-size: 14px;
 }

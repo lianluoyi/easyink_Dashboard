@@ -1,9 +1,9 @@
 <!--
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
-  <el-dialog class="import-file-div" width="443px" v-bind="$attrs" append-to-body v-on="$listeners">
+  <el-dialog class="import-file-div" width="443px" v-bind="$attrs" append-to-body :title="'导入'+title" v-on="$listeners">
     <div v-show="step === FIRST_STEP" class="first-step">
       <el-alert
         v-if="alertTitle"
@@ -12,8 +12,8 @@
         :closable="false"
       />
       <div class="download-template">
-        <div>1. 下载模板，将要导入的话术填入模板中</div>
-        <el-link class="download-div theme-text-color" href="easyWeCom话术导入模版.xlsx" :underline="false" target="_blank" download="easyWeCom话术导入模版.xlsx" icon="el-icon-download">下载模板</el-link>
+        <div>1. 下载模板，将要导入的{{ title }}填入模板中</div>
+        <el-link class="download-div theme-text-color" :href="href" :underline="false" target="_blank" :download="href" icon="el-icon-download">下载模板</el-link>
       </div>
       <div class="upload-template">
         2. 上传填写好的模板文件
@@ -21,6 +21,7 @@
           class="upload-div"
           :http-request="customUploadFile"
           :action="action"
+          :on-remove="resetData"
           :accept="accept"
           :file-list="fileList"
         >
@@ -77,6 +78,14 @@ export default {
     importInfo: {
       type: Object,
       default: () => {}
+    },
+    title: {
+      type: String,
+      default: ''
+    },
+    href: {
+      type: String,
+      default: ''
     }
   },
   data() {

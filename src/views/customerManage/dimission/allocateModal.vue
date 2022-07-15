@@ -5,7 +5,7 @@
 -->
 <script>
 import { allocateUser } from '@/api/customer/dimission';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 
 export default {
   name: 'AddMaterialModal',

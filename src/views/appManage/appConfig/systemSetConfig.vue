@@ -93,7 +93,9 @@
                 v-for="(item, index) in useStaff"
                 :key="index"
                 class="user-tag"
-              >{{ item.name }}</el-tag>
+              >
+                <TagUserShow :name="item.name" :show-icon="item.type === USESCOPE_TYPE['department']" />
+              </el-tag>
             </div>
           </el-radio>
         </el-radio-group>
@@ -121,10 +123,12 @@
 <script>
 import { listRole } from '@/api/system/role';
 import EmployeeBindAccountModal from './employeeBindAccountModal.vue';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import { updateMyApplicationConfig, setMyApplicationUseScope } from '@/api/appManage';
 import { verifyNetwork, getBindTotal } from '@/api/order';
 import { mapGetters } from 'vuex';
+import { groupBy } from 'lodash';
+import TagUserShow from '@/components/TagUserShow';
 
 const YUAN_TONG_TYPE = 1;
 const YUN_DA_TYPE = 2;
@@ -136,17 +140,22 @@ const COURIER_TYPE = {
   'zhongTong': ZHONG_TONG_TYPE
 };
 
+// 指定员工
 const USER_SCOPE = 1;
+// 指定角色
 const ROLE_SCOPE = 2;
+// 指定部门
+const DEPARTMENT_SCOPE = 3;
 // 使用范围类型
 const USESCOPE_TYPE = {
   'user': USER_SCOPE,
-  'role': ROLE_SCOPE
+  'role': ROLE_SCOPE,
+  'department': DEPARTMENT_SCOPE
 };
 
 export default {
   name: 'SystemSetConfig',
-  components: { EmployeeBindAccountModal, SelectUser },
+  components: { EmployeeBindAccountModal, SelectUser, TagUserShow },
   props: {
     appDetail: {
       type: Object,
@@ -202,17 +211,16 @@ export default {
     dealType() {
       if (this.appDetail.scopeList && this.appDetail.scopeList.length > 0) {
         const type = this.appDetail.scopeList[0].type;
-        this.useScope = type;
-        switch (type) {
-          case USESCOPE_TYPE['user']: {
-            this.useStaff = [...this.appDetail.scopeList];
-            break;
-          }
-          case USESCOPE_TYPE['role']: {
-            this.selectedRole = this.appDetail.scopeList[0].val;
-            break;
-          }
-        }
+        this.useScope = [USESCOPE_TYPE['user'], USESCOPE_TYPE['department']].includes(type) ? USESCOPE_TYPE['user'] : USESCOPE_TYPE['department'];
+        const userOrDepartmentList = [...this.appDetail.scopeList];
+        const groupByUserOrDepartmentList = groupBy(userOrDepartmentList, item => item.type);
+        let userList = groupByUserOrDepartmentList[USESCOPE_TYPE['user']] || [];
+        userList = userList.map(item => { return { ...item, userId: item.val }; });
+        let departmentList = groupByUserOrDepartmentList[USESCOPE_TYPE['department']] || [];
+        departmentList = departmentList.map(item => { return { ...item, id: item.val }; });
+        const roleList = groupByUserOrDepartmentList[USESCOPE_TYPE['role']] || [];
+        this.useStaff = [...userList, ...departmentList];
+        this.selectedRole = roleList[0]?.val;
       }
     },
     getBindTotal() {
@@ -276,7 +284,9 @@ export default {
     },
     // 选择添加人确认按钮
     selectedUser(users) {
-      this.useStaff = users;
+      let newUsers = [...users];
+      newUsers = newUsers.map(item => { return { ...item, type: item.userId ? USESCOPE_TYPE['user'] : USESCOPE_TYPE['department'] }; });
+      this.useStaff = newUsers;
       this.handleChangeScope();
     },
     async updateMyApplicationConfig(params) {
@@ -298,7 +308,7 @@ export default {
           break;
         }
         case USESCOPE_TYPE['user']: {
-          if (this.useStaff && this.useStaff.length) useScopeList = this.useStaff.map(item => { return { type, val: item.userId }; });
+          if (this.useStaff && this.useStaff.length) useScopeList = this.useStaff.map(item => { return { type: item.userId ? type : USESCOPE_TYPE['department'], val: item.userId || item.id }; });
           break;
         }
       }

@@ -4,8 +4,9 @@
 import {
   MS_TO_SECONDS, WX_TYPE, CORP_TYPE, ICON_LIST, MEDIA_TYPE_POSTER, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO,
   MEDIA_TYPE_FILE, FILE_EXCEL_TYPE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK,
-  MEDIA_TYPE_MINIAPP
+  MEDIA_TYPE_MINIAPP, SCOPELIST_TYPE
 } from '@/utils/constant';
+import { groupBy } from 'lodash';
 const baseURL = process.env.VUE_APP_BASE_API;
 const TIME_LENGTH = 10;
 
@@ -154,9 +155,6 @@ export function handleTree(data, id, parentId, children) {
   if (!Array.isArray(data)) {
     return result;
   }
-  data.forEach(item => {
-    delete item[children];
-  });
   const map = {};
   data.forEach(item => {
     map[item[id]] = item;
@@ -274,20 +272,21 @@ export function downloadAMR(fileUrl) {
  * @param userList 部门下的员工列表
  * @return flag 是否找到部门
  */
-export function changeDeptTreeData(deptData, deptId, userList) {
+export function changeDeptTreeData(deptData, deptId, userList = [], loadKey = 'loaded', deptIdKey = 'id') {
   let flag = false;
   // 找到该部门
-  const dept = deptData.find(ele => ele.id === deptId);
+  const dept = deptData.find(ele => ele[deptIdKey] === deptId);
   if (dept) {
     // 有子部门则children为员工列表+子部门，否则为员工列表
-    dept.children = dept.children ? [...userList, ...dept.children] : userList;
+    dept.children = dept.children ? [...dept.children, ...userList] : userList;
+    if (loadKey) dept[loadKey] = true;
     return true;
   }
   // 没找到则遍历当前部门列表中各部门的子部门
   for (let i = 0; i < deptData.length; i++) {
     const dept = deptData[i];
     if (dept.children) {
-      flag = changeDeptTreeData(dept.children, deptId, userList);
+      flag = changeDeptTreeData(dept.children, deptId, userList, loadKey, deptIdKey);
       // flag为true，则说明找到了，结束循环
       if (flag) break;
     }
@@ -717,3 +716,22 @@ export const changeButtonLoading = (store, type) => {
   });
 };
 
+/**
+ * 通过传入符号分割字符串
+ * @param {*} str
+ * @param {*} sign 通过某符号进行分割，默认采用空格
+ */
+
+export const splitBySign = (str, sign = ' ') => {
+  return str ? str.split(sign).filter((item) => item && item.trim()) : [];
+};
+
+export const groupByScopeType = (users) => {
+  const groupObj = groupBy(users, (item) => {
+    if (item.userId) return SCOPELIST_TYPE.USER;
+    if (item.id) return SCOPELIST_TYPE.DEPARTMENT;
+  });
+  const useEmployeesList = groupObj[SCOPELIST_TYPE.USER] || [];
+  const useDepartmentList = groupObj[SCOPELIST_TYPE.DEPARTMENT] || [];
+  return { useEmployeesList, useDepartmentList };
+};

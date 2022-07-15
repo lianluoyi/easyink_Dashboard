@@ -1,12 +1,13 @@
 <!--
  * @Description: 发布朋友圈
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <script>
 import RequestButton from '@/components/Button/RequestButton.vue';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
+import TagUserShow from '@/components/TagUserShow';
 import {
   PAGE_LIMIT, MEDIA_TYPE, MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, DEFAULT_IMG, CUSTOM_LINK, DEFAULT_LINK, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH
 } from '@/utils/constant';
@@ -19,7 +20,7 @@ import Uploadimg from './Uploadimg.vue';
 import FriendsUpload from './friendsUpload.vue';
 import { getWordsUrlContent } from '@/api/wordsGroup';
 import { createFriendsCircle, updateMoment, getMomentTaskBasicInfo } from '@/api/friends';
-import { changeButtonLoading } from '@/utils/common';
+import { changeButtonLoading, groupByScopeType } from '@/utils/common';
 import moment from 'moment';
 // 朋友圈为图片时，素材库显示的title最大选取数量
 const MAX_APPENDIX_NUM = 9;
@@ -28,7 +29,7 @@ const MAX_APPENDIX_VIDEO_NUM = 1;
 const FILE_NAME_LENGTH = 100;
 const FRIENDSCIRCLE = 'friendscircle';
 export default {
-  components: { SelectTag, SelectUser, MaterialListDrawer, VerbalTrickImgLink, FriendsUpload, MaterialAddModal, UploadVideo, Uploadimg, RequestButton },
+  components: { SelectTag, SelectUser, MaterialListDrawer, VerbalTrickImgLink, FriendsUpload, MaterialAddModal, UploadVideo, Uploadimg, RequestButton, TagUserShow },
   props: {},
   data() {
     return {
@@ -105,6 +106,9 @@ export default {
     },
     categoryId() {
       return this.$store.state.materialInfo?.categoryInfo[this.appendixType]?.id;
+    },
+    userAndDepartmentList() {
+      return [...this.form.departments || [], ...this.form.users || []];
     }
   },
   watch: {
@@ -133,19 +137,20 @@ export default {
     if (Object.keys(this.$route.query).length !== 0) {
       this.loading = true;
       this.from = this.$route.query.from;
-      // 处理用户列表
-      if (this.$route.query.user !== null) {
-        const user = this.$route.query.user.map((obj) => {
-          obj.name = obj.userName;
-          return obj;
-        });
-        this.form.users = user;
-      }
       // 处理朋友圈id
       this.momentTaskId = this.$route.query.momentTaskId;
       getMomentTaskBasicInfo({ momentTaskId: this.$route.query.momentTaskId }).then(({ data }) => {
         // 处理标签
-        const { pushRange, content, type, taskType, sendTime, mediaType } = data;
+        const { pushRange, content, type, taskType, sendTime, mediaType, useDepartmentList, useUserList } = data;
+        const departmentList = useDepartmentList?.map((item) => {
+          item.name = item.departmentName;
+          item.id = item.departmentId;
+          return item;
+        });
+        const userList = useUserList?.map((item) => {
+          item.name = item.userName;
+          return item;
+        });
         if (data.tagList) {
           this.form.tags = data.tagList;
         }
@@ -156,7 +161,9 @@ export default {
           pushRange: pushRange,
           type: type,
           taskType: taskType,
-          sendTime: sendTime
+          sendTime: sendTime,
+          users: userList && userList.length !== 0 ? userList : [],
+          departments: departmentList && departmentList.length !== 0 ? departmentList : []
         };
         // 处理附件
         this.momentsContent = String(mediaType);
@@ -246,7 +253,9 @@ export default {
     },
     // 选择添加人确认按钮
     selectedUser(users) {
-      this.form.users = users;
+      const groupByList = groupByScopeType(users);
+      this.form.users = groupByList.useEmployeesList;
+      this.form.departments = groupByList.useDepartmentList;
     },
     // 选择标签确认按钮
     submitSelectTag(data) {
@@ -268,7 +277,7 @@ export default {
       Promise.resolve()
         .then(() => {
           if (form.pushRange === 1) {
-            if (form.users.length === 0 && form.tags.length === 0) {
+            if ((Number(!!form.users?.length) + Number(!!form.departments?.length)) === 0 && Number(!!form.tags?.length) === 0) {
               this.msgInfo('请设置可见范围');
               changeButtonLoading(this.$store, 'submit');
               return Promise.reject();
@@ -331,11 +340,15 @@ export default {
                 }
               });
             }
-
             // 处理标签
-            if (key === 'tags' || key === 'users') {
+            if (['tags', 'users', 'departments'].includes(key)) {
+              const keyField = {
+                tags: 'tagId',
+                users: 'userId',
+                departments: 'id'
+              };
               const newItem = form[key].map((obj) => {
-                return key === 'tags' ? obj.tagId : obj.userId;
+                return obj[keyField[key]];
               });
               form[key] = newItem;
             }
@@ -479,12 +492,14 @@ export default {
                     >{{ unit.name }}</el-tag>
                   </el-form-item>
                   <el-form-item v-if="form.pushRange === 1" label="所属员工" label-width="68px" style="padding:8px 0;">
-                    <el-button icon="el-icon-plus" @click="dialogVisibleSelectUser = true">{{ form.users.length === 0 ? '添加成员' : '修改成员' }}</el-button>
+                    <el-button icon="el-icon-plus" @click="dialogVisibleSelectUser = true">{{ userAndDepartmentList.length === 0 ? '添加成员' : '修改成员' }}</el-button>
                     <el-tag
-                      v-for="(unit, unique) in form.users"
+                      v-for="(unit, unique) in userAndDepartmentList"
                       :key="unique"
-                      class="theme-text-color user-tag"
-                    >{{ unit.name }}</el-tag>
+                      class="theme-text-color user-tag iaic"
+                    >
+                      <TagUserShow :name="unit.name" :show-icon="!unit.userId" />
+                    </el-tag>
                   </el-form-item>
                 </div>
               </el-form-item>
@@ -684,7 +699,7 @@ export default {
         :visible.sync="dialogVisibleSelectUser"
         title="选择员工"
         :is-only-leaf="false"
-        :selected-user-list="form.users"
+        :selected-user-list="userAndDepartmentList"
         @success="selectedUser"
       />
 

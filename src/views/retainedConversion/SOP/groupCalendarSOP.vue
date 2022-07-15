@@ -1,7 +1,7 @@
 <!--
  * @Description: 群日历界面
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="group-sop-page">

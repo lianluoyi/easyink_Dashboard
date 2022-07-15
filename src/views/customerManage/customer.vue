@@ -5,7 +5,7 @@ import { getList as getListTag } from '@/api/customer/tag';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import AddTag from '@/components/AddTag';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import { EventBus } from '@/event-bus.js';
 import { goRouteWithQuery } from '@/utils';

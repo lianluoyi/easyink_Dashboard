@@ -1,7 +1,7 @@
 <!--
  * @Description: 发布详情
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <script>
 import TabContent from './TabContent.vue';
@@ -9,7 +9,7 @@ import { getMomentTaskBasicInfo } from '@/api/friends';
 import Statistics from './Statistics.vue';
 import VerbalTrickImgLink from './Link.vue';
 import ContentVideo from './ContentVideo.vue';
-import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_TEXT } from '@/utils/constant';
 // 发布类型  1:个人 0：企业
 const SELF = 1;
 // 任务类型（0：立即发送 1：定时发送）
@@ -27,6 +27,7 @@ export default {
       MEDIA_TYPE_POSTER,
       MEDIA_TYPE_IMGLINK,
       MEDIA_TYPE_VIDEO,
+      MEDIA_TYPE_TEXT,
       // 可见范围
       text: '全部客户'
     };
@@ -111,7 +112,7 @@ export default {
                 <span>可见范围：</span>
                 <span style="color:#333333">{{ text }}</span>
               </div>
-              <div v-for="item in data.tagList" :key="item.tagId" class="tag">{{ item.name }}</div>
+              <el-tag v-for="item in data.tagList" :key="item.tagId" class="tag ml5">{{ item.name }}</el-tag>
             </div>
           </div>
         </div>
@@ -139,7 +140,7 @@ export default {
               <ContentVideo :data="data.weWordsDetailList[0]" />
             </div>
             <!-- 没有附件 -->
-            <div v-if="data.mediaType === null" class="message-content">
+            <div v-if="[null, Number(MEDIA_TYPE_TEXT)].includes(data.mediaType)" class="message-content">
               <div class="message-text">{{ data.content }}</div>
             </div>
           </div>
@@ -247,8 +248,6 @@ export default {
 }
 .tag {
   background-color: #F0F8F7 ;
-  margin-left:5px;
-  width: 58px;
   height: 26px;
   border-radius: 4px;
   text-align: center;

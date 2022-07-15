@@ -1,7 +1,7 @@
 <!--
  * @Description: 欢迎语列表
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="welcome-list-page">
@@ -69,7 +69,7 @@
           <el-table-column v-if="activeName === EMPLOYEES_WELCOME" label="使用员工" align="center" prop="welcomeMsg">
             <template slot-scope="{ row }">
               <span v-for="(userItem, userIndex) in row.useUsers" :key="userIndex">
-                {{ `${userIndex !== 0 ? ',' : ''}${userItem.userName}` }}
+                {{ `${userIndex !== 0 ? ',' : ''}${userItem && userItem.userName}` }}
               </span>
             </template>
           </el-table-column>

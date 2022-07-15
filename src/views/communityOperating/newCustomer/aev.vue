@@ -4,18 +4,24 @@ import { getQrcode } from '@/api/drainageCode/staff';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
 import PhoneDialog from '@/components/PhoneDialog';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import SelectQrCode from '@/components/SelectQrCode';
-
+import { SCOPELIST_TYPE, NORMAL_WORD, ACTIVE_WORD } from '@/utils/constant';
+import TagUserShow from '@/components/TagUserShow';
+import ReferCode from '@/components/ReferCode';
+import ActivityPopup from '@/components/ReferCode/ActivityPopup.vue';
 const businessIdTypeOfUser = 2;
 const SELECT_TIME_TYPE = 2;
 const CODE_TYPE_MANY = 2;
 const MAX_WELCOME_MSG_LENGTH = 2000;
+const DEPARTMENT_ID_KEY = 'businessId';
 export default {
-  components: { PhoneDialog, SelectTag, SelectUser, SelectQrCode, RequestButton },
+  components: { PhoneDialog, SelectTag, SelectUser, SelectQrCode, ActivityPopup, RequestButton, TagUserShow, ReferCode },
   data() {
     return {
+      NORMAL_WORD,
+      ACTIVE_WORD,
       newGroupId: '',
       dialogVisibleSelectUser: false, // 选择员工会话
       dialogVisibleSelectTag: false, // 选择客户标签会话
@@ -29,7 +35,9 @@ export default {
         groupCodeId: undefined, // 群活码ID
         tagList: [], // 客户标签
         remarkType: 1,
-        skipVerify: 1 // 无需确认自动加好友
+        skipVerify: 1, // 无需确认自动加好友
+        // 表单的欢迎语类型
+        welcomeMsgType: NORMAL_WORD
       },
       welMsgMaxlength: MAX_WELCOME_MSG_LENGTH,
       time: ['00:00', '23:59'],
@@ -55,8 +63,60 @@ export default {
             },
             trigger: 'blur'
           }
+        ],
+        sendValue: [
+          {
+            required: true,
+            validator: (rule, value, callback) => {
+              const { codeSuccessMsg, codeFailMsg, codeRepeatMsg } = this.codeMsg;
+              if (!(codeSuccessMsg || codeFailMsg || codeRepeatMsg)) {
+                this.msgError('请至少填写一项发送内容');
+                callback(new Error('该项为必填项'));
+              } else {
+                callback();
+              }
+            },
+            trigger: 'blur'
+          }
+        ],
+        exchangeActivities: [
+          {
+            type: 'object',
+            required: true,
+            validator: (rule, value, callback) => {
+              if (!this.activeList.length) {
+                this.msgError('请选择兑换活动');
+                callback(new Error('该项为必填项'));
+              } else {
+                callback();
+              }
+            }
+          }
         ]
-      })
+      }),
+      // 使用员工类型
+      SCOPELIST_TYPE,
+      DEPARTMENT_ID_KEY,
+      // 活动列表
+      activeList: [],
+      // 控制兑换活动弹窗
+      dialogVisibleActivityPopup: false,
+      codeMaterialList: {
+        // 可使用兑换码的附件
+        codeSuccessMaterialList: [],
+        // 没有可使用兑换码的附件
+        codeFailMaterialList: [],
+        // 过期兑换码的附件
+        codeRepeatMaterialList: []
+      },
+      codeMsg: {
+        // 可使用兑换码的附件的欢迎语
+        codeSuccessMsg: '',
+        // 没有可使用兑换码的附件的欢迎语
+        codeFailMsg: '',
+        // 过期兑换码的附件的欢迎语
+        codeRepeatMsg: ''
+      }
     };
   },
   watch: {
@@ -64,11 +124,13 @@ export default {
       this.form.weEmpleCodeTags = [...tags];
     },
     users(users) {
-      this.form.weEmpleCodeUseScops = users.map((u) => {
+      this.form.weEmpleCodeUseScops = users.map((user) => {
         return {
-          businessId: u.businessId,
-          businessIdType: u.businessIdType,
-          businessName: u.businessName
+          ...user,
+          id: undefined,
+          businessId: user.businessId,
+          businessIdType: user.businessIdType,
+          businessName: user.businessName
         };
       });
       // 需要延迟 否则会先弹出提示
@@ -87,9 +149,19 @@ export default {
       this.loading = true;
       getDetail(id).then(({ data }) => {
         this.form = data;
-        this.form.scenario = data.scenario || '';
-        this.form.skipVerify = data.skipVerify || 0;
-        this.form.welcomeMsg = data.welcomeMsg || '';
+        const { scenario, skipVerify, welcomeMsg } = data;
+        this.form.weEmpleCodeUseScops = data?.weEmpleCodeUseScops?.map(item => {
+          return {
+            ...item,
+            name: item.businessName, userId: item.businessIdType === SCOPELIST_TYPE['USER'] ? item.businessId : undefined
+          };
+        });
+        this.form = {
+          ...this.form,
+          scenario: scenario || '',
+          skipVerify: skipVerify || 0,
+          welcomeMsg: welcomeMsg || ''
+        };
         this.time = [data.effectTimeOpen || '00:00', data.effectTimeClose || '00:00'];
         if (data.weGroupCode && data.weGroupCode.id) {
           this.codes = [data.weGroupCode];
@@ -106,20 +178,32 @@ export default {
         // this.$refs.form.validateField('weEmpleCodeUseScops')
         this.loading = false;
         this.qrCode = data.qrCode;
+        // 活动欢迎语;
+        if (data.welcomeMsgType) {
+          this.activeList = [data.codeActivity] || [];
+          const { codeSuccessMaterialList, codeRepeatMaterialList, codeFailMaterialList, codeFailMsg, codeRepeatMsg, codeSuccessMsg } = data;
+          this.codeMaterialList.codeSuccessMaterialList = codeSuccessMaterialList;
+          this.codeMaterialList.codeFailMaterialList = codeFailMaterialList;
+          this.codeMaterialList.codeRepeatMaterialList = codeRepeatMaterialList;
+          this.codeMsg.codeSuccessMsg = codeSuccessMsg;
+          this.codeMsg.codeFailMsg = codeFailMsg;
+          this.codeMsg.codeRepeatMsg = codeRepeatMsg;
+        }
       });
     },
     // 选择人员变化事件
     submitSelectUser(users) {
       const params = { userIds: [], departmentIds: [] };
-      this.users = users.map((d) => {
-        d.userId && params.userIds.push(d.userId);
-        d.id && params.departmentIds.push(d.id);
+      this.users = users.map((user) => {
+        user.userId && params.userIds.push(user.userId);
+        !user.userId && params.departmentIds.push(user[DEPARTMENT_ID_KEY]);
         return {
-          businessId: d.id || d.userId,
-          businessName: d.name,
-          businessIdType: d.userId ? businessIdTypeOfUser : 1,
-          mobile: d.mobile,
-          empleCodeId: d.empleCodeId
+          ...user,
+          businessId: user[DEPARTMENT_ID_KEY] || user.userId,
+          businessName: user.name,
+          businessIdType: user.userId ? businessIdTypeOfUser : 1,
+          mobile: user.mobile,
+          empleCodeId: user.empleCodeId
         };
       });
       params.userIds += '';
@@ -144,9 +228,6 @@ export default {
       this.form.groupCodeId = data.id;
       this.$refs.form.validateField('groupCodeId');
     },
-    handlleReturn() {
-      this.$router.go(-1);
-    },
     handeAddTextClick(text) {
       if (this.form.welcomeMsg.length + text.length <= this.welMsgMaxlength) {
         this.form.welcomeMsg = this.form.welcomeMsg + text;
@@ -159,6 +240,20 @@ export default {
           if (this.form.isAutoPass && this.form.skipVerify === SELECT_TIME_TYPE) {
             this.form.effectTimeOpen = this.time[0];
             this.form.effectTimeClose = this.time[1];
+          }
+          if (this.form.welcomeMsgType) {
+            this.form.codeActivity = this.activeList[0];
+            const { codeFailMaterialList, codeSuccessMaterialList, codeRepeatMaterialList } = this.codeMaterialList;
+            const { codeFailMsg, codeSuccessMsg, codeRepeatMsg } = this.codeMsg;
+            this.form = {
+              ...this.form,
+              codeSuccessMaterialList,
+              codeRepeatMaterialList,
+              codeFailMaterialList,
+              codeFailMsg,
+              codeRepeatMsg,
+              codeSuccessMsg
+            };
           }
           if (this.newGroupId) {
             update(this.newGroupId, this.form)
@@ -192,6 +287,26 @@ export default {
           changeButtonLoading(this.$store, 'save');
         }
       });
+    },
+    /**
+     * 选择活动
+     */
+    selectedActivity(value) {
+      this.activeList = value;
+    },
+    /**
+     * 删除活动
+     */
+    delTag() {
+      this.activeList = [];
+    },
+    /**
+     * 切换欢迎语类型
+     */
+    welcomeMsgTypeChange() {
+      this.form.welcomeMsg = '';
+      Object.keys(this.codeMsg).forEach(key => { this.codeMsg[key] = ''; });
+      Object.keys(this.codeMaterialList).forEach(key => { this.codeMaterialList[key] = []; });
     }
   }
 };
@@ -199,12 +314,7 @@ export default {
 
 <template>
   <div v-loading="loading" class="wrap">
-    <div class="wrap-head">
-      <el-button type="text" size="medium" @click="handlleReturn">
-        <svg class="icon-restore" :width="18" :height="18">
-          <use href="#icon-restore" /></svg>返回
-      </el-button>
-    </div>
+    <ReturnPage />
     <div class="wrap-body">
       <el-alert
         title="功能说明"
@@ -226,16 +336,18 @@ export default {
             />
           </el-form-item>
           <el-form-item label="使用员工" prop="weEmpleCodeUseScops">
-            <el-button
-              class="mr10"
-              plain
-              icon="el-icon-plus"
-              size="mini"
-              @click="dialogVisibleSelectUser = true"
-            >{{ users.length ? '修改' : '添加' }}成员</el-button>
-            <el-tag v-for="(user, index) in users" :key="index" class="user-tag" size="medium">{{
-              user.businessName
-            }}</el-tag>
+            <div class="flexw">
+              <el-button
+                class="mr10 mb5"
+                plain
+                icon="el-icon-plus"
+                size="mini"
+                @click="dialogVisibleSelectUser = true"
+              >{{ users.length ? '修改' : '添加' }}成员</el-button>
+              <el-tag v-for="(user, index) in users" :key="index" class="user-tag aic mb5" size="medium">
+                <TagUserShow :name="user.businessName" :show-icon="user.businessIdType === SCOPELIST_TYPE.DEPARTMENT" />
+              </el-tag>
+            </div>
           </el-form-item>
           <el-form-item label="客户标签">
             <el-switch v-model="form.tagFlag" :active-value="1" :inactive-value="0" />
@@ -287,21 +399,56 @@ export default {
               </div>
             </template>
           </el-alert>
-          <el-form-item label="加群引导语" prop="welcomeMsg">
-            <el-input
-              v-model="form.welcomeMsg"
-              type="textarea"
-              :maxlength="welMsgMaxlength"
-              show-word-limit
-              :autosize="{ minRows: 5, maxRows: 20 }"
-              placeholder="客户添加员工后，将收到加群引导语"
-              clearable
-            />
-            <div class="quick-actions">
-              <span @click="handeAddTextClick('#客户昵称#')">#客户昵称#</span>
-              <span @click="handeAddTextClick('#员工姓名#')">#员工姓名#</span>
-            </div>
+          <el-form-item label="类型" prop="welcomeMsgType">
+            <el-radio-group v-model="form.welcomeMsgType" @change="welcomeMsgTypeChange">
+              <el-radio :label="NORMAL_WORD">普通引导语</el-radio>
+              <el-radio :label="ACTIVE_WORD">活动引导语</el-radio>
+            </el-radio-group>
           </el-form-item>
+          <div v-if="form.welcomeMsgType === NORMAL_WORD">
+            <el-form-item label="加群引导语" prop="welcomeMsg">
+              <el-input
+                v-model="form.welcomeMsg"
+                type="textarea"
+                :maxlength="welMsgMaxlength"
+                show-word-limit
+                :autosize="{ minRows: 5, maxRows: 20 }"
+                placeholder="客户添加员工后，将收到加群引导语"
+                clearable
+              />
+              <div class="quick-actions">
+                <span @click="handeAddTextClick('#客户昵称#')">#客户昵称#</span>
+                <span @click="handeAddTextClick('#员工姓名#')">#员工姓名#</span>
+              </div>
+            </el-form-item>
+          </div>
+          <div v-else>
+            <el-form-item label="兑换活动" prop="exchangeActivities">
+              <div>
+                <el-button
+                  class="mr10"
+                  icon="el-icon-plus"
+                  size="mini"
+                  @click="dialogVisibleActivityPopup = true"
+                >{{ activeList.length ? '修改' : '选择' }}活动</el-button>
+                <el-tag
+                  v-for="(item, index) in activeList"
+                  :key="index"
+                  size="medium"
+                  closable
+                  @close="delTag"
+                >{{ item.activityName }}</el-tag>
+              </div>
+            </el-form-item>
+            <el-form-item label="加群引导语" prop="sendValue">
+              <ReferCode
+                type="customerAdd"
+                :code-msg.sync="codeMsg"
+                :code-material-list.sync="codeMaterialList"
+              />
+            </el-form-item>
+          </div>
+
           <el-form-item label="群活码设置" prop="groupCodeId">
             <div>
               <div>
@@ -370,7 +517,7 @@ export default {
             fit="fit"
           />
           <div class="tip mb20">活码预览</div>
-          <PhoneDialog :message="form.welcomeMsg" :is-other="groupQrCode && groupQrCode.codeUrl ? true : false">
+          <PhoneDialog v-if="form.welcomeMsgType === NORMAL_WORD" :message="form.welcomeMsg" :is-other="groupQrCode && groupQrCode.codeUrl ? true : false">
             <el-image class="phone-dialog-image" :src="groupQrCode.codeUrl" fit="fit" />
           </PhoneDialog>
         </div>
@@ -387,9 +534,15 @@ export default {
       :is-only-leaf="form.codeType !== 2"
       :is-sigle-select="form.codeType == 1"
       :selected-user-list="form.weEmpleCodeUseScops || []"
+      :department-id-key="DEPARTMENT_ID_KEY"
       @success="submitSelectUser"
     />
-
+    <!-- 选择兑换活动弹窗 -->
+    <ActivityPopup
+      :visible.sync="dialogVisibleActivityPopup"
+      :selected-active-list="activeList"
+      @success="selectedActivity"
+    />
     <!-- 选择标签弹窗 -->
     <SelectTag
       :visible.sync="dialogVisibleSelectTag"

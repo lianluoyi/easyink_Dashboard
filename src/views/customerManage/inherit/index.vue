@@ -221,7 +221,7 @@ import { getCustomerList, transfer, getTransferConfig, editConfig } from '@/api/
 
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import InheritFailDrawer from './InheritFailDrawer';
 

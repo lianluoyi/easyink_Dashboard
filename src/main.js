@@ -13,8 +13,8 @@ Vue.use(Element, {
   size: Cookies.get('size') || 'small' // set element-ui default size
 });
 
-import '@/styles/common.scss'; // common css
 import '@/styles/icon.scss'; // common css
+import '@/styles/common.scss'; // common css
 import '@/styles/index.scss'; // global css
 import 'video.js/dist/video-js.css';
 
@@ -42,7 +42,7 @@ import RightToolbar from '@/components/RightToolbar';
 import Upload from '@/components/Upload';
 import UploadTxt from '@/components/UploadTxt';
 import BorderColor from '@/components/ThemeComponents/BorderColor';
-
+import ReturnPage from '@/components/ReturnPage';
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts;
 Vue.prototype.parseTime = parseTime;
@@ -102,19 +102,33 @@ Vue.component('RightToolbar', RightToolbar);
 Vue.component('Upload', Upload);
 Vue.component('UploadTxt', UploadTxt);
 Vue.component('BorderColor', BorderColor);
-
+Vue.component('ReturnPage', ReturnPage);
 Vue.use(directive);
 
-/**
- * If you don't want to use mock-server
- * you want to use MockJs for mock api
- * you can execute: mockXHR()
- *
- * Currently MockJs will be used in the production environment,
- * please remove it before going online! ! !
- */
-
 Vue.config.productionTip = false;
+
+// router.beforeEach((to, from, next) => {
+//   const whitePathName = ['Role', 'AddRule', 'CustomerCenter/customerDetail', 'StaffAdd', 'CustomerGroupDetail', 'NewCustomerAev', 'OldCustomerAev', 'WelcomeAdd', 'GroupWelcomeAdd', 'Add', 'Release', 'AddSOP']; // 拦截需要提示的路由name //所有的编辑页
+//   if (from.path !== '/' && !whitePathName.includes(from.name)) {
+//     window.sessionStorage.setItem('from', from.path); // 设置编辑页从哪个路由跳转来 在返回的时候使用push
+//   }
+//   // 若当前是通过浏览器返回,则不进行拦截
+//   if (window.history && window.history.pushState) {
+//     if (document.URL.split('#')[1] !== from.fullPath) {
+//       return next();
+//     }
+//   }
+//   if (!whitePathName.includes(from.name)) return next();
+//   Vue.prototype.$confirm('离开后，当前编辑内容不会保存，是否继续？', '提示', {
+//     confirmButtonText: '确定',
+//     cancelButtonText: '取消',
+//     type: 'warning'
+//   }).then(() => {
+//     next();
+//   }).catch(() => {
+//     next(false);
+//   });
+// });
 
 new Vue({
   el: '#app',
