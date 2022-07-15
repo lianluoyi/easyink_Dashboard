@@ -53,7 +53,9 @@ export default {
       // tab栏绑定的员工ID
       employeesId: this.$route.query.userId,
       wxType: WX_TYPE,
-      ADD_BY_CHANNEL
+      ADD_BY_CHANNEL,
+      // 是否有数据权限编辑客户信息
+      permission: true
     };
   },
   computed: {
@@ -99,6 +101,9 @@ export default {
   created() {
     initGetCustomerProper(this.$store);
     this.getEmployeesList();
+    if (this.$route.query.prePageType === 'conversionCodeDetail') {
+      this.permission = false;
+    }
   },
   methods: {
     getEmployeesList() {
@@ -518,7 +523,7 @@ export default {
         </el-descriptions>
       </div>
       <div class="bottom-tool">
-        <el-button type="primary" @click="handleSubmit">{{ editStatus ? '保存' : '编辑' }}</el-button>
+        <el-button v-if="permission" type="primary" @click="handleSubmit">{{ editStatus ? '保存' : '编辑' }}</el-button>
       </div>
       <!-- 选择标签弹窗 -->
       <SelectTag

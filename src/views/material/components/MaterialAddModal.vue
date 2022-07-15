@@ -275,6 +275,11 @@ export default {
      * 关闭弹窗
      */
     closeModal() {
+      // this.confirmModal({
+      //   msg: '离开后，当前编辑内容不会保存，是否继续？'
+      // }, async() => {
+      //   this.Pvisible = false;
+      // });
       this.Pvisible = false;
     },
     /**
@@ -308,7 +313,7 @@ export default {
 </script>
 
 <template>
-  <el-dialog :title="modalTitle" :visible.sync="Pvisible" width="680px" append-to-body :close-on-click-modal="false">
+  <el-dialog :title="modalTitle" :before-close="closeModal" :close-on-press-escape="false" :visible.sync="Pvisible" width="680px" append-to-body :close-on-click-modal="false">
     <div class="material-add-modal">
       <el-form ref="form" :model.sync="form" :rules="formRules" label-width="80px">
         <el-form-item v-if="![MEDIA_TYPE_MINIAPP, MEDIA_TYPE_IMGLINK].includes(type)" label="标题" prop="materialName">

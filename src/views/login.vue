@@ -1,165 +1,168 @@
 <template>
-  <div v-loading="webLoginLoading" class="login">
-    <img class="login-logo" :style="'top:' + logoTop + 'px'" src="@/assets/image/login_logo.svg" alt="">
+  <div style="width: 100%;">
+    <div v-loading="webLoginLoading" class="login">
+      <img class="login-logo" :style="'top:' + logoTop + 'px'" src="@/assets/image/login_logo.svg" alt="">
 
-    <div class="login-wrap">
-      <div class="login-tab-wrap">
-        <div v-show="!isAuth" :class="['login-tab', activeTab === qrCodeLoginType ? 'active' : '']" @click="changeActiveTab(qrCodeLoginType)">
-          <div style="color:#6bb4ab" class="login-tab-text">扫码登录</div>
-          <div class="login-tab-after" />
-        </div>
-        <div v-show="!isThird" :class="['login-tab', 'login-tab2', activeTab === passwordLoginType ? 'active' : '']" @click="changeActiveTab(passwordLoginType)">
-          <div class="login-tab-before" />
-          <div class="login-tab-text">账密登录</div>
-          <div class="login-tab-after" />
-        </div>
-        <div v-show="isAuth" :class="['login-tab', 'active']" @click="changeActiveTab(qrCodeLoginType)">
-          <div class="login-tab-text">企业注册</div>
-          <div class="login-tab-after" />
-        </div>
-      </div>
-      <div class="login-form-wrap">
-        <div v-show="isThird && !isAuth && isEnterPriseUnAuth" class="login-third-err-wrap">
-          <div class="err-title">登录失败</div>
-          <div class="err-info">
-            <p>所在企业未授权easyWeCom应用</p>
-            <p>请联系企业管理员前往授权</p>
+      <div class="login-wrap">
+        <div class="login-tab-wrap">
+          <div v-show="!isAuth" :class="['login-tab', activeTab === qrCodeLoginType ? 'active' : '']" @click="changeActiveTab(qrCodeLoginType)">
+            <div style="color:#6bb4ab" class="login-tab-text">扫码登录</div>
+            <div class="login-tab-after" />
           </div>
-          <el-button type="primary" class="primary-btn" @click="isAuth = true;isEnterPriseUnAuth = false;">我是企业管理员，去授权</el-button>
-        </div>
-        <div v-show="isThird && !isAuth && isEnterPriseUnConfig" class="login-third-err-wrap">
-          <div class="err-title">登录失败</div>
-          <div class="err-info">
-            <p>所在企业未配置通讯录</p>
-            <p>请联系企业管理员登录系统并完善配置</p>
+          <div v-show="!isThird" :class="['login-tab', 'login-tab2', activeTab === passwordLoginType ? 'active' : '']" @click="changeActiveTab(passwordLoginType)">
+            <div class="login-tab-before" />
+            <div class="login-tab-text">账密登录</div>
+            <div class="login-tab-after" />
           </div>
-          <el-button type="primary" @click="reThirdScan">已配置，重新扫码</el-button>
-        </div>
-        <div v-show="isThird && isAuth" class="login-third-auth-wrap">
-          <div class="step">
-            <p>① 使用easyWeCom需通过企业微信授权进行企业验证</p>
-            <p>② 未注册企业微信的用户请先注册</p>
-            <p>③ 完成授权后，需扫码登录系统完成初始化配置</p>
-          </div>
-          <div class="third-btn-area">
-            <el-button v-show="!isGoneAuth" class="primary-btn" type="primary" @click="gotoAuth">我是企业管理员，去授权</el-button>
-            <el-button v-show="isGoneAuth" class="primary-btn" type="primary" @click="isAuth = false; isGoneAuth = false; isEnterPriseUnAuth = false;">我已授权，去扫码登录</el-button>
-            <el-button v-show="isGoneAuth" @click="gotoAuth">重新授权</el-button>
-            <el-button @click="gotoRegister">还没有企业微信，去注册</el-button>
+          <div v-show="isAuth" :class="['login-tab', 'active']" @click="changeActiveTab(qrCodeLoginType)">
+            <div class="login-tab-text">企业注册</div>
+            <div class="login-tab-after" />
           </div>
         </div>
-        <div
-          v-show="isThird && !isAuth && !isEnterPriseUnAuth && !isEnterPriseUnConfig"
-          class="login-third-wrap"
-          :style="authRedict ? 'justify-content: center;' : ''"
-        >
-          <div v-if="!authRedict" class="step">
-            <p>① 企业已注册easyWeCom，员工可直接扫码登录</p>
-            <p>② 企业未注册easyWeCom，需要企业管理员前往授权</p>
+        <div class="login-form-wrap">
+          <div v-show="isThird && !isAuth && isEnterPriseUnAuth" class="login-third-err-wrap">
+            <div class="err-title">登录失败</div>
+            <div class="err-info">
+              <p>所在企业未授权easyWeCom应用</p>
+              <p>请联系企业管理员前往授权</p>
+            </div>
+            <el-button type="primary" class="primary-btn" @click="isAuth = true;isEnterPriseUnAuth = false;">我是企业管理员，去授权</el-button>
           </div>
-          <div v-show="isThird && !isAuth && !isEnterPriseUnAuth && !isEnterPriseUnConfig" class="third-btn-area">
-            <el-button class="primary-btn" :loading="loginLoading" type="primary" @click="gotoLogin">
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-work-logo" />
-              </svg>企业微信扫码登录
-            </el-button>
-            <el-button v-if="!authRedict" style="color:#6bb4ab;" @click="isAuth = true">
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-easyWeCom-logo" />
-              </svg>授权easyWeCom
-            </el-button>
+          <div v-show="isThird && !isAuth && isEnterPriseUnConfig" class="login-third-err-wrap">
+            <div class="err-title">登录失败</div>
+            <div class="err-info">
+              <p>所在企业未配置通讯录</p>
+              <p>请联系企业管理员登录系统并完善配置</p>
+            </div>
+            <el-button type="primary" @click="reThirdScan">已配置，重新扫码</el-button>
           </div>
-        </div>
-        <div v-show="activeTab === qrCodeLoginType && !isThird" class="login-qrcode-wrap">
-          <div v-show="hasEnterprise" class="login-info">
-            <img src="@/assets/image/sound.png">
-            <span>员工请在此使用企业微信扫码登录</span>
+          <div v-show="isThird && isAuth" class="login-third-auth-wrap">
+            <div class="step">
+              <p>① 使用easyWeCom需通过企业微信授权进行企业验证</p>
+              <p>② 未注册企业微信的用户请先注册</p>
+              <p>③ 完成授权后，需扫码登录系统完成初始化配置</p>
+            </div>
+            <div class="third-btn-area">
+              <el-button v-show="!isGoneAuth" class="primary-btn" type="primary" @click="gotoAuth">我是企业管理员，去授权</el-button>
+              <el-button v-show="isGoneAuth" class="primary-btn" type="primary" @click="isAuth = false; isGoneAuth = false; isEnterPriseUnAuth = false;">我已授权，去扫码登录</el-button>
+              <el-button v-show="isGoneAuth" @click="gotoAuth">重新授权</el-button>
+              <el-button @click="gotoRegister">还没有企业微信，去注册</el-button>
+            </div>
           </div>
-          <div v-show="hasEnterprise" class="qrcode-area">
-            <div id="qrcode" class="qrcode" />
+          <div
+            v-show="isThird && !isAuth && !isEnterPriseUnAuth && !isEnterPriseUnConfig"
+            class="login-third-wrap"
+            :style="authRedict ? 'justify-content: center;' : ''"
+          >
+            <div v-if="!authRedict" class="step">
+              <p>① 企业已注册easyWeCom，员工可直接扫码登录</p>
+              <p>② 企业未注册easyWeCom，需要企业管理员前往授权</p>
+            </div>
+            <div v-show="isThird && !isAuth && !isEnterPriseUnAuth && !isEnterPriseUnConfig" class="third-btn-area">
+              <el-button class="primary-btn" :loading="loginLoading" type="primary" @click="gotoLogin">
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#icon-work-logo" />
+                </svg>企业微信扫码登录
+              </el-button>
+              <el-button v-if="!authRedict" style="color:#6bb4ab;" @click="isAuth = true">
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#icon-easyWeCom-logo" />
+                </svg>授权easyWeCom
+              </el-button>
+            </div>
           </div>
-          <div v-show="!hasEnterprise" class="no-enterprise-info">
+          <div v-show="activeTab === qrCodeLoginType && !isThird" class="login-qrcode-wrap">
+            <div v-show="hasEnterprise" class="login-info">
+              <img src="@/assets/image/sound.png">
+              <span>员工请在此使用企业微信扫码登录</span>
+            </div>
+            <div v-show="hasEnterprise" class="qrcode-area">
+              <div id="qrcode" class="qrcode" />
+            </div>
+            <div v-show="!hasEnterprise" class="no-enterprise-info">
+              <el-alert
+                title="系统未配置有效企业，请联系系统管理员"
+                type="warning"
+                :closable="false"
+                show-icon
+              />
+            </div>
+          </div>
+          <el-form
+            v-show="activeTab === passwordLoginType"
+            ref="loginForm"
+            :model="loginForm"
+            :rules="loginRules"
+            class="login-form"
+          >
             <el-alert
-              title="系统未配置有效企业，请联系系统管理员"
+              title="系统超级管理员请在此登录"
               type="warning"
               :closable="false"
               show-icon
             />
-          </div>
+            <el-form-item prop="username">
+              <el-input
+                v-model="loginForm.username"
+                type="text"
+                auto-complete="off"
+                placeholder="请输入账号"
+                @change="autoSetPwd"
+              />
+              <i class="iconfont icon-account" />
+            </el-form-item>
+            <el-form-item prop="password">
+              <el-input
+                v-model="loginForm.password"
+                :type="pwdVisible? 'text' : 'password'"
+                auto-complete="off"
+                placeholder="请输入密码"
+              />
+              <i class="iconfont icon-password" />
+              <i
+                :class="[!pwdVisible ? 'icon-invisible' : 'icon-visible', 'iconfont']"
+                @click="changePwdVisible"
+              />
+            </el-form-item>
+            <el-form-item prop="code">
+              <el-input
+                v-model="loginForm.code"
+                auto-complete="off"
+                placeholder="请输入验证码"
+                style="width: 63%"
+                @keyup.enter.native="handleLogin"
+              />
+              <i class="iconfont icon-verification" />
+              <div class="login-code">
+                <img :src="codeUrl" class="login-code-img" @click="getCode">
+              </div>
+            </el-form-item>
+            <el-checkbox
+              v-model="loginForm.rememberMe"
+              class="fl"
+              style="margin:0px 0px 25px 0px;padding: 10px 0 0 5px;"
+            >记住密码</el-checkbox>
+            <el-form-item style="width:100%;">
+              <el-button
+                :loading="loading"
+                size="medium"
+                type="primary"
+                style="width:100%;"
+                class="primary-btn"
+                @click.native.prevent="handleLogin"
+              >
+                <span v-if="!loading">登 录</span>
+                <span v-else>登 录 中...</span>
+              </el-button>
+            </el-form-item>
+          </el-form>
+          <img v-if="isEnterPriseUnAuth" class="login-bg-error" :src="require('@/assets/image/login-unauth-bg.svg')" alt="">
+          <img v-else-if="isEnterPriseUnConfig" class="login-bg-error" :src="require('@/assets/image/login-unconfig-bg.svg')" alt="">
+          <img v-else class="login-bg-default" :src="require('@/assets/image/login_bg.svg')" alt="">
         </div>
-        <el-form
-          v-show="activeTab === passwordLoginType"
-          ref="loginForm"
-          :model="loginForm"
-          :rules="loginRules"
-          class="login-form"
-        >
-          <el-alert
-            title="系统超级管理员请在此登录"
-            type="warning"
-            :closable="false"
-            show-icon
-          />
-          <el-form-item prop="username">
-            <el-input
-              v-model="loginForm.username"
-              type="text"
-              auto-complete="off"
-              placeholder="请输入账号"
-              @change="autoSetPwd"
-            />
-            <i class="iconfont icon-account" />
-          </el-form-item>
-          <el-form-item prop="password">
-            <el-input
-              v-model="loginForm.password"
-              :type="pwdVisible? 'text' : 'password'"
-              auto-complete="off"
-              placeholder="请输入密码"
-            />
-            <i class="iconfont icon-password" />
-            <i
-              :class="[!pwdVisible ? 'icon-invisible' : 'icon-visible', 'iconfont']"
-              @click="changePwdVisible"
-            />
-          </el-form-item>
-          <el-form-item prop="code">
-            <el-input
-              v-model="loginForm.code"
-              auto-complete="off"
-              placeholder="请输入验证码"
-              style="width: 63%"
-              @keyup.enter.native="handleLogin"
-            />
-            <i class="iconfont icon-verification" />
-            <div class="login-code">
-              <img :src="codeUrl" class="login-code-img" @click="getCode">
-            </div>
-          </el-form-item>
-          <el-checkbox
-            v-model="loginForm.rememberMe"
-            class="fl"
-            style="margin:0px 0px 25px 0px;padding: 10px 0 0 5px;"
-          >记住密码</el-checkbox>
-          <el-form-item style="width:100%;">
-            <el-button
-              :loading="loading"
-              size="medium"
-              type="primary"
-              style="width:100%;"
-              class="primary-btn"
-              @click.native.prevent="handleLogin"
-            >
-              <span v-if="!loading">登 录</span>
-              <span v-else>登 录 中...</span>
-            </el-button>
-          </el-form-item>
-        </el-form>
-        <img v-if="isEnterPriseUnAuth" class="login-bg-error" :src="require('@/assets/image/login-unauth-bg.svg')" alt="">
-        <img v-else-if="isEnterPriseUnConfig" class="login-bg-error" :src="require('@/assets/image/login-unconfig-bg.svg')" alt="">
-        <img v-else class="login-bg-default" :src="require('@/assets/image/login_bg.svg')" alt="">
       </div>
     </div>
+    <div class="cp" style="position: absolute; bottom: 20px; width: 100%; text-align: center; color: #999;" @click="openLink">{{ icp }}</div>
   </div>
 </template>
 
@@ -227,9 +230,12 @@ export default {
       passwordLoginType: TAB_LOGIN_BY_PASSWORD,
       loginLoading: false,
       // 免密登录加载状态
-      webLoginLoading: false
+      webLoginLoading: false,
+      // 网站备案
+      icp: ''
     };
   },
+
   watch: {
     $route: {
       handler: function(route) {
@@ -357,6 +363,7 @@ export default {
         this.isThird = res.data.serverType === SERVER_TYPE_THIRD;
         Cookies.set(SERVER_TYPE, res.data.serverType);
         this.getWxConfig(this.isThird);
+        this.icp = res?.data?.icp;
       });
     },
     getWxConfig(isThird) {
@@ -486,6 +493,10 @@ export default {
     },
     changePwdVisible() {
       this.pwdVisible = !this.pwdVisible;
+    },
+    openLink() {
+      const ICP_LINK = 'https://beian.miit.gov.cn/';
+      window.open(ICP_LINK);
     }
   }
 };

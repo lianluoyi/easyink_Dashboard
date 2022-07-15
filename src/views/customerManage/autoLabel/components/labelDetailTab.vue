@@ -1,7 +1,7 @@
 <!--
  * @Description:  标签规则详情tab页
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <template>
   <div class="label-detail-tab">
@@ -26,8 +26,14 @@
         <div v-if="labelType ===3||labelType==1" class="mt5 flex label-item">
           <div class="label">使用员工：</div>
           <div class="message-content">
-            <span>{{ dealName(userList) }}</span>
-            <span v-if="Object.keys(labelDetail).length!==0 && userList.length > MAXSHOWLENGTH" class="ml10 theme-text-color" @click="onShowMore">查看</span>
+            <template v-if="(userList.length + departmentList.length) !== 0">
+              <ByLengthUserShow :department-list="departmentList" :user-list="userList" :max-length="MAXSHOWLENGTH" />
+              <span>{{ (userAndDepartmentList.length > MAXSHOWLENGTH ? '等' + userAndDepartmentList.length + '个' : '') }}</span>
+            </template>
+            <span v-else>全部员工</span>
+            <span v-if="Object.keys(labelDetail).length!==0 && userList.length + departmentList.length > MAXSHOWLENGTH" class="ml10 theme-text-color" style="cursor:pointer" @click="onShowMore">
+              查看
+            </span>
           </div>
         </div>
         <div v-if="labelType ===3" class="cycle-div flex">
@@ -87,6 +93,7 @@
       title="使用员工"
       :visible.sync="useEmployeeVisible"
       :user-list="userList"
+      :department-list="departmentList"
     />
   </div>
 </template>
@@ -96,6 +103,7 @@ import SceneList from './sceneList.vue';
 import { AUTOLABEL_TYPE } from '@/utils/constant';
 import { getKeywordRuleInfo, getIntoGroupRuleInfo, getNewCustomerRuleInfo } from '@/api/customer/auto';
 import UseEmployeeModal from '@/views/retainedConversion/components/UseEmployeeModal.vue';
+import ByLengthUserShow from '@/components/ByLengthUserShow';
 // 使用员工最多显示的人数
 const MAXSHOWLENGTH = 5;
 // 模糊匹配
@@ -104,7 +112,7 @@ const FUZZYKEYWORDS = 1;
 const ACCURATEKEYWORDS = 2;
 export default {
   name: '',
-  components: { UseEmployeeModal, SceneList },
+  components: { UseEmployeeModal, SceneList, ByLengthUserShow },
   inject: ['labelRuleInfo'],
   data() {
     return {
@@ -135,6 +143,19 @@ export default {
     userList() {
       const list = this.labelDetail.userList;
       return (list && [...list]) || [];
+    },
+    /**
+     * 使用部门
+     */
+    departmentList() {
+      const list = this.labelDetail.departmentList;
+      return (list && [...list]) || [];
+    },
+    /**
+     * 员工和部门总列表
+     */
+    userAndDepartmentList() {
+      return [...this.userList, ...this.departmentList];
     }
   },
   created() {
@@ -177,11 +198,11 @@ export default {
       this.useEmployeeVisible = true;
     },
     // 处理使用员工
-    dealName(userList) {
-      if (userList.length === 0) {
+    dealName(departmentList, userList) {
+      if (departmentList.length === 0 && userList.length === 0) {
         return '全部员工';
       } else {
-        return this.dealSplit(userList) + (userList.length > MAXSHOWLENGTH ? '等' + userList.length + '人' : '');
+        return (userList.length + departmentList.length) > MAXSHOWLENGTH ? '等' + (userList.length + departmentList.length) + '人' : '';
       }
     },
     // 处理员工的间隔符号
@@ -221,6 +242,8 @@ export default {
                     }
                     .message-content {
                       line-height: 20px;
+                      display: flex;
+                      align-items: center;
                     }
                 }
             }

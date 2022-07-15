@@ -1,7 +1,7 @@
 <!--
  * @Description: 单个策略布局
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <!-- 敏感词设置页面 -->
 <template>
@@ -18,14 +18,14 @@
       </div>
       <div class="scope strategy-item">
         <div class="label">审计范围</div>
-        <div v-for="(userItem, scopeIndex) in item.auditUserScope.slice(0, 10)" :key="scopeIndex" class="scope-item">
-          <svg v-if="departType.includes(userItem.scopeType)" class="icon-folder" :width="15" :height="15">
-            <use href="#icon-folder" />
-          </svg>
-          {{ userItem.auditScopeName }}
-          <span v-if="item.auditUserScope.length > 10 && (scopeIndex === item.auditUserScope.length - 1 || scopeIndex === 9)">等</span>
-          <span v-if="scopeIndex !== item.auditUserScope.length - 1 && scopeIndex !== 9">、</span>
-        </div>
+        <ByLengthUserShow
+          :max-length="MAX_SHOW_LENGTH"
+          :user-list="item.auditUserScope.filter(item => item.scopeType === SCOPELIST_TYPE.USER || item.scopeType === SCOPELIST_TYPE.ALL_USER ).map(item => { return { ...item, userName: item.auditScopeName } } )"
+          :department-list="item.auditUserScope.filter(item => item.scopeType === SCOPELIST_TYPE.DEPARTMENT).map(item => { return { ...item, departmentName: item.auditScopeName, departmentId:item.id } })"
+        />
+        <span v-if="item.auditUserScope && item.auditUserScope.length > MAX_SHOW_LENGTH">
+          等{{ item.auditUserScope.length }}人
+        </span>
       </div>
       <div class="user-list strategy-item">
         <div class="label">审计人员</div>
@@ -66,8 +66,12 @@
 // 审计范围类型（1:员工、2:部门、3:所有）
 const DEPART_TYPE = 1;
 const ALL_TYPE = 3;
+// 审计范围显示人数最大值
+const MAX_SHOW_LENGTH = 10;
+import { SCOPELIST_TYPE } from '@/utils/constant';
+import ByLengthUserShow from '@/components/ByLengthUserShow';
 export default {
-  components: {},
+  components: { ByLengthUserShow },
   props: {
     item: {
       type: Object,
@@ -88,7 +92,9 @@ export default {
   },
   data() {
     return {
-      departType: [DEPART_TYPE, ALL_TYPE]
+      departType: [DEPART_TYPE, ALL_TYPE],
+      MAX_SHOW_LENGTH,
+      SCOPELIST_TYPE
     };
   },
   computed: {

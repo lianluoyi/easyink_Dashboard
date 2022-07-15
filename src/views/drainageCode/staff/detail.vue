@@ -2,21 +2,21 @@
 import {
   getDetail,
   getTimeRangeAnalyseCount,
-  download,
-  getUserByEmplyCode
+  download
 } from '@/api/drainageCode/staff';
 import ClipboardJS from 'clipboard';
 import echarts from 'echarts';
 import { Notification } from 'element-ui';
-import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE } from '@/utils/constant';
+import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE, SCOPELIST_TYPE } from '@/utils/constant';
 import PhoneDialog from '@/components/PhoneDialog';
+import TagUserShow from '@/components/TagUserShow';
 
 const DEFAULT_TIME_RANGE = 7;
 const DEFAULT_SLICE_LENGHT = 3;
 const ITEM_GAP = 50;
 export default {
   name: 'CodeDetail',
-  components: { PhoneDialog },
+  components: { PhoneDialog, TagUserShow },
   data() {
     return {
       // 遮罩层
@@ -32,7 +32,7 @@ export default {
       // 表单参数
       form: {},
       // 员工列表参数
-      userByEmplyCodeList: {},
+      userByEmplyCodeList: [],
       // 查询参数
       query: {
         userId: undefined,
@@ -47,7 +47,9 @@ export default {
       selectedUser: null,
       MESSAGE_MEDIA_TYPE,
       // 欢迎语预览弹窗
-      previewVisible: false
+      previewVisible: false,
+      // 员工类型(员工/部门)
+      SCOPELIST_TYPE
     };
   },
   created() {
@@ -73,12 +75,14 @@ export default {
     /** 获取详情 */
     getDetail(id) {
       this.loading = true;
-      // 获取员工活码的使用员工数据
-      getUserByEmplyCode(id).then(({ data }) => {
-        this.userByEmplyCodeList = data;
-        this.query.userId = data[0].userId;
-      });
+      // 获取员工活码的使用员工数据 后端这个接口暂时未修改，看后端后面怎么处理，若还是这个接口则让后端修改
+      // getUserByEmplyCode(id).then(({ data }) => {
+      //   this.userByEmplyCodeList = data;
+      //   this.query.userId = data[0].userId;
+      // });
       getDetail(id).then(({ data }) => {
+        this.userByEmplyCodeList = data.weEmpleCodeUseScops;
+        this.query.userId = data.weEmpleCodeUseScops[0].businessId;
         this.form = data;
         this.loading = false;
         this.query.addWay = 1;
@@ -224,12 +228,17 @@ export default {
         <el-form ref="form" label-width="100px">
           <el-form-item label="活动场景：">{{ form.scenario }}</el-form-item>
           <el-form-item label="使用员工：">
-            <el-tag
-              v-for="(item, index) in form.weEmpleCodeUseScops"
-              :key="index"
-              class="user-tag"
-              size="small"
-            >{{ item.businessName }}</el-tag>
+            <div class="flexw" style="max-width:600px">
+              <el-tag
+                v-for="(item, index) in form.weEmpleCodeUseScops"
+                :key="index"
+                class="user-tag aic"
+                size="small"
+                style="margin-bottom:5px"
+              >
+                <TagUserShow :name="item.businessName" :show-icon="item.businessIdType === SCOPELIST_TYPE.DEPARTMENT" />
+              </el-tag>
+            </div>
           </el-form-item>
           <el-form-item
             label="客户标签："
@@ -253,7 +262,7 @@ export default {
               <span v-else-if="form.skipVerify === SKIP_VERIFY['timeAdd']">{{ `${form.effectTimeOpen}~${form.effectTimeClose}生效` }}</span>
             </div>
           </el-form-item>
-          <el-form-item label="欢迎语：">
+          <el-form-item v-if="!form.welcomeMsgType" label="欢迎语：">
             <div v-if="(form.materialList && form.materialList.length) || form.welcomeMsg" class="welcome-div">
               <div class="welcome-div-content">
                 <div v-if="form.welcomeMsg">[文字] {{ form.welcomeMsg }}</div>
@@ -316,8 +325,8 @@ export default {
           <el-option
             v-for="(item, index) in userByEmplyCodeList"
             :key="index"
-            :label="item.userName"
-            :value="item.userId"
+            :label="item.businessName"
+            :value="item.businessId"
           />
         </el-select>
       </div>

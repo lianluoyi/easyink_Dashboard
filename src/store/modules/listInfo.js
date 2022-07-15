@@ -3,10 +3,8 @@
  * @Author: turing5467
  * @LastEditors: turing5467
  */
-import * as api from '@/api/organization';
 import { getGroupTagList } from '@/api/customer/grouptag';
 import { getList } from '@/api/customer/tag';
-const USER_PAGE_LIMIT = '999';
 const listInfo = {
   namespaced: true,
   state: {
@@ -26,9 +24,6 @@ const listInfo = {
       });
       state.tagList = tagList;
     },
-    SET_USER_LIST: (state, userList) => {
-      state.userList = userList;
-    },
     SET_GROUP_TAG_LIST: (state, groupTagList) => {
       state.groupTagList = groupTagList;
     }
@@ -37,9 +32,6 @@ const listInfo = {
   actions: {
     setTagList({ commit }, { list }) {
       commit('SET_TAG_LIST', list);
-    },
-    setUserList({ commit }, { list }) {
-      commit('SET_USER_LIST', list);
     },
     getTagList({ commit }) {
       return new Promise((resolve, reject) => {
@@ -53,22 +45,6 @@ const listInfo = {
           }
         }).catch(error => {
           reject(error);
-        });
-      });
-    },
-    getUserList({ commit }) {
-      api.getTree({
-        isActivate: 1
-      }).then(({ data }) => {
-        const departmentIds = data.filter(ele => ele.enable).map(ele => ele.id).join(',');
-        const querys = {
-          pageNum: '1',
-          pageSize: USER_PAGE_LIMIT,
-          departmentStr: departmentIds,
-          isActivate: 1
-        };
-        api.getList(querys).then(({ rows }) => {
-          commit('SET_USER_LIST', rows);
         });
       });
     },

@@ -1,7 +1,7 @@
 <script>
 import * as taskApi from '@/api/task';
 import SelectTag from '@/components/SelectTag';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import SelectPoster from '@/components/SelectPoster';
 import SelectQrCode from '@/components/SelectQrCode';
 export default {

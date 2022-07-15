@@ -28,7 +28,7 @@
             />
           </el-form-item>
           <el-form-item v-if="labelType !== AUTOLABEL_TYPE['intoGroup']" label="使用员工" prop="useStaff">
-            <div>
+            <div class="flexw">
               <el-button
                 class="mr10"
                 icon="el-icon-plus"
@@ -39,8 +39,10 @@
                 v-for="(item, index) in useStaff"
                 :key="index"
                 size="medium"
-                class="user-tag"
-              >{{ item.name }}</el-tag>
+                class="user-tag aic"
+              >
+                <TagUserShow :name="item.name" :show-icon="item.id" />
+              </el-tag>
             </div>
             <p class="tip">{{ labelType === AUTOLABEL_TYPE['keyWords'] ? '不选择即默认所有员工，使用员工需已开通会话存档功能' : '不选择即默认所有员工' }}</p>
           </el-form-item>
@@ -203,12 +205,14 @@ import SceneList from './components/sceneList.vue';
 import SelectUser from '@/components/SelectUser';
 import SelectTag from '@/components/SelectTag';
 import { addNewCustomerRule, addIntoGroupRule, addKeywordRule, getKeywordRuleInfo, getIntoGroupRuleInfo, getNewCustomerRuleInfo, updateKeywordRule, updateIntoGroupRule, updateNewCustomerRule } from '@/api/customer/auto';
-import { ONE_DAY, ONE_HOUR, MS_TO_SECONDS, NEWCUSOMTER_SCENE_TYPE } from '@/utils/constant';
+import { ONE_DAY, ONE_HOUR, MS_TO_SECONDS, NEWCUSOMTER_SCENE_TYPE, SCOPELIST_TYPE } from '@/utils/constant';
 import differenceBy from 'lodash/differenceBy';
+import { groupBy } from 'lodash';
+import TagUserShow from '@/components/TagUserShow';
 
 export default {
   name: '',
-  components: { ReturnPage, SceneList, SelectUser, SelectTag, RequestButton },
+  components: { ReturnPage, SceneList, SelectUser, SelectTag, RequestButton, TagUserShow },
   props: {},
   data() {
     const checkCustomerTags = (rule, value, callback) => {
@@ -412,7 +416,9 @@ export default {
             // 客户标签列表
             tagIdList: tagIdList,
             // 使用员工列表
-            userIdList: this.useStaff?.map(item => item.userId)
+            userIdList: this.useEmployeesList?.map(item => item.userId),
+            // 使用部门列表
+            departmentIdList: this.useDepartmentList?.map(item => item.id)
           });
           break;
         }
@@ -455,7 +461,8 @@ export default {
                 tagIdList: item.tagList?.map(item => item.tagId)
               };
             }),
-            userIdList: this.useStaff?.map(item => item.userId)
+            userIdList: this.useEmployeesList?.map(item => item.userId),
+            departmentIdList: this.useDepartmentList?.map(item => item.id)
           });
           break;
         }
@@ -512,7 +519,8 @@ export default {
             exactMatchKeywordList: this.accurateKeywords,
             fuzzyMatchKeywordList: this.fuzzyKeywords,
             tagIdList: tagList,
-            userIdList: this.useStaff?.map(item => item.userId)
+            userIdList: this.useEmployeesList?.map(item => item.userId),
+            departmentIdList: this.useDepartmentList?.map(item => item.id)
           };
           await addKeywordRule(newParams);
           break;
@@ -544,7 +552,8 @@ export default {
                 tagIdList: item.tagList?.map(tagItem => tagItem.tagId)
               };
             }),
-            userIdList: this.useStaff?.map(item => item.userId)
+            userIdList: this.useEmployeesList?.map(item => item.userId),
+            departmentIdList: this.useDepartmentList?.map(item => item.id)
           };
           await addNewCustomerRule(newParams);
           break;
@@ -577,6 +586,12 @@ export default {
     // 选择添加人确认按钮
     selectedUser(users) {
       this.useStaff = users;
+      const groupObj = groupBy(users, (item) => {
+        if (item.userId) return SCOPELIST_TYPE.USER;
+        if (item.id) return SCOPELIST_TYPE.DEPARTMENT;
+      });
+      this.useEmployeesList = groupObj[SCOPELIST_TYPE.USER] || [];
+      this.useDepartmentList = groupObj[SCOPELIST_TYPE.DEPARTMENT] || [];
     },
     /**
      * 打开客户标签弹窗
@@ -603,6 +618,14 @@ export default {
       this.removeTagList.push(item);
     },
     /**
+     * 将详情中的员工和部门处理字段名并分别设置到变量中
+     */
+    getInfoAndDealUserList(userList, departmentList) {
+      this.useStaff = [...userList, ...departmentList]?.map(item => { return { ...item, name: item.userName || item.departmentName, id: item.departmentId }; });
+      this.useEmployeesList = userList?.map(item => { return { ...item, name: item.userName }; });
+      this.useDepartmentList = departmentList?.map(item => { return { ...item, name: item.departmentName, id: item.departmentId }; });
+    },
+    /**
      * 编辑模式下，获取对应规则的详情
      */
     async getRuleDetail(id) {
@@ -613,12 +636,12 @@ export default {
       switch (this.labelType) {
         case AUTOLABEL_TYPE['keyWords']: {
           const keywordDetailRes = await getKeywordRuleInfo(params);
-          const { ruleName, fuzzyMatchKeywordList, exactMatchKeywordList, userList, tagList } = keywordDetailRes.data;
+          const { ruleName, fuzzyMatchKeywordList, exactMatchKeywordList, userList, departmentList, tagList } = keywordDetailRes.data;
           ruleForm.ruleName = ruleName;
           this.fuzzyKeywords = [...fuzzyMatchKeywordList];
           this.accurateKeywords = [...exactMatchKeywordList];
           this.customerTags = tagList?.map(item => { return { ...item, name: item.tagName }; });
-          this.useStaff = userList?.map(item => { return { ...item, name: item.userName }; });
+          this.getInfoAndDealUserList(userList, departmentList);
           break;
         }
         case AUTOLABEL_TYPE['intoGroup']: {
@@ -636,10 +659,10 @@ export default {
         }
         case AUTOLABEL_TYPE['newCustomer']: {
           const customerDetailRes = await getNewCustomerRuleInfo(params);
-          const { ruleName, userList, customerSceneList, effectBeginTime, effectEndTime } = customerDetailRes.data;
+          const { ruleName, userList, departmentList, customerSceneList, effectBeginTime, effectEndTime } = customerDetailRes.data;
           ruleForm.ruleName = ruleName;
           this.sceneList = [...customerSceneList];
-          this.useStaff = userList?.map(item => { return { ...item, name: item.userName }; });
+          this.getInfoAndDealUserList(userList, departmentList);
           ruleForm.effectTime = [effectBeginTime || '', effectEndTime || ''];
           break;
         }

@@ -95,20 +95,10 @@
           <el-table-column key="row-2" :label="`${sopName}名称`" prop="name" align="left" />
           <el-table-column v-if="showUseEmployees" key="row-3" label="使用员工" prop="scopeList" align="left" :show-overflow-tooltip="true">
             <template slot-scope="{ row }">
-              <el-tooltip class="item" effect="dark" placement="bottom">
-                <div slot="content">
-                  <div style="max-width: 300px;">
-                    <span v-for="(userItem, userIndex) in row.scopeList" :key="userIndex">
-                      {{ `${userItem.userName}${userIndex === row.scopeList.length - 1 ? '' : '、'}` }}
-                    </span>
-                  </div>
-                </div>
-                <div class="intwoline">
-                  <span v-for="(userItem, userIndex) in row.scopeList" :key="userIndex">
-                    {{ `${userItem.userName}${userIndex === row.scopeList.length - 1 ? '' : '、'}` }}
-                  </span>
-                </div>
-              </el-tooltip>
+              <ListUserShow
+                :use-user-name="getUseUserName(row.scopeList.map(item => item.type === SCOPELIST_TYPE.USER ? item.userName : undefined).filter(item => item && item.trim()))"
+                :department-name="getUseUserName(row.scopeList.map(item => item.type === SCOPELIST_TYPE.DEPARTMENT ? item.departmentName : undefined).filter(item => item && item.trim()))"
+              />
             </template>
           </el-table-column>
           <el-table-column key="row-4" label="启用状态" prop="isOpen" align="left">
@@ -158,6 +148,7 @@
       :visible.sync="dialogVisibleSelectUser"
       title="选择使用员工"
       :selected-user-list="selectUserList || []"
+      :is-only-leaf="false"
       @success="submitSelectUser"
     />
   </div>
@@ -165,15 +156,17 @@
 <script>
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
-import SelectUser from '@/components/SelectUser';
+import SelectUser from '@/components/SelectUser/index.vue';
 import { goRouteWithQuery } from '@/utils';
-import { SOP_TYPE, PAGE_LIMIT } from '@/utils/constant';
+import { SOP_TYPE, PAGE_LIMIT, SCOPELIST_TYPE } from '@/utils/constant';
 import { checkPermi } from '@/utils/permission';
 import { getSopList, batchSwitchSop, deleteSop, editUser } from '@/api/sop';
+import ListUserShow from '@/components/ListUserShow';
+import { groupByScopeType } from '@/utils/common';
 
 export default {
   name: '',
-  components: { RightContainer, EmptyDefaultIcon, SelectUser },
+  components: { RightContainer, EmptyDefaultIcon, SelectUser, ListUserShow },
   props: {
     sopType: {
       type: Number,
@@ -225,7 +218,9 @@ export default {
       selectUserList: [],
       // 列表加载状态
       loading: false,
-      currentSopId: null
+      currentSopId: null,
+      // 员工类型(员工/部门)
+      SCOPELIST_TYPE
     };
   },
   computed: {
@@ -251,9 +246,12 @@ export default {
   created() {
     this.getSopList();
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
+    // 通过数组拼接出用户名str
+    getUseUserName(list) {
+      return list.join(',');
+    },
     /**
        * 查询
        */
@@ -365,9 +363,11 @@ export default {
      * 选择人员变化事件
      */
     submitSelectUser(users) {
+      const groupByUsers = groupByScopeType(users);
       this.editUser({
         id: this.currentSopId,
-        userIdList: (users?.map(item => item.userId)) || []
+        userIdList: (groupByUsers?.useEmployeesList?.map(item => item.userId)) || [],
+        departmentIdList: (groupByUsers?.useDepartmentList?.map(item => item.id)) || []
       });
     },
     /**
@@ -376,7 +376,7 @@ export default {
     editEmployee(row) {
       this.dialogVisibleSelectUser = true;
       this.currentSopId = row.id;
-      this.selectUserList = row.scopeList.map(item => { return { ...item, userId: item.targetId }; });
+      this.selectUserList = row.scopeList.map(item => { return { ...item, [item.type === SCOPELIST_TYPE['USER'] ? 'userId' : 'id']: item.targetId, name: item.type === SCOPELIST_TYPE['USER'] ? item.userName : item.departmentName }; });
     },
     async getSopList(params = {}) {
       const query = this.query;

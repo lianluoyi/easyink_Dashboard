@@ -117,7 +117,8 @@
     />
     <ImportFile
       :visible.sync="importVisible"
-      title="导入话术"
+      title="话术"
+      href="easyWeCom话术导入模版.xlsx"
       alert-title="仅支持导入文字话术"
       :upload-params="{type: type}"
       :loading="importLoading"
