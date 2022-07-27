@@ -2,7 +2,7 @@
 import { getDetail, add, update } from '@/api/communityOperating/newCustomer';
 import { getQrcode } from '@/api/drainageCode/staff';
 import RequestButton from '@/components/Button/RequestButton.vue';
-import { changeButtonLoading } from '@/utils/common';
+import { changeButtonLoading, checkChange } from '@/utils/common';
 import PhoneDialog from '@/components/PhoneDialog';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
@@ -10,7 +10,7 @@ import SelectQrCode from '@/components/SelectQrCode';
 import { SCOPELIST_TYPE, NORMAL_WORD, ACTIVE_WORD } from '@/utils/constant';
 import TagUserShow from '@/components/TagUserShow';
 import ReferCode from '@/components/ReferCode';
-import ActivityPopup from '@/components/ReferCode/ActivityPopup.vue';
+import ActivityPopup from '@/components/ReferCode/ActivityPopup';
 const businessIdTypeOfUser = 2;
 const SELECT_TIME_TYPE = 2;
 const CODE_TYPE_MANY = 2;
@@ -142,6 +142,25 @@ export default {
     this.newGroupId = this.$route.query.id;
     this.newGroupId && this.getDetail(this.newGroupId);
     this.$route.meta.title = (this.newGroupId ? '编辑' : '新建') + '新客进群';
+  },
+  beforeUpdate() {
+    const oldVal = {
+      ...this.$options.data().form,
+      isAutoPass: 0,
+      activeList: this.$options.data().activeList,
+      codeMaterialList: this.$options.data().codeMaterialList,
+      codeMsg: this.$options.data().codeMsg,
+      isAutoSetRemark: 0,
+      tagFlag: 0
+    };
+    // 修改之后的值
+    const newVal = {
+      ...this.form,
+      activeList: this.activeList,
+      codeMaterialList: this.codeMaterialList,
+      codeMsg: this.codeMsg
+    };
+    checkChange(oldVal, newVal);
   },
   methods: {
     /** 获取详情 */
@@ -314,7 +333,7 @@ export default {
 
 <template>
   <div v-loading="loading" class="wrap">
-    <ReturnPage />
+    <ReturnPage path="/operationsCenter/drainageCode/newCustomer" />
     <div class="wrap-body">
       <el-alert
         title="功能说明"

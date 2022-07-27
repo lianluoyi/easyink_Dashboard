@@ -5,7 +5,7 @@ import PhoneDialog from '@/components/PhoneDialog';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import RequestButton from '@/components/Button/RequestButton.vue';
-import { changeButtonLoading } from '@/utils/common';
+import { changeButtonLoading, checkChange } from '@/utils/common';
 import {
   PAGE_LIMIT,
   MEDIA_TYPE,
@@ -23,7 +23,7 @@ import {
 import TagUserShow from '@/components/TagUserShow';
 import ReferCode from '@/components/ReferCode';
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
-import ActivityPopup from '@/components/ReferCode/ActivityPopup.vue';
+import ActivityPopup from '@/components/ReferCode/ActivityPopup';
 // 欢迎语类型
 const SELECT_TIME_TYPE = 2;
 const MAX_WELCOME_MSG_LENGTH = 2000;
@@ -153,6 +153,24 @@ export default {
   created() {
     const id = this.$route.query.id;
     id && this.getDetail(id);
+  },
+  beforeUpdate() {
+    const oldVal = {
+      ...this.$options.data().form,
+      activeList: this.$options.data().activeList,
+      codeMaterialList: this.$options.data().codeMaterialList,
+      codeMsg: this.$options.data().codeMsg,
+      appendixList: this.$options.data().appendixList
+    };
+    // 修改之后的值
+    const newVal = {
+      ...this.form,
+      activeList: this.activeList,
+      codeMaterialList: this.codeMaterialList,
+      codeMsg: this.codeMsg,
+      appendixList: this.appendixList
+    };
+    checkChange(oldVal, newVal);
   },
   methods: {
     /** 获取详情 */
@@ -354,7 +372,7 @@ export default {
 </script>
 <template>
   <div v-loading="loading" class="wrap">
-    <ReturnPage />
+    <ReturnPage path="/operationsCenter/drainageCode/staff" />
     <div class="wrap-body">
       <el-alert
         title="功能说明"

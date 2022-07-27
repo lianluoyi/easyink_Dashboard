@@ -12,6 +12,7 @@ import {
   MESSAGE_MEDIA_TYPE,
   MEDIA_TYPE_POSTER,
   MEDIA_TYPE_IMGLINK,
+  MEDIA_TYPE_RADARLINK,
   MEDIA_TYPE_VIDEO,
   MEDIA_TYPE_FILE,
   MEDIA_TYPE_MINIAPP,
@@ -27,7 +28,7 @@ import {
   GROUP_MESSAGE_PUSH_TIME_SET,
   MAX_APPENDIX_NUM
 } from '@/utils/constant';
-import { getFileName, changeButtonLoading } from '@/utils/common';
+import { getFileName, changeButtonLoading, checkChange } from '@/utils/common';
 import NoConfigInfo from '@/components/NoConfigInfo';
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
 import RequestButton from '@/components/Button/RequestButton.vue';
@@ -95,6 +96,7 @@ export default {
       MEDIA_TYPE_VIDEO,
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_MINIAPP,
+      MEDIA_TYPE_RADARLINK,
       MEDIA_TYPE,
       MESSAGE_MEDIA_TYPE,
       limitSelectLength: MAX_APPENDIX_NUM,
@@ -138,6 +140,9 @@ export default {
       this.query.mediaType = val;
     }
   },
+  beforeUpdate() {
+    checkChange({ ...this.$options.data().form, appendixList: this.$options.data().appendixList }, { ...this.form, appendixList: this.appendixList });
+  },
   created() {
     this.$store.dispatch(
       'app/setBusininessDesc',
@@ -176,12 +181,16 @@ export default {
     initForm() {
       if (this.$route.query) {
         const query = this.$route.query;
-        this.form.messageId = query.messageId;
+        if (query.messageId) {
+          this.form.messageId = query.messageId;
+        }
         if (query.attachments && query.attachments.length >= 1) {
           this.appendixList = this.resolveAttactments(query.attachments);
         }
         Object.keys(this.form).forEach((key) => {
-          this.form.textMessage.content = query.content;
+          if (query.content) {
+            this.form.textMessage.content = query.content;
+          }
           if (key === 'pushTime') {
             this.form[key] = query.settingTime ? GROUP_MESSAGE_PUSH_TIME_SET : GROUP_MESSAGE_PUSH_TIME_NOW;
           }
@@ -265,6 +274,13 @@ export default {
             appendix.materialUrl = attatchment.miniprogramMessage.page;
             appendix.coverUrl = attatchment.miniprogramMessage.picUrl;
             appendix.materialName = attatchment.miniprogramMessage.title;
+            break;
+          case MEDIA_TYPE_RADARLINK:
+            appendix.radarId = attatchment.radarMessage.radarId;
+            appendix.radarTitle = attatchment.radarMessage.radar.radarTitle;
+            appendix.title = attatchment.radarMessage.radar.weRadarUrl.title;
+            appendix.content = attatchment.radarMessage.radar.weRadarUrl.content;
+            appendix.coverUrl = attatchment.radarMessage.radar.weRadarUrl.coverUrl;
         }
         appendixList.push(appendix);
       });
@@ -308,6 +324,11 @@ export default {
               page: appendix.materialUrl,
               picUrl: appendix.coverUrl,
               title: appendix.materialName
+            };
+            break;
+          case MEDIA_TYPE_RADARLINK:
+            attach.radarMessage = {
+              radarId: appendix.radarId
             };
         }
         attachments.push(attach);
@@ -377,6 +398,8 @@ export default {
           changeButtonLoading(this.$store, 'submit');
           this.msgSuccess('操作成功');
           this.loading = false;
+          // 路由跳转前设置change为false,在requestbutton中不起作用是因为点击按钮之后又触发了组件的更新，导致change又变为true
+          window.sessionStorage.setItem('change', false);
           this.$router.push('record');
         })
         .catch(() => {

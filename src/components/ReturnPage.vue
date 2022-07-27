@@ -21,6 +21,11 @@ export default {
     path: {
       type: String,
       default: ''
+    },
+    // 跳转的组件参数
+    query: {
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -31,21 +36,17 @@ export default {
   mounted() {},
   methods: {
     handlleReturn() {
+      // 跳转到客户资料的不需要在组件中添加path 返回时会丢失原本的路由数据，若需要在详情页修改 ，可以在query里添加数据
       if (this.path) {
-        this.$router.push(this.path);
+        this.$router.push(!Object.keys(this.query || {}).length ? this.path : { path: this.path, query: this.query });
       } else {
-        this.$router.go(-1);
+        // 由于客户详情页来自的页面不同 在此单独处理
+        if (window.sessionStorage.getItem('from') !== '/customerManage/customerCenter/customer') {
+          this.$router.go(-1);
+          return;
+        }
+        this.$router.push(window.sessionStorage.getItem('from'));
       }
-      // 后面重新修改
-      // if (window.sessionStorage.getItem('labelType') && this.$route.query.labelType) { // 自动标签路由携带的参数
-      //   this.$router.push({ path: window.sessionStorage.getItem('from'), query: { labelType: this.$route.query.labelType }});
-      // } else if (window.sessionStorage.getItem('sopType') && this.$route.query.sopType) { // SOP路由携带参数
-      //   this.$router.push({ path: window.sessionStorage.getItem('from'), query: { sopType: this.$route.query.sopType }});
-      // } else if (window.sessionStorage.getItem('welcomeMsgTplType') && this.$route.query.welcomeMsgTplType) { // 欢迎语路由携带参数
-      //   this.$router.push({ path: window.sessionStorage.getItem('from'), query: { welcomeMsgTplType: this.$route.query.welcomeMsgTplType }});
-      // } else {
-      //   this.$router.push(window.sessionStorage.getItem('from'));
-      // }
     }
   }
 

@@ -15,7 +15,8 @@ window.CONFIG = {
 
   services: {
     wecom: '/wecom',
-    common: '/common'
+    common: '/common',
+    wechatopen: '/wechatopen'
   },
 
   /**

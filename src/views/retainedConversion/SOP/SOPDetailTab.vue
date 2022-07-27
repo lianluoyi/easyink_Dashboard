@@ -1,7 +1,7 @@
 <!--
  * @Description: sop详情tab页
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="sop-detail-tab">

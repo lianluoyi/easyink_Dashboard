@@ -6,7 +6,7 @@ import EnterpriseCodeModal from './enterpriseCodeModal.vue';
 import ActuaList from './actuaList.vue';
 import { CREATE_TYPE } from '@/utils/constant';
 import RequestButton from '@/components/Button/RequestButton.vue';
-import { changeButtonLoading } from '@/utils/common';
+import { changeButtonLoading, checkChange } from '@/utils/common';
 export default {
   components: { PhoneDialog, CustomerGroupModal, EnterpriseCodeModal, ActuaList, RequestButton },
   props: {
@@ -60,6 +60,9 @@ export default {
     isDKCorp() {
       return this.$store.state.serverInfo.dkCorp;
     }
+  },
+  beforeUpdate() {
+    checkChange(this.$options.data().form, this.form);
   },
   created() {
     if (this.groupCodeId) this.getGroupDetail();

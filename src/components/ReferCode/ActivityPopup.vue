@@ -4,10 +4,9 @@
  * @LastEditors: wJiaaa
 -->
 <template>
-
   <div class="exchange-activities">
     <!-- 触发详情弹窗 -->
-    <el-dialog title="选择兑换活动" :visible="Pvisible" :close-on-click-modal="false" :before-close="onClose" width="800px">
+    <el-dialog title="选择兑换活动" :visible="Pvisible" :close-on-click-modal="false" :before-close="onClose">
       <RightContainer>
         <template v-slot:search>
           <el-form
@@ -43,7 +42,7 @@
               />
             </template>
             <el-table-column type="selection" width="55" align="center" />
-            <el-table-column prop="activityName" label="活动名称" align="center">
+            <el-table-column prop="activityName" label="活动名称" align="center" width="200">
               <template #default="{ row }">
                 <el-popover
                   :open-delay="600"
@@ -56,12 +55,12 @@
                 </el-popover>
               </template>
             </el-table-column>
-            <el-table-column label="活动时间" align="center">
+            <el-table-column label="活动时间" align="center" width="200">
               <template #default="{ row }">
                 <div v-if="row.effectStartTime">{{ row.effectStartTime }}~{{ row.effectEndTime }}</div>
               </template>
             </el-table-column>
-            <el-table-column align="center" prop="status">
+            <el-table-column align="center" prop="status" width="200">
               <template #default="{ row }">
                 <div>{{ row.remainInventory }}/{{ row.sumInventory }}</div>
               </template>
@@ -93,7 +92,7 @@
           :total="total"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
-          pager-count="3"
+          :pager-count="7"
           @pagination="getList()"
         />
         <div v-else class="footer-text">
@@ -254,6 +253,9 @@ export default {
 
 <style scoped lang="scss">
 .exchange-activities {
+  /deep/ .el-dialog {
+   width: auto;
+  }
   /deep/ .el-dialog__wrapper {
     display: flex;
     align-items: center;

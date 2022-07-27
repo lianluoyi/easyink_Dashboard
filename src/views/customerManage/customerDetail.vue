@@ -101,8 +101,26 @@ export default {
   created() {
     initGetCustomerProper(this.$store);
     this.getEmployeesList();
-    if (this.$route.query.prePageType === 'conversionCodeDetail') {
+    // 在该数组下的路径不显示编辑按钮
+    const blackPathName = ['conversionCodeDetail', 'customerClickRecord', 'channelClickRecord'];
+    if (blackPathName.includes(this.$route.query.prePageType)) {
       this.permission = false;
+    }
+  },
+  // 在这里单独写是因为监听不到改变
+  beforeRouteLeave(to, from, next) {
+    if (isEqual(this.oldBaseList, this.baseList) && isEqual(this.oldCustomList, this.customList)) {
+      next();
+    } else {
+      this.$confirm('离开后，当前页面更改内容不会保存，是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        next();
+      }).catch(() => {
+        next(false);
+      });
     }
   },
   methods: {

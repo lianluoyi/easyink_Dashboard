@@ -4,7 +4,7 @@ export const PAGE_LIMIT_TWENTY = 20;
 export const PAGE_LIMIT_THIRTY = 30;
 export const PAGE_LIMIT_FIFTY = 50;
 export const PAGE_LIMIT_INFINITE = 999;
-
+export const DEFAULT_PAGE_NUM = 1;
 // 海报
 export const MEDIA_TYPE_POSTER = '0';
 // 语音
@@ -19,7 +19,8 @@ export const MEDIA_TYPE_TEXT = '4';
 export const MEDIA_TYPE_IMGLINK = '5';
 // 小程序
 export const MEDIA_TYPE_MINIAPP = '6';
-
+// 雷达链接
+export const MEDIA_TYPE_RADARLINK = '7';
 // 素材库类型
 export const MEDIA_TYPE = {
   [MEDIA_TYPE_POSTER]: '海报',
@@ -28,7 +29,8 @@ export const MEDIA_TYPE = {
   [MEDIA_TYPE_FILE]: '文件',
   [MEDIA_TYPE_TEXT]: '文本',
   [MEDIA_TYPE_IMGLINK]: '链接',
-  [MEDIA_TYPE_MINIAPP]: '小程序'
+  [MEDIA_TYPE_MINIAPP]: '小程序',
+  [MEDIA_TYPE_RADARLINK]: '雷达链接'
 };
 // 群发附件类型
 export const MESSAGE_MEDIA_TYPE = {
@@ -36,7 +38,8 @@ export const MESSAGE_MEDIA_TYPE = {
   [MEDIA_TYPE_VIDEO]: '视频',
   [MEDIA_TYPE_FILE]: '文件',
   [MEDIA_TYPE_IMGLINK]: '链接',
-  [MEDIA_TYPE_MINIAPP]: '小程序'
+  [MEDIA_TYPE_MINIAPP]: '小程序',
+  [MEDIA_TYPE_RADARLINK]: '雷达链接'
 };
 
 // 链接默认摘要
@@ -515,6 +518,7 @@ const WEL_MATERIAL_IMGLINK = 2;
 const WEL_MATERIAL_MINIAPP = 3;
 const WEL_MATERIAL_FILE = 4;
 const WEL_MATERIAL_VIDEO = 5;
+const WEL_MATERIAL_RADAR_LINK = 7;
 
 export const WELCOME_APPENDIX_TYPE = {
   'text': WEL_MATERIAL_TEXT,
@@ -522,7 +526,8 @@ export const WELCOME_APPENDIX_TYPE = {
   'imgLink': WEL_MATERIAL_IMGLINK,
   'miniApp': WEL_MATERIAL_MINIAPP,
   'file': WEL_MATERIAL_FILE,
-  'video': WEL_MATERIAL_VIDEO
+  'video': WEL_MATERIAL_VIDEO,
+  'radarLink': WEL_MATERIAL_RADAR_LINK
 };
 /** 素材库素材类型转为欢迎语附件类型 */
 export const MEDIA_TO_WELCOME_TYPE = {
@@ -531,7 +536,8 @@ export const MEDIA_TO_WELCOME_TYPE = {
   [MEDIA_TYPE_IMGLINK]: WEL_MATERIAL_IMGLINK,
   [MEDIA_TYPE_MINIAPP]: WEL_MATERIAL_MINIAPP,
   [MEDIA_TYPE_VIDEO]: WEL_MATERIAL_VIDEO,
-  [MEDIA_TYPE_FILE]: WEL_MATERIAL_FILE
+  [MEDIA_TYPE_FILE]: WEL_MATERIAL_FILE,
+  [MEDIA_TYPE_RADARLINK]: WEL_MATERIAL_RADAR_LINK
 };
 
 /** 欢迎语附件类型转为素材库素材类型 */
@@ -541,7 +547,8 @@ export const WELCOME_TO_MEDIA_TYPE = {
   [WEL_MATERIAL_IMGLINK]: MEDIA_TYPE_IMGLINK,
   [WEL_MATERIAL_MINIAPP]: MEDIA_TYPE_MINIAPP,
   [WEL_MATERIAL_VIDEO]: MEDIA_TYPE_VIDEO,
-  [WEL_MATERIAL_FILE]: MEDIA_TYPE_FILE
+  [WEL_MATERIAL_FILE]: MEDIA_TYPE_FILE,
+  [WEL_MATERIAL_RADAR_LINK]: MEDIA_TYPE_RADARLINK
 };
 
 /** 周的文字 */
@@ -641,12 +648,43 @@ export const SCOPELIST_TYPE = {
 };
 // 欢迎语发送内容类型
 export const redeemCodeMsgType = {
-  'success': 1,
+  'success': 1, // 可以使用兑换码
   // eslint-disable-next-line no-magic-numbers
-  'fail': 2,
+  'fail': 2, // 没有可使用的兑换码
   // eslint-disable-next-line no-magic-numbers
-  'repeat': 3
+  'repeat': 3 // 兑换码过期
 };
 // 欢迎语类型
-export const NORMAL_WORD = 0;
-export const ACTIVE_WORD = 1;
+export const NORMAL_WORD = 0; // 普通欢迎语
+export const ACTIVE_WORD = 1; // 活动欢迎语
+
+// 企业雷达
+const ENTERPRISE_RADAR = 3;
+// 部门雷达
+const DEPARTMENT_RADAR = 2;
+// 我的雷达
+const PERSONAL_RADAR = 1;
+
+/** 雷达类型 */
+export const RADAR_TYPE = {
+  'enterprise': ENTERPRISE_RADAR,
+  'department': DEPARTMENT_RADAR,
+  'personal': PERSONAL_RADAR
+};
+
+// 发布朋友圈可见范围 （0：全部客户 1：部分客户）
+export const FRIEND_PUSH_RANGE = {
+  ALL_CLIENT: 0,
+  PART_CLIENR: 1
+};
+// 发布朋友圈是否选择员工（2：未选择 1：已选择）
+export const FRIEND_SELECT_USER = {
+  IS_SELECT: 1,
+  // eslint-disable-next-line no-magic-numbers
+  NO_SELECT: 2
+};
+// 排序
+export const SORT = {
+  'ascending': true, // 升序
+  'descending': false // 降序
+};

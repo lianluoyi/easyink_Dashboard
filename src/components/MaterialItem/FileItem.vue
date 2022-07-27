@@ -1,17 +1,17 @@
 <!--
- * @Description: 单个文件/链接样式
+ * @Description: 单个文件/链接/雷达链接样式
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <script>
 import TagList from './Taglist.vue';
 import { getFileIcon, filterSize, matchDealtagName } from '@/utils/common';
-import { ICON_LIST } from '@/utils/constant';
+import { ICON_LIST, MEDIA_TYPE_RADARLINK } from '@/utils/constant';
 import MaskItem from './ToolMaskItem.vue';
 
 /**
- * 单个文件/链接样式
- * @displayName FileItem(单个文件/链接样式)
+ * 单个文件/链接/雷达链接样式
+ * @displayName FileItem(单个文件/链接样式/雷达链接)
  */
 export default {
   name: 'FileItem',
@@ -92,7 +92,8 @@ export default {
     return {
       srcList: [],
       checked: false,
-      ICON_LIST
+      ICON_LIST,
+      MEDIA_TYPE_RADARLINK
     };
   },
   computed: {
@@ -116,21 +117,24 @@ export default {
      * 显示的标签列表
      */
     tagList() {
-      return matchDealtagName(this.item.tagList, this.$store);
+      if (this.item.mediaType === Number(MEDIA_TYPE_RADARLINK)) {
+        return this.item.radarTagList;
+      }
+      return matchDealtagName(this.item.tagList || [], this.$store);
     },
     /**
      * 选中素材
      */
     onChecked() {
       return this.selectedMaterialList.some(selectedItem => {
-        return this.item.id === selectedItem.id;
+        return this.item.id ? this.item.id === selectedItem.id : this.item.radarId === selectedItem.radarId;
       });
     }
   },
   methods: {
     onCheck() {
       const newIds = [...this.selectedMaterialList];
-      const index = this.selectedMaterialList.findIndex(materialItem => materialItem.id === this.item.id);
+      const index = this.selectedMaterialList.findIndex(materialItem => this.item.id ? this.item.id === materialItem.id : this.item.radarId === materialItem.radarId);
       if (index > -1) {
         newIds.splice(index, 1);
       } else {
@@ -169,7 +173,13 @@ export default {
 <template>
   <div :class="'item-container material-file-container material-item-scss' + (onChecked ? ' selected' : '')" @click="() => onCheck()">
     <div class="operate">
-      <div class="operate-left"><el-checkbox :value="onChecked" @change="() => onCheck()" /></div>
+      <div class="operate-left">
+        <el-checkbox :value="onChecked" @change="() => onCheck()" />
+        <!-- 雷达类型 -->
+        <div v-if="type === MEDIA_TYPE_RADARLINK" class="inoneline title">
+          {{ item.radarTitle }}
+        </div>
+      </div>
       <MaskItem
         :tool-list="toolList"
         :filemask="true"
@@ -186,8 +196,18 @@ export default {
         <div class="left">
           <span class="file-title intwoline" :title="item.materialName">
             <span v-if="item.showMaterial && !hideStatus" class="publish-status">发布</span>
-            <span class="file-name">{{ item.materialName }}</span>
+            <span v-if="type !== MEDIA_TYPE_RADARLINK" class="file-name">{{ item.materialName }}</span>
           </span>
+          <!-- 雷达类型 -->
+          <div v-if="type === MEDIA_TYPE_RADARLINK" class="inoneline title">
+            <div class="inoneline title">
+              <!-- 链接 标题 -->
+              {{ item.title }}
+            </div>
+            <!-- 链接 摘要 -->
+            <div class="desc-text inoneline" :title="descText">{{ item.content }}</div>
+          </div>
+          <!-- 普通链接 -->
           <div class="desc-text inoneline" :title="descText">{{ descText }}</div>
         </div>
         <div class="right">
@@ -230,7 +250,13 @@ export default {
     height: 32px;
     border-bottom: 1px solid $borderColor;
     .operate-left {
+      display: flex;
       z-index: 998;
+      overflow: hidden;
+      .title {
+        margin-left: 10px;
+        width: 200px;
+      }
       /deep/ .el-checkbox {
         .el-checkbox__inner {
           height: 16px;

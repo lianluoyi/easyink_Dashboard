@@ -68,6 +68,8 @@ export default {
      *   按钮的状态
      */
     handleClick() {
+      // 点击确定的时候会有路由跳转，要设置是否改变（change）为 false 才能跳转的时候不显示弹窗
+      window.sessionStorage.setItem('change', false);
       // 点击按钮后 将按钮的加载状态设置为true key值为传入的按钮类型
       this.$store.commit('requestButton/CHANGE_BUTTONLOADING', {
         key: this.buttonType,

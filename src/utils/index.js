@@ -538,6 +538,15 @@ export const dealAppendixType = (list) => {
         };
         break;
       }
+      case WELCOME_APPENDIX_TYPE['radarLink']: {
+        materialObj = { ...item,
+          description: item.content,
+          picUrl: item.coverUrl,
+          url: item.materialUrl,
+          content: item.materialName
+        };
+        break;
+      }
     }
     return { ...materialObj, type: MEDIA_TO_WELCOME_TYPE[item.mediaType] };
   });

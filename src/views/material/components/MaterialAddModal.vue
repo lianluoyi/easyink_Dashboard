@@ -9,7 +9,9 @@ import {
   MEDIA_TYPE_FILE,
   MEDIA_TYPE_MINIAPP,
   MEDIA_TYPE_IMGLINK,
-  IMG_LINK_DIGEST
+  MEDIA_TYPE_RADARLINK,
+  IMG_LINK_DIGEST,
+  RADAR_TYPE
 } from '@/utils/constant';
 import { add, update } from '@/api/material';
 import SelectTagModal from './SelectTagModal.vue';
@@ -21,6 +23,9 @@ import AddImgLinkForm from '@/components/MaterialModal/AddImgLinkForm.vue';
 import { checkPermi } from '@/utils/permission';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
+import differenceBy from 'lodash/differenceBy';
+import SelectTag from '@/components/SelectTag';
+import { addRadar } from '@/api/radar';
 const LIMIT_FILE_NAME = 32;
 const THREE_DAYS = 3;
 const SEVEN_DAYS = 7;
@@ -34,7 +39,8 @@ export default {
     AddFileForm,
     AddMiniAppForm,
     AddImgLinkForm,
-    RequestButton
+    RequestButton,
+    SelectTag
   },
   props: {
     form: {
@@ -72,6 +78,7 @@ export default {
   },
   data() {
     return {
+      RADAR_TYPE,
       limitFileName: LIMIT_FILE_NAME,
       MEDIA_TYPE_POSTER,
       MEDIA_TYPE_AUDIO,
@@ -79,6 +86,7 @@ export default {
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_MINIAPP,
       MEDIA_TYPE_IMGLINK,
+      MEDIA_TYPE_RADARLINK,
       IMG_LINK_DIGEST,
       titlePlaceholder: {
         [MEDIA_TYPE_POSTER]: '请输入海报标题，不填写则默认取文件名',
@@ -101,7 +109,9 @@ export default {
             text: '3天后',
             onClick(picker) {
               const date = new Date();
-              date.setTime(date.getTime() + ONE_HOUR * MS_TO_SECONDS * ONE_DAY * THREE_DAYS);
+              date.setTime(
+                date.getTime() + ONE_HOUR * MS_TO_SECONDS * ONE_DAY * THREE_DAYS
+              );
               picker.$emit('pick', date);
             }
           },
@@ -109,39 +119,82 @@ export default {
             text: '一周后',
             onClick(picker) {
               const date = new Date();
-              date.setTime(date.getTime() + ONE_HOUR * MS_TO_SECONDS * ONE_DAY * SEVEN_DAYS);
+              date.setTime(
+                date.getTime() + ONE_HOUR * MS_TO_SECONDS * ONE_DAY * SEVEN_DAYS
+              );
               picker.$emit('pick', date);
             }
           }
         ],
         // 禁用之前的日期
         disabledDate(time) {
-          return time.getTime() + ONE_HOUR * MS_TO_SECONDS * ONE_DAY < Date.now();
+          return (
+            time.getTime() + ONE_HOUR * MS_TO_SECONDS * ONE_DAY < Date.now()
+          );
         }
       },
       // 选择标签弹窗显示
       dialogVisible: false,
       rules: {
-        materialName: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
-        materialUrl: [{ required: true, message: '该项为必填项', trigger: 'blur' }]
+        materialName: [
+          { required: true, message: '该项为必填项', trigger: 'blur' }
+        ],
+        materialUrl: [
+          { required: true, message: '该项为必填项', trigger: 'blur' }
+        ]
       },
+
       miniAppRules: {
         content: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
-        materialUrl: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
-        materialName: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
-        coverUrl: [{ required: true, message: '该项为必填项', trigger: 'blur' }]
+        materialUrl: [
+          { required: true, message: '该项为必填项', trigger: 'blur' }
+        ],
+        materialName: [
+          { required: true, message: '该项为必填项', trigger: 'blur' }
+        ],
+        coverUrl: [
+          { required: true, message: '该项为必填项', trigger: 'blur' }
+        ]
       },
       imgLinkRules: {
-        materialUrl: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
-        materialName: [{ required: true, message: '该项为必填项', trigger: 'blur' }]
+        materialUrl: [
+          { required: true, message: '该项为必填项', trigger: 'blur' }
+        ],
+        materialName: [
+          { required: true, message: '该项为必填项', trigger: 'blur' }
+        ]
       },
       /**
        * 已被选中的标签列表
        */
-      selectedTagIdList: []
+      selectedTagIdList: [],
+      radarType: RADAR_TYPE['enterprise'],
+      radarFormRules: {
+        radarTitle: [
+          { required: true, message: '该项为必填项', trigger: 'blur' }
+        ]
+      },
+      radarForm: {
+        radarTitle: '',
+        enableClickNotice: false,
+        enableBehaviorRecord: false,
+        enableCustomerTag: false,
+        enableUpdateNotice: false
+      },
+      // 设为雷达链接时选择的客户标签
+      customerTags: [],
+      dialogVisibleSelectTag: false,
+      // 移除的标签列表
+      removeTagList: [],
+      // 链接是否转为雷达
+      isRadarLink: false
     };
   },
   computed: {
+    // 判断是否是admin
+    isAdmin() {
+      return this.$store.state.user.isSuperAdmin;
+    },
     formRules() {
       let rule = this.rules;
       switch (this.type) {
@@ -168,7 +221,10 @@ export default {
      * 素材标签选项
      */
     materialOptions() {
-      return this.$store.state.materialInfo.allTagObj && Object.values(this.$store.state.materialInfo.allTagObj);
+      return (
+        this.$store.state.materialInfo.allTagObj &&
+        Object.values(this.$store.state.materialInfo.allTagObj)
+      );
     },
     formTagList() {
       const list = [];
@@ -189,6 +245,9 @@ export default {
     visible(val) {
       // 弹窗打开后再次处理标签id列表数据
       if (val) this.selectedTagIdList = this.dealTagIdList();
+    },
+    'form.enableConvertRadar'(val) {
+      this.isRadarLink = val;
     }
   },
   created() {},
@@ -198,6 +257,24 @@ export default {
     this.selectedTagIdList = this.dealTagIdList();
   },
   methods: {
+    /**
+     * 选择客户标签
+     */
+    submitSelectTag(data) {
+      // 过滤出弹窗中取消选中的标签
+      let removeList = differenceBy(this.customerTags, data, 'tagId');
+      this.customerTags = [...data];
+      this.dialogVisibleSelectTag = false;
+      removeList = this.removeTagList.concat(removeList);
+      this.removeTagList = removeList;
+    },
+    /**
+     * 移除客户标签
+     */
+    closeTag(item, index) {
+      this.customerTags.splice(index, 1);
+      this.removeTagList.push(item);
+    },
     onFocus(e) {
       this.dialogVisible = true;
     },
@@ -228,7 +305,8 @@ export default {
           ...form,
           mediaType: this.type,
           tagIdList: this.selectedTagIdList,
-          categoryId: this?.$store?.state?.materialInfo?.categoryInfo[this.type]?.id || ''
+          categoryId:
+            this?.$store?.state?.materialInfo?.categoryInfo[this.type]?.id || ''
         };
         // 链接设置默认摘要
         if (params.mediaType === MEDIA_TYPE_IMGLINK) {
@@ -242,14 +320,45 @@ export default {
           return this.msgInfo('请填写链接标题');
         }
         // 校验发布素材的权限;
-        if (!checkPermi(['wechat:material:publish'])) params.showMaterial = false;
+        if (!checkPermi(['wechat:material:publish'])) {
+          params.showMaterial = false;
+        }
+        // 链接设置是否设为雷达链接
+        // 新增链接
+        if (this.isRadarLink && !form.enableConvertRadar) {
+          if (!this.radarForm.radarTitle) {
+            changeButtonLoading(this.$store, 'submit');
+            return this.msgInfo('请填写雷达标题');
+          }
+          params.enableConvertRadar = this.isRadarLink;
+          // 增加雷达传递的参数
+          // 从params中拿出链接的信息
+          const { isDefined, materialName: title, materialUrl: url, coverUrl, digest: content } = params;
+          const radarParams = {
+            ...this.radarForm,
+            radarTagList: this.customerTags.map((item) => {
+              return {
+                tagId: item.tagId
+              };
+            }),
+            type: this.radarType,
+            weRadarUrl: {
+              isDefined: isDefined,
+              title: title, // 标题
+              url: url, // 链接url
+              coverUrl: coverUrl, // 封面图
+              content: content // 摘要
+            }
+          };
+          addRadar(radarParams);
+        }
         if (this.isOperatingMaterial) {
           (form.id ? update : add)(params)
             .then(() => {
               changeButtonLoading(this.$store, 'submit');
               this.msgSuccess('操作成功');
               this.Pvisible = false;
-              this.getList();
+              this.getList({ mediaType: params.mediaType });
               this.$refs['form'].resetFields();
             })
             .catch(() => {
@@ -275,11 +384,6 @@ export default {
      * 关闭弹窗
      */
     closeModal() {
-      // this.confirmModal({
-      //   msg: '离开后，当前编辑内容不会保存，是否继续？'
-      // }, async() => {
-      //   this.Pvisible = false;
-      // });
       this.Pvisible = false;
     },
     /**
@@ -313,93 +417,87 @@ export default {
 </script>
 
 <template>
-  <el-dialog :title="modalTitle" :before-close="closeModal" :close-on-press-escape="false" :visible.sync="Pvisible" width="680px" append-to-body :close-on-click-modal="false">
-    <div class="material-add-modal">
-      <el-form ref="form" :model.sync="form" :rules="formRules" label-width="80px">
-        <el-form-item v-if="![MEDIA_TYPE_MINIAPP, MEDIA_TYPE_IMGLINK].includes(type)" label="标题" prop="materialName">
-          <el-input
-            v-model="form.materialName"
-            :placeholder="titlePlaceholder[type]"
-            :maxlength="limitFileName"
-            show-word-limit
-            style="width: 380px"
-          />
-        </el-form-item>
-        <template v-if="type === MEDIA_TYPE_POSTER">
-          <AddPosterForm :form="form" :limit-file-name="limitFileName" @changeForm="changeForm" />
-        </template>
-        <template v-else-if="type === MEDIA_TYPE_VIDEO">
-          <AddVideoForm :form="form" :limit-file-name="limitFileName" @changeForm="changeForm" />
-        </template>
-
-        <template v-else-if="type === MEDIA_TYPE_FILE">
-          <AddFileForm
-            :form.sync="form"
-            :remove-file="removeFile"
-            :limit-file-name="limitFileName"
-            @changeForm="changeForm"
-          />
-        </template>
-        <template v-else-if="type === MEDIA_TYPE_MINIAPP">
-          <AddMiniAppForm :form="form" :limit-file-name="limitFileName" :placeholder="titlePlaceholder[type]" />
-        </template>
-        <template v-else-if="type === MEDIA_TYPE_IMGLINK">
-          <AddImgLinkForm ref="imgLink" :form.sync="form" :placeholder="titlePlaceholder[type]" />
-        </template>
-        <el-form-item
-          v-show="showMaterialSave"
-          v-hasPermi="['wechat:material:add']"
-          label="存为素材"
-          prop="saveToMaterial"
+  <div>
+    <el-dialog
+      :title="modalTitle"
+      :before-close="closeModal"
+      :close-on-press-escape="false"
+      :visible.sync="Pvisible"
+      width="680px"
+      append-to-body
+      :close-on-click-modal="false"
+    >
+      <div class="material-add-modal">
+        <el-form
+          ref="form"
+          :model.sync="form"
+          :rules="formRules"
+          label-width="80px"
         >
-          <div class="field-item">
-            <el-switch v-model="form.saveToMaterial" @change="changeShowMaterial" />
-            <el-popover placement="top-start" content="将该附件添加到素材库" trigger="hover" popper-class="tip-popover">
-              <i slot="reference" class="iconfont icon-question" />
-            </el-popover>
-          </div>
-        </el-form-item>
-        <div v-show="showMaterialSetting">
-          <el-form-item v-hasPermi="['wechat:material:publish']" label="发布素材" prop="showMaterial">
-            <div class="field-item">
-              <el-switch v-model="form.showMaterial" />
-              <el-popover
-                placement="top-start"
-                content="开启后，员工可在企业微信客户端侧边栏【素材库】查看，并发送给客户"
-                trigger="hover"
-                popper-class="tip-popover"
-              >
-                <i slot="reference" class="iconfont icon-question" />
-              </el-popover>
-            </div>
-          </el-form-item>
-          <el-form-item label="素材标签" prop="labelId">
-            <el-select
-              v-model="selectedTagIdList"
-              class="material-tag-select"
-              popper-class="invisible-select-popover"
-              multiple
+          <el-form-item
+            v-if="![MEDIA_TYPE_MINIAPP, MEDIA_TYPE_IMGLINK].includes(type)"
+            label="标题"
+            prop="materialName"
+          >
+            <el-input
+              v-model="form.materialName"
+              :placeholder="titlePlaceholder[type]"
+              :maxlength="limitFileName"
+              show-word-limit
               style="width: 380px"
-              placeholder="设置素材标签，方便分类管理"
-              @focus="onFocus"
-            >
-              <el-option v-for="item in materialOptions" :key="item.id" :label="item.tagName" :value="item.id" />
-            </el-select>
+            />
           </el-form-item>
-          <el-form-item label="过期时间" prop="expireTime">
+          <template v-if="type === MEDIA_TYPE_POSTER">
+            <AddPosterForm
+              :form="form"
+              :limit-file-name="limitFileName"
+              @changeForm="changeForm"
+            />
+          </template>
+          <template v-else-if="type === MEDIA_TYPE_VIDEO">
+            <AddVideoForm
+              :form="form"
+              :limit-file-name="limitFileName"
+              @changeForm="changeForm"
+            />
+          </template>
+
+          <template v-else-if="type === MEDIA_TYPE_FILE">
+            <AddFileForm
+              :form.sync="form"
+              :remove-file="removeFile"
+              :limit-file-name="limitFileName"
+              @changeForm="changeForm"
+            />
+          </template>
+          <template v-else-if="type === MEDIA_TYPE_MINIAPP">
+            <AddMiniAppForm
+              :form="form"
+              :limit-file-name="limitFileName"
+              :placeholder="titlePlaceholder[type]"
+            />
+          </template>
+          <template v-else-if="type === MEDIA_TYPE_IMGLINK">
+            <AddImgLinkForm
+              ref="imgLink"
+              :form.sync="form"
+              :placeholder="titlePlaceholder[type]"
+            />
+          </template>
+          <el-form-item
+            v-show="showMaterialSave"
+            v-hasPermi="['wechat:material:add']"
+            label="存为素材"
+            prop="saveToMaterial"
+          >
             <div class="field-item">
-              <el-date-picker
-                v-model="form.expireTime"
-                type="datetime"
-                placeholder="选择素材过期时间"
-                align="right"
-                :picker-options="pickerOptions"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                @change="confirmTime"
+              <el-switch
+                v-model="form.saveToMaterial"
+                @change="changeShowMaterial"
               />
               <el-popover
                 placement="top-start"
-                content="到期后自动移到过期素材，员工不可继续使用"
+                content="将该附件添加到素材库"
                 trigger="hover"
                 popper-class="tip-popover"
               >
@@ -407,23 +505,174 @@ export default {
               </el-popover>
             </div>
           </el-form-item>
-        </div>
-        <slot />
-      </el-form>
-      <SelectTagModal
-        :visible.sync="dialogVisible"
-        :show-add-tag="true"
-        modal-title="选择标签"
-        :tag-list="this.$store.state.materialInfo ? Object.values(this.$store.state.materialInfo.allTagObj) : []"
-        :default-tag-list="formTagList"
-        @submitSelectTags="submitSelectTags"
-      />
-    </div>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="closeModal">取 消</el-button>
-      <RequestButton type="primary" :request-method="submit" button-type="submit">确 定</RequestButton>
-    </div>
-  </el-dialog>
+          <div v-show="showMaterialSetting">
+            <el-form-item
+              v-hasPermi="['wechat:material:publish']"
+              label="发布素材"
+              prop="showMaterial"
+            >
+              <div class="field-item">
+                <el-switch v-model="form.showMaterial" />
+                <el-popover
+                  placement="top-start"
+                  content="开启后，员工可在企业微信客户端侧边栏【素材库】查看，并发送给客户"
+                  trigger="hover"
+                  popper-class="tip-popover"
+                >
+                  <i slot="reference" class="iconfont icon-question" />
+                </el-popover>
+              </div>
+            </el-form-item>
+            <el-form-item label="素材标签" prop="labelId">
+              <el-select
+                v-model="selectedTagIdList"
+                class="material-tag-select"
+                popper-class="invisible-select-popover"
+                multiple
+                style="width: 380px"
+                placeholder="设置素材标签，方便分类管理"
+                @focus="onFocus"
+              >
+                <el-option
+                  v-for="item in materialOptions"
+                  :key="item.id"
+                  :label="item.tagName"
+                  :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="过期时间" prop="expireTime">
+              <div class="field-item">
+                <el-date-picker
+                  v-model="form.expireTime"
+                  type="datetime"
+                  placeholder="选择素材过期时间"
+                  align="right"
+                  :picker-options="pickerOptions"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  @change="confirmTime"
+                />
+                <el-popover
+                  placement="top-start"
+                  content="到期后自动移到过期素材，员工不可继续使用"
+                  trigger="hover"
+                  popper-class="tip-popover"
+                >
+                  <i slot="reference" class="iconfont icon-question" />
+                </el-popover>
+              </div>
+            </el-form-item>
+            <el-form-item v-if=" type === MEDIA_TYPE_IMGLINK " label="雷达链接" prop="isRadarLink" class="drawer-div">
+              <el-switch
+                v-model="isRadarLink"
+                :disabled="form.enableConvertRadar"
+                :active-value="true"
+                :inactive-value="false"
+              />
+              <span class="back-text">设为雷达链接，可记录客户访问数据</span>
+              <div v-show="isRadarLink && !form.enableConvertRadar">
+                <el-form
+                  ref="radarForm"
+                  :model="radarForm"
+                  label-width="80px"
+                  class="radarForm"
+                  :rules="radarFormRules"
+                >
+                  <el-form-item label="雷达标题" prop="radarTitle">
+                    <el-input
+                      v-model="radarForm.radarTitle"
+                      maxlength="32"
+                      show-word-limit
+                      placeholder="请填写雷达使用场景，方便标记使用"
+                      clearable
+                    />
+                  </el-form-item>
+                  <el-form-item label="雷达类型">
+                    <el-radio-group v-model="radarType">
+                      <el-radio :label="RADAR_TYPE['enterprise']">公共</el-radio>
+                      <el-radio v-if="!isAdmin" :label="RADAR_TYPE['department']">部门</el-radio>
+                      <el-radio v-if="!isAdmin" :label="RADAR_TYPE['personal']">个人</el-radio>
+                    </el-radio-group>
+                  </el-form-item>
+                  <el-form-item label="行为通知" prop="enableClickNotice" class="iiii">
+                    <el-switch
+                      v-model="radarForm.enableClickNotice"
+                      :active-value="true"
+                      :inactive-value="false"
+                    />
+                    <span class="back-text">开启后，当客户点击雷达链接，将发送应用提醒通知所属员工</span>
+                  </el-form-item>
+                  <el-form-item label="轨迹记录" prop="enableBehaviorRecord">
+                    <el-switch
+                      v-model="radarForm.enableBehaviorRecord"
+                      :active-value="true"
+                      :inactive-value="false"
+                    />
+                    <span class="back-text">开启后，当客户点击雷达链接，会记录在其客户资料的活动轨迹下</span>
+                  </el-form-item>
+                  <el-form-item label="客户标签">
+                    <el-switch
+                      v-model="radarForm.enableCustomerTag"
+                      :active-value="true"
+                      :inactive-value="false"
+                    />
+                    <span class="back-text">开启后，根据使用场景做标记，自动为扫码添加的客户打上标签</span>
+                  </el-form-item>
+                  <el-form-item v-show="radarForm.enableCustomerTag" label="" prop="customerTags">
+                    <div style="margin-left:60px;">
+                      <el-button
+                        icon="el-icon-plus"
+                        size="mini"
+                        @click="dialogVisibleSelectTag = true"
+                      >添加标签</el-button>
+                      <el-tag
+                        v-for="(item, index) in customerTags"
+                        :key="index"
+                        size="medium"
+                        closable
+                        @close="closeTag(item, index)"
+                      >{{ item.name }}</el-tag>
+                    </div>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </el-form-item>
+          </div>
+          <slot />
+        </el-form>
+        <SelectTagModal
+          :visible.sync="dialogVisible"
+          :show-add-tag="true"
+          modal-title="选择标签"
+          :tag-list="
+            this.$store.state.materialInfo
+              ? Object.values(this.$store.state.materialInfo.allTagObj)
+              : []
+          "
+          :default-tag-list="formTagList"
+          @submitSelectTags="submitSelectTags"
+        />
+
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeModal">取 消</el-button>
+        <RequestButton
+          type="primary"
+          :request-method="submit"
+          button-type="submit"
+        >确 定</RequestButton>
+      </div>
+    </el-dialog>
+    <!-- 选择标签弹窗 -->
+    <SelectTag
+      :visible.sync="dialogVisibleSelectTag"
+      :selected="customerTags"
+      type="search"
+      info-msg="通过活码添加员工的客户，将被自动打上选中的标签"
+      :is-show-add="true"
+      @success="submitSelectTag"
+    />
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -456,10 +705,29 @@ export default {
     font-size: 14px;
     margin-left: 5px;
   }
-
   /deep/ .upload-button {
     border: 1px solid $borderColor;
     color: $grayColor;
+  }
+  .radarForm {
+    /deep/ .el-form-item {
+      padding: 5px 0px;
+      .el-form-item__label {
+        margin-left: -10px;
+      }
+      .el-form-item__content {
+        margin-left: 10px !important;
+      }
+      .el-input {
+        width: 360px;
+      }
+    }
+  }
+  .drawer-div {
+    .back-text {
+      color:#999999;
+      margin-left: 5px;
+    }
   }
 }
 </style>

@@ -19,7 +19,7 @@ export default {
 
 <template>
   <div class="page">
-    <ReturnPage />
+    <ReturnPage path="/operationsCenter/drainageCode/customerGroup" />
     <div class="wrap-body">
       <el-alert
         title="功能说明"

@@ -1,19 +1,20 @@
 <!--
  * @Description: 发布详情
  * @Author: wJiaaa
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <script>
 import TabContent from './TabContent.vue';
 import { getMomentTaskBasicInfo } from '@/api/friends';
-import Statistics from './Statistics.vue';
+import Statistics from '@/components/Statistics';
 import VerbalTrickImgLink from './Link.vue';
 import ContentVideo from './ContentVideo.vue';
-import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_TEXT } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_TEXT, FRIEND_SELECT_USER, FRIEND_PUSH_RANGE } from '@/utils/constant';
 // 发布类型  1:个人 0：企业
 const SELF = 1;
 // 任务类型（0：立即发送 1：定时发送）
 const TASKTYPE = 0;
+import { getTotal } from '@/api/friends';
 export default {
   components: {
     TabContent, Statistics, VerbalTrickImgLink, ContentVideo
@@ -29,33 +30,46 @@ export default {
       MEDIA_TYPE_VIDEO,
       MEDIA_TYPE_TEXT,
       // 可见范围
-      text: '全部客户'
+      text: '全部客户',
+      numsList: {},
+      uptime: '',
+      colList: [
+        { title: '员工总数', showPopover: true, content: '需要发布该朋友圈的员工数量' },
+        { title: '已发布员工', showPopover: true, content: '收到通知后48小时内发布朋友圈的员工' },
+        { title: '待发布员工', showPopover: true, content: '发出通知后48小时内没有发布朋友圈的员工' },
+        { title: '过期朋友圈', showPopover: true, content: '收到通知后没有在48小时内发布朋友圈的员工，若48小时后发布，仍视为过期' }
+      ]
     };
   },
   computed: {},
   watch: {},
   created() {
     this.getMomentTaskBasicInfo();
+    this.getTotal();
   },
   mounted() {
   },
   methods: {
+    getTotal() {
+      getTotal({ momentTaskId: this.$route.query.id }).then(({ data }) => {
+        this.numsList = data;
+        this.uptime = data.updateTime;
+      });
+    },
     getMomentTaskBasicInfo() {
       getMomentTaskBasicInfo({ momentTaskId: this.$route.query.id }).then(({ data }) => {
         this.data = data;
-        if (data.tagList !== null) {
-          var tagLength = data.tagList.length;
-          // 可见范围是部分客户
-          if (data.pushRange === 1) {
-            // 只设置员工 没设置标签
-            if (data.selectUser === 1 && tagLength === 0) {
-              this.text = '部分客户';
-            }
-            // 设置了标签
-            if (tagLength !== 0) {
-              // 是否设置员工
-              this.text = data.selectUser === 0 ? '客户被打上标签' : '部分员工下客户被打上标签';
-            }
+        var tagLength = data.tagList ? data.tagList.length : 0;
+        // 可见范围是部分客户
+        if (data.pushRange === FRIEND_PUSH_RANGE.PART_CLIENR) {
+          // 只设置员工 没设置标签
+          if (data.selectUser === FRIEND_SELECT_USER.IS_SELECT && tagLength === 0) {
+            this.text = '部分客户';
+          }
+          // 设置了标签
+          if (tagLength !== 0) {
+            // 是否设置员工
+            this.text = data.selectUser === FRIEND_SELECT_USER.NO_SELECT ? '客户被打上标签' : '部分员工下客户被打上标签';
           }
         }
       });
@@ -74,7 +88,7 @@ export default {
     },
     // 刷新发布统计的数据
     refshTime() {
-      this.$refs.refshTime.getTotal();
+      this.getTotal();
     }
   }
 };
@@ -147,7 +161,14 @@ export default {
         </div>
       </div>
     </el-card>
-    <Statistics ref="refshTime" />
+    <Statistics
+      :nums-list="numsList"
+      :show-uptime="true"
+      :uptime="uptime"
+      :col-list="colList"
+      title="发布统计"
+    />
+
     <el-tabs v-if="data.momentTaskId" class="group-message-detail-page-table mt15">
       <TabContent :users-id="data.users" :moment-task-id="data.momentTaskId" :send-time="data.sendTime" :type="data.type" @refshTime="refshTime" />
     </el-tabs>

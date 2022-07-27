@@ -4,6 +4,8 @@
     v-bind="$attrs"
     :before-close="handleClose"
     :append-to-body="true"
+    :close-on-press-escape="false"
+    :wrapper-closable="false"
     class="verbal-trick-drawer"
     v-on="$listeners"
   >
@@ -151,8 +153,6 @@ export default {
         emitPath: false,
         expandTrigger: 'hover'
       }
-      // 判断当前抽屉是否是点击确定关闭
-      // confim: false
     };
   },
   computed: {},
@@ -209,12 +209,6 @@ export default {
       this.handleClose();
     },
     handleClose() {
-      // if (this.confim) return this.$emit('update:visible', false);
-      // this.confirmModal({
-      //   msg: '离开后，当前编辑内容不会保存，是否继续？'
-      // }, async() => {
-      //   this.$emit('update:visible', false);
-      // });
       this.$emit('update:visible', false);
     },
     handleAddVerbalTrick(command) {

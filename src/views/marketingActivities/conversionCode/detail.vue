@@ -447,7 +447,7 @@ export default {
           receiveUserId: !this.isSingleAdd ? this.addForm.receiveUserId : null
         };
         conversionCode[
-          this.isSingleAdd ? 'addConversionCode' : 'upadteConversionCode'
+          this.isSingleAdd ? 'addConversionCode' : 'updateConversionCode'
         ](params).then(() => {
           this.msgSuccess('操作成功');
           changeButtonLoading(this.$store, 'save');

@@ -4,13 +4,13 @@
  * @LastEditors: wJiaaa
 -->
 <template>
-  <!-- :wrapper-closable="false" -->
-  <!-- :close-on-press-escape="false" -->
   <el-drawer
     v-bind="$attrs"
     :before-close="handleClose"
     :append-to-body="true"
     class="add-rule-drawer"
+    :wrapper-closable="false"
+    :close-on-press-escape="false"
     size="780px"
     v-on="$listeners"
   >

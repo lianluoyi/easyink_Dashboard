@@ -33,6 +33,7 @@
       :file-tool-list="['download']"
       :miniapp-tool-list="[]"
       :query.sync="query"
+      :radar-query.sync="radarQuery"
       :type="'select'"
       :total="total"
       :is-loading="isLoadingMaterial"
@@ -44,12 +45,12 @@
 </template>
 <script>
 import {
-  MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK,
+  MEDIA_TYPE_POSTER, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK, RADAR_TYPE,
   MEDIA_TYPE_MINIAPP, PAGE_LIMIT, MEDIA_TYPE, DEFAULT_LINK
 } from '@/utils/constant';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import { getList } from '@/api/material';
-
+import { getRadaList } from '@/api/radar';
 const MATERIAL_SELECT = 'materialSelect';
 export default {
   name: '',
@@ -95,7 +96,9 @@ export default {
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_IMGLINK,
       MEDIA_TYPE_MINIAPP,
+      MEDIA_TYPE_RADARLINK,
       MATERIAL_SELECT,
+      RADAR_TYPE,
       dialogVisibleSelectMaterial: false,
       isLoadingMaterial: true,
       materialList: [],
@@ -110,7 +113,13 @@ export default {
       },
       materialType: MEDIA_TYPE_POSTER,
       appendixList: [],
-      MEDIA_TYPE
+      MEDIA_TYPE,
+      radarQuery: {
+        type: this.$store.state.user.isSuperAdmin ? RADAR_TYPE['enterprise'] : '',
+        pageNum: 1,
+        pageSize: PAGE_LIMIT,
+        searchTitle: ''
+      }
     };
   },
   created() {},
@@ -155,7 +164,7 @@ export default {
         }
         // 素材库选取附件
         case MATERIAL_SELECT: {
-          !this.materialList?.length && this.getMaterialList();
+          !this.materialList?.length && this.getMaterialList({ mediaType: this.materialType });
           this.materialType = MEDIA_TYPE_POSTER;
           this.dialogVisibleSelectMaterial = true;
         }
@@ -171,14 +180,41 @@ export default {
      */
     getMaterialList(params) {
       this.isLoadingMaterial = true;
-      getList({
-        ...this.query,
-        ...params
-      }).then(res => {
-        this.materialList = res.rows;
-        this.total = Number(res.total);
-        this.isLoadingMaterial = false;
-      });
+      if (params.mediaType !== MEDIA_TYPE_RADARLINK) {
+        getList({
+          ...this.query,
+          ...params
+        }).then(res => {
+          this.materialList = res.rows;
+          this.total = Number(res.total);
+          this.isLoadingMaterial = false;
+        });
+      } else {
+        getRadaList(this.radarQuery).then(res => {
+          const newArr = res.rows.map((item) => {
+            return {
+              // 链接标题
+              title: item.weRadarUrl.title,
+              // 链接摘要
+              content: item.weRadarUrl.content,
+              // 链接封面
+              coverUrl: item.weRadarUrl.coverUrl,
+              // 链接URL
+              url: item.weRadarUrl.url,
+              // 雷达标题
+              radarTitle: item.radarTitle,
+              radarId: item.radarId,
+              tagList: item.radarTagList,
+              mediaType: +MEDIA_TYPE_RADARLINK,
+              categoryId: this.$store.state.materialInfo?.categoryInfo[+MEDIA_TYPE_RADARLINK]?.id || '',
+              tagIdList: item.radarTagList
+            };
+          });
+          this.materialList = newArr;
+          this.total = Number(res.total);
+          this.isLoadingMaterial = false;
+        });
+      }
     },
     /**
      * 确认选择素材
@@ -212,6 +248,12 @@ export default {
               isDefined: DEFAULT_LINK
             });
             break;
+          }
+          case MEDIA_TYPE_RADARLINK: {
+            newList.push({
+              mediaType,
+              ...item
+            });
           }
         }
       });

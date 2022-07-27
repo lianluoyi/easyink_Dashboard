@@ -1,36 +1,47 @@
 <!--
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
-  <div v-if="item.mediaType.toString() === MEDIA_TYPE_TEXT" class="content-item-div">{{ item.content }}</div>
-  <div v-else class="content-item-div">
-    <div class="cover-img">
-      <svg v-if="item.mediaType.toString() === MEDIA_TYPE_FILE" class="icon" aria-hidden="true" width="60" height="60">
-        <use :xlink:href="'#icon-' + getFileIconClass" />
-      </svg>
-      <video v-else-if="item.mediaType.toString() === MEDIA_TYPE_VIDEO" :src="item.url" />
-      <el-image v-else :src="dealCoverUrl(item, item.mediaType)">
-        <div v-if="item.mediaType.toString() === MEDIA_TYPE_IMGLINK" slot="error" class="image-slot">
-          <svg class="icon-img-link" :width="25" :height="25">
-            <use href="#icon-img-link" />
-          </svg>
-        </div>
-      </el-image>
-    </div>
-    <div class="file-info">
-      <div class="inoneline">{{ item.title }}</div>
-      <div class="desc">{{ dealContent(item.content, item.mediaType) }}</div>
+  <div v-if="item.mediaType === MEDIA_TYPE_RADARLINK">
+    <RadarLink
+      :radar-title="radarTitle"
+      class-name="link-preview"
+      :link-title="item.title"
+      :cover-url="item.coverUrl"
+      :content="item.content"
+    />
+  </div>
+  <div v-else>
+    <div v-if="item.mediaType.toString() === MEDIA_TYPE_TEXT" class="content-item-div">1{{ item.content }}</div>
+    <div v-else class="content-item-div">
+      <div class="cover-img">
+        <svg v-if="item.mediaType.toString() === MEDIA_TYPE_FILE" class="icon" aria-hidden="true" width="60" height="60">
+          <use :xlink:href="'#icon-' + getFileIconClass" />
+        </svg>
+        <video v-else-if="item.mediaType.toString() === MEDIA_TYPE_VIDEO" :src="item.url" />
+        <el-image v-else :src="dealCoverUrl(item, item.mediaType)">
+          <div v-if="item.mediaType.toString() === MEDIA_TYPE_IMGLINK" slot="error" class="image-slot">
+            <svg class="icon-img-link" :width="25" :height="25">
+              <use href="#icon-img-link" />
+            </svg>
+          </div>
+        </el-image>
+      </div>
+      <div class="file-info">
+        <div class="inoneline">{{ item.title }}</div>
+        <div class="desc">{{ dealContent(item.content, item.mediaType) }}</div>
+      </div>
     </div>
   </div>
 </template>
 <script>
-import { MEDIA_TYPE_TEXT, MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_FILE } from '@/utils/constant';
+import { MEDIA_TYPE_TEXT, MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_FILE } from '@/utils/constant';
 import { filterSize, getFileIcon } from '@/utils/common';
-
+import RadarLink from '@/views/radarLibrary/components/radarLink.vue';
 export default {
   name: '',
-  components: {},
+  components: { RadarLink },
   props: {
     item: {
       type: Object,
@@ -42,7 +53,8 @@ export default {
       MEDIA_TYPE_TEXT,
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_VIDEO,
-      MEDIA_TYPE_IMGLINK
+      MEDIA_TYPE_IMGLINK,
+      MEDIA_TYPE_RADARLINK
     };
   },
   computed: {
@@ -51,6 +63,10 @@ export default {
      */
     getFileIconClass() {
       return getFileIcon(this.item.url);
+    },
+    radarTitle() {
+      const item = { ...this.item };
+      return item.radar?.radarTitle || item.radarTitle;
     }
   },
   created() {},

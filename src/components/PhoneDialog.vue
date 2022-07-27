@@ -1,6 +1,6 @@
 <script>
 import VideoModal from '@/views/conversation/component/videoModal.vue';
-import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_TEXT } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, DEFAULT_IMG, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_TEXT, MEDIA_TYPE_RADARLINK } from '@/utils/constant';
 import { getFileIcon, filterSize } from '@/utils/common';
 /**
  * 手机对话框样式
@@ -93,6 +93,8 @@ export default {
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_MINIAPP,
       MEDIA_TYPE_TEXT,
+      MEDIA_TYPE_RADARLINK,
+      DEFAULT_IMG,
       visible: false
     };
   },
@@ -118,6 +120,12 @@ export default {
      */
     getFileSize(msg) {
       return filterSize(msg.content);
+    },
+    getContent(msg) {
+      return msg?.radar?.weRadarUrl?.content || msg?.content || '';
+    },
+    getCoverUrl(msg) {
+      return msg?.coverUrl || msg?.radar?.weRadarUrl?.coverUrl || DEFAULT_IMG.link;
     }
   }
 };
@@ -192,6 +200,16 @@ export default {
               </div>
               <el-image
                 :src="msg.coverUrl"
+              />
+            </div>
+            <div v-else-if="String(msg.mediaType) === MEDIA_TYPE_RADARLINK " class="msg-card">
+              <div class="msg-card-info">
+                <div class="msg-card-title inoneline">{{ msg.radarTitle || msg.radar.radarTitle }}</div>
+                <div class="msg-card-title inoneline">{{ msg.title || msg.radar.weRadarUrl.title }}</div>
+                <div class="msg-card-desc">{{ getContent(msg) }}</div>
+              </div>
+              <el-image
+                :src="getCoverUrl(msg)"
               />
             </div>
             <div v-else-if="String(msg.mediaType) === MEDIA_TYPE_FILE" class="msg-card">

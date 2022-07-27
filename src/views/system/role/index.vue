@@ -181,7 +181,6 @@ import { ROLE_IN_USE_CODE } from '@/utils/constant';
 import difference from 'lodash/difference';
 import uniq from 'lodash/uniq';
 import { THIRD_INVISIBLE_MENUS } from '@/utils/constant';
-
 const TABLE_HEIGHT = 650;
 // 1： 系统管理员角色（管理员）
 // 2： 系统默认角色（部门管理员和员工）
@@ -265,6 +264,7 @@ export default {
       tableHeight: TABLE_HEIGHT,
       checkedKeys: [],
       menuTree: {},
+      isChange: false, // 判断是否有改变
       // 三种默认角色对应的roleType
       // 1： 系统管理员角色（管理员）
       // 2： 系统默认角色（部门管理员和员工）
@@ -299,6 +299,15 @@ export default {
         <div>普通员工：部门的普通成员</div>
       `
     );
+  },
+  beforeRouteLeave(to, form, next) {
+    if (!this.isChange) return next();
+    this.confirmModal({
+      msg: '离开后，当前页面更改内容不会保存，是否继续？'
+    }, async() => {
+      this.isChange = false;
+      next();
+    });
   },
   methods: {
     /**
@@ -464,6 +473,7 @@ export default {
      * 更新角色详情
      */
     updateRoleInfo() {
+      this.isChange = false;
       if (this.form.dataScope === '2') this.form.deptIds = this.roleInfoDataScopeIds;
       this.form.menuIds = this.checkedKeys;
       updateRole(this.form).then((response) => {
@@ -521,13 +531,17 @@ export default {
      * 选中某个角色
      */
     selectRole(roleId) {
-      // roleId !== this.nowSelectedRole &&
-      // this.confirmModal({
-      //   msg: '离开后，当前编辑内容不会保存，是否继续？'
-      // }, async() => {
-      //   this.nowSelectedRole = roleId;
-      // });
-      this.nowSelectedRole = roleId;
+      if (this.isChange) {
+        roleId !== this.nowSelectedRole &&
+      this.confirmModal({
+        msg: '离开后，当前页面更改内容不会保存，是否继续？'
+      }, async() => {
+        this.isChange = false;
+        this.nowSelectedRole = roleId;
+      });
+      } else {
+        this.nowSelectedRole = roleId;
+      }
     },
     /**
      * 获取角色详情
@@ -660,6 +674,7 @@ export default {
         }
       }
       // 已选菜单id去重
+      this.isChange = true;
       this.checkedKeys = uniq(checkedKeys);
     }
   }

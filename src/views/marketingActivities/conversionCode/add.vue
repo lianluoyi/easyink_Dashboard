@@ -5,7 +5,7 @@
 -->
 <template>
   <div class="wrap">
-    <ReturnPage />
+    <ReturnPage path="/operationsCenter/conversionCode/list" />
     <div class="wrap-body">
       <el-alert
         title="功能说明"
@@ -97,7 +97,7 @@
 <script>
 import SelectUser from '@/components/SelectUser/index.vue';
 import RequestButton from '@/components/Button/RequestButton.vue';
-import { changeButtonLoading } from '@/utils/common';
+import { changeButtonLoading, checkChange } from '@/utils/common';
 import * as conversionCodeActive from '@/api/redeem';
 const ENABLE_ALARM_OR_LIMITED = {
   'open': 1,
@@ -133,6 +133,9 @@ export default {
         useUsers: [{ required: true, message: ' ', trigger: 'blur' }]
       }
     };
+  },
+  beforeUpdate() {
+    checkChange(this.$options.data().form, this.form);
   },
   created() {
     this.$route.query.id && conversionCodeActive['getConversionCodeActiveDetail']({ id: this.$route.query.id }).then((res) => {
@@ -199,7 +202,7 @@ export default {
             useUsers,
             id: this.$route.query.id
           };
-          conversionCodeActive[this.$route.query.id ? 'upadteConversionCodeActive' : 'addConversionCodeActive'](params).then((res) => {
+          conversionCodeActive[this.$route.query.id ? 'updateConversionCodeActive' : 'addConversionCodeActive'](params).then((res) => {
             this.msgSuccess('操作成功');
             changeButtonLoading(this.$store, 'save');
             !this.$route.query.id ? this.$router.push({ path: '/operationsCenter/conversionCode/conversionCodeDetail', query: { id: res.data || this.$route.query.id }}) : this.$router.go(-1);

@@ -58,7 +58,7 @@ export function deleteConversionCodeActive(data) {
  * @param {*} data
  * @returns
  */
-export function upadteConversionCodeActive(data) {
+export function updateConversionCodeActive(data) {
   return request({
     url: service + '/update',
     method: 'put',
@@ -105,7 +105,7 @@ export function deleteConversionCode(data) {
  * @param {*} data
  * @returns
  */
-export function upadteConversionCode(data) {
+export function updateConversionCode(data) {
   return request({
     url: serviceCode + '/update',
     method: 'put',

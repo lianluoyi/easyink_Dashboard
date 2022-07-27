@@ -290,7 +290,8 @@ export default {
         url: [WELCOME_APPENDIX_TYPE['img'], WELCOME_APPENDIX_TYPE['file']].includes(item.type) ? item.picUrl : item.url,
         coverUrl: item.picUrl,
         content: item.description,
-        title: item.content
+        title: item.content,
+        radarTitle: item.radar?.radarTitle
       };
       return newItem;
     },

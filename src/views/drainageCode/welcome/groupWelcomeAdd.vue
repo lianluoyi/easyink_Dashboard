@@ -1,11 +1,11 @@
 <!--
  * @Description: 添加入群欢迎语
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="flex add-group-welcome-page">
-    <ReturnPage />
+    <ReturnPage path="/operationsCenter/drainageCode/welcome" :query="{ welcomeMsgTplType: this.$route.query.welcomeMsgTplType }" />
     <div class="wrap-body">
       <el-alert
         title="功能说明"
@@ -45,6 +45,7 @@
                 :appendix-list.sync="appendixList"
                 :remove-appendix-list.sync="removeAppendixList"
                 :msg-tip="`欢迎语最多支持设置${MAX_APPENDIX_NUM}个附件`"
+                :group="true"
               />
             </el-form-item>
             <el-form-item v-if="!form.id" label="通知员工">
@@ -64,24 +65,26 @@
       </div>
     </div>
     <div class="wrap-footer">
-      <el-button type="primary" :loading="loading" @click="submit">保存</el-button>
+      <RequestButton type="primary" :request-method="submit" button-type="submit">保存</RequestButton>
     </div>
   </div>
 </template>
 <script>
+import RequestButton from '@/components/Button/RequestButton.vue';
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
 import PhoneDialog from '@/components/PhoneDialog';
 import ReturnPage from '@/components/ReturnPage.vue';
 import { editGroupWelMsg, addGroupWelMsg, getWelcomeDetaiById } from '@/api/tlp';
 import { dealAppendixType, dealAppendixTypeToMaterial } from '@/utils/index';
-
+import { checkChange, changeButtonLoading } from '@/utils/common';
+import { INTO_GROUP } from '@/utils/constant';
 // 入群欢迎语内容上限
 const MAX_GROUP_WELCOME_MSG_LENGTH = 1000;
 // 附件选择上限
 const MAX_APPENDIX_NUM = 1;
 export default {
   name: '',
-  components: { AddAppendixBtn, PhoneDialog, ReturnPage },
+  components: { AddAppendixBtn, PhoneDialog, ReturnPage, RequestButton },
   props: {},
   data() {
     const checkDefaultMsg = (rule, value, callback) => {
@@ -92,7 +95,6 @@ export default {
       }
     };
     return {
-      loading: false,
       appendixList: [],
       /** 素材库选择弹窗子标题 */
       subTitle: '已添加 0 个附件，还可选择 1 个',
@@ -129,6 +131,9 @@ export default {
     if (this.form.id) this.getDetail(this.form.id);
   },
   mounted() {},
+  beforeUpdate() {
+    checkChange({ ...this.$options.data().form, welcomeMsgTplType: INTO_GROUP }, this.form);
+  },
   methods: {
     /**
      * 点击保存
@@ -157,16 +162,17 @@ export default {
               }
             };
           }
-          this.loading = true;
           (this.form.id ? editGroupWelMsg : addGroupWelMsg)(params)
             .then(({ data }) => {
               this.msgSuccess('操作成功');
-              this.loading = false;
+              changeButtonLoading(this.$store, 'submit');
               this.goBack();
             })
             .catch(() => {
-              this.loading = false;
+              changeButtonLoading(this.$store, 'submit');
             });
+        } else {
+          changeButtonLoading(this.$store, 'submit');
         }
       });
     },

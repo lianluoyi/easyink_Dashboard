@@ -12,7 +12,6 @@ const MSG_DURATION = 2000;
 Vue.use(Element, {
   size: Cookies.get('size') || 'small' // set element-ui default size
 });
-
 import '@/styles/icon.scss'; // common css
 import '@/styles/common.scss'; // common css
 import '@/styles/index.scss'; // global css
@@ -107,29 +106,33 @@ Vue.use(directive);
 
 Vue.config.productionTip = false;
 
-// router.beforeEach((to, from, next) => {
-//   const whitePathName = ['Role', 'AddRule', 'CustomerCenter/customerDetail', 'StaffAdd', 'CustomerGroupDetail', 'NewCustomerAev', 'OldCustomerAev', 'WelcomeAdd', 'GroupWelcomeAdd', 'Add', 'Release', 'AddSOP']; // 拦截需要提示的路由name //所有的编辑页
-//   if (from.path !== '/' && !whitePathName.includes(from.name)) {
-//     window.sessionStorage.setItem('from', from.path); // 设置编辑页从哪个路由跳转来 在返回的时候使用push
-//   }
-//   // 若当前是通过浏览器返回,则不进行拦截
-//   if (window.history && window.history.pushState) {
-//     if (document.URL.split('#')[1] !== from.fullPath) {
-//       return next();
-//     }
-//   }
-//   if (!whitePathName.includes(from.name)) return next();
-//   Vue.prototype.$confirm('离开后，当前编辑内容不会保存，是否继续？', '提示', {
-//     confirmButtonText: '确定',
-//     cancelButtonText: '取消',
-//     type: 'warning'
-//   }).then(() => {
-//     next();
-//   }).catch(() => {
-//     next(false);
-//   });
-// });
-
+router.beforeEach((to, from, next) => {
+  const whitePathName = ['ConversionCodeAdd', 'Role', 'AddRule', 'CustomerCenter/customerDetail', 'StaffAdd', 'CustomerGroupDetail', 'NewCustomerAev', 'OldCustomerAev', 'WelcomeAdd', 'GroupWelcomeAdd', 'Add', 'Release', 'AddSOP']; // 拦截需要提示的路由name //所有的编辑页
+  if (from.path !== '/' && !whitePathName.includes(from.name)) {
+    window.sessionStorage.setItem('from', from.path); // 设置编辑页从哪个路由跳转来 在返回的时候使用push
+  }
+  // 若当前是通过浏览器返回,则不进行拦截
+  if (window.history && window.history.pushState) {
+    if (document.URL.split('#')[1] !== from.fullPath) {
+      return next();
+    }
+  }
+  if (!whitePathName.includes(from.name)) return next();
+  if (window.sessionStorage.getItem('change') === 'true') {
+    Vue.prototype.$confirm('离开后，当前页面更改内容不会保存，是否继续？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      next();
+      window.sessionStorage.setItem('change', false);
+    }).catch(() => {
+      next(false);
+    });
+  } else {
+    next();
+  }
+});
 new Vue({
   el: '#app',
   router,
