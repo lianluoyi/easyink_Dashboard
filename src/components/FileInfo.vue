@@ -1,10 +1,19 @@
 <!--
  * @Description: 文件样式
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
-  <div class="file-info-div">
+  <div v-if="item.mediaType === Number(MEDIA_TYPE_RADARLINK)">
+    <RadarLink
+      :radar-title="radarTitle"
+      class-name="material-preview"
+      :link-title="item.title"
+      :cover-url="item.coverUrl"
+      :content="item.content"
+    />
+  </div>
+  <div v-else class="file-info-div">
     <div class="cover-img">
       <svg v-if="item.mediaType === MEDIA_TYPE_FILE" class="icon" aria-hidden="true" width="60" height="60">
         <use :xlink:href="'#icon-' + getFileIconClass" />
@@ -31,11 +40,11 @@
 </template>
 <script>
 import { getFileIcon, filterSize } from '@/utils/common';
-import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP } from '@/utils/constant';
-
+import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP } from '@/utils/constant';
+import RadarLink from '@/views/radarLibrary/components/radarLink.vue';
 export default {
   name: '',
-  components: {},
+  components: { RadarLink },
   props: {
     type: {
       type: String,
@@ -55,7 +64,8 @@ export default {
   },
   data() {
     return {
-      MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP
+      MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP,
+      MEDIA_TYPE_RADARLINK
     };
   },
   computed: {
@@ -72,6 +82,10 @@ export default {
       } else {
         return item[this.descField];
       }
+    },
+    radarTitle() {
+      const item = { ...this.item };
+      return item.radar?.radarTitle || item.radarTitle;
     }
   },
   created() {},
@@ -81,7 +95,7 @@ export default {
      * 获取封面地址
      */
     dealCoverUrl(item, type) {
-      if ([MEDIA_TYPE_IMGLINK, MEDIA_TYPE_MINIAPP].includes(type)) {
+      if ([MEDIA_TYPE_IMGLINK, MEDIA_TYPE_MINIAPP, Number(MEDIA_TYPE_RADARLINK)].includes(type)) {
         return item.coverUrl;
       } else {
         return item.url;
@@ -91,7 +105,7 @@ export default {
      * 获取摘要内容
      */
     dealContent(content, type) {
-      if ([MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE].includes(type)) {
+      if ([MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, Number(MEDIA_TYPE_RADARLINK)].includes(type)) {
         return filterSize(content);
       } else {
         return content;

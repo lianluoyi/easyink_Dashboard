@@ -5,7 +5,7 @@
 -->
 <template>
   <div class="add-rule-page wrap">
-    <ReturnPage class="wrap-head" />
+    <ReturnPage class="wrap-head" path="/customerManage/customerCenter/autoLabel" :query="{ labelType: this.$route.query.labelType }" />
     <div class="wrap-body">
       <el-alert
         title="功能说明"
@@ -198,7 +198,7 @@
 </template>
 <script>
 import RequestButton from '@/components/Button/RequestButton.vue';
-import { changeButtonLoading } from '@/utils/common';
+import { changeButtonLoading, checkChange } from '@/utils/common';
 import ReturnPage from '@/components/ReturnPage.vue';
 import { AUTOLABEL_TYPE } from '@/utils/constant';
 import SceneList from './components/sceneList.vue';
@@ -292,6 +292,25 @@ export default {
     }
   },
   mounted() {},
+  beforeUpdate() {
+    const { useStaff, fuzzyKeywords, accurateKeywords, ruleForm, sceneList } = this.$options.data();
+    sceneList.push({ chatRoomList: [], tagList: [] });
+    const oldVal = {
+      useStaff,
+      fuzzyKeywords,
+      accurateKeywords,
+      sceneList: this.labelType === AUTOLABEL_TYPE['intoGroup'] ? [{ chatRoomList: [], tagList: [] }] : [{ sceneType: NEWCUSOMTER_SCENE_TYPE['day'], loopPoint: NEWCUSOMTER_SCENE_TYPE['day'] }],
+      ...ruleForm
+    };
+    const newVal = {
+      useStaff: this.useStaff,
+      fuzzyKeywords: this.fuzzyKeywords,
+      accurateKeywords: this.accurateKeywords,
+      sceneList: this.sceneList,
+      ...this.ruleForm
+    };
+    checkChange(oldVal, newVal);
+  },
   methods: {
     /**
      * 根据不同标签类型显示不同的提示语

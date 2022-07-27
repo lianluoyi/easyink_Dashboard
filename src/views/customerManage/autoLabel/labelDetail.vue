@@ -8,10 +8,10 @@
     <ReturnPage />
     <div class="label-detail-content mt10">
       <el-tabs v-model="activeName" class="label-header-container">
-        <el-tab-pane label="规则详情" name="0">
+        <el-tab-pane label="规则详情" :name="TAG_DETAIL['rule_detail']">
           <LabelDetailTab />
         </el-tab-pane>
-        <el-tab-pane :label="'客户记录'" name="1" :lazy="true">
+        <el-tab-pane :label="'客户记录'" :name="TAG_DETAIL['customer_record']" :lazy="true">
           <CustomerRecord />
         </el-tab-pane>
       </el-tabs>
@@ -23,7 +23,10 @@
 import ReturnPage from '@/components/ReturnPage.vue';
 import LabelDetailTab from './components/labelDetailTab.vue';
 import CustomerRecord from './components/customerRecord.vue';
-
+const TAG_DETAIL = {
+  'rule_detail': '0',
+  'customer_record': '1'
+};
 export default {
   name: '',
   components: { ReturnPage, LabelDetailTab, CustomerRecord },
@@ -35,7 +38,8 @@ export default {
   },
   data() {
     return {
-      activeName: '0',
+      TAG_DETAIL,
+      activeName: TAG_DETAIL['rule_detail'],
       labelRuleInfo: {
         labelType: null,
         ruleId: null
@@ -46,7 +50,7 @@ export default {
   created() {
     this.labelRuleInfo.labelType = Number(this.$route.query.labelType);
     this.labelRuleInfo.ruleId = this.$route.query.id;
-    this.activeName = window.sessionStorage.getItem('DetailActive');
+    this.activeName = window.sessionStorage.getItem('DetailActive') || TAG_DETAIL['rule_detail'];
     window.sessionStorage.removeItem('DetailActive');
   },
   methods: {}

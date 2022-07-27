@@ -1,7 +1,7 @@
 <!--
  * @Description: 添加附件按钮组件
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div>
@@ -30,10 +30,13 @@
             <i class="el-icon-remove-outline" @click="handleDeleteAppendix(index, appendix)" />
           </el-tooltip>
           <span class="appendix-type">[{{ MESSAGE_MEDIA_TYPE[appendix.mediaType] }}]</span>
-          <span class="appendix-title inoneline">{{ appendix.materialName }}</span>
+          <span v-if="appendix.mediaType == Number(MEDIA_TYPE_RADARLINK)" class="appendix-title inoneline">{{ appendix.radarTitle || appendix.radar.radarTitle }}</span>
+          <span v-else class="appendix-title inoneline">{{ appendix.materialName }}</span>
           <span class="appendix-operate-icon">
             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-              <i class="iconfont icon-tool-edit" @click="() => showEditMaterial(appendix)" />
+              <!-- 雷达不允许编辑 使用一个空的i标签 不然会导致拖拽排序位置偏离 -->
+              <i v-if="appendix.mediaType !== Number(MEDIA_TYPE_RADARLINK)" class="iconfont icon-tool-edit" @click="() => showEditMaterial(appendix)" />
+              <i v-else />
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="长按拖拽排序" placement="right">
               <i
@@ -64,6 +67,7 @@
       v-if="dialogVisibleSelectMaterial"
       ref="materialDrawer"
       drawer-title="选择素材"
+      :group="group"
       :visible.sync="dialogVisibleSelectMaterial"
       :list="materialList"
       :get-list="getMaterialList"
@@ -73,6 +77,7 @@
       :file-tool-list="['download']"
       :miniapp-tool-list="[]"
       :query.sync="query"
+      :radar-query.sync="radarQuery"
       :sub-title="subTitle"
       :type="'select'"
       :total="total"
@@ -106,11 +111,14 @@ import {
   MEDIA_TYPE,
   MESSAGE_MEDIA_TYPE,
   MAX_APPENDIX_NUM,
-  PAGE_LIMIT
+  MEDIA_TYPE_RADARLINK,
+  PAGE_LIMIT,
+  RADAR_TYPE
 } from '@/utils/constant';
 import { getList as getMaterialListApi } from '@/api/material';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import { getCategoryList, getMaterialTagList } from '@/utils/material';
+import { getRadaList } from '@/api/radar';
 export default {
   name: 'AddAppendixBtn',
   components: { MaterialAddModal, MaterialListDrawer },
@@ -141,6 +149,11 @@ export default {
     removeAppendixList: {
       type: Array,
       default: () => []
+    },
+    // 是否是群欢迎语
+    group: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -149,6 +162,7 @@ export default {
       appendixType: MEDIA_TYPE_POSTER,
       dialogVisibleSelectMaterial: false,
       MEDIA_TYPE,
+      RADAR_TYPE,
       MESSAGE_MEDIA_TYPE,
       dragSource: undefined,
       dragTarget: undefined,
@@ -161,6 +175,13 @@ export default {
         mediaType: MEDIA_TYPE_POSTER,
         isExpire: false
       },
+      // 雷达查询条件
+      radarQuery: {
+        type: this.$store.state.user.isSuperAdmin ? RADAR_TYPE['enterprise'] : '',
+        pageNum: 1,
+        pageSize: PAGE_LIMIT,
+        searchTitle: ''
+      },
       isLoadingMaterial: true,
       total: 0,
       materialList: [],
@@ -171,6 +192,7 @@ export default {
       MEDIA_TYPE_VIDEO,
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_MINIAPP,
+      MEDIA_TYPE_RADARLINK,
       MAX_APPENDIX_NUM
     };
   },
@@ -301,14 +323,43 @@ export default {
      */
     getMaterialList(params) {
       this.isLoadingMaterial = true;
-      getMaterialListApi({
-        ...this.query,
-        ...params
-      }).then(res => {
-        this.materialList = res.rows;
-        this.total = Number(res.total);
-        this.isLoadingMaterial = false;
-      });
+      if (params.mediaType !== MEDIA_TYPE_RADARLINK) {
+        getMaterialListApi({
+          ...this.query,
+          ...params
+        }).then(res => {
+          this.materialList = res.rows;
+          this.total = Number(res.total);
+          this.isLoadingMaterial = false;
+        });
+      } else {
+        // 雷达不从素材库获取 从雷达列表中获取
+        getRadaList(this.radarQuery).then(res => {
+          const newArr = res.rows.map((item) => {
+            return {
+              // 链接标题
+              title: item.weRadarUrl.title,
+              // 链接摘要
+              content: item.weRadarUrl.content,
+              // 链接封面
+              coverUrl: item.weRadarUrl.coverUrl,
+              // 链接URL
+              url: item.weRadarUrl.url,
+              // 雷达标题
+              radarTitle: item.radarTitle,
+              radarId: item.radarId,
+              materialUrl: item.weRadarUrl.url,
+              materialName: item.weRadarUrl.title,
+              radarTagList: item.radarTagList,
+              mediaType: +MEDIA_TYPE_RADARLINK,
+              categoryId: this.$store.state.materialInfo?.categoryInfo[+MEDIA_TYPE_RADARLINK]?.id || ''
+            };
+          });
+          this.materialList = newArr;
+          this.total = Number(res.total);
+          this.isLoadingMaterial = false;
+        });
+      }
     },
     /**
      * 编辑附件（点击的对应附件内容）

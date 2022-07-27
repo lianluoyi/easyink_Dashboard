@@ -1,7 +1,7 @@
 <!--
  * @Description: 发布朋友圈
  * @Author: wJiaaa
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <script>
 import RequestButton from '@/components/Button/RequestButton.vue';
@@ -9,7 +9,7 @@ import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import TagUserShow from '@/components/TagUserShow';
 import {
-  PAGE_LIMIT, MEDIA_TYPE, MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, DEFAULT_IMG, CUSTOM_LINK, DEFAULT_LINK, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH
+  PAGE_LIMIT, MEDIA_TYPE, RADAR_TYPE, MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, DEFAULT_IMG, CUSTOM_LINK, DEFAULT_LINK, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH, MEDIA_TYPE_RADARLINK
 } from '@/utils/constant';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import VerbalTrickImgLink from './Link.vue';
@@ -20,7 +20,8 @@ import Uploadimg from './Uploadimg.vue';
 import FriendsUpload from './friendsUpload.vue';
 import { getWordsUrlContent } from '@/api/wordsGroup';
 import { createFriendsCircle, updateMoment, getMomentTaskBasicInfo } from '@/api/friends';
-import { changeButtonLoading, groupByScopeType } from '@/utils/common';
+import { changeButtonLoading, groupByScopeType, checkChange } from '@/utils/common';
+// import { getRadaList } from '@/api/radar';
 import moment from 'moment';
 // 朋友圈为图片时，素材库显示的title最大选取数量
 const MAX_APPENDIX_NUM = 9;
@@ -28,6 +29,8 @@ const MAX_APPENDIX_NUM = 9;
 const MAX_APPENDIX_VIDEO_NUM = 1;
 const FILE_NAME_LENGTH = 100;
 const FRIENDSCIRCLE = 'friendscircle';
+// 来自素材库
+const FROM_MATERIAL = 2;
 export default {
   components: { SelectTag, SelectUser, MaterialListDrawer, VerbalTrickImgLink, FriendsUpload, MaterialAddModal, UploadVideo, Uploadimg, RequestButton, TagUserShow },
   props: {},
@@ -37,8 +40,14 @@ export default {
       LINK_CONTENT_MAXLENGTH,
       DEFAULT_LINK,
       CUSTOM_LINK,
+      FROM_MATERIAL,
+      RADAR_TYPE,
       DEFAULT_IMG,
       FRIENDSCIRCLE,
+      // radarQuery: {
+      //   type: this.$store.state.user.isSuperAdmin ? RADAR_TYPE['enterprise'] : '',
+      //   searchTitle: ''
+      // },
       // 文件名字限制
       limitFileName: FILE_NAME_LENGTH,
       loading: false,
@@ -85,6 +94,7 @@ export default {
       MEDIA_TYPE_IMGLINK,
       MEDIA_TYPE_VIDEO,
       MEDIA_TYPE,
+      MEDIA_TYPE_RADARLINK,
       appendixType: MEDIA_TYPE_POSTER,
       showAppendixAddModal: false,
       materialForm: {}, // 素材表单
@@ -96,7 +106,8 @@ export default {
       selectTagType: 'tags',
       // 判断在详情页点击的是编辑还是复制
       from: 'copy',
-      momentTaskId: ''
+      momentTaskId: '',
+      chooseMaterial: false
     };
   },
   computed: {
@@ -123,6 +134,22 @@ export default {
         this.appendixType = MEDIA_TYPE_POSTER;
       }
     },
+    isDefined(val) {
+      if (val === FROM_MATERIAL) {
+        this.form.attachments = [];
+        this.link = {};
+        this.materialType = MEDIA_TYPE_IMGLINK;
+        this.chooseMaterial = true;
+        this.dialogVisibleSelectMaterial = true;
+      } else {
+        this.chooseMaterial = false;
+        this.materialType = MEDIA_TYPE_POSTER;
+      }
+    },
+    chooseMaterial(val) {
+      this.link = {};
+      this.form.attachments = [];
+    },
     form: {
       deep: true,
       handler: function() {
@@ -130,6 +157,19 @@ export default {
           : `已添加 ${this.form.attachments.length} 个附件，还可选择 ${MAX_APPENDIX_VIDEO_NUM - this.form.attachments.length} 个`;
       }
     }
+  },
+  beforeUpdate() {
+    // 未修改之前的值 原始值
+    const oldVal = {
+      ...this.$options.data().form,
+      momentsContent: this.$options.data().momentsContent
+    };
+    // 修改之后的值
+    const newVal = {
+      ...this.form,
+      momentsContent: this.momentsContent
+    };
+    checkChange(oldVal, newVal);
   },
   created() {},
   mounted() {
@@ -191,12 +231,12 @@ export default {
         this.loading = false;
       });
     }
-    this.getMaterialList();
+    this.getMaterialList({ mediaType: this.materialType });
   },
   methods: {
     // 点击链接清除的输入框之后触发的方法
     clear() {
-      if (this.isDefined === 'DEFAULT_LINK') {
+      if (this.isDefined === DEFAULT_LINK) {
         this.link = {};
         this.form.attachments = [];
       } else {
@@ -318,6 +358,7 @@ export default {
               changeButtonLoading(this.$store, 'submit');
             }
             this.link.mediaType = Number(MEDIA_TYPE_IMGLINK);
+            // this.link.mediaType = this.isDefined === FROM_MATERIAL ? Number(MEDIA_TYPE_RADARLINK) : Number(MEDIA_TYPE_IMGLINK);
             form.attachments[0] = this.link;
             this.form.attachments[0] = this.link;
             // 在提交时将链接类型设置到附件里
@@ -358,6 +399,8 @@ export default {
           changeButtonLoading(this.$store, 'submit');
           this.msgSuccess('操作成功');
           this.loading = false;
+          // 路由跳转前设置change为false,在requestbutton中不起作用是因为点击按钮之后又触发了组件的更新，导致change又变为true
+          window.sessionStorage.setItem('change', false);
           this.$router.push('record');
         }).catch(() => {
           changeButtonLoading(this.$store, 'submit');
@@ -367,6 +410,7 @@ export default {
     // 获取素材列表
     getMaterialList(params) {
       this.isLoadingMaterial = true;
+      // if (params.mediaType !== MEDIA_TYPE_RADARLINK) {
       getList({
         ...this.query,
         ...params
@@ -375,10 +419,36 @@ export default {
         this.total = Number(res.total);
         this.isLoadingMaterial = false;
       });
+      // } else {
+      // getRadaList(this.radarQuery).then(res => {
+      //   const newArr = res.rows.map((item) => {
+      //     return {
+      //       // 链接标题
+      //       title: item.weRadarUrl.title,
+      //       // 链接摘要
+      //       content: item.weRadarUrl.content,
+      //       // 链接封面
+      //       coverUrl: item.weRadarUrl.coverUrl,
+      //       // 链接URL
+      //       url: item.weRadarUrl.url,
+      //       // 雷达标题
+      //       radarTitle: item.radarTitle,
+      //       radarId: item.radarId,
+      //       tagList: item.radarTagList,
+      //       mediaType: +MEDIA_TYPE_RADARLINK,
+      //       categoryId: this.$store.state.materialInfo?.categoryInfo[+MEDIA_TYPE_RADARLINK]?.id || '',
+      //       tagIdList: item.radarTagList
+      //     };
+      //   });
+      //   this.materialList = newArr;
+      //   this.total = Number(res.total);
+      //   this.isLoadingMaterial = false;
+      // });
+      // }
     },
     // 选择素材
     handleAddApendixList(list) {
-      // 上传的最大图片和视频的数量 图片为9 视频为1 链接封面为1
+      // 上传的最大图片和视频的数量 图片为9 视频为1 链接封面为1 雷达为1
       let MAX = 9;
       if (this.momentsContent !== MEDIA_TYPE_POSTER) {
         MAX = 1;
@@ -393,6 +463,17 @@ export default {
             itemList.mediaType = item.mediaType;
             itemList.size = item.content;
           } else if (this.momentsContent === MEDIA_TYPE_IMGLINK) {
+            this.link.mediaType = this.isDefined === FROM_MATERIAL ? Number(MEDIA_TYPE_RADARLINK) : Number(MEDIA_TYPE_IMGLINK);
+            if (this.isDefined === FROM_MATERIAL) {
+              this.link.coverUrl = item.coverUrl;
+              this.link.url = item.url || item.materialUrl;
+              this.link.title = item.materialName;
+              this.link.addressUrl = item.url || item.materialUrl;
+              if (item.mediaType === Number(MEDIA_TYPE_RADARLINK)) {
+                this.link.radarId = item.radarId;
+              }
+              return;
+            }
             this.link.coverUrl = item.materialUrl;
             this.link.url = item.materialUrl;
           } else {
@@ -406,7 +487,11 @@ export default {
         if (this.momentsContent === MEDIA_TYPE_POSTER) {
           this.msgWarn(`上传海报不能超过${MAX}个！请重新选择`);
         } else {
-          this.msgWarn(this.momentsContent === MEDIA_TYPE_IMGLINK ? '只允许添加一张封面图片' : '只允许添加一个视频');
+          if (this.isDefined === FROM_MATERIAL) {
+            this.msgWarn('只允许添加一个链接');
+          } else {
+            this.msgWarn(this.momentsContent === MEDIA_TYPE_IMGLINK ? '只允许添加一张封面图片' : '只允许添加一个视频');
+          }
         }
       }
     },
@@ -564,6 +649,7 @@ export default {
                       <el-radio-group v-model="isDefined">
                         <el-radio :label="DEFAULT_LINK">使用链接默认信息</el-radio>
                         <el-radio :label="CUSTOM_LINK">自定义链接信息</el-radio>
+                        <!-- <el-radio :label="FROM_MATERIAL">从素材库选取</el-radio> -->
                       </el-radio-group>
                       <div v-if="isDefined === CUSTOM_LINK">
                         <el-form-item label-width="0" prop="url">
@@ -597,7 +683,7 @@ export default {
                         <div class="momentsContent-tip">只能上传jpg/png文件，且大小不超过10M，尺寸不超过1440×1080</div>
                         <VerbalTrickImgLink :title="link.title" :cover-url="link.coverUrl" />
                       </div>
-                      <div v-else>
+                      <div v-if="isDefined === DEFAULT_LINK">
                         <el-form-item label-width="0" prop="url">
                           <el-input
                             v-model="link.addressUrl"
@@ -611,9 +697,13 @@ export default {
                         </el-form-item>
                         <VerbalTrickImgLink :title="link.title" :cover-url="link.coverUrl" />
                       </div>
+                      <!-- <div v-if="isDefined === FROM_MATERIAL">
+                        <VerbalTrickImgLink :title="link.title" :cover-url="link.coverUrl" />
+                      </div> -->
                     </div>
                   </div>
-                </div></el-form-item>
+                </div>
+              </el-form-item>
             </div>
           </div>
           <div v-if="form.type === 0" class="form-base-wrap">
@@ -719,6 +809,7 @@ export default {
         drawer-title="选择素材"
         :moment="true"
         :moment-type="momentsContent"
+        :choose-material="chooseMaterial"
         :visible.sync="dialogVisibleSelectMaterial"
         :list="materialList"
         :get-list="getMaterialList"
@@ -949,7 +1040,7 @@ export default {
   .item-div {
       border: 1px solid $borderColor;
       padding: 10px;
-      width: 380px;
+      width: 580px;
       margin-top: 10px;
       /deep/ .el-form-item__error {
         position: relative;

@@ -9,7 +9,7 @@ import { getRepeatItem, dealAppendixType, dealAppendixTypeToMaterial } from '@/u
 import PhoneDialog from '@/components/PhoneDialog';
 import uniqBy from 'lodash/uniqBy';
 import RequestButton from '@/components/Button/RequestButton.vue';
-import { changeButtonLoading } from '@/utils/common';
+import { changeButtonLoading, checkChange } from '@/utils/common';
 const MAX_WELCOME_MSG_LENGTH = 1000;
 
 export default {
@@ -67,6 +67,9 @@ export default {
     this.welcomeMsgTplType = EMPLOYEES_WELCOME;
   },
   mounted() {},
+  beforeUpdate() {
+    checkChange({ ...this.$options.data().form, appendixList: this.$options.data().appendixList, welcomeMsgTplType: EMPLOYEES_WELCOME }, { appendixList: this.appendixList, ...this.form });
+  },
   methods: {
     getData() {},
     goBack() {
@@ -315,7 +318,7 @@ export default {
 
 <template>
   <div class="flex add-welcome-page">
-    <ReturnPage />
+    <ReturnPage path="/operationsCenter/drainageCode/welcome" :query="{ welcomeMsgTplType: this.$route.query.welcomeMsgTplType }" />
     <div class="wrap-body">
       <el-alert
         title="功能说明"

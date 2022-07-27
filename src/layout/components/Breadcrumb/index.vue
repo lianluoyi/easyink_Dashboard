@@ -173,6 +173,12 @@ const specialRoute = {
       title: '兑换码',
       path: '/operationsCenter/marketingActivities/conversionCode'
     }
+  ],
+  '/operationsCenter/material/radarDetail': [
+    {
+      title: '雷达库',
+      path: '/operationsCenter/material/radarManage'
+    }
   ]
 };
 

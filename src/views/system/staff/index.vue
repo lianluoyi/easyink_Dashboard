@@ -185,7 +185,7 @@ export default {
       api
         .getTree()
         .then(({ data }) => {
-          this.scopeDeptList = data.filter((ele) => ele.enable);
+          this.scopeDeptList = data;
           this.treeData = this.handleTree(this.scopeDeptList);
           this.treeMap = this.getDeptMap(data);
           this.query.departments = this.dealScopedDepts(this.scopeDeptList[0] ? this.scopeDeptList[0].id : '').join(

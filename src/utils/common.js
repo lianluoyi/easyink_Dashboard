@@ -6,10 +6,9 @@ import {
   MEDIA_TYPE_FILE, FILE_EXCEL_TYPE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK,
   MEDIA_TYPE_MINIAPP, SCOPELIST_TYPE
 } from '@/utils/constant';
-import { groupBy } from 'lodash';
+import { groupBy, isEqual } from 'lodash';
 const baseURL = process.env.VUE_APP_BASE_API;
 const TIME_LENGTH = 10;
-
 // 日期格式化
 export function parseTime(time, pattern) {
   if (arguments.length === 0 || !time) {
@@ -734,4 +733,16 @@ export const groupByScopeType = (users) => {
   const useEmployeesList = groupObj[SCOPELIST_TYPE.USER] || [];
   const useDepartmentList = groupObj[SCOPELIST_TYPE.DEPARTMENT] || [];
   return { useEmployeesList, useDepartmentList };
+};
+
+/**
+ * @Description: 属性改变监听
+ * @param {object} newVal - 原始值
+ * @param {object} oldVal - 改变的
+ * @使用方法: 首先导入  import {checkChange} from '@/utils/common';   在组件的beforeUpdate生命周期中使用
+ * @example : beforeUpdate{ checkChange(newVal, oldVal) }
+ * @attention newVal 是 this.$options.data()中你需要监听是否改变的值 oldVal是改变的值 详细使用方法可以查看 朋友圈 beforeUpdate的使用 也可查看自动标签中自定义oldval newval的使用
+ */
+export const checkChange = (oldVal, newVal) => {
+  window.sessionStorage.setItem('change', !isEqual(newVal, oldVal));
 };

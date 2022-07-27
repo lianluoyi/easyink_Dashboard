@@ -4,7 +4,7 @@
  * @LastEditors: wJiaaa
 -->
 <script>
-import { CUSTOM_LINK, DEFAULT_LINK, IMG_LINK_DIGEST, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH } from '@/utils/constant';
+import { CUSTOM_LINK, DEFAULT_LINK, DEFAULT_IMG, IMG_LINK_DIGEST, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH } from '@/utils/constant';
 import VerbalTrickImgLink from '../../views/verbalTrickLibrary/component/verbalTrickPreview/verbalTrickImgLink.vue';
 import { getWordsUrlContent } from '@/api/wordsGroup';
 /**
@@ -36,6 +36,7 @@ export default {
       DEFAULT_LINK,
       CUSTOM_LINK,
       IMG_LINK_DIGEST,
+      DEFAULT_IMG,
       // 是否是自定义链接 默认为false
       isDefined: DEFAULT_LINK
     };
@@ -64,6 +65,12 @@ export default {
           this.$set(this.form, 'digest', res.data?.desc?.substring(0, LINK_CONTENT_MAXLENGTH));
           this.$set(this.form, 'materialName', res.data?.title?.substring(0, LINK_TITLE_MAXLENGTH));
           if (!res.data.isUrl && res.data.image) {
+            // 判断是否是BASE64格式
+            const IMG_FORMAT_LENGTH = 4;
+            if (res.data.image.substring(0, IMG_FORMAT_LENGTH) === 'data') {
+              this.radarLink.coverUrl = DEFAULT_IMG.link;
+              return;
+            }
             // 这里定义一个url来获取链接中的域名部分
             const url = this.form.materialUrl.split('/');
             const newCoverUrl = 'https://' + url[2] + (res.data.image[0] !== '/' ? '/' : '') + res.data.image;

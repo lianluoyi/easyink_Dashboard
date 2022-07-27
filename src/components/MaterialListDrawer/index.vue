@@ -9,7 +9,9 @@ import {
   MEDIA_TYPE_VIDEO,
   MEDIA_TYPE_FILE,
   MEDIA_TYPE_MINIAPP,
-  MEDIA_TYPE
+  MEDIA_TYPE,
+  MEDIA_TYPE_RADARLINK,
+  RADAR_TYPE
 } from '@/utils/constant';
 import { restoreMaterial, removeMaterial } from '@/api/material';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
@@ -103,6 +105,19 @@ export default {
     momentType: {
       type: String,
       default: MEDIA_TYPE_POSTER
+    },
+    // 是否从素材库选取
+    chooseMaterial: {
+      type: Boolean,
+      default: false
+    },
+    radarQuery: {
+      type: Object,
+      default: () => {}
+    },
+    group: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -112,14 +127,32 @@ export default {
       MEDIA_TYPE_VIDEO,
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_MINIAPP,
+      MEDIA_TYPE_RADARLINK,
       activeName: this.materialType,
       MEDIA_TYPE,
       tagIdList: [],
+      RADAR_TYPE,
       // 选中素材详情列表
       selectedMaterialList: []
     };
   },
   computed: {
+    // 选择雷达下拉框
+
+    radarSelect() {
+      // 当前是admin
+      if (this.$store.state.user.isSuperAdmin) {
+        return [
+          { type: RADAR_TYPE['enterprise'], name: '企业雷达' }
+        ];
+      } else {
+        return [
+          { type: RADAR_TYPE['enterprise'], name: '企业雷达' },
+          { type: RADAR_TYPE['department'], name: '部门雷达' },
+          { type: RADAR_TYPE['personal'], name: '个人雷达' }
+        ];
+      }
+    },
     drawerVisible: {
       get() {
         // this.getTree();
@@ -189,6 +222,9 @@ export default {
       this.tagIdList = [];
       this.query.search = '';
       this.query.pageNum = 1;
+      this.radarQuery.type = '';
+      this.radarQuery.pageNum = 1;
+      this.radarQuery.searchTitle = '';
       this.onSearch();
     },
     /**
@@ -199,17 +235,16 @@ export default {
         this.selectedMaterialList = [];
         this.$emit('emptyExpireList');
       }
-      this.getList({
-        mediaType: this.activeName
-      });
       this.$emit('update:materialType', this.activeName);
       this.query.pageNum = 1;
       this.query.mediaType = this.activeName;
     },
     onSearch() {
+      this.radarQuery.pageNum = 1;
       this.getList({
         pageNum: 1,
-        tagIds: this.tagIdList && this.tagIdList.join(',')
+        tagIds: this.tagIdList && this.tagIdList.join(','),
+        mediaType: this.materialType
       });
       this.$emit('changeTagIdList', this.tagIdList);
     },
@@ -295,7 +330,7 @@ export default {
      */
     getAndClearSelected() {
       this.type === 'search' && (this.selectedMaterialList = []);
-      this.getList({});
+      this.getList({ mediaType: this.materialType });
     },
     submit() {
       if (typeof this.limitSelectLength === 'number' && this.selectedMaterialList.length > this.limitSelectLength) {
@@ -324,15 +359,17 @@ export default {
         <el-radio-group v-model="activeName" class="radio-group-div" size="medium" @change="changeTab">
           <el-radio-button
             :label="MEDIA_TYPE_POSTER"
-            :disabled="moment && momentType === MEDIA_TYPE_VIDEO"
+            :disabled="moment && (momentType === MEDIA_TYPE_VIDEO || chooseMaterial)"
           >海报</el-radio-button>
-          <el-radio-button :label="MEDIA_TYPE_IMGLINK" :disabled="moment">链接</el-radio-button>
+          <el-radio-button :label="MEDIA_TYPE_IMGLINK" :disabled="moment && (momentType === MEDIA_TYPE_VIDEO || momentType === MEDIA_TYPE_POSTER || !chooseMaterial)">链接</el-radio-button>
           <el-radio-button
             :label="MEDIA_TYPE_VIDEO"
             :disabled="moment && (momentType === MEDIA_TYPE_POSTER || momentType === MEDIA_TYPE_IMGLINK)"
           >视频</el-radio-button>
           <el-radio-button :label="MEDIA_TYPE_FILE" :disabled="moment">文件</el-radio-button>
           <el-radio-button :label="MEDIA_TYPE_MINIAPP" :disabled="moment">小程序</el-radio-button>
+          <!-- 先注释朋友圈的雷达选项 -->
+          <el-radio-button v-show="!moment && !group" :label="MEDIA_TYPE_RADARLINK" :disabled="moment && !chooseMaterial">雷达</el-radio-button>
         </el-radio-group>
         <div class="tab-right-btn">
           <slot name="tab-right-btn" />
@@ -340,21 +377,34 @@ export default {
       </div>
       <div class="search-container">
         <div class="search-item">
-          <el-input v-model="query.search" placeholder="请输入素材标题" clearable style="width: 240px" />
+          <el-input v-if="activeName!== MEDIA_TYPE_RADARLINK" v-model="query.search" placeholder="请输入素材标题" clearable style="width: 240px" />
+          <el-input v-else v-model="radarQuery.searchTitle" placeholder="输入雷达/链接标题" clearable style="width: 240px" />
         </div>
         <div class="search-item">
-          <el-select
-            v-model="tagIdList"
-            clearable
-            filterable
-            multiple
-            collapse-tags
-            placeholder="请选择标签"
-            style="width: 240px"
-          >
-            <!-- <el-option label="所有标签" value /> -->
-            <el-option v-for="(item, index) in allTagList" :key="index" :label="item.tagName" :value="item.id" />
-          </el-select>
+          <div v-show="activeName!== MEDIA_TYPE_RADARLINK">
+            <el-select
+              v-model="tagIdList"
+              clearable
+              filterable
+              multiple
+              collapse-tags
+              placeholder="请选择标签"
+              style="width: 240px"
+            >
+              <!-- <el-option label="所有标签" value /> -->
+              <el-option v-for="(item, index) in allTagList" :key="index" :label="item.tagName" :value="item.id" />
+            </el-select>
+          </div>
+          <div v-show="activeName=== MEDIA_TYPE_RADARLINK">
+            <el-select
+              v-model="radarQuery.type"
+              clearable
+              placeholder="请选择雷达类型"
+              style="width: 240px"
+            >
+              <el-option v-for="(item, index) in radarSelect" :key="index" :label="item.name" :value="item.type" />
+            </el-select>
+          </div>
         </div>
         <el-button type="primary" @click="onSearch()">查询</el-button>
         <el-button class="btn-reset" @click="resetQuery()">重置</el-button>
@@ -366,7 +416,7 @@ export default {
               共 <span class="num theme-text-color">{{ total }}</span> 个{{ type === 'search' ? '过期的' : ''
               }}{{ MEDIA_TYPE[activeName] }}素材
             </div>
-            <div class="right-btn">
+            <div v-if="activeName !== MEDIA_TYPE_RADARLINK" class="right-btn">
               <slot name="right-btn" />
             </div>
           </div>
@@ -438,6 +488,18 @@ export default {
                   :hide-status="type === 'search'"
                   @getList="getList"
                 />
+                <FileItem
+                  v-if="activeName === MEDIA_TYPE_RADARLINK"
+                  :key="index"
+                  :item="item"
+                  :type="MEDIA_TYPE_RADARLINK"
+                  :show-expire-time="showExpireTime"
+                  :selected-material-list="selectedMaterialList"
+                  :select-material="selectMaterial"
+                  :hide-status="type === 'search'"
+                  :desc-field="'digest'"
+                  @getList="getList"
+                />
               </template>
             </div>
           </empty-default-icon>
@@ -447,13 +509,23 @@ export default {
           :style="type === 'select' && total > 0 ? { justifyContent: 'space-between' } : { justifyContent: 'end' }"
         >
           <pagination
-            v-show="total > 0"
+            v-show="total > 0 && activeName !== MEDIA_TYPE_RADARLINK"
             :total="total"
             :page.sync="query.pageNum"
             :limit.sync="query.pageSize"
             :layout="type === 'select' ? 'sizes, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
             @pagination="getAndClearSelected"
           />
+          <template v-if="Object.keys(radarQuery || {}).length">
+            <pagination
+              v-show="total > 0 && activeName === MEDIA_TYPE_RADARLINK "
+              :total="total"
+              :page.sync="radarQuery.pageNum"
+              :limit.sync="radarQuery.pageSize"
+              :layout="type === 'select' ? 'sizes, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
+              @pagination="getAndClearSelected"
+            />
+          </template>
           <div v-show="type === 'select'" class="dialog-footer">
             <el-button @click="drawerVisible = false">取 消</el-button>
             <el-button type="primary" @click="submit">确 定</el-button>
@@ -511,6 +583,7 @@ export default {
         overflow: auto;
         .operate-container {
           display: flex;
+          height: 32px;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 10px;

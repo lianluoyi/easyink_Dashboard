@@ -1,11 +1,11 @@
 <!--
  * @Description: 新增sop
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="add-sop-page wrap">
-    <ReturnPage class="wrap-head" />
+    <ReturnPage class="wrap-head" :query="{ sopType: this.$route.query.sopType }" :path="returnPath" />
     <div class="wrap-body">
       <el-alert
         v-if="dealDescription().desc"
@@ -335,7 +335,7 @@ import { addSop, getSopDetail, updateSop } from '@/api/sop';
 import SelectProperty from '../components/SelectProperty.vue';
 import CustomPropertyItem from '@/views/customerManage/components/customPropertyItem.vue';
 import BasePropertyItem from '@/views/customerManage/components/basePropertyItem.vue';
-import { initGetCustomerProper, changeButtonLoading, groupByScopeType } from '@/utils/common';
+import { initGetCustomerProper, changeButtonLoading, groupByScopeType, checkChange } from '@/utils/common';
 import moment from 'moment';
 import { deepClone } from '@/utils/index';
 import SopCalendar from './sopCalendar.vue';
@@ -494,6 +494,25 @@ export default {
         return true;
       }
       return false;
+    },
+    // 处理组件返回的路径
+    returnPath() {
+      let path;
+      switch (this.sopType) {
+        case SOP_TYPE['newCustomer']:
+        case SOP_TYPE['activity']:
+        case SOP_TYPE['birthday']:
+          path = '/operationsCenter/retainedConversion/customerSOP';
+          break;
+        case SOP_TYPE['timing']:
+        case SOP_TYPE['cycle']:
+          path = '/operationsCenter/retainedConversion/groupSOP';
+          break;
+        case SOP_TYPE['groupCalendar']:
+          path = '/operationsCenter/retainedConversion/groupCalendarSOP';
+          break;
+      }
+      return path;
     }
   },
   created() {
@@ -509,6 +528,9 @@ export default {
     }
     // 从路由中截取到了id，则为编辑sop界面
     if (routerQuery.id) this.getSopDetail(routerQuery.id);
+  },
+  beforeUpdate() {
+    checkChange(this.$options.data().sopForm, this.sopForm);
   },
   mounted() {},
   methods: {

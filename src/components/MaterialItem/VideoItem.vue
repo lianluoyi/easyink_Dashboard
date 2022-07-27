@@ -1,7 +1,7 @@
 <!--
  * @Description: 单个视频样式
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <script>
 import TagList from './Taglist.vue';
@@ -70,7 +70,7 @@ export default {
   },
   computed: {
     tagList() {
-      return matchDealtagName(this.item.tagList, this.$store);
+      return matchDealtagName(this.item.tagList || [], this.$store);
     }
   },
   watch: {},

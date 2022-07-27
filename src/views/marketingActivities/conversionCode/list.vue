@@ -223,7 +223,7 @@ export default {
 
     /**
      * 删除单个兑换码活动
-     * @param row 对应兑换码活动
+     * @param id 对应兑换码活动id
      */
     handleDelete(id) {
       this.delConversionCodeActive({

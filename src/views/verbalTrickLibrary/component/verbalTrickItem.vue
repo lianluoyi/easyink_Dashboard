@@ -98,6 +98,18 @@
         </div>
         <MoveTool :index="contentIndex" :item="item" :list.sync="allContentList" :show-tool="showTool" @getRemoveList="getRemoveList" />
       </template>
+      <template v-if="mediaType === MEDIA_TYPE_RADARLINK">
+        <div class="item-div">
+          <RadarLink
+            class-name="material-preview"
+            :radar-title="radarTitle"
+            :link-title="item.title"
+            :cover-url="item.coverUrl"
+            :content="item.content"
+          />
+        </div>
+        <MoveTool :index="contentIndex" :item="item" :list.sync="allContentList" :show-tool="showTool" @getRemoveList="getRemoveList" />
+      </template>
       <template v-if="mediaType === MEDIA_TYPE_IMGLINK">
         <div class="item-div">
           <el-radio-group v-model="item.isDefined">
@@ -219,19 +231,20 @@
 </template>
 <script>
 import {
-  MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK,
-  MEDIA_TYPE_MINIAPP, CUSTOM_LINK, DEFAULT_LINK, IMG_LINK_DIGEST, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH
+  MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_RADARLINK,
+  MEDIA_TYPE_MINIAPP, CUSTOM_LINK, DEFAULT_LINK, IMG_LINK_DIGEST, DEFAULT_IMG, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH
 } from '@/utils/constant';
 import MoveTool from '@/components/MoveTool.vue';
 import UploadDrag from '@/components/uploadDrag.vue';
 import VerbalTrickImgLink from './verbalTrickPreview/verbalTrickImgLink.vue';
 import VerbalTrickAppId from './verbalTrickPreview/verbalTrickAppId.vue';
 import { getWordsUrlContent } from '@/api/wordsGroup';
+import RadarLink from '@/views/radarLibrary/components/radarLink.vue';
 const LIMIT_FILENAME = 32;
 
 export default {
   name: '',
-  components: { MoveTool, UploadDrag, VerbalTrickImgLink, VerbalTrickAppId },
+  components: { MoveTool, UploadDrag, VerbalTrickImgLink, VerbalTrickAppId, RadarLink },
   props: {
     mediaType: {
       type: String,
@@ -270,6 +283,7 @@ export default {
     return {
       LINK_TITLE_MAXLENGTH,
       LINK_CONTENT_MAXLENGTH,
+      MEDIA_TYPE_RADARLINK,
       DEFAULT_LINK,
       CUSTOM_LINK,
       MEDIA_TYPE_TEXT,
@@ -278,6 +292,7 @@ export default {
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_IMGLINK,
       MEDIA_TYPE_MINIAPP,
+      DEFAULT_IMG,
       // 上传文件
       uploadFile: {},
       LIMIT_FILENAME,
@@ -292,6 +307,10 @@ export default {
       set(val) {
         this.$emit('update:contentList', val);
       }
+    },
+    radarTitle() {
+      const item = { ...this.item };
+      return item.radar?.radarTitle || item.radarTitle;
     }
   },
   watch: {
@@ -316,8 +335,15 @@ export default {
         getWordsUrlContent({ url: this.item.url }).then(res => {
           this.item.content = res.data?.desc?.substring(0, LINK_CONTENT_MAXLENGTH);
           this.item.title = res.data?.title?.substring(0, LINK_TITLE_MAXLENGTH);
+          // 定义一个数字作为截取字符串的长度
+          const IMG_FORMAT_LENGTH = 4;
           if (!res.data.isUrl && res.data.image) {
-          // 这里定义一个url来获取链接中的域名部分
+            // 判断是否是BASE64格式
+            if (res.data.image.substring(0, IMG_FORMAT_LENGTH) === 'data') {
+              this.radarLink.coverUrl = DEFAULT_IMG.link;
+              return;
+            }
+            // 这里定义一个url来获取链接中的域名部分
             const url = this.item.url.split('/');
             this.item.coverUrl = 'https://' + url[2] + (res.data.image[0] !== '/' ? '/' : '') + res.data.image;
           } else {

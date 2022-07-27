@@ -6,7 +6,7 @@ import SelectTag from '@/components/SelectTag';
 import SelectQrCode from '@/components/SelectQrCode';
 import { GENDER_TYPE } from '@/utils/constant';
 import RequestButton from '@/components/Button/RequestButton.vue';
-import { changeButtonLoading } from '@/utils/common';
+import { changeButtonLoading, checkChange } from '@/utils/common';
 const SEND_PART_CUSTOMER_TYPE = 1;
 export default {
   components: { PhoneDialog, SelectTag, SelectUser, SelectQrCode, RequestButton },
@@ -82,6 +82,9 @@ export default {
   created() {
     this.taskId = this.$route.query.id;
     this.taskId && this.getDetail(this.taskId);
+  },
+  beforeUpdate() {
+    checkChange(this.$options.data().form, this.form);
   },
   methods: {
     getExpectedReceptionData() {
@@ -171,7 +174,7 @@ export default {
 
 <template>
   <div v-loading="loading" class="wrap">
-    <ReturnPage />
+    <ReturnPage path="/operationsCenter/drainageCode/tag" />
     <div class="wrap-body">
       <el-alert
         title="功能说明"
