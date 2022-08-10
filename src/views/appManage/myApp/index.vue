@@ -91,7 +91,7 @@ export default {
      * 是否屏蔽进入应用按钮
      */
     isShielding(app) {
-      return app.name.includes('工单');
+      return app?.name?.includes('工单');
     }
   }
 

@@ -1,7 +1,7 @@
 <!--
  * @Description: 欢迎语列表
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="welcome-list-page">
@@ -26,7 +26,7 @@
             <i slot="reference" class="iconfont icon-question" />
             <div>
               <div>企业入群欢迎语素材最多可创建100条，包含在企业微信管理后台创建的；</div>
-              <div>受企业微信限制，easyWeCom不能管理和统计在企业微信后台或其他第三方应用创建的素材。</div>
+              <div>受企业微信限制，EasyInk不能管理和统计在企业微信后台或其他第三方应用创建的素材。</div>
             </div>
           </el-popover></div>
       </template>

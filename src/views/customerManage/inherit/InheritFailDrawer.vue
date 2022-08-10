@@ -1,6 +1,6 @@
 <!--
  * @Author: 佚名
- * @LastEditors: 佚名
+ * @LastEditors: xulinbin
 -->
 <template>
   <el-drawer
@@ -12,7 +12,7 @@
     <div class="inherit-fail-drawer">
       <p>需要确认以下内容：</p>
       <p>
-        1. <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#apps" target="_blank">企业微信后台【应用管理】</el-link>下easyWeCom应用中可见范围有包含接替员工，如图所示。
+        1. <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#apps" target="_blank">企业微信后台【应用管理】</el-link>下联络易应用中可见范围有包含接替员工，如图所示。
         <el-image
           class="part-img"
           :src="require('@/assets/example/inherit/可见范围.png')"

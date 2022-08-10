@@ -1,7 +1,7 @@
 <!--
  * @Description: 换肤抽屉
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <template>
   <el-drawer
@@ -12,7 +12,7 @@
     size="600px"
   >
     <div style="padding: 0 20px;color: #606266">
-      请从以下主题中选择自己的easyWeCom主打色
+      请从以下主题中选择自己的EasyInk主打色
     </div>
     <div class="theme-list">
       <div

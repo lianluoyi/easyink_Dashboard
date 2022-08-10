@@ -56,14 +56,14 @@ export default {
         <div v-if="isThirdType" class="content-title">（1）域名备案：{{ replaceUrl(defaultDomain.sidebar) }}</div>
         <div v-else>
           <div class="content-title">（1）域名备案。</div>
-          <div class="content-text">如果WeComSidebar部署在本地，将服务映射到完成备案的域名，如easywecom.com:8092。</div>
+          <div class="content-text">如果WeComSidebar部署在本地，将服务映射到完成备案的域名，如 www.easyink.net:8092。</div>
         </div>
       </div>
       <div class="part">
         <div class="content-title">（2）应用配置可信域名。</div>
         <div class="content-text">进入
           <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#apps" target="_blank">【应用管理】</el-link>
-          ，找到并进入easyWeCom应用，滑至页面底部，点击【网页授权及JS-SDK】，打开弹窗，将在（1）中准备的域名填入表单。
+          ，找到并进入联络易应用，滑至页面底部，点击【网页授权及JS-SDK】，打开弹窗，将在（1）中准备的域名填入表单。
         </div>
         <el-image
           class="part-img"
@@ -93,7 +93,7 @@ export default {
       <div class="part">
         <div class="content-title">（3）登录企业微信后台
           <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#apps" target="_blank">【应用管理】</el-link>
-          ，进入easyWeCom应用，点击“配置”聊天工具栏。</div>
+          ，进入联络易应用，点击“配置”聊天工具栏。</div>
         <el-image
           class="part-img"
           :src="require('@/assets/example/demo/chat-step2-1.jpg')"

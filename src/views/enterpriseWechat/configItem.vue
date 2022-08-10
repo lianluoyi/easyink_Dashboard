@@ -143,7 +143,7 @@ export default {
       });
       if (updateCorpIdFlag && this.oldForm.corpId !== newParams.corpId) {
         this.confirmModal({
-          msg: '当前企业修改后，easyWeCom下所有在线员工将被强制下线，原有企业数据不可查看，是否继续？'
+          msg: '当前企业修改后，EasyInk下所有在线员工将被强制下线，原有企业数据不可查看，是否继续？'
         }, () => {
           this.addOrUpdateConfig(newParams, this.contactChangeSuccessAlert);
         });
@@ -181,11 +181,13 @@ export default {
      * 校验是否显示修改企业ID的提示
      */
     checkEnterpriseIdValid(val) {
-      const flag = val.some(item => {
-        return item.label === '企业ID' && this.form[item.field].includes('_');
-      });
-      this.showWarnTip = flag;
-      return flag;
+      if (this.$store.state.serverInfo.serverType !== SERVER_TYPE_THIRD) {
+        const flag = val.some(item => {
+          return item.label === '企业ID' && this.form[item.field].includes('_');
+        });
+        this.showWarnTip = flag;
+        return flag;
+      }
     },
     clearTip(item) {
       if (item.label === '企业ID') this.showWarnTip = false;

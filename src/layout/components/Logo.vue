@@ -13,7 +13,7 @@
             </svg>
           </div>
           <div class="logo-container-left-text">
-            <p class="logo-name">easyWeCom</p>
+            <p class="logo-name">EasyInk</p>
             <p class="logo-company-name">{{ companyName }}</p>
           </div>
         </div>
@@ -21,7 +21,7 @@
           <svg class="icon-easyWeCom_logo_white">
             <use href="#icon-easyWeCom_logo_white" />
           </svg>
-          <p class="text-no-company-name">easyWeCom</p>
+          <p class="text-no-company-name">EasyInk</p>
         </div>
       </router-link>
     </transition>

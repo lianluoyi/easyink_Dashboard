@@ -64,6 +64,11 @@ export default {
     departmentIdKey: {
       type: String,
       default: 'id'
+    },
+    // 是否允许选择的员工列表为空
+    isNull: {
+      type: Boolean,
+      default: true
     }
     // 是否不禁止选择父节点
     // unDisableParent: {
@@ -124,6 +129,12 @@ export default {
     }
   },
   watch: {
+    // 监听当前窗口是否打开 若清空人员列表点击取消后 再次打开弹窗会出现已选择的人员为空的情况 在窗口打开为userList进行赋值
+    Pvisible(val) {
+      if (val) {
+        this.userList = this.selectedUserList;
+      }
+    },
     filterText(val) {
       this.searchTreeData = [];
       this.isSearching = false;
@@ -309,6 +320,10 @@ export default {
     },
     // 确 定
     submit() {
+      if (!this.isNull && !this.userList.length) {
+        this.msgWarn('请选择使用员工');
+        return;
+      }
       this.$emit('success', [...this.userList]);
       this.Pvisible = false;
     },

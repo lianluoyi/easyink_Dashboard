@@ -67,7 +67,7 @@
       v-if="dialogVisibleSelectMaterial"
       ref="materialDrawer"
       drawer-title="选择素材"
-      :group="group"
+      :radar-hidden="radarHidden"
       :visible.sync="dialogVisibleSelectMaterial"
       :list="materialList"
       :get-list="getMaterialList"
@@ -150,8 +150,8 @@ export default {
       type: Array,
       default: () => []
     },
-    // 是否是群欢迎语
-    group: {
+    // 是否隐藏雷达选项
+    radarHidden: {
       type: Boolean,
       default: false
     }

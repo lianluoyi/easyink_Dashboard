@@ -77,7 +77,7 @@ export default {
       </div>
       <div class="part">
         <div class="content-title">（2）将以下信息填写到应用中，并设置该应用有哪些成员可见。</div>
-        <div class="content-text">应用名称：easyWeCom</div>
+        <div class="content-text">应用名称：联络易</div>
         <div class="content-text" style="display: flex; align-items: center;">
           应用logo：
           <el-image
@@ -118,7 +118,7 @@ export default {
         <div class="content-title">
           （2）获取通讯录Secret。
         </div>
-        <div class="content-text">将权限改为API编辑通讯录并保存，可在easyWeCom管理员工信息；点击Secret旁“查看”按钮，即可收到“企业微信团队”发出的消息，查看并复制通讯录Secret。</div>
+        <div class="content-text">将权限改为API编辑通讯录并保存，可在EasyInk管理员工信息；点击Secret旁“查看”按钮，即可收到“企业微信团队”发出的消息，查看并复制通讯录Secret。</div>
         <el-image
           class="part-img"
           :src="require('@/assets/example/demo/contact-step3-2.jpg')"
@@ -132,14 +132,14 @@ export default {
           （1）域名备案：{{ replaceUrl(defaultDomain.dashboard) }}
         </div>
         <div v-else class="content-title">
-          （1）将WeComDashboard模块进行域名备案，如www.easywecom.com:8091。
+          （1）将WeComDashboard模块进行域名备案，如www.easyink.net:8091。
         </div>
       </div>
       <div class="part">
         <div class="content-title">
           （2）在企业微信后台
           <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#apps" target="_blank">【应用管理】</el-link>
-          找到easyWeCom应用，找到“企业微信授权登录”，进入页面。
+          找到联络易应用，找到“企业微信授权登录”，进入页面。
         </div>
         <el-image
           class="part-img"
@@ -149,7 +149,7 @@ export default {
       </div>
       <div class="part">
         <div class="content-title">
-          （3）找到Web网页，编辑授权回调域，将（1）中备案好的域名填入并保存，即可实现员工扫码登录easyWeCom。
+          （3）找到Web网页，编辑授权回调域，将（1）中备案好的域名填入并保存，即可实现员工扫码登录EasyInk。
         </div>
         <el-image
           class="part-img"

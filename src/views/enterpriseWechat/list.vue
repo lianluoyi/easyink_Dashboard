@@ -288,7 +288,7 @@ export default {
               {
                 label: 'Sidebar服务域名',
                 placeholder:
-                  '请输入Sidebar服务域名，需与企微后台一致，例http://www.easywecom.com:8092',
+                  '请输入Sidebar服务域名，需与企微后台一致，例http://www.easyink.net:8092',
                 type: 'input',
                 btnText: '保存',
                 btnType: 'save',

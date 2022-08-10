@@ -75,6 +75,7 @@ export default {
     /** 获取详情 */
     getDetail(id) {
       this.loading = true;
+      // TODO
       // 获取员工活码的使用员工数据 后端这个接口暂时未修改，看后端后面怎么处理，若还是这个接口则让后端修改
       // getUserByEmplyCode(id).then(({ data }) => {
       //   this.userByEmplyCodeList = data;
@@ -84,12 +85,43 @@ export default {
         this.userByEmplyCodeList = data.weEmpleCodeUseScops;
         this.query.userId = data.weEmpleCodeUseScops[0].businessId;
         this.form = data;
+        this.form.welcomeMsg = this.getFirstMsg(this.form).welcomeMsg;
+        this.form.materialList = this.getFirstMsg(this.form).materialList;
         this.loading = false;
         this.query.addWay = 1;
         this.query.state = data.state;
         this.setTime(DEFAULT_TIME_RANGE);
         // this.getList()
       });
+    },
+    /**
+     * 获取第一个欢迎语
+     */
+    getFirstMsg(item) {
+      // 按照活动欢迎语顺序进行匹配 当匹配到即return 没有匹配到进入下一个if语句中
+      if (item.codeSuccessMsg || item.codeSuccessMaterialList?.length) {
+        return {
+          welcomeMsg: item.codeSuccessMsg || '',
+          materialList: item?.codeSuccessMaterialList || []
+        };
+      }
+      if (item.codeFailMsg || item.codeFailMaterialList?.length) {
+        return {
+          welcomeMsg: item.codeFailMsg || '',
+          materialList: item?.codeFailMaterialList || []
+        };
+      }
+      if (item.codeRepeatMsg || item.codeRepeatMaterialList?.length) {
+        return {
+          welcomeMsg: item.codeRepeatMsg || '',
+          materialList: item?.codeRepeatMaterialList || []
+        };
+      }
+      // 为普通欢迎语时返回下列字段值
+      return {
+        welcomeMsg: item.welcomeMsg || '',
+        materialList: item?.materialList || []
+      };
     },
     /**  */
     getList() {
@@ -262,15 +294,15 @@ export default {
               <span v-else-if="form.skipVerify === SKIP_VERIFY['timeAdd']">{{ `${form.effectTimeOpen}~${form.effectTimeClose}生效` }}</span>
             </div>
           </el-form-item>
-          <el-form-item v-if="!form.welcomeMsgType" label="欢迎语：">
-            <div v-if="(form.materialList && form.materialList.length) || form.welcomeMsg" class="welcome-div">
+          <el-form-item label="欢迎语：">
+            <div class="welcome-div">
               <div class="welcome-div-content">
                 <div v-if="form.welcomeMsg">[文字] {{ form.welcomeMsg }}</div>
                 <div v-for="(materialItem, index) in form.materialList" :key="index">
                   <div>{{ `[${MESSAGE_MEDIA_TYPE[materialItem.mediaType]}] ${materialItem.materialName}` }}</div>
                 </div>
               </div>
-              <div v-if="form.materialList.length || form.welcomeMsg" class="preview theme-text-color" @click="hanldePreview">预览效果</div>
+              <div v-if="form.materialList && form.materialList.length || form.welcomeMsg" class="preview theme-text-color" @click="hanldePreview">预览效果</div>
             </div>
           </el-form-item>
         </el-form>

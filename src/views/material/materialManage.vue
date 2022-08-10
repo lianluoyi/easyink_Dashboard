@@ -9,7 +9,7 @@ import ImgLink from '@/views/material/graphicList.vue';
 import MiniAppPage from './miniAppList.vue';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import { getList, getMaterialConfig, updateMaterialConfig } from '@/api/material';
-import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, PAGE_LIMIT_TWENTY } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER, PAGE_LIMIT, MEDIA_TYPE_IMGLINK, RADAR_TYPE, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, PAGE_LIMIT_TWENTY } from '@/utils/constant';
 import SelectTagModal from './components/SelectTagModal.vue';
 import { getMaterialTagList } from '@/utils/material';
 const DEFAULT_EXPIRE_DAYS = 7;
@@ -35,6 +35,7 @@ export default {
       activeName: MEDIA_TYPE_POSTER,
       dialogVisible: false,
       drawerVisible: false,
+      RADAR_TYPE,
       query: {
         pageNum: 1,
         pageSize: PAGE_LIMIT_TWENTY,
@@ -56,7 +57,14 @@ export default {
       // 被选择的素材数量
       selectedMaterialNum: 0,
       // 列表加载状态
-      isLoading: true
+      isLoading: true,
+      // 需要写radarQuery 避免为null报错
+      radarQuery: {
+        type: '',
+        searchTitle: '',
+        pageNum: 1,
+        pageSize: PAGE_LIMIT
+      }
     };
   },
   computed: {
@@ -202,6 +210,8 @@ export default {
       :file-tool-list="['download', 'restore', 'remove']"
       :miniapp-tool-list="['restore', 'remove']"
       :query.sync="query"
+      :radar-hidden="true"
+      :radar-query.sync="radarQuery"
       :total="total"
       :is-loading="isLoading"
       @emptyExpireList="emptyExpireList"

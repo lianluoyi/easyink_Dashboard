@@ -1,7 +1,7 @@
 <!--
  * @Description: 代开发聊天工具栏
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div>
@@ -12,7 +12,7 @@
           type="primary"
           href="https://work.weixin.qq.com/wework_admin/frame#apps"
           target="_blank"
-        >【应用管理】</el-link>，进入easyWeCom应用，点 击“配置”聊天工具栏。
+        >【应用管理】</el-link>，进入联络易应用，点 击“配置”聊天工具栏。
       </div>
       <el-image
         class="part-img"
