@@ -1,4 +1,4 @@
-### easyWeCom操作手册
+### easyink操作手册
 
 [自建应用操作手册](https://www.yuque.com/docs/share/9217b462-a4c2-4d4a-97cb-48eebf800784?#hsf4v)
 
@@ -6,15 +6,15 @@
 
 ### :rocket: 项目介绍
 
-该项目为easyWeCom的前端模块之一，负责后台UI界面展示，企业基础设置、内容管理、运营功能等均在该页面操作。
+该项目为easyink的前端模块之一，负责后台UI界面展示，企业基础设置、内容管理、运营功能等均在该页面操作。
 
 ### :factory: 关联项目
 
 | 项目名                            | 项目说明                                                | 项目地址                                                 |
 | --------------------------------- | ------------------------------------------------------- | -------------------------------------------------------- |
-| easyWeCom_System                  | easyWeCom后端服务                                       | https://github.com/easywecom/easyWeCom_System.git        |
-| **easyWeCom_Dashboard(当前项目)** | **easyWeCom前端服务，主要负责后台UI界面展示**           | **https://github.com/easywecom/easyWeCom_Dashboard.git** |
-| easyWeCom_Sidebar                 | easyWeCom前端服务，主要负责企微客户端中的侧边栏界面展示 | https://github.com/easywecom/easyWeCom_Sidebar.git       |
+| easyink_System                  | easyink后端服务                                       | https://github.com/easyink/easyink_System.git        |
+| **easyink_Dashboard(当前项目)** | **easyink前端服务，主要负责后台UI界面展示**           | **https://github.com/easyink/easyink_Dashboard.git** |
+| easyink_Sidebar                 | easyink前端服务，主要负责企微客户端中的侧边栏界面展示 | https://github.com/easyink/easyink_Sidebar.git       |
 
 ### :star2: 体验功能
 
@@ -32,10 +32,10 @@
 
 ```
 # 克隆项目
-git clone https://github.com/easywecom/easyWeCom_Dashboard.git
+git clone https://github.com/easyink/easyink_Dashboard.git
 
 # 进入项目目录
-cd easyWeCom_Dashboard
+cd easyink_Dashboard
 
 # 安装依赖
 npm install
