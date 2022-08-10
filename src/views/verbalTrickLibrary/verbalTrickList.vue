@@ -1,6 +1,6 @@
 <!--
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="verbal-trick-list-page">
@@ -118,7 +118,7 @@
     <ImportFile
       :visible.sync="importVisible"
       title="话术"
-      href="easyWeCom话术导入模版.xlsx"
+      href="EasyInk话术导入模版.xlsx"
       alert-title="仅支持导入文字话术"
       :upload-params="{type: type}"
       :loading="importLoading"

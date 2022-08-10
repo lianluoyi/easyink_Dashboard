@@ -1,7 +1,7 @@
 <!--
  * @Description: sop任务列表公共样式
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="sop-list-page">
@@ -149,6 +149,7 @@
       title="选择使用员工"
       :selected-user-list="selectUserList || []"
       :is-only-leaf="false"
+      :is-null="false"
       @success="submitSelectUser"
     />
   </div>

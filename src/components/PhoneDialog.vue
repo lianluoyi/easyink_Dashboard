@@ -204,7 +204,6 @@ export default {
             </div>
             <div v-else-if="String(msg.mediaType) === MEDIA_TYPE_RADARLINK " class="msg-card">
               <div class="msg-card-info">
-                <div class="msg-card-title inoneline">{{ msg.radarTitle || msg.radar.radarTitle }}</div>
                 <div class="msg-card-title inoneline">{{ msg.title || msg.radar.weRadarUrl.title }}</div>
                 <div class="msg-card-desc">{{ getContent(msg) }}</div>
               </div>

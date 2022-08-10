@@ -12,7 +12,13 @@
       :wrapper-closable="false"
     >
       <div class="wrap-body-form drawer-div">
-        <el-form ref="form" :model="form" label-width="80px" class="form" :rules="rules">
+        <el-form
+          ref="form"
+          :model="form"
+          label-width="80px"
+          class="form"
+          :rules="rules"
+        >
           <p class="config-title" style="margin-bottom: 10px">基本设置</p>
           <el-form-item label="雷达标题" prop="radarTitle">
             <el-input
@@ -143,12 +149,12 @@
                 size="medium"
                 closable
                 @close="closeTag(item, index)"
-              >{{ item.tagName||item.name }}</el-tag>
+              >{{ item.tagName || item.name }}</el-tag>
             </div>
           </el-form-item>
         </el-form>
         <div class="confirm-div">
-          <div v-if="activeRadar!== RADAR_TYPE['personal']">
+          <div v-if="activeRadar !== RADAR_TYPE['personal']">
             <el-switch
               v-model="form.enableUpdateNotice"
               :active-value="true"
@@ -158,7 +164,11 @@
           </div>
           <div class="confirm-btn-div">
             <el-button @click="Pvisible = false">取消</el-button>
-            <RequestButton type="primary" :request-method="submitForm" button-type="submit">确定</RequestButton>
+            <RequestButton
+              type="primary"
+              :request-method="submitForm"
+              button-type="submit"
+            >确定</RequestButton>
           </div>
         </div>
       </div>
@@ -301,7 +311,15 @@ export default {
      */
     getRadaDetail() {
       getRadaDetail({ id: this.radarId }).then((res) => {
-        const { radarTitle, enableBehaviorRecord, enableClickNotice, enableCustomerTag, enableUpdateNotice, radarTagList, weRadarUrl } = res.data;
+        const {
+          radarTitle,
+          enableBehaviorRecord,
+          enableClickNotice,
+          enableCustomerTag,
+          enableUpdateNotice,
+          radarTagList,
+          weRadarUrl
+        } = res.data;
         this.form = {
           ...this.form,
           id: this.radarId,
@@ -360,7 +378,7 @@ export default {
               (res.data.image[0] !== '/' ? '/' : '') +
               res.data.image;
           } else {
-            this.radarLink.coverUrl = res.data.image;
+            this.radarLink.coverUrl = res.data.image || DEFAULT_IMG.link;
           }
         });
       }
@@ -372,6 +390,12 @@ export default {
           this.radarLink = {
             ...this.radarLink,
             content: '请点击查看链接'
+          };
+        }
+        if (!this.radarLink.coverUrl) {
+          this.radarLink = {
+            ...this.radarLink,
+            coverUrl: DEFAULT_IMG.link
           };
         }
         this.form.type = this.activeRadar;

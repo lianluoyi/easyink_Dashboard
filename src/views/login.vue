@@ -23,7 +23,7 @@
           <div v-show="isThird && !isAuth && isEnterPriseUnAuth" class="login-third-err-wrap">
             <div class="err-title">登录失败</div>
             <div class="err-info">
-              <p>所在企业未授权easyWeCom应用</p>
+              <p>所在企业未授权EasyInk应用</p>
               <p>请联系企业管理员前往授权</p>
             </div>
             <el-button type="primary" class="primary-btn" @click="isAuth = true;isEnterPriseUnAuth = false;">我是企业管理员，去授权</el-button>
@@ -38,7 +38,7 @@
           </div>
           <div v-show="isThird && isAuth" class="login-third-auth-wrap">
             <div class="step">
-              <p>① 使用easyWeCom需通过企业微信授权进行企业验证</p>
+              <p>① 使用EasyInk需通过企业微信授权进行企业验证</p>
               <p>② 未注册企业微信的用户请先注册</p>
               <p>③ 完成授权后，需扫码登录系统完成初始化配置</p>
             </div>
@@ -55,8 +55,8 @@
             :style="authRedict ? 'justify-content: center;' : ''"
           >
             <div v-if="!authRedict" class="step">
-              <p>① 企业已注册easyWeCom，员工可直接扫码登录</p>
-              <p>② 企业未注册easyWeCom，需要企业管理员前往授权</p>
+              <p>① 企业已注册EasyInk，员工可直接扫码登录</p>
+              <p>② 企业未注册EasyInk，需要企业管理员前往授权</p>
             </div>
             <div v-show="isThird && !isAuth && !isEnterPriseUnAuth && !isEnterPriseUnConfig" class="third-btn-area">
               <el-button class="primary-btn" :loading="loginLoading" type="primary" @click="gotoLogin">
@@ -67,7 +67,7 @@
               <el-button v-if="!authRedict" style="color:#6bb4ab;" @click="isAuth = true">
                 <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-easyWeCom-logo" />
-                </svg>授权easyWeCom
+                </svg>授权EasyInk
               </el-button>
             </div>
           </div>

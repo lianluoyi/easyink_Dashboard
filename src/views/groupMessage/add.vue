@@ -187,6 +187,19 @@ export default {
         if (query.attachments && query.attachments.length >= 1) {
           this.appendixList = this.resolveAttactments(query.attachments);
         }
+        let newArr = [];
+        if (query.userList?.length) {
+          newArr = query.userList;
+        }
+        if (query.departmentList?.length) {
+          newArr = [...newArr, ...query.departmentList.map((item) => {
+            return {
+              id: item.departmentId,
+              name: item.departmentName
+            };
+          })];
+        }
+        this[query.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'groupOwner' : 'userParty'] = newArr;
         Object.keys(this.form).forEach((key) => {
           if (query.content) {
             this.form.textMessage.content = query.content;

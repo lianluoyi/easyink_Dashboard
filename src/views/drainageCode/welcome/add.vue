@@ -348,7 +348,7 @@ export default {
                 item && item.userName
               }}</el-tag>
             </el-form-item>
-            <el-form-item label="默认欢迎语" prop="defaultWelcomeMsg" style="width: 550px">
+            <el-form-item label="默认欢迎语" style="width: 550px">
               <el-input
                 v-model="form.defaultWelcomeMsg"
                 type="textarea"

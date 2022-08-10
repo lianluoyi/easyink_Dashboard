@@ -115,7 +115,8 @@ export default {
       type: Object,
       default: () => {}
     },
-    group: {
+    // 雷达选项是否隐藏
+    radarHidden: {
       type: Boolean,
       default: false
     }
@@ -172,7 +173,7 @@ export default {
     }
   },
   watch: {
-    // 监听选择素材类型
+    // 监听朋友圈选择素材类型
     momentType(val) {
       this.query.mediaType = val;
       this.query.pageNum = 1;
@@ -369,7 +370,7 @@ export default {
           <el-radio-button :label="MEDIA_TYPE_FILE" :disabled="moment">文件</el-radio-button>
           <el-radio-button :label="MEDIA_TYPE_MINIAPP" :disabled="moment">小程序</el-radio-button>
           <!-- 先注释朋友圈的雷达选项 -->
-          <el-radio-button v-show="!moment && !group" :label="MEDIA_TYPE_RADARLINK" :disabled="moment && !chooseMaterial">雷达</el-radio-button>
+          <el-radio-button v-show="!moment && !radarHidden" :label="MEDIA_TYPE_RADARLINK" :disabled="moment && !chooseMaterial">雷达</el-radio-button>
         </el-radio-group>
         <div class="tab-right-btn">
           <slot name="tab-right-btn" />
@@ -395,7 +396,7 @@ export default {
               <el-option v-for="(item, index) in allTagList" :key="index" :label="item.tagName" :value="item.id" />
             </el-select>
           </div>
-          <div v-show="activeName=== MEDIA_TYPE_RADARLINK">
+          <div v-show="activeName === MEDIA_TYPE_RADARLINK">
             <el-select
               v-model="radarQuery.type"
               clearable

@@ -44,10 +44,13 @@ export default {
       RADAR_TYPE,
       DEFAULT_IMG,
       FRIENDSCIRCLE,
-      // radarQuery: {
-      //   type: this.$store.state.user.isSuperAdmin ? RADAR_TYPE['enterprise'] : '',
-      //   searchTitle: ''
-      // },
+      // 当前屏蔽朋友圈 但是需要传递radarQuery 否则会当作空对象 打开素材库的时候为null
+      radarQuery: {
+        type: '',
+        searchTitle: '',
+        pageNum: 1,
+        pageSize: PAGE_LIMIT
+      },
       // 文件名字限制
       limitFileName: FILE_NAME_LENGTH,
       loading: false,
@@ -551,7 +554,7 @@ export default {
                 type="warning"
                 :closable="false"
               >
-                <div>1. 每个客户每天可收到员工发表的3条朋友圈，企业发表的1条朋友圈</div>
+                <div>1. 每个客户每天可收到员工发表的3条朋友圈，企业发表的4条朋友圈</div>
                 <div>2. 员工需在企业微信APP上发表朋友圈，PC端暂不支持</div>
               </el-alert>
               <el-form-item label="发布类型" prop="type" label-width="68px" style="padding:0">
@@ -770,9 +773,9 @@ export default {
                 <i class="el-icon-d-arrow-right" />
                 <el-image
                   class="part-img"
-                  :src="require('@/assets/image/friendsSelf-step3-3.png')"
+                  :src="require('@/assets/image/friendsSelf-step3-3.jpg')"
                   :preview-src-list="[
-                    require('@/assets/image/friendsSelf-step3-3.png'),
+                    require('@/assets/image/friendsSelf-step3-3.jpg'),
                   ]"
                 />
               </div>
@@ -817,6 +820,7 @@ export default {
         :imglink-tool-list="['preview']"
         :video-tool-list="['preview']"
         :query.sync="query"
+        :radar-query.sync="radarQuery"
         :sub-title="subTitle"
         :type="'select'"
         :total="total"

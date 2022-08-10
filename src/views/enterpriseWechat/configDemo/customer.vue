@@ -75,7 +75,7 @@ export default {
         <div class="content-title">（1）权限配置。</div>
         <div class="content-text">企业管理员扫码登录
           <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/loginpage_wx" target="_blank">企业微信后台</el-link>，进入
-          <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#customer/group" target="_blank">【客户联系】-【权限配置】</el-link>，修改客户联系的使用范围，范围下的员工可以在easyWeCom下使用客户相关功能。
+          <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#customer/group" target="_blank">【客户联系】-【权限配置】</el-link>，修改客户联系的使用范围，范围下的员工可以在EasyInk下使用客户相关功能。
         </div>
         <el-image
           class="part-img"
@@ -88,7 +88,7 @@ export default {
         <div class="content-text">进入
           <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#customer/analysis" target="_blank">【客户联系】 -【客户】</el-link>，点击“API”展开按钮，点击Secret旁“查看”按钮，即可收到“企业微信团队”发出的消息，查看并复制客户联系Secret。
         </div>
-        <div class="content-text">点击“可调用应用”的设置按钮，勾选应用“easyWeCom”即可。</div>
+        <div class="content-text">点击“可调用应用”的设置按钮，勾选应用“联络易”即可。</div>
         <el-image
           class="part-img"
           :src="require('@/assets/example/demo/customer-step1-2.jpg')"
@@ -113,7 +113,7 @@ export default {
         <div class="content-title">
           （1）设置可信IP地址。
         </div>
-        <div class="content-text">将easyWeCom的IP地址加入可信IP地址（如没有部署在本地，则联系客服获取IP）。</div>
+        <div class="content-text">将EasyInk的IP地址加入可信IP地址（如没有部署在本地，则联系客服获取IP）。</div>
       </div>
       <div class="part">
         <div class="content-title">

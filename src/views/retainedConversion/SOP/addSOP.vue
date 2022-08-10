@@ -1,7 +1,7 @@
 <!--
  * @Description: 新增sop
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="add-sop-page wrap">
@@ -716,31 +716,31 @@ export default {
         case SOP_TYPE['newCustomer']: {
           return {
             desc: '客户添加员工后，员工第一时间与客户建立联系，提高新客户的留存率。',
-            tip: '满足规则，发送easyWeCom应用消息提醒员工给新客户发送规则下内容'
+            tip: '满足规则，发送联络易应用消息提醒员工给新客户发送规则下内容'
           };
         }
         case SOP_TYPE['activity']: {
           return {
             desc: '突破客户每天只能收到一条群发消息的限制，由员工在指定时间手动发送指定内容给客户',
-            tip: '到指定时间，发送easyWeCom应用消息提醒员工给指定客户发送规则下内容'
+            tip: '到指定时间，发送联络易应用消息提醒员工给指定客户发送规则下内容'
           };
         }
         case SOP_TYPE['birthday']: {
           return {
             desc: '当客户生日时，提醒员工为客户发送生日祝福，让企业服务有温度。',
-            tip: '客户生日时，发送easyWeCom应用消息提醒员工给客户发送规则下内容'
+            tip: '客户生日时，发送联络易应用消息提醒员工给客户发送规则下内容'
           };
         }
         case SOP_TYPE['timing']: {
           return {
             desc: '细化客户群每个阶段的运营，由员工定期发送统一文案，提升客户群的转化效率',
-            tip: '满足规则，发送easyWeCom应用消息提醒员工给客户群发送规则下内容'
+            tip: '满足规则，发送联络易应用消息提醒员工给客户群发送规则下内容'
           };
         }
         case SOP_TYPE['cycle']: {
           return {
             desc: '标准化、流程化管理客户群，按天、周、月的周期定期循环提醒员工发送统一文案，提升客户群的运营效率',
-            tip: '满足规则，发送easyWeCom应用消息提醒员工给客户群发送规则下内容'
+            tip: '满足规则，发送联络易应用消息提醒员工给客户群发送规则下内容'
           };
         }
         case SOP_TYPE['groupCalendar']: {

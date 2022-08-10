@@ -18,15 +18,11 @@
         <div class="wrap-body-form">
           <el-form ref="form" :model="form" label-width="100px" class="form" :rules="rules">
             <p class="config-title">基础设置</p>
-            <el-alert
-              class="alert-tip"
-              type="warning"
-              :closable="false"
-            >
+            <el-alert class="alert-tip" type="warning" :closable="false">
               <div>1. 入群欢迎语素材最多可创建100个，包含在企业微信管理后台或其他应用创建的</div>
               <div>2. 入群欢迎语素材仅支持文本+1个附件</div>
             </el-alert>
-            <el-form-item label="欢迎语" prop="defaultWelcomeMsg">
+            <el-form-item label="欢迎语">
               <el-input
                 v-model="form.defaultWelcomeMsg"
                 type="textarea"
@@ -45,7 +41,7 @@
                 :appendix-list.sync="appendixList"
                 :remove-appendix-list.sync="removeAppendixList"
                 :msg-tip="`欢迎语最多支持设置${MAX_APPENDIX_NUM}个附件`"
-                :group="true"
+                :radar-hidden="true"
               />
             </el-form-item>
             <el-form-item v-if="!form.id" label="通知员工">

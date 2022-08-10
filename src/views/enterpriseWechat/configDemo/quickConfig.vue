@@ -208,7 +208,7 @@ export default {
         this.qrcodeLoad = true;
         this.stopTimer();
         this.confirmModal({
-          msg: '当前扫码企业与现有企业不一致，若继续，则easyWeCom下所有在线员工将被强制下线，原有企业数据不可查看，是否继续？'
+          msg: '当前扫码企业与现有企业不一致，若继续，则EasyInk下所有在线员工将被强制下线，原有企业数据不可查看，是否继续？'
         }, () => {
           this.loginSuccessAndConfig();
         }, () => {
@@ -483,7 +483,7 @@ export default {
   <div class="quick-demo enterprise-wechat-demo">
     <div class="quick-div">
       <el-alert
-        title="即将为你自动创建easyWeCom应用，并配置相关信息，若原来有创建过该应用，将会覆盖，请谨慎操作。"
+        title="即将为你自动创建联络易应用，并配置相关信息，若原来有创建过该应用，将会覆盖，请谨慎操作。"
         type="warning"
         show-icon
         :closable="false"
@@ -502,7 +502,7 @@ export default {
                   </div>
                   <div class="input-item">
                     <div class="domain-pre">域名</div>
-                    <el-input v-model="domainConfig.sidebarDomain" class="domain-input" placeholder="例：http://www.easywecom.com" />
+                    <el-input v-model="domainConfig.sidebarDomain" class="domain-input" placeholder="例：http://www.easyink.net" />
                   </div>
                   <div class="input-item">
                     <div class="port-pre">端口号</div>
@@ -516,7 +516,7 @@ export default {
                   </div>
                   <div class="input-item">
                     <div class="domain-pre">域名</div>
-                    <el-input v-model="domainConfig.dashboardDomain" class="domain-input" placeholder="例：http://www.easywecom.com" />
+                    <el-input v-model="domainConfig.dashboardDomain" class="domain-input" placeholder="例：http://www.easyink.net" />
                   </div>
                   <div class="input-item">
                     <div class="port-pre">端口号</div>
@@ -530,7 +530,7 @@ export default {
                   </div>
                   <div class="input-item">
                     <div class="domain-pre">域名</div>
-                    <el-input v-model="domainConfig.weComSystemDomain" class="domain-input" placeholder="例：http://www.easywecom.com" />
+                    <el-input v-model="domainConfig.weComSystemDomain" class="domain-input" placeholder="例：http://www.easyink.net" />
                   </div>
                   <div class="input-item">
                     <div class="port-pre">端口号</div>

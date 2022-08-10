@@ -405,7 +405,7 @@ export const GROUP_ENTER_WAY_MAP = {
 
 export const GROUP_MESSAG_STATUS_SENDED = '1';
 
-/** 转接失败（easyWecom自定义） */
+/** 转接失败（EasyInk自定义） */
 export const INHERIT_STATUS_FAIL = 0;
 /** 接替完毕 */
 export const INHERIT_STATUS_INHERITED = 1;

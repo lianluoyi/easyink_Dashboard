@@ -179,7 +179,7 @@ export default {
         this.qrcodeLoad = true;
         this.stopTimer();
         this.confirmModal({
-          msg: '当前扫码企业与现有企业不一致，若继续，则easyWeCom下所有在线员工将被强制下线，原有企业数据不可查看，是否继续？'
+          msg: '当前扫码企业与现有企业不一致，若继续，则EasyInk下所有在线员工将被强制下线，原有企业数据不可查看，是否继续？'
         }, () => {
           this.loginSuccessAndConfig();
         }, () => {

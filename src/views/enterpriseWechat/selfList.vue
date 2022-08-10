@@ -29,7 +29,11 @@ export default {
       defaultDomain: {}
     };
   },
-  computed: {},
+  computed: {
+    enterPriseWechatConfig() {
+      return this.$store.state.enterPriseWechatConfig;
+    }
+  },
   watch: {},
   created() {
     this.checkGuide();
@@ -41,7 +45,7 @@ export default {
     // 判断企微是否完成授权配置
     isAuth() {
       // 当客服人员安装完成时,此时状态为0，corpId是ww开头,代开发应用已授权
-      if (this.$store.state.enterPriseWechatConfig.status === NORMAL && this.$store.state.enterPriseWechatConfig.corpId.substring(0, SUBSTR) === 'ww') {
+      if (this.$store.state.enterPriseWechatConfig.status === NORMAL && (this.enterPriseWechatConfig.corpId.substring(0, SUBSTR) === 'ww' || this.enterPriseWechatConfig.authorized)) {
         this.isConfiguration = true;
       }
     },

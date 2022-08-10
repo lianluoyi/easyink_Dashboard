@@ -43,7 +43,7 @@ export default {
     <div v-if="active === 0" class="content-div">
       <div class="part">
         <div class="content-title">（1）进入企业微信后台
-          <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#apps" target="_blank">【应用管理】</el-link>，点击easyWeCom应用，找到“接收消息”，点击“设置API接收”。
+          <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#apps" target="_blank">【应用管理】</el-link>，点击联络易应用，找到“接收消息”，点击“设置API接收”。
         </div>
         <el-image
           class="part-img"

@@ -21,7 +21,6 @@
         </el-button>
         <el-button v-else-if="!isShielding(appDetail)" type="primary" @click="() => handleOpenApp(appDetail)">进入</el-button>
       </AppInfo>
-      <EnterpriseWxPlusDetail v-if="appDetail.name && appDetail.name.includes('企微')" />
       <WorkSheetAssistantDetail v-if="appDetail.name && appDetail.name.includes('工单')" :app-detail="appDetail" />
     </div>
     <div v-else class="empty">
@@ -39,12 +38,11 @@
 import AppInfo from '../component/AppInfo';
 import { getApplicationDetail, installApplication } from '@/api/appManage';
 import { SERVER_TYPE_THIRD, SERVER_TYPE_INTERNAL } from '@/utils/constant';
-import EnterpriseWxPlusDetail from './enterpriseWxPlusDetail.vue';
 import WorkSheetAssistantDetail from './workSheetAssistantDetail.vue';
 
 export default {
   name: '',
-  components: { AppInfo, EnterpriseWxPlusDetail, WorkSheetAssistantDetail },
+  components: { AppInfo, WorkSheetAssistantDetail },
   props: {},
   data() {
     return {
@@ -106,7 +104,7 @@ export default {
      * 是否屏蔽进入应用按钮
      */
     isShielding(app) {
-      return app.name.includes('工单');
+      return app?.name?.includes('工单');
     }
   }
 };

@@ -34,7 +34,11 @@ export default {
       qrcodeUrl: ''
     };
   },
-  computed: {},
+  computed: {
+    enterPriseWechatConfig() {
+      return this.$store.state.enterPriseWechatConfig;
+    }
+  },
   watch: {},
   created() {
     this.isAuth();
@@ -57,12 +61,12 @@ export default {
   methods: {
     // 判断是否完成配置处理页面跳转和弹窗显示
     isAuth() {
-      // 当客服人员未授权时,此时状态为0，corpId是wp开头,提醒授权的弹窗打开
-      if (this.$store.state.enterPriseWechatConfig.status === NORMAL && this.$store.state.enterPriseWechatConfig.corpId.substring(0, NUMBER) === 'wp') {
+      // 当客服人员未授权时,此时状态为0，corpId是wp开头,提醒授权的弹窗打开  authorized判断是否授权
+      if (this.enterPriseWechatConfig.status === NORMAL && (this.enterPriseWechatConfig.corpId.substring(0, NUMBER) === 'wp' && !this.enterPriseWechatConfig.authorized)) {
         this.dialogVisible = true;
       }
       // 当客服人员授权完成但是未启用时,此时状态为2，corpId是ww开头，页面显示的时候将active的值变为1
-      if (this.$store.state.enterPriseWechatConfig.status === AUTH_ENADLE && this.$store.state.enterPriseWechatConfig.corpId.substring(0, NUMBER) === 'ww') {
+      if (this.enterPriseWechatConfig.status === AUTH_ENADLE && (this.enterPriseWechatConfig.corpId.substring(0, NUMBER) === 'ww' || this.enterPriseWechatConfig.authorized)) {
         this.active = 1;
       }
     },
@@ -74,7 +78,7 @@ export default {
       this.qrcodeUrl = getCode.data;
     },
     /**
-     * 判断管理员是否扫描二维码
+     * 判断管理员是否扫描二维码1
      */
     async isScanCode() {
       const getStatus = await api.isScanCode({});
@@ -101,7 +105,7 @@ export default {
      */
     async callBackTotal() {
       const getNowConfigRes = await api.getNowConfig({});
-      if (getNowConfigRes.data.corpId.substring(0, NUMBER) === 'ww' && getNowConfigRes.data.status === NUMBER) {
+      if ((getNowConfigRes.data.corpId.substring(0, NUMBER) === 'ww' || getNowConfigRes.data.authorized) && getNowConfigRes.data.status === NUMBER) {
         // 未完成完成应用安装和配置的弹窗
         this.notEndConfig = true;
       } else {
@@ -132,7 +136,7 @@ export default {
                 请使用企业微信管理员扫描以下二维码授权，允许系统客服人员为您安装应用
               </div>
               <div class="qrcode-div">
-                <el-image :src="qrcodeUrl" :fit="fit" />
+                <el-image :src="qrcodeUrl" fit="fit" />
               </div>
             </template>
           </el-step>

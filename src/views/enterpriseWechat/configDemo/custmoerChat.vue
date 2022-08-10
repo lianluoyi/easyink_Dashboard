@@ -86,7 +86,7 @@ export default {
         <div class="content-title">
           （1）设置可信IP地址。
         </div>
-        <div class="content-text">将easyWeCom的IP地址加入可信IP地址（如没有部署在本地，则联系客服获取IP）。</div>
+        <div class="content-text">将EasyInk的IP地址加入可信IP地址（如没有部署在本地，则联系客服获取IP）。</div>
       </div>
       <div class="part">
         <div class="content-title">
