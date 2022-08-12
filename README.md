@@ -12,9 +12,9 @@
 
 | 项目名                            | 项目说明                                                | 项目地址                                                 |
 | --------------------------------- | ------------------------------------------------------- | -------------------------------------------------------- |
-| easyink_System                  | easyink后端服务                                       | https://github.com/easyink/easyink_System.git        |
-| **easyink_Dashboard(当前项目)** | **easyink前端服务，主要负责后台UI界面展示**           | **https://github.com/easyink/easyink_Dashboard.git** |
-| easyink_Sidebar                 | easyink前端服务，主要负责企微客户端中的侧边栏界面展示 | https://github.com/easyink/easyink_Sidebar.git       |
+| easyink_System                  | easyink后端服务                                       | https://github.com/lianluoyi/easyink_System.git        |
+| **easyink_Dashboard(当前项目)** | **easyink前端服务，主要负责后台UI界面展示**           | **https://github.com/lianluoyi/easyink_Dashboard.git** |
+| easyink_Sidebar                 | easyink前端服务，主要负责企微客户端中的侧边栏界面展示 | https://github.com/lianluoyi/easyink_Sidebar.git       |
 
 ### :star2: 体验功能
 
