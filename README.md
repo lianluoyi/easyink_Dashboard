@@ -32,10 +32,9 @@
 
 ```
 # 克隆项目
-git clone https://github.com/easyink/easyink_Dashboard.git
+git clone https://github.com/lianluoyi/easyink_Dashboard.git
 
 # 进入项目目录
-cd easyink_Dashboard
 
 # 安装依赖
 npm install
