@@ -1,7 +1,7 @@
 <template>
   <div class="show-data-wrapper">
     <div class="back" @click="back"><i class="el-icon-arrow-left" />返回上一页</div>
-    <div v-if="!empty">
+    <div>
       <AppInfo
         :app-name="appName"
         :app-sketch="appDetail.description"
@@ -16,13 +16,6 @@
       <div class="mt10">
         <el-tabs v-model="activeName" type="card">
           <el-tab-pane label="配置管理" name="set">
-            <EnterpriseWxPlus
-              v-if="appName.includes('企微')"
-              :old-config="oldConfig"
-              :config="config"
-              :update-my-application-config="handleInstallApp"
-              :app-id="appId && Number(appId)"
-            />
             <WorkSheetAssistant
               v-if="appName.includes('工单')"
               :app-detail="appDetail"
@@ -40,27 +33,17 @@
         </el-tabs>
       </div>
     </div>
-    <div v-else class="empty">
-      <div class="empty-title">开启高效且持续的营收增长之路</div>
-      <div class="empty-des">
-        为企业提供更多应用工具，满足多场景、多行业的需求，提升运营服务能力
-      </div>
-      <div>
-        <el-button type="primary" class="empty-btn">了解详情</el-button>
-      </div>
-    </div>
   </div>
 </template>
 <script>
 import AppInfo from '../component/AppInfo';
 import { getApplicationDetail, updateMyApplicationConfig, deleteMyApplication } from '@/api/appManage';
-import EnterpriseWxPlus from './enterpriseWxPlus.vue';
 import WorkSheetAssistant from './workSheetAssistant.vue';
 import SystemSetConfig from './systemSetConfig.vue';
 
 export default {
   name: '',
-  components: { AppInfo, EnterpriseWxPlus, WorkSheetAssistant, SystemSetConfig },
+  components: { AppInfo, WorkSheetAssistant, SystemSetConfig },
   props: {},
   data() {
     return {
@@ -140,26 +123,5 @@ export default {
   background-color: #fff;
   padding: 20px;
   color: #333;
-}
-
-.empty {
-  text-align: center;
-  min-height: 100%;
-  background: url('../../../assets/image/appCenterWxWork.jpg') no-repeat;
-}
-.empty .empty-title {
-  font-size: 40px;
-  font-weight: bold;
-  margin: 0 0 30px;
-  padding: 50px 0 0;
-}
-.empty .empty-des {
-  font-size: 18px;
-  margin: 0 0 40px;
-}
-.empty-btn {
-  width: 150px;
-  height: 50px;
-  font-size: 16px;
 }
 </style>
