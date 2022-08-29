@@ -84,7 +84,11 @@
           <el-table-column label="员工" prop="name">
             <template slot-scope="{ row }">
               <div class="user-info">
-                <el-image class="mr10" :src="row.headImageUrl" style="height: 36px;width: 36px;" />
+                <el-image class="mr10" :src="row.headImageUrl" style="height: 36px;width: 36px;">
+                  <div slot="error" class="image-slot">
+                    <img class="user-avatar" :src="require('@/assets/image/card-avatar.svg')" style="width: 100%;">
+                  </div>
+                </el-image>
                 <div class="intwoline" style="flex: 1;">{{ row.userName }}</div>
               </div>
             </template>
