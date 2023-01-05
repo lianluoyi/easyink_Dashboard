@@ -56,3 +56,12 @@ export function getMemberCount(params) {
     params
   });
 }
+
+// 导出客户群
+export function exportGroup(params) {
+  return request({
+    url: service + '/chat/export',
+    method: 'get',
+    params
+  });
+}

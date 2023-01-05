@@ -11,7 +11,14 @@ export default {
   computed: {},
   watch: {},
   mounted() {},
-  methods: {}
+  methods: {
+    /**
+     * 查看使用教程
+     */
+    checkTutorial() {
+      window.open('https://www.yuque.com/docs/share/591b5dff-f705-413e-b167-e8ef72d519bf?#');
+    }
+  }
 };
 </script>
 
@@ -22,6 +29,7 @@ export default {
       <p>为您解答系统使用问题</p>
       <img :src="require('@/assets/image/wxwork-qrcode.png')" alt="">
       <h3 style="font-weight: normal;">使用微信扫码</h3>
+      <el-button type="text" style="margin-top:1px;" @click="checkTutorial">查看使用教程</el-button>
     </div>
     <div slot="reference" class="popover-btn">
       <svg class="icon-kefu" :width="25" :height="25">

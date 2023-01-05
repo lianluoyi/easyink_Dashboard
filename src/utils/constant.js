@@ -215,8 +215,8 @@ export const ENTERPRISE_WECHAT_CONFIG_STEP_TEXT = {
 };
 export const ENTERPRISE_WECHAT_AUTH_STEP_TEXT = {
   [FIRST_STEP]: '已复制，下一步',
-  [SECOND_STEP]: '已创建，下一步',
-  [THIRD_STEP]: '已复制，下一步',
+  [SECOND_STEP]: '下一步',
+  [THIRD_STEP]: '下一步',
   [FORTH_STEP]: '已授权，回表单填写配置'
 };
 

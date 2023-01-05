@@ -101,8 +101,11 @@ export default {
     this.getListTag();
   },
   methods: {
-    /** 查询 */
-    getList(page) {
+    /**
+     * @description: 进行query的起始时间和结束时间的赋值
+     * @return {*}
+     */
+    setQueryTime() {
       if (this.dateRange) {
         this.query.beginTime = this.dateRange[0];
         this.query.endTime = this.dateRange[1];
@@ -110,6 +113,33 @@ export default {
         this.query.beginTime = '';
         this.query.endTime = '';
       }
+    },
+    /**
+     * @description: 导出客户群
+     * @return {*}
+     */
+    exportGroup() {
+      this.setQueryTime();
+      this.$confirm('即将导出当前查询结果，是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        api.exportGroup(this.query)
+          .then((res) => {
+            this.download(res.msg, true);
+          }).catch(e => {
+            this.msgError('导出失败!');
+          });
+      }).catch(() => {});
+    },
+    /**
+     * @description: 获取列表
+     * @param {*} page 页码
+     * @return {*}
+     */
+    getList(page) {
+      this.setQueryTime();
       page && (this.query.pageNum = page);
       this.loading = true;
       api
@@ -347,6 +377,10 @@ export default {
         v-hasPermi="['customerManage:group:sync']"
         @click="sync"
       >同步客户群</el-button>
+      <el-button
+        v-hasPermi="['customerManage:group:export']"
+        @click="exportGroup"
+      >导出客户群</el-button>
     </template>
     <template v-slot:data>
       <el-table

@@ -1,7 +1,7 @@
 <!--
  * @Description: 雷达详情
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="radar-detail-page">
@@ -173,7 +173,9 @@ export default {
       clickPersonNum: [],
       // 点击次数
       sumClickNum: [],
-      radarId: ''
+      radarId: '',
+      beginTime: '',
+      endTime: ''
     };
   },
   watch: {
@@ -313,20 +315,21 @@ export default {
      * @params val :选中的日期
      */
     pickData(val) {
-      this.getTimeRangeAnalyseCount(val);
+      this.beginTime = val ? val[0] : '';
+      this.endTime = val ? val[1] : '';
+      this.getTimeRangeAnalyseCount();
     },
     /**
      * 获取折线图数据
      */
-    getTimeRangeAnalyseCount(val) {
+    getTimeRangeAnalyseCount() {
       const params = {
         radarId: this.radarId,
-        channelName: this.channelName
+        channelName: this.channelName,
+        beginTime: this.beginTime,
+        endTime: this.endTime
       };
-      if (val) {
-        params.beginTime = val[0];
-        params.endTime = val[1];
-      }
+
       getTimeRangeAnalyseCount(params).then((res) => {
         this.chartsXData = res.data.list.map((item) => item.createDate);
         this.clickPersonNum = res.data.list.map((item) => item.clickPersonNum);

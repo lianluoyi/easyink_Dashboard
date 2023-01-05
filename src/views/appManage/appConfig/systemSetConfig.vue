@@ -1,7 +1,7 @@
 <!--
  * @Description: 工单助手系统设置界面
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="system-setting-config config-tab">
@@ -170,10 +170,10 @@ export default {
     return {
       useScope: 0,
       roleList: [],
-      selectedRole: null,
+      selectedRole: null, // 指定角色
       employeeVisible: false,
       dialogVisibleSelectUser: false,
-      useStaff: [],
+      useStaff: [], // 指定员工
       config: {
         // 网点id
         networkId: ''
@@ -211,7 +211,7 @@ export default {
     dealType() {
       if (this.appDetail.scopeList && this.appDetail.scopeList.length > 0) {
         const type = this.appDetail.scopeList[0].type;
-        this.useScope = [USESCOPE_TYPE['user'], USESCOPE_TYPE['department']].includes(type) ? USESCOPE_TYPE['user'] : USESCOPE_TYPE['department'];
+        this.useScope = [USESCOPE_TYPE['user'], USESCOPE_TYPE['department']].includes(type) ? USESCOPE_TYPE['user'] : USESCOPE_TYPE['role'];
         const userOrDepartmentList = [...this.appDetail.scopeList];
         const groupByUserOrDepartmentList = groupBy(userOrDepartmentList, item => item.type);
         let userList = groupByUserOrDepartmentList[USESCOPE_TYPE['user']] || [];

@@ -130,7 +130,7 @@
     <!-- 选择审计人弹窗 -->
     <SelectUser
       :visible.sync="dialogVisibleSelectAuditUser"
-      title="选择添加人"
+      title="选择审计人"
       is-sigle-select
       :ignore-permission="true"
       :select-user-list="auditUser"
