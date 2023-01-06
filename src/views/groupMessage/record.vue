@@ -30,9 +30,9 @@ export default {
       query: {
         pageNum: 1,
         pageSize: PAGE_LIMIT,
-        sender: undefined,
-        content: undefined,
-        pushType: undefined,
+        sender: undefined, // 创建人姓名
+        content: undefined, // 消息内容
+        pushType: undefined, // 群发类型
         beginTime: undefined,
         endTime: undefined
       },
@@ -55,6 +55,9 @@ export default {
           this.query[key] = this.$route.query[key];
         }
       });
+      if (this.query.beginTime && this.query.endTime) {
+        this.dateRange = [this.query.beginTime, this.query.endTime];
+      }
     }
     this.getList();
   },
@@ -87,7 +90,9 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = [];
-      this.$refs['queryForm'].resetFields();
+      this.$set(this.query, 'sender', undefined);
+      this.$set(this.query, 'content', undefined);
+      this.$set(this.query, 'pushType', undefined);
       this.getList(1);
     },
     // 多选框选中数据

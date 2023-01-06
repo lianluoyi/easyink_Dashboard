@@ -1,7 +1,7 @@
 <!--
  * @Description: 如何使用兑换活动
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <el-drawer
@@ -101,34 +101,32 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-  .draw-body-title {
-    margin-left: 20px;
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 9px;
-  }
-  .draw-body-content {
-    margin-bottom: 10px;
-    line-height:20px;
-    margin-left: 58px;
-  }
+    .draw-body-title {
+      margin-left: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 9px;
+    }
+    .draw-body-content {
+      margin-bottom: 10px;
+      line-height:20px;
+      margin-left: 58px;
+    }
     .confirm-div {
-    display: flex;
-    align-items: center;
-    padding: 20px 30px;
-    position: relative;
-    height: 60px;
-    .switch-tip {
-      margin-left: 10px;
+      display: inline-block;
+      .confirm-btn-div {
+        float: right;
+        margin: 20px 20px;
+        &::after{
+          clear: both;
+        }
+      }
     }
-    .confirm-btn-div {
-      position: absolute;
-      right: 30px;
-    }
-  }
 }
 .part-img {
   width: 520px;
   height: 300px;
+  margin-top: 5px;
+  border: 1px solid gray;
 }
 </style>

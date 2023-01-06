@@ -616,7 +616,7 @@ export default {
                       :active-value="true"
                       :inactive-value="false"
                     />
-                    <span class="back-text">开启后，根据使用场景做标记，自动为扫码添加的客户打上标签</span>
+                    <span class="back-text">开启后，当客户点击雷达链接，为其打上指定客户标签</span>
                   </el-form-item>
                   <el-form-item v-show="radarForm.enableCustomerTag" label="" prop="customerTags">
                     <div style="margin-left:60px;">

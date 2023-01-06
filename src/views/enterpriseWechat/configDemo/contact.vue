@@ -100,6 +100,15 @@ export default {
           :preview-src-list="[require('@/assets/example/demo/contact-step2-3.jpg')]"
         />
       </div>
+      <div class="part">
+        <div class="content-title">（4）添加企业IP白名单。</div>
+        <div class="content-text"> 找到"企业可信IP"，点击“配置”按钮，填写当前系统的IP地址。</div>
+        <el-image
+          class="part-img"
+          :src="require('@/assets/example/demo/contact-step2-4.jpg')"
+          :preview-src-list="[require('@/assets/example/demo/contact-step2-4.jpg')]"
+        />
+      </div>
     </div>
     <div v-if="active === 2" class="content-div">
       <div class="part">
@@ -123,6 +132,28 @@ export default {
           class="part-img"
           :src="require('@/assets/example/demo/contact-step3-2.jpg')"
           :preview-src-list="[require('@/assets/example/demo/contact-step3-2.jpg')]"
+        />
+      </div>
+      <div class="part">
+        <div class="content-title">
+          （3）添加企业IP白名单
+        </div>
+        <div class="content-text">点击"企业可信IP"旁边的配置按钮，<span style="color: red;">当前弹窗先不要关闭</span>，此时企微客户端将收到一条企业微信团队发送的确认操作。</div>
+        <el-image
+          class="part-img"
+          :src="require('@/assets/example/demo/contact-step3-3.jpg')"
+          :preview-src-list="[require('@/assets/example/demo/contact-step3-3.jpg')]"
+        />
+      </div>
+      <div class="part">
+        <div class="content-title">
+          （4）在客户端确认操作后，企微后台弹窗即转为可编辑的输入框，填进当前系统的IP地址后，点击"确定"按钮保存即可。
+        </div>
+        <div class="content-text" />
+        <el-image
+          class="part-img"
+          :src="require('@/assets/example/demo/contact-step3-4.jpg')"
+          :preview-src-list="[require('@/assets/example/demo/contact-step3-4.jpg')]"
         />
       </div>
     </div>

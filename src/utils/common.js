@@ -112,8 +112,13 @@ export function selectDictLabels(datas, value, separator) {
 }
 
 // 通用下载方法
-export function download(fileName) {
-  window.location.href = baseURL + '/common/download?fileName=' + encodeURI(fileName) + '&delete=' + true;
+export function download(fileName, noStamp = false) {
+  const base = baseURL + '/common/download?fileName=' + encodeURI(fileName) + '&delete=' + true;
+  if (!noStamp) {
+    window.location.href = base;
+  } else {
+    window.location.href = base + '&needTimeStamp=' + false;
+  }
 }
 
 // 字符串格式化(%s )

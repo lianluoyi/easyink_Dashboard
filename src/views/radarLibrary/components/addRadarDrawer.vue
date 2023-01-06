@@ -133,7 +133,7 @@
               :active-value="true"
               :inactive-value="false"
             />
-            <span class="we-emple-code-tags-tip">开启后，根据使用场景做标记，自动为扫码添加的客户打上标签</span>
+            <span class="we-emple-code-tags-tip">开启后，当客户点击雷达链接，为其打上指定客户标签</span>
           </el-form-item>
           <el-form-item v-show="form.enableCustomerTag" label="" prop="customerTags">
             <div>
