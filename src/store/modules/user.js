@@ -84,22 +84,22 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(res => {
           try {
-            const user = res.data;
-            const avatar = user.avatar;
-            if (user.roles && user.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-              commit('SET_ROLES', user.roles);
-              commit('SET_PERMISSIONS', user.permissions);
+            const resUser = res.data;
+            const avatar = resUser.avatar;
+            if (resUser.roles && resUser.roles.length > 0) { // 验证返回的roles是否是一个非空数组
+              commit('SET_ROLES', resUser.roles);
+              commit('SET_PERMISSIONS', resUser.permissions);
             } else {
               commit('SET_ROLES', ['ROLE_DEFAULT']);
             }
-            commit('SET_NAME', user.userName);
+            commit('SET_NAME', resUser.userName);
             commit('SET_AVATAR', avatar);
-            commit('SET_ISSUPERADMIN', user.isSuperAdmin);
-            commit('SET_USERID', user.userId);
+            commit('SET_ISSUPERADMIN', resUser.isSuperAdmin);
+            commit('SET_USERID', resUser.userId);
             resolve(res);
-            if (user.isSuperAdmin) {
-              getUserProfile().then(res => {
-                commit('SET_NAME', res.data.nickName || res.data.userName);
+            if (resUser.isSuperAdmin) {
+              getUserProfile().then(response => {
+                commit('SET_NAME', response.data.nickName || response.data.userName);
               });
             }
           } catch (err) {

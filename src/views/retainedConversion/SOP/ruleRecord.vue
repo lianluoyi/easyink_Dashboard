@@ -1,7 +1,7 @@
 <!--
  * @Description: 规则执行记录
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="rule-record">
@@ -288,7 +288,7 @@ export default {
         ruleName: query.ruleName
       }).then(res => {
         if (res) {
-          this.list = [...res.rows] || [];
+          this.list = res.rows?.length ? [...res.rows] : [];
           this.total = res.total;
         }
       });
@@ -303,8 +303,8 @@ export default {
         userName: employeeQuery.userName
       }).then(res => {
         if (res) {
-          this.list = [...res.rows] || [];
-          this.total = res.total;
+          this.list = res?.rows?.length ? [...res.rows] : [];
+          this.total = res?.total;
         }
       });
     },

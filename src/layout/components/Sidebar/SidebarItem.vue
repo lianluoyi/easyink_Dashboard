@@ -2,7 +2,7 @@
   <div v-if="!item.hidden" v-bind="$attrs" class="sidebar-item">
     <template
       v-if="
-        hasOneShowingChild(item.children, item) &&
+        hasOneShowingChild(item, item.children) &&
           (!onlyOneChild.children || onlyOneChild.noShowingChildren) &&
           !item.alwaysShow
       "
@@ -78,7 +78,7 @@ export default {
     return {};
   },
   methods: {
-    hasOneShowingChild(children = [], parent) {
+    hasOneShowingChild(parent, children = []) {
       const showingChildren = children.filter((item) => {
         if (item.hidden) {
           return false;

@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import icons from './requireIcons';
+import icons from './icons';
 export default {
   name: 'IconSelect',
   data() {

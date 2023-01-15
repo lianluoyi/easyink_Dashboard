@@ -1,5 +1,5 @@
 <script>
-import { getDetail, add, update, getExpectedReceptionData } from '@/api/communityOperating/oldCustomer';
+import { add, getExpectedReceptionData } from '@/api/communityOperating/oldCustomer';
 import PhoneDialog from '@/components/PhoneDialog';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
@@ -67,9 +67,7 @@ export default {
       }
     },
     users(users) {
-      this.form.scopeList = users.map((user) => {
-        return user.userId;
-      });
+      this.form.scopeList = users;
       this.$refs.form.validateField('scopeList');
     },
     tags(tags) {
@@ -79,46 +77,20 @@ export default {
       this.$refs.form.validateField('tagList');
     }
   },
-  created() {
-    this.taskId = this.$route.query.id;
-    this.taskId && this.getDetail(this.taskId);
-  },
   beforeUpdate() {
     checkChange(this.$options.data().form, this.form);
   },
   methods: {
     getExpectedReceptionData() {
-      getExpectedReceptionData(this.form).then((res) => {
+      const payload = {
+        ...this.form,
+        scopeList: this.form.scopeList.map((item) => item.userId)
+      };
+      getExpectedReceptionData(payload).then((res) => {
         this.customerCount = res.data.expectedCustomerCount;
       });
     },
-    /** 获取详情 */
-    getDetail(id) {
-      this.loading = true;
-      getDetail(id).then(({ data }) => {
-        this.form.taskName = data.taskName || '';
-        this.form.welcomeMsg = data.welcomeMsg || '';
-        this.form.sendType = data.sendType || 0;
-        this.form.sendScope = data.sendScope || 0;
-        this.form.sendGender = data.sendGender || 0;
 
-        this.tags = data.tagList || [];
-        this.users = data.scopeList || [];
-        this.dateRange = [data.cusBeginTime || '', data.cusEndTime || ''];
-
-        if (data.groupCodeInfo && data.groupCodeInfo.id) {
-          this.codes = [data.groupCodeInfo];
-          this.groupQrCode = data.groupCodeInfo;
-          this.form.groupCodeId = this.groupQrCode.id;
-        } else {
-          this.codes = [];
-          this.groupQrCode = {};
-          this.form.groupCodeId = '';
-        }
-
-        this.loading = false;
-      });
-    },
     // 选择人员事件
     submitSelectUser(users) {
       this.users = users;
@@ -138,31 +110,21 @@ export default {
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.loading = true;
-          if (this.taskId) {
-            update(this.taskId, this.form)
-              .then(() => {
-                changeButtonLoading(this.$store, 'submit');
-                this.msgSuccess('更新成功');
-                this.loading = false;
-                this.$router.back();
-              })
-              .catch(() => {
-                changeButtonLoading(this.$store, 'submit');
-                this.loading = false;
-              });
-          } else {
-            add(this.form)
-              .then(() => {
-                changeButtonLoading(this.$store, 'submit');
-                this.msgSuccess('添加成功');
-                this.loading = false;
-                this.$router.back();
-              })
-              .catch(() => {
-                changeButtonLoading(this.$store, 'submit');
-                this.loading = false;
-              });
-          }
+          const payload = {
+            ...this.form,
+            scopeList: this.form.scopeList.map((item) => item.userId)
+          };
+          add(payload)
+            .then(() => {
+              changeButtonLoading(this.$store, 'submit');
+              this.msgSuccess('添加成功');
+              this.loading = false;
+              this.$router.back();
+            })
+            .catch(() => {
+              changeButtonLoading(this.$store, 'submit');
+              this.loading = false;
+            });
         } else {
           changeButtonLoading(this.$store, 'submit');
         }

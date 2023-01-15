@@ -152,7 +152,7 @@ export default {
         if (this.tagType === 'customer') {
           this.list = rows;
         } else {
-          this.list = data.map(tag => ({ ...tag, groupName: tag.name, groupId: tag.id, weTags: tag.tagList.map(tag => ({ ...tag, tagId: tag.id })) }));
+          this.list = data.map(tag => ({ ...tag, groupName: tag.name, groupId: tag.id, weTags: tag.tagList.map(item => ({ ...item, tagId: item.id })) }));
         }
         this.listOneArray = [];
         this.list.forEach((element) => {

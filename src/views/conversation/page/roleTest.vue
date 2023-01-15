@@ -240,7 +240,7 @@ export default {
       };
       // 处理消息内容
       content.getChatAllList(query).then(res => {
-        const revokeDate = res.rows.map(chatDate => {
+        const revokeDate = res.data.list.map(chatDate => {
           if (chatDate.msgType === 'revoke') {
             const revokeDateStorage = chatDate.revoke.content ?? {};
             chatDate = { ...chatDate, ...revokeDateStorage };
@@ -253,7 +253,7 @@ export default {
           }
         });
         this.fileData = revokeDate;
-        this.total = Number(res.total);
+        this.total = Number(res.data.total);
       });
     },
     chechName(e) {

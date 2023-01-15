@@ -200,8 +200,8 @@ export default {
             treeParentCode: genTable.treeParentCode,
             parentMenuId: genTable.parentMenuId
           };
-          updateGenTable(genTable).then(res => {
-            this.msgSuccess(res.msg);
+          updateGenTable(genTable).then(response => {
+            this.msgSuccess(response.msg);
             this.close();
           });
         } else {

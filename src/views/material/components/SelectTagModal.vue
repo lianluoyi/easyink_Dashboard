@@ -86,9 +86,7 @@ export default {
      */
     showTagList() {
       let list = [...this.tagList];
-      list = list.filter((item) => item.tagName && item.tagName.includes(this.tagName));
-      // 标签倒序显示
-      list = list.reverse();
+      list = list.filter((item) => item.tagName && item.tagName.includes(this.tagName)).reverse();
       return list;
     }
   },

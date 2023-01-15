@@ -242,7 +242,7 @@ export default {
       this.canvansData('main3', ['群新增人数'], 'arr3', 'btm1', '#14BF48');
       this.canvansData('main4', ['流失客户数'], 'arr4', 'btm1', '#FA7216');
     },
-    drawLine(id, arrData, data, color) {
+    drawLine(id, _arrData, data, color) {
       const obj = document.getElementById(id);
       if (obj) {
         obj.style.width = '100%';
@@ -255,7 +255,7 @@ export default {
           trigger: 'axis'
         },
         legend: {
-          data: arrData
+          data: _arrData
         },
         grid: {
           left: '3%',
@@ -285,7 +285,7 @@ export default {
 
         },
         series: [{
-          name: arrData,
+          name: _arrData,
           type: 'line',
           stack: '总量',
           smooth: true,

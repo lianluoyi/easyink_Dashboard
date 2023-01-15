@@ -21,7 +21,6 @@
     "clipboard": "2.0.4",
     "core-js": "3.19.1",
     "echarts": "4.2.1",
-    "element-resize-detector": "^1.2.2",
     "element-ui": "^2.15.2",
     "file-saver": "2.0.1",
     "fuse.js": "3.4.4",

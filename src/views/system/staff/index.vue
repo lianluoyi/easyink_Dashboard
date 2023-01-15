@@ -188,9 +188,7 @@ export default {
           this.scopeDeptList = data;
           this.treeData = this.handleTree(this.scopeDeptList);
           this.treeMap = this.getDeptMap(data);
-          this.query.departments = this.dealScopedDepts(this.scopeDeptList[0] ? this.scopeDeptList[0].id : '').join(
-            ','
-          );
+          this.query.departments = [].join(',');
           this.getList();
         })
         .catch(() => {

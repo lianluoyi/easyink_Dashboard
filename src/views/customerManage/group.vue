@@ -193,16 +193,14 @@ export default {
       }
       this.selectedTags = [];
       const hasErrorTag = [];
-      const repeat = [];
       this.multipleSelection.forEach((element) => {
         element.tagList.forEach((child) => {
           // 判断是否有重复标签
           const isRepeat = this.selectedTags.some((tag) => {
             return tag.tagId === child.tagId;
           });
-            // 去重
+          // 去重
           if (isRepeat) {
-            repeat.push(child.tagName);
             return;
           }
           const filter = this.listTagOneArray.find((tag) => {
@@ -249,7 +247,7 @@ export default {
     deleteTag(tag) {
       const index = this.queryTag.findIndex(tag_ => tag_.tagId === tag.tagId);
       this.queryTag.splice(index, 1);
-      this.query.tagIds = this.queryTag.map((tag) => tag.tagId) + '';
+      this.query.tagIds = this.queryTag.map((item) => item.tagId) + '';
     },
     getListTag() {
       tagApi.getGroupTagList().then(({ data }) => {

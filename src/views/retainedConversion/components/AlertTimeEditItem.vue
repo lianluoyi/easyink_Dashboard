@@ -1,7 +1,7 @@
 <!--
  * @Description: 编辑提醒时间
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="alert-time-edit-item-div">
@@ -205,7 +205,7 @@ export default {
       const options = [];
       const monthLength = 31;
       const list = [...new Array(monthLength).keys()];
-      list.map(item => {
+      list.forEach(item => {
         options.push({ label: `${item + 1}号`, value: item + 1 });
       });
       return options;

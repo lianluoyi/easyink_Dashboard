@@ -60,17 +60,14 @@ export default {
   methods: {
     handleBeforeUpload(file) {
       this.loading = true;
-      const isFormat = true;
       const isSize = file.size / MAX_BYTE / MAX_BYTE < LIMIT_BYTE;
 
       if (!isSize) {
         this.msgError('上传文件大小不能超过 20MB!');
-      }
-      if (!isFormat || !isSize) {
         this.loading = false;
       }
 
-      return isFormat && isSize;
+      return isSize;
     },
     onSuccess(res, file) {
       // if (res.code === 200) {

@@ -108,7 +108,7 @@ export default {
     getSensiveRecordList() {
       sensitiveApis.getSensitiveRecord(this.recordPageConfig).then(res => {
         const resData = [...res.rows];
-        resData.map(item => {
+        resData.forEach((item) => {
           const dealOperateTargetObj = this.dealUserInfo(item, 'operateTarget');
           const dealOperatorObj = this.dealUserInfo(item, 'operator');
           if (dealOperateTargetObj) item.operateTargetObj = dealOperateTargetObj;

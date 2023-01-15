@@ -387,19 +387,19 @@ export default {
       }
       if (isGroup) {
         content.chatGrounpList(query).then(res => {
-          this.total = Number(res.total);
-          this.resortData(res);
+          this.total = Number(res.data.total);
+          this.resortData(res.data);
         });
       } else {
         content.chatList(query).then(res => {
-          this.total = Number(res.total);
-          this.resortData(res);
+          this.total = Number(res.data.total);
+          this.resortData(res.data);
         });
       }
     },
     resortData(res) {
       if (!res) return;
-      const resData = res.rows || [];
+      const resData = res.list || [];
       switch (this.activeNameThree) {
         case MSG_TYPE_ALL: {
           this.allChat = resData;

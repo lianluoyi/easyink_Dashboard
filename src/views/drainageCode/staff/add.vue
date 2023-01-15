@@ -197,7 +197,7 @@ export default {
         }
         // 活动欢迎语
         if (data.welcomeMsgType) {
-          this.activeList = [data.codeActivity] || [];
+          this.activeList = data.codeActivity ? [data.codeActivity] : [];
           const { codeSuccessMaterialList, codeRepeatMaterialList, codeFailMaterialList, codeFailMsg, codeRepeatMsg, codeSuccessMsg } = data;
           this.codeMaterialList.codeSuccessMaterialList = codeSuccessMaterialList;
           this.codeMaterialList.codeFailMaterialList = codeFailMaterialList;

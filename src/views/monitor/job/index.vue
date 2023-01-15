@@ -378,8 +378,8 @@ export default {
           msg: '确认要"' + text + '""' + row.jobName + '"任务吗?'
         },
         () => {
-          const status = row.status === '0' ? '1' : '0';
-          return changeJobStatus(row.jobId, status).then(() => {
+          const needChangeStatus = row.status === '0' ? '1' : '0';
+          return changeJobStatus(row.jobId, needChangeStatus).then(() => {
             this.msgSuccess(text + '成功');
             this.getList();
           });

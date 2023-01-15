@@ -7,7 +7,7 @@ import enterPriseWechatConfig from './modules/enterPriseWechatConfig';
 import serverInfo from './modules/serverInfo';
 import getters from './getters';
 import materialInfo from './modules/materialInfo';
-import customerProperty from './modules/customerProperty';
+import customerProperty from './modules/customerPropertyList';
 import listInfo from './modules/listInfo';
 import requestButton from './modules/requestButton';
 

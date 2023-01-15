@@ -75,7 +75,7 @@ export default {
       getList(this.query)
         .then(({ rows, total }) => {
           const newRows = [...rows];
-          newRows.map(item => {
+          newRows.forEach(item => {
             item.contentList = item.content.split(',');
           });
           this.list = newRows;
@@ -106,7 +106,7 @@ export default {
       const { msgid, messageId } = data;
       const magArr = msgid.split(',');
       syncMsg({ msgids: magArr, messageId })
-        .then(({ data }) => {
+        .then(({ data: resData }) => {
           this.msgSuccess('同步成功');
           this.getList();
           // this.list = rows
