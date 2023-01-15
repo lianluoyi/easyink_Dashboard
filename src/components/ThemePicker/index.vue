@@ -70,12 +70,12 @@ export default {
 
       const getHandler = (variable, id) => {
         return () => {
-          const originalCluster = this.getThemeCluster(
+          const originCluster = this.getThemeCluster(
             ORIGINAL_THEME.replace('#', '')
           );
           const newStyle = this.updateStyle(
             this[variable],
-            originalCluster,
+            originCluster,
             themeCluster
           );
 

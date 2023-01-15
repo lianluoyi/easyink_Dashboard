@@ -104,9 +104,9 @@ export default {
           if (!rows.length) {
             this.query.pageNum = 1;
             // 如果当前页面，数据为空，跳转第一页
-            getList(this.query).then(({ rows, total }) => {
-              this.list = rows;
-              this.total = total;
+            getList(this.query).then(({ rows: resRows, total: resTotal }) => {
+              this.list = resRows;
+              this.total = resTotal;
               this.loading = false;
             }).catch(() => {
               this.loading = false;

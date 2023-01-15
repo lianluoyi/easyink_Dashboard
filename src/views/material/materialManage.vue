@@ -44,6 +44,7 @@ export default {
         mediaType: MEDIA_TYPE_POSTER,
         isExpire: true
       },
+      // 过期素材
       expireList: [],
       // 是否全选
       checkAll: false,
@@ -108,7 +109,7 @@ export default {
      */
     openExpireList() {
       this.drawerVisible = true;
-      this.getExpireMaterialList(this.query);
+      this.getExpireMaterialList({});
     },
     /**
      * 获取过期素材列表
@@ -214,6 +215,7 @@ export default {
       :radar-query.sync="radarQuery"
       :total="total"
       :is-loading="isLoading"
+      :material-type.sync="query.materialType"
       @emptyExpireList="emptyExpireList"
       @changeSelectedMaterialNum="changeSelectedMaterialNum"
     >

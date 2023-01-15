@@ -283,7 +283,7 @@ export default {
      * 编辑渠道
      */
     editChannel(row) {
-      this.$refs.form.resetFields();
+      this.$refs?.form?.resetFields();
       this.form.name = row.name;
       this.id = row.id;
       this.addChannelVisible = true;

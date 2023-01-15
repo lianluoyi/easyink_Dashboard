@@ -149,9 +149,8 @@ export default {
 
     dealChildIdList() {
       const idList = [];
-      let childList = [...this.lowerGroupList];
-      childList = childList.reverse();
-      childList.map((item, index) => {
+      const childList = [...this.lowerGroupList].reverse();
+      childList.forEach((item, index) => {
         idList.push({
           childId: item.id,
           name: item.name,

@@ -275,15 +275,15 @@ export function debounce(func, wait, immediate) {
     }
   };
 
-  return function(...args) {
+  return function(..._args) {
     context = this;
     timestamp = +new Date();
     const callNow = immediate && !timeout;
     // 如果延时不存在，重新设定延时
     if (!timeout) timeout = setTimeout(later, wait);
     if (callNow) {
-      result = func.apply(context, args);
-      context = args = null;
+      result = func.apply(context, _args);
+      context = _args = null;
     }
 
     return result;
@@ -302,7 +302,7 @@ export function deepClone(source) {
   if (!source && typeof source !== 'object') {
     throw new Error('error arguments', 'deepClone');
   }
-  const targetObj = source.constructor === Array ? [] : {};
+  const targetObj = source && source.constructor === Array ? [] : {};
   Object.keys(source).forEach((keys) => {
     if (source[keys] && typeof source[keys] === 'object') {
       targetObj[keys] = deepClone(source[keys]);

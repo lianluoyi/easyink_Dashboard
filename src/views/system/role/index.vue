@@ -404,17 +404,17 @@ export default {
     dealMenuTree(menuList) {
       const menuObj = {};
       const newMenuList = menuList.concat();
-      newMenuList.map((menuItem) => {
+      newMenuList.forEach((menuItem) => {
         const childObj = Object.assign({}, menuItem);
         const childArr = childObj.children ? childObj.children.concat() : [];
         const menuChildIds = [];
         const menuChildObj = {};
-        childArr.map((modelItem) => {
+        childArr.forEach((modelItem) => {
           const modelChildIds = [];
           menuChildIds.push(Number(modelItem.id));
           if (modelItem.children) {
             const pointerChildObj = {};
-            modelItem.children.map((pointerItem) => {
+            modelItem.children.forEach((pointerItem) => {
               modelChildIds.push(Number(pointerItem.id));
               pointerChildObj[pointerItem.id] = pointerItem;
             });

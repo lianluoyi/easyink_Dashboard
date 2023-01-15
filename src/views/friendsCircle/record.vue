@@ -1,7 +1,7 @@
 <!--
  * @Description: 发布记录
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <script>
 import { goRouteWithQuery } from '@/utils';
@@ -132,9 +132,9 @@ export default {
       }
     },
     // 赋值编辑跳转方法
-    goToGroupMessageAdd(type, data) {
+    goToGroupMessageAdd(_type, data) {
       const params = {};
-      params.from = type;
+      params.from = _type;
       // 将所属员工在路由中传递过去
       params.user = data.userList;
       params.momentTaskId = data.momentTaskId;

@@ -1,7 +1,7 @@
 /*
  * @Description: 员工列表与标签列表，用于新增群发页面渲染
  * @Author: turing5467
- * @LastEditors: turing5467
+ * @LastEditors: xulinbin
  */
 import { getGroupTagList } from '@/api/customer/grouptag';
 import { getList } from '@/api/customer/tag';
@@ -52,7 +52,7 @@ const listInfo = {
       return new Promise((resolve, reject) => {
         getGroupTagList().then((res) => {
           try {
-            const list = res.data.map(tag => ({ ...tag, groupName: tag.name, groupId: tag.id, weTags: tag.tagList.map(tag => ({ ...tag, tagId: tag.id })) }));
+            const list = res.data.map(tag => ({ ...tag, groupName: tag.name, groupId: tag.id, weTags: tag.tagList.map(item => ({ ...item, tagId: item.id })) }));
             commit('SET_GROUP_TAG_LIST', list);
             resolve(res);
           } catch (err) {

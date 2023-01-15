@@ -1,7 +1,7 @@
 <!--
  * @Description: 群发详情列表
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <script>
 import { getPushResult, sendToUser } from '@/api/groupMessage';
@@ -107,7 +107,7 @@ export default {
         : pushResult.customers;
     },
     getUserHeadImg(userId) {
-      const user = this.$store.state.listInfo.userList.find(user => user.userId === userId);
+      const user = this.$store.state.listInfo.userList.find(item => item.userId === userId);
       return user && user.avatarMediaid;
     }
   }

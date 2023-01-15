@@ -114,8 +114,8 @@ export default {
           result = await getCustomerCount(this.ruleId);
           break;
       }
-      this.ignoreDuplicateCount = result.data.distinctCount;
-      this.totalCount = result.data.count;
+      this.ignoreDuplicateCount = result?.data?.distinctCount || 0;
+      this.totalCount = result?.data?.count || 0;
     },
     /**
      * 重置
@@ -207,8 +207,8 @@ export default {
           listRes = await getCustomerRecordList(newParams);
           break;
       }
-      this.total = listRes.total;
-      this.list = listRes.rows;
+      this.total = listRes?.total || 0;
+      this.list = listRes?.rows || [];
     },
     // 处理名字
     renderUserInfo(item) {

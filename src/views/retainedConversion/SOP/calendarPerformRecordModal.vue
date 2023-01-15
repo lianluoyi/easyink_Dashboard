@@ -1,7 +1,7 @@
 <!--
  * @Description: 群日历执行详情弹窗
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <el-dialog v-bind="$attrs" class="perform-record-modal" width="800px" v-on="$listeners" @close="onClose">
@@ -261,7 +261,7 @@ export default {
         pageSize: PAGE_LIMIT_INFINITE
       }).then(res => {
         if (res) {
-          this.ruleList = [...res.rows] || [];
+          this.ruleList = res.rows?.length ? [...res.rows] : [];
         }
       });
     },

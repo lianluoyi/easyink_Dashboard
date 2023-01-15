@@ -260,9 +260,9 @@ export default {
         var t = [];
         this.options = checkedKeys.map((item) => {
           // 设置option选项
-          var node = this.$refs.tree.getNode(item); // 所有被选中的节点对应的node
-          t.push(node.data);
-          return { label: node.label, value: node.key };
+          const selectNode = this.$refs.tree.getNode(item); // 所有被选中的节点对应的node
+          t.push(selectNode.data);
+          return { label: selectNode.label, value: selectNode.key };
         });
         this.returnDataKeys = this.options.map((item) => {
           return item.value;
@@ -369,11 +369,11 @@ export default {
     },
     // 将一维的扁平数组转换为多层级对象
     buildTree(data, id) {
-      const fa = (id) => {
+      const fa = (needId) => {
         const temp = [];
         for (let i = 0; i < data.length; i++) {
           const n = data[i];
-          if (n[this.obj.pid] === id) {
+          if (n[this.obj.pid] === needId) {
             n[this.obj.children] = fa(n[this.obj.id]);
             temp.push(n);
           }

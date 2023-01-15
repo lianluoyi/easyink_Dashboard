@@ -13,29 +13,29 @@ const state = {
 };
 
 const mutations = {
-  TOGGLE_SIDEBAR: (state) => {
-    state.sidebar.opened = !state.sidebar.opened;
-    state.sidebar.withoutAnimation = false;
-    if (state.sidebar.opened) {
+  TOGGLE_SIDEBAR: (_state) => {
+    _state.sidebar.opened = !_state.sidebar.opened;
+    _state.sidebar.withoutAnimation = false;
+    if (_state.sidebar.opened) {
       Cookies.set('sidebarStatus', 1);
     } else {
       Cookies.set('sidebarStatus', 0);
     }
   },
-  CLOSE_SIDEBAR: (state, withoutAnimation) => {
+  CLOSE_SIDEBAR: (_state, withoutAnimation) => {
     Cookies.set('sidebarStatus', 0);
-    state.sidebar.opened = false;
-    state.sidebar.withoutAnimation = withoutAnimation;
+    _state.sidebar.opened = false;
+    _state.sidebar.withoutAnimation = withoutAnimation;
   },
-  TOGGLE_DEVICE: (state, device) => {
-    state.device = device;
+  TOGGLE_DEVICE: (_state, device) => {
+    _state.device = device;
   },
-  SET_SIZE: (state, size) => {
-    state.size = size;
+  SET_SIZE: (_state, size) => {
+    _state.size = size;
     Cookies.set('size', size);
   },
-  SET_busininessDesc: (state, busininessDesc) => {
-    state.busininessDesc = busininessDesc;
+  SET_busininessDesc: (_state, busininessDesc) => {
+    _state.busininessDesc = busininessDesc;
   }
 };
 

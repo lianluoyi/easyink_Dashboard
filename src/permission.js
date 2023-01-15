@@ -13,7 +13,7 @@ const NUMBER = '2';
 const checkLogin = (from, data, next) => {
   // 这里判断登录的时候页面的跳转
   if (from.path === '/login') {
-    if (!data || (data && (!data.corpId || !data.contactSecret || (data.status === NUMBER)))) {
+    if (!data || (!data.corpId || !data.contactSecret || (data.status === NUMBER))) {
       next({ path: '/system/sysSetting/enterpriseWechat' });
     }
   }
@@ -61,8 +61,8 @@ router.beforeEach((to, from, next) => {
               // }
               // }
               // 设置企微配置全局变量
-              store.dispatch('GetConfig').then(res => {
-                checkLogin(from, res.data, next);
+              store.dispatch('GetConfig').then(response => {
+                checkLogin(from, response.data, next);
               }).catch(() => {
                 checkLogin(from, null, next);
               });

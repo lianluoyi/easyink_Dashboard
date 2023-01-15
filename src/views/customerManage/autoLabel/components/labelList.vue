@@ -1,7 +1,7 @@
 <!--
  * @Description: 自动标签列表公共样式
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="label-list-page">
@@ -297,8 +297,8 @@ export default {
           listRes = await getCustomerList(newParams);
           break;
       }
-      this.total = listRes.total;
-      this.list = listRes.rows;
+      this.total = listRes?.total || 0;
+      this.list = listRes?.rows || [];
     },
 
     /**
@@ -423,7 +423,7 @@ export default {
     deleteTag(tag) {
       const index = this.selectedTags.findIndex(tag_ => tag_.tagId === tag.tagId);
       this.selectedTags.splice(index, 1);
-      this.query.tagIdList = this.selectedTags.map((tag) => tag.tagId);
+      this.query.tagIdList = this.selectedTags.map((item) => item.tagId);
     }
   }
 };

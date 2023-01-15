@@ -497,16 +497,16 @@ export default {
         if (this.contactTabType === CONTACT_TYPE_GROUP) {
           content.chatGrounpList(query).then(res => {
             this.allChatStack = [{
-              allChat: res.rows,
-              total: +res.total,
+              allChat: res.data.list,
+              total: +res.data.total,
               currentPage: this.currentPage
             }];
           });
         } else {
           content.chatList(query).then(res => {
             this.allChatStack = [{
-              allChat: res.rows,
-              total: +res.total,
+              allChat: res.data.list,
+              total: +res.data.total,
               currentPage: this.currentPage
             }];
           });

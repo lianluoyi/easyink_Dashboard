@@ -15,18 +15,6 @@ export function getList(params) {
 }
 
 /**
- * 获取老客老客进群详情
- * @param {*} params
- * id: 老客老客进群任务ID
- */
-export function getDetail(id) {
-  return request({
-    url: service + '/' + id,
-    method: 'get'
-  });
-}
-
-/**
  * 新增老客老客进群
  * @param {Object} data
 {
@@ -46,30 +34,6 @@ export function add(data) {
   return request({
     url: service + '/',
     method: 'post',
-    data
-  });
-}
-
-/**
-   * 修改老客老客进群
-   * @param {*} data
-{
-  "taskName": "string",
-  "welcomeMsg": "string",
-  "sendType": 0,
-  "groupCodeId": "string",
-  "weOldGroupTagList": [],
-  "weOldGroupUseScopeList": [],
-  "sendScope": 0,
-  "sendGender": 0,
-  "cusBeginTime": "string",
-  "cusEndTime": "string",
-}
-   */
-export function update(id, data) {
-  return request({
-    url: service + '/' + id,
-    method: 'put',
     data
   });
 }

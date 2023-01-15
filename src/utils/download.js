@@ -1,3 +1,4 @@
+import { MessageBox } from 'element-ui';
 /* eslint-disable no-magic-numbers */
 // download.js v4.2, by dandavis  2008-2016. [CCBY2] see http://danml.com/download.html for tests/usage
 // v1 landed a FF+Chrome compat way of downloading strings to local un-named files, upgraded to use a hidden frame and optional mime
@@ -85,9 +86,9 @@ export const download = (data, strFileName, strMimeType) => {
     for (i; i < mx; ++i) uiArr[i] = binData.charCodeAt(i);
     return new MyBlob([uiArr], { type: type });
   }
-  function saver(url, winMode) {
+  function saver(saverUrl, winMode) {
     if ('download' in anchor) { // html5 A[download]
-      anchor.href = url;
+      anchor.href = saverUrl;
       anchor.setAttribute('download', fileName);
       anchor.className = 'download-js-link';
       anchor.innerHTML = 'downloading...';
@@ -106,9 +107,15 @@ export const download = (data, strFileName, strMimeType) => {
     }
     // handle non-a[download] safari as best we can:
     if (/(Version)\/(\d+)\.(\d+)(?:\.(\d+))?.*Safari\//.test(navigator.userAgent)) {
-      url = url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
-      if (!window.open(url)) { // popup blocked, offer direct download:
-        if (confirm('Displaying New Document\n\nUse Save As... to download, then click back to return to this page.')) { location.href = url; }
+      saverUrl = saverUrl.replace(/^data:([\w\/\-\+]+)/, defaultMime);
+      if (!window.open(saverUrl)) { // popup blocked, offer direct download:
+        MessageBox.$confirm('Use Save As... to download, then click back to return to this page.', 'Displaying New Document', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          location.href = saverUrl;
+        });
       }
       return true;
     }
@@ -116,9 +123,9 @@ export const download = (data, strFileName, strMimeType) => {
     const f = document.createElement('iframe');
     document.body.appendChild(f);
     if (!winMode) { // force a mime that will download:
-      url = 'data:' + url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
+      saverUrl = 'data:' + saverUrl.replace(/^data:([\w\/\-\+]+)/, defaultMime);
     }
-    f.src = url;
+    f.src = saverUrl;
     setTimeout(function() { document.body.removeChild(f); }, 333);
   }// end saver
   if (navigator.msSaveBlob) { // IE10+ : (has Blob, but not a[download] or URL)

@@ -191,7 +191,8 @@ export default {
       this.loading = true;
       const params = {
         ...this.query,
-        tagIds: this.tagIdList && this.tagIdList.join(',')
+        tagIds: this.tagIdList && this.tagIdList.join(','),
+        usingFlag: this.sidebarUsing
       };
       getList(params)
         .then(({ rows, total }) => {
