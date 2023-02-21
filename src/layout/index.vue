@@ -92,7 +92,7 @@ export default {
   }
 
   .main-wrap {
-    height: calc(100vh - 58px);
+    height: calc(100vh - 65px);
     background: #eee;
     .main {
       height: 100%;

@@ -24,12 +24,20 @@ const chatList = (params) => {
     params
   });
 };
+/**
+ * 数据总览接口
+ * @returns
+ */
 const indexTable = () => {
   return request({
     url: '/wecom/page/getCorpBasicData',
     method: 'get'
   });
 };
+/**
+ * 实时数据接口
+ * @returns
+ */
 const indexEchart = () => {
   return request({
     url: '/wecom/page/getCorpRealTimeData',

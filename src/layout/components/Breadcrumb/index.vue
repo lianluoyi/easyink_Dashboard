@@ -179,6 +179,18 @@ const specialRoute = {
       title: '雷达库',
       path: '/operationsCenter/material/radarManage'
     }
+  ],
+  '/operationsCenter/material/editForm': [
+    {
+      title: '智能表单',
+      path: '/operationsCenter/material/intelligentForm'
+    }
+  ],
+  '/operationsCenter/material/formDetail': [
+    {
+      title: '智能表单',
+      path: '/operationsCenter/material/intelligentForm'
+    }
   ]
 };
 

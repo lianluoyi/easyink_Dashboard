@@ -3,42 +3,46 @@
  * @Author: wJiaaa
  * @LastEditors: wJiaaa
 -->
+// TODO 重新布局 采用自适应 每行最少显示3个 可进行换行显示
 <template>
-  <div class="index">
-    <div class="index_l whitebg">
-      <div class="tables">
-        <div style="text-align: left">
-          <el-row type="flex" class="row-bg" justify="space-between">
-            <el-col :span="24" class="title_name">
-              {{ title }}
-              <span v-if="showUptime" class="fontgay">更新于{{ uptime }}</span>
-            </el-col>
-          </el-row>
-          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top: 35px; text-align: center">
-            <el-col v-for="(item, index) in colList" :key="index" :span="6" class="col_style">
-              {{ item.title }}
-              <el-popover
-                v-if="item.showPopover"
-                :placement="item.placement || 'top-start'"
-                :content="item.content"
-                trigger="hover"
-                popper-class="tip-popover"
-              >
-                <i
-                  slot="reference"
-                  class="iconfont icon-question"
-                  style="font-size: 12px"
-                />
-              </el-popover>
-            </el-col>
-          </el-row>
-          <el-row type="flex" class="row-bg data-count theme-text-color" justify="space-between">
-            <el-col :span="6">{{ numsList.userNum || numsList.sumClickPersonNum || 0 }}</el-col>
-            <el-col :span="6">{{ numsList.publishNum || numsList.sumClickNum || 0 }}</el-col>
-            <el-col :span="6">{{ numsList.notPublishNum || numsList.nowadaysClickPersonNum || 0 }}</el-col>
-            <el-col :span="6">{{ numsList.expireNum || numsList.nowadaysClickNum || 0 }}</el-col>
-          </el-row>
-        </div>
+  <div class="index-main">
+    <div :style="`border-radius:${borderRadius}`" class="tables whitebg">
+      <div style="text-align: left">
+        <el-row type="flex" class="row-bg" justify="space-between" align="middle">
+          <el-col :span="24" class="title_name">
+            {{ title }}
+            <span v-if="showUptime" class="fontgay">更新于{{ uptime }}</span>
+          </el-col>
+          <!-- operate 插槽 用来控制标题右侧的内容-->
+          <slot name="operate" />
+        </el-row>
+        <el-row type="flex" class="row-bg" justify="space-between" style="margin-top: 35px; text-align: center">
+          <el-col v-for="(item, index) in colList" :key="index" :span="6" class="col_style">
+            {{ item.title }}
+            <el-popover
+              v-if="item.showPopover"
+              :placement="item.placement || 'top-start'"
+              :content="item.content"
+              trigger="hover"
+              popper-class="tip-popover"
+            >
+              <i
+                slot="reference"
+                class="iconfont icon-question"
+                style="font-size: 12px"
+              />
+            </el-popover>
+          </el-col>
+        </el-row>
+        <el-row type="flex" class="row-bg data-count theme-text-color" justify="space-between">
+          <el-col v-for="(item,index) in colList" :key="index" :span="6">
+            <span :style="`color: ${color} `" class="col-item theme-text-color">
+              {{ item[item.filed] || 0 }}
+              <!-- 符号 -->
+              <span class="unit">{{ item.unit }}</span>
+            </span>
+          </el-col>
+        </el-row>
       </div>
     </div>
   </div>
@@ -46,28 +50,33 @@
 <script>
 export default {
   props: {
-    // 列表各个项的总数
-    numsList: {
-      type: Object,
-      default: () => {}
-    },
-    // 是否展示更新时间
+    /** 是否展示更新时间 */
     showUptime: {
       type: Boolean,
       default: false
     },
-    // 更新时间
+    /** 更新时间 */
     uptime: {
       type: String,
       default: ''
     },
-    // 列表详情  title：展示的标题 showPopover：是否显示弹出框 content：弹出框内容  placement:弹出框位置
+    /** 列表详情  title：展示的标题 showPopover：是否显示弹出框 content：弹出框内容  placement:弹出框位置 filed:要显示的字段 unit:单位 */
     colList: {
       type: Array,
       default: () => []
     },
-    // 标题
+    /** 标题 */
     title: {
+      type: String,
+      default: ''
+    },
+    /** 字体颜色 */
+    color: {
+      type: String,
+      default: ''
+    },
+    /** 边框弧度 */
+    borderRadius: {
       type: String,
       default: ''
     }
@@ -80,15 +89,14 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.index {
+.index-main {
   width: 100%;
   background: #f1f1f1;
-  margin-top: 2px;
   .title_name {
+    flex:1;
     font-size: 24px;
     font-weight: bold;
     color: #000000;
-    padding-top: 15px;
   }
   .col_style {
     font-size: 18px;
@@ -103,23 +111,18 @@ export default {
     font-weight: 200;
   }
 
-  .fr {
-    float: right;
-  }
-
   .tables {
     width: 100%;
-    height: 200px;
+    height: 180px;
     background: #fff;
-    border-radius: 5px;
     padding: 15px;
     font-size: 16px;
   }
 
   .whitebg {
+    width: 100%;
     min-height: 0px;
     float: left;
-    border-radius: 5px;
     .data-count {
       margin-top: 10px;
       font-size: 35px;
@@ -127,8 +130,13 @@ export default {
       text-align: center;
     }
   }
-  .index_l {
-    width: 100%;
+  .col-item {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+  }
+  .unit {
+    font-size: 16px;
   }
 }
 </style>

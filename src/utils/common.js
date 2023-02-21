@@ -7,8 +7,23 @@ import {
   MEDIA_TYPE_MINIAPP, SCOPELIST_TYPE
 } from '@/utils/constant';
 import { groupBy, isEqual } from 'lodash';
+import moment from 'moment';
 const baseURL = process.env.VUE_APP_BASE_API;
 const TIME_LENGTH = 10;
+
+// 昨天
+export const YESTERDAY_TIME = moment().subtract(1, 'days').format('YYYY-MM-DD');
+// 180天之前
+export const ONE_HUNDRED_AND_EIGHTY = 180;
+export const FIXED_DAYS_AGO_TIME = moment().subtract(ONE_HUNDRED_AND_EIGHTY, 'days').format('YYYY-MM-DD');
+// 一个月之前
+export const ONE_MOUNTH_AGO = (time) => {
+  return moment(time).subtract(1, 'month').format('YYYY-MM-DD');
+};
+// 一个月之后
+export const ONE_MOUNTH_LATER = (time) => {
+  return moment(time).add(1, 'month').format('YYYY-MM-DD');
+};
 // 日期格式化
 export function parseTime(time, pattern) {
   if (arguments.length === 0 || !time) {
@@ -198,19 +213,27 @@ export function dataURLtoFile(dataURL) {
  */
 export function arrData(data) {
   const obj = {
-    arr1: [],
-    arr2: [],
-    arr3: [],
-    arr4: [],
+    totalContactCnt: [],
+    newContactCnt: [],
+    negativeFeedbackCnt: [],
+    newContactRetentionRate: [],
+    chatTotal: [],
+    newChatCnt: [],
+    memberTotal: [],
+    newMemberCnt: [],
     btm1: []
   };
 
   data.forEach((a, b) => {
-    obj.arr1.push(a.newApplyCnt);
+    obj.totalContactCnt.push(+a.totalContactCnt);
+    obj.newContactCnt.push(+a.newContactCnt);
+    obj.negativeFeedbackCnt.push(+a.negativeFeedbackCnt);
+    obj.newContactRetentionRate.push(+a.newContactRetentionRate);
+    obj.chatTotal.push(+a.chatTotal);
+    obj.newChatCnt.push(+a.newChatCnt);
+    obj.memberTotal.push(+a.memberTotal);
+    obj.newMemberCnt.push(+a.newMemberCnt);
     obj.btm1.push(a.xtime);
-    obj.arr3.push(a.newMemberCnt);
-    obj.arr2.push(a.newContactCnt);
-    obj.arr4.push(a.negativeFeedbackCnt);
   });
   // console.log(obj)
   return obj;

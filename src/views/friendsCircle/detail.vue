@@ -31,13 +31,12 @@ export default {
       MEDIA_TYPE_TEXT,
       // 可见范围
       text: '全部客户',
-      numsList: {},
       uptime: '',
       colList: [
-        { title: '员工总数', showPopover: true, content: '需要发布该朋友圈的员工数量' },
-        { title: '已发布员工', showPopover: true, content: '收到通知后48小时内发布朋友圈的员工' },
-        { title: '待发布员工', showPopover: true, content: '发出通知后48小时内没有发布朋友圈的员工' },
-        { title: '过期朋友圈', showPopover: true, content: '收到通知后没有在48小时内发布朋友圈的员工，若48小时后发布，仍视为过期' }
+        { title: '员工总数', showPopover: true, content: '需要发布该朋友圈的员工数量', filed: 'userNum' },
+        { title: '已发布员工', showPopover: true, content: '收到通知后48小时内发布朋友圈的员工', filed: 'publishNum' },
+        { title: '待发布员工', showPopover: true, content: '发出通知后48小时内没有发布朋友圈的员工', filed: 'notPublishNum' },
+        { title: '过期朋友圈', showPopover: true, content: '收到通知后没有在48小时内发布朋友圈的员工，若48小时后发布，仍视为过期', filed: 'expireNum' }
       ]
     };
   },
@@ -52,7 +51,12 @@ export default {
   methods: {
     getTotal() {
       getTotal({ momentTaskId: this.$route.query.id }).then(({ data }) => {
-        this.numsList = data;
+        this.colList = this.colList.map((item) => {
+          return {
+            ...item,
+            [item.filed]: data[item.filed]
+          };
+        });
         this.uptime = data.updateTime;
       });
     },
@@ -162,7 +166,6 @@ export default {
       </div>
     </el-card>
     <Statistics
-      :nums-list="numsList"
       :show-uptime="true"
       :uptime="uptime"
       :col-list="colList"

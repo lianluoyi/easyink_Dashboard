@@ -7,8 +7,6 @@ import { sync as groupSync } from '@/api/customer/group';
 import { syncTag } from '@/api/customer/tag';
 import { setDefaultConfig } from '@/utils/enterpriseWechat';
 import { validURL } from '@/utils/validate';
-import ClipboardJS from 'clipboard';
-import { Notification } from 'element-ui';
 import { ENTERPRISE_CONFIG_TIP, SERVER_TYPE_THIRD } from '@/utils/constant';
 import { getDefaultDomainConfig } from '@/api/admin';
 import CodeValidata from '../codeValidata.vue';
@@ -108,20 +106,6 @@ export default {
     if (this.isThirdType) {
       this.initConfig();
     }
-    this.clipboard = new ClipboardJS('.copy-btn');
-
-    this.clipboard.on('success', (e) => {
-      Notification.closeAll();
-      this.$notify({
-        title: '成功',
-        message: '内容已复制到剪切板，可粘贴。',
-        type: 'success'
-      });
-    });
-
-    this.clipboard.on('error', (e) => {
-      this.msgError('内容复制失败');
-    });
   },
   methods: {
     async checkQrcode(qrcodeKey) {
@@ -634,30 +618,27 @@ export default {
                     <span class="label">URL：</span>
                     <span>{{ form.callbackUri }}</span>
                     <el-button
+                      v-copy="form.callbackUri"
                       size="mini"
                       type="text"
-                      class="copy-btn"
-                      :data-clipboard-text="form.callbackUri"
                     >复制</el-button>
                   </div>
                   <div v-if="form.token" class="copy-item">
                     <span class="label">Token：</span>
                     <span>{{ form.token }}</span>
                     <el-button
+                      v-copy="form.token"
                       size="mini"
                       type="text"
-                      class="copy-btn"
-                      :data-clipboard-text="form.token"
                     >复制</el-button>
                   </div>
                   <div v-if="form.encodingAesKey" class="copy-item">
                     <span class="label">EncodingAESKey：</span>
                     <span>{{ form.encodingAesKey }}</span>
                     <el-button
+                      v-copy="form.encodingAesKey"
                       size="mini"
                       type="text"
-                      class="copy-btn"
-                      :data-clipboard-text="form.encodingAesKey"
                     >复制</el-button>
                   </div>
                 </div>

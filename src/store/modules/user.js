@@ -2,7 +2,7 @@ import { login, logout, getInfo, qrCodeLogin, qrCodeLogin3rd } from '@/api/login
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import { getUserProfile } from '@/api/system/user';
 import { GET_INFO_ERROR } from '@/utils/constant';
-
+import { RSAECBEncrypt } from '@/utils/jsencrypt';
 const user = {
   state: {
     token: getToken(),
@@ -64,7 +64,7 @@ const user = {
         });
       } else {
         const username = userInfo.username.trim();
-        const password = userInfo.password;
+        const password = RSAECBEncrypt(userInfo.password, userInfo.publicKey);
         const code = userInfo.code;
         const uuid = userInfo.uuid;
         return new Promise((resolve, reject) => {

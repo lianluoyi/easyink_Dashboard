@@ -47,7 +47,7 @@ function filterAsyncRouter(asyncRouterMap) {
     if (route.component) {
       // Layout组件特殊处理
       if (route.component === 'Layout') {
-        if (route.redirect === 'noRedirect' && route.children.length) {
+        if (route.redirect === 'noRedirect' && route.children?.length) {
           const routeChildren = route.children.find(checkCanRedirect);
           route.redirect = route.path + '/' + routeChildren?.path;
           // 子节点是目录
@@ -65,7 +65,7 @@ function filterAsyncRouter(asyncRouterMap) {
         route.component = loadView(route.component);
       }
     }
-    if (route.children != null && route.children && route.children.length) {
+    if (route.children != null && route.children && route.children?.length) {
       route.children = filterAsyncRouter(route.children);
     }
     return true;

@@ -1,7 +1,7 @@
 <!--
  * @Description: 自定义渠道
  * @Author: wJiaaa
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div>
@@ -65,10 +65,9 @@
                   <template slot-scope="{ row }">
                     <div>
                       <el-button
+                        v-copy="row.shortUrl"
                         size="mini"
                         type="text"
-                        class="channel-copy-btn"
-                        :data-clipboard-text="row.shortUrl"
                       >复制链接</el-button>
                     </div>
                     <div>
@@ -127,7 +126,6 @@
 <script>
 // 渠道名称最大长度
 const MAX_INPUT_LENGTH = 32;
-import ClipboardJS from 'clipboard';
 import RightContainer from '@/components/RightContainer';
 import { PAGE_LIMIT, DEFAULT_PAGE_NUM } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
@@ -195,23 +193,6 @@ export default {
     roleKey(val) {
       this.hasRole = val;
     }
-  },
-  mounted() {
-    this.clipboard = new ClipboardJS('.channel-copy-btn');
-    // TODO 多处用到，后续可将该方法改为自定义指令
-    this.clipboard.on('success', (e) => {
-      this.$notify({
-        title: '成功',
-        message: '链接已复制到剪切板，可Ctrl+V粘贴',
-        type: 'success'
-      });
-    });
-    this.clipboard.on('error', (e) => {
-      this.msgError('链接复制失败');
-    });
-  },
-  destroyed() {
-    this.clipboard.destroy();
   },
   created() {
   },

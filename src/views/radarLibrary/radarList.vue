@@ -1,36 +1,17 @@
 <!--
  * @Description: 雷达列表
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
-  <div>
-    <div class="tip-div">
-      <el-alert
-        class="warn-tip"
-        type="warning"
-        :closable="false"
-      >
-        <span>渠道点击次数的统计需要将企业微信绑定unionId方可使用，点击<span class="open-tip cp" @click="openTip"> 配置引导 </span>查看配置步骤</span>
-      </el-alert>
-      <el-drawer
-        class="drawer-div"
-        title="企业微信绑定unionId"
-        :visible.sync="tipDrawer"
-        :before-close="handleClose"
-        :size="780"
-      >
-        <ConfigTip @closeDrawer="closeDrawer" @closeTip="closeTip" />
-      </el-drawer>
-    </div>
-    <div v-if="showTip">
-      <EmptyDefaultIcon>
-        <template slot="customBtn">
-          <div class="customBtn">需要将企业微信绑定unionId后方可使用，前往<el-button type="text" @click="openTip">配置</el-button></div>
-        </template>
-      </EmptyDefaultIcon>
-    </div>
-    <RightContainer v-else>
+  <div style="height: 100%;">
+    <ConfigOffAccount
+      ref="offAccountConfigDialog"
+      :visible.sync="configDialogVisible"
+      :get-off-account="getOffAccountConfig"
+      :off-account-list="offAccountList"
+    />
+    <RightContainer>
       <template v-slot:data-stat>
         <div>
           <el-input
@@ -44,9 +25,19 @@
         </div>
       </template>
       <template v-slot:operate-btn>
-        <div v-if="roleKey" class="operate-btn">
-          <el-button class="btn-reset" @click="batchDel">批量删除</el-button>
-          <el-button type="primary" @click="addRadarDrawer">添加雷达</el-button>
+        <div class="radar-handle-wrap">
+          <div v-if="isDKCorp" class="config-offAccount" @click="openConfig">
+            <i
+              class="property-setting el-icon-setting"
+              style="font-size: 20px; color: #6DB4AB; margin-right: 4px;"
+            />
+            <span v-if="!hasOffAccount" class="error-span">请配置公众号</span>
+            <span v-else class="success-span">公众号: {{ offAccountInfo.nickName }}</span>
+          </div>
+          <div v-if="roleKey" class="operate-btn">
+            <el-button class="btn-reset" @click="batchDel">批量删除</el-button>
+            <el-button type="primary" @click="addRadarDrawer">添加雷达</el-button>
+          </div>
         </div>
       </template>
       <template v-slot:data>
@@ -184,13 +175,15 @@
 import RightContainer from '@/components/RightContainer';
 import { RADAR_TYPE, PAGE_LIMIT, DEFAULT_PAGE_NUM, SORT } from '@/utils/constant';
 import { getConfig } from '@/api/wechatopen';
+import { checkPermi } from '@/utils/permission';
+import { getRadarConfig } from '@/api/radar';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import AddRararDrawer from './components/addRadarDrawer.vue';
 import CustomChannel from './components/customChannel.vue';
 import { goRouteWithQuery } from '@/utils';
 import { getRadaList, deleteRadar } from '@/api/radar';
 import RadarLink from './components/radarLink.vue';
-import ConfigTip from './components/ConfigTip.vue';
+import ConfigOffAccount from './configOffAccount.vue';
 export default {
   name: 'RadarList',
   components: {
@@ -199,7 +192,7 @@ export default {
     AddRararDrawer,
     CustomChannel,
     RadarLink,
-    ConfigTip
+    ConfigOffAccount
   },
   props: {
     activeRadar: {
@@ -229,11 +222,24 @@ export default {
       customChannelVisible: false,
       radarId: '',
       tipDrawer: false,
-      showTip: true,
-      hasRole: this.roleKey
+      hasRole: this.roleKey,
+      // 全部的公众号
+      offAccountList: [],
+      // 雷达是否配置公众号
+      hasOffAccount: false,
+      // 公众号信息
+      offAccountInfo: undefined,
+      // 配置公众号弹窗显隐
+      configDialogVisible: false,
+      // 弹出操作须知弹窗去配置按钮loading
+      handleHintBtnLoading: false
     };
   },
   computed: {
+    // 是否为代开发应用
+    isDKCorp() {
+      return this.$store.state.serverInfo.dkCorp;
+    },
     // 处理标签
     dealTagList() {
       return function(tagList) {
@@ -247,12 +253,28 @@ export default {
     },
     roleKey(val) {
       this.hasRole = val;
+    },
+    configDialogVisible(val, oldVal) {
+      if (val) {
+        // 请求一次全部的公众号
+        this.getAllOffAccountConfig();
+        // 设置为第一个选项
+        this.$refs.offAccountConfigDialog.setInitAppId();
+      }
     }
   },
   created() {
     this.init();
   },
   methods: {
+    /**
+     * @description: 打开配置公众号弹窗
+     * @return {*}
+     */
+    openConfig() {
+      this.configDialogVisible = true;
+    },
+
     /**
      * 表格排序
      */
@@ -262,9 +284,28 @@ export default {
       this.getRadaList(1);
     },
     async init() {
-      const list = await this.getRadaList();
+      await this.getRadaList();
+      this.getAllOffAccountConfig();
+      this.getOffAccountConfig();
+    },
+
+    /**
+     * @description: 获取全部的公众号
+     * @return {*}
+     */
+    async getAllOffAccountConfig() {
       const configRes = await getConfig();
-      this.showTip = !list.length && !configRes.data;
+      this.offAccountList = configRes.data;
+    },
+
+    /**
+     * @description: 获取雷达公众号配置
+     * @return {*}
+     */
+    async getOffAccountConfig() {
+      const radarConfigRes = await getRadarConfig();
+      this.hasOffAccount = !!radarConfigRes.data;
+      this.hasOffAccount ? this.offAccountInfo = radarConfigRes.data : null;
     },
     /**
      * 获取雷达列表
@@ -313,6 +354,31 @@ export default {
     addRadarDrawer() {
       this.radarId = '';
       this.addRadarDrawerVisible = true;
+      // 代开发： 若该企业的雷达库没有配置过公众号则弹出操作须知弹窗
+      if (this.isDKCorp && !this.hasOffAccount) {
+        this.openHandleHint();
+      }
+      // 自建：若该企业未配置公众号则弹出操作须知弹窗
+      if (!this.isDKCorp && !this.offAccountList?.length) {
+        this.openHandleHint();
+      }
+    },
+    /**
+     * @description: 弹出操作须知弹窗
+     * @return {*}
+     */
+    openHandleHint() {
+      this.confirmModal({
+        msg: '您还未配置公众号，需进行公众号配置后方可使用雷达功能。',
+        confirmButtonText: '去配置'
+      }, () => {
+        // 当没有“公众号授权”页面权限时，点击该按钮后提示“暂无权限，需联系管理员进行公众号授权”
+        if (!checkPermi(['system:offAccount:list'])) {
+          this.msgError('暂无权限，需联系管理员进行公众号授权');
+        } else {
+          this.$router.push({ path: '/system/configCentre/offAccount' }); // 页面跳转至“公众号授权”的页面。
+        }
+      });
     },
     /**
      * 关闭侧边栏
@@ -376,18 +442,6 @@ export default {
       goRouteWithQuery(this.$router, 'radarDetail', this.query, {
         id: row.radarId
       });
-    },
-    handleClose() {
-      this.tipDrawer = false;
-    },
-    openTip() {
-      this.tipDrawer = true;
-    },
-    closeDrawer() {
-      this.handleClose();
-    },
-    closeTip() {
-      this.showTip = false;
     }
   }
 };
@@ -398,21 +452,27 @@ export default {
   display: flex;
   align-items: center;
 }
+.radar-handle-wrap {
+  display: flex;
+  justify-content: center;
+  .config-offAccount {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    line-height: 30px;
+    cursor: pointer;
+  }
+  .error-span {
+    color:red;
+  }
+  .success-span {
+    color:#6DB4AB;
+  }
+}
 .tagList {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-}
-.tip-div {
-  padding: 15px 15px 0 15px;
-  background: #fff;
-  .open-tip {
-    color: $light-blue;
-  }
-  /deep/ .el-drawer__body {
-    padding: 0 20px;
-    height: calc(100% - 43px);
-  }
 }
 .customBtn button {
   font-size: 14px;

@@ -1,6 +1,4 @@
 <script>
-import ClipboardJS from 'clipboard';
-import { Notification } from 'element-ui';
 import * as api from '@/api/enterpriseId';
 import { setDefaultConfig } from '@/utils/enterpriseWechat';
 import { ENTERPRISE_CONFIG_TIP, SERVER_TYPE_THIRD } from '@/utils/constant';
@@ -66,20 +64,6 @@ export default {
     }
   },
   created() {
-  },
-  mounted() {
-    var clipboard = new ClipboardJS('.copy-btn');
-    clipboard.on('success', (e) => {
-      Notification.closeAll();
-      this.$notify({
-        title: '成功',
-        message: '链接已复制到剪切板，可粘贴。',
-        type: 'success'
-      });
-    });
-    clipboard.on('error', (e) => {
-      this.$message.error('链接复制失败');
-    });
   },
   methods: {
     addOrUpdateConfig(newParams, callback) {
@@ -233,15 +217,23 @@ export default {
             class="btn-reset"
             @click="onSaveAll"
           >{{ item.btnText }}</el-button>
-          <el-button
-            v-else-if="item.btnText && !(isThirdType && disableInputField.includes(item.field))"
-            v-hasPermi="item.btnType === 'copy' ? [] : ['wechat:corp:edit']"
-            :data-clipboard-text="form[item.field]"
-            :class="`btn-reset ${item.btnType === 'copy' ? 'copy-btn' : ''}`"
-            @click="onSaveSingle(item.btnType, item.field)"
-          >
-            {{ item.btnText }}
-          </el-button>
+          <template v-else-if="item.btnText && !(isThirdType && disableInputField.includes(item.field))">
+            <el-button
+              v-if="item.btnType === 'copy'"
+              v-hasPermi="item.btnType === 'copy' ? [] : ['wechat:corp:edit']"
+              v-copy="form[item.field]"
+              @click="onSaveSingle(item.btnType, item.field)"
+            >
+              {{ item.btnText }}
+            </el-button>
+            <el-button
+              v-else
+              v-hasPermi="item.btnType === 'copy' ? [] : ['wechat:corp:edit']"
+              @click="onSaveSingle(item.btnType, item.field)"
+            >
+              {{ item.btnText }}
+            </el-button>
+          </template>
           <div v-if="item.label === '企业ID' && showWarnTip" class="warn-tip-text"><i class="el-icon-warning" />请替换为当前企业的ID。</div>
         </div>
       </template>

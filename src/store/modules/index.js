@@ -6,6 +6,7 @@ import user from './user';
 import materialInfo from './materialInfo';
 import customerProperty from './customerPropertyList';
 import listInfo from './listInfo';
+import secretKey from './secretKey';
 
 export default {
   app,
@@ -15,5 +16,6 @@ export default {
   user,
   materialInfo,
   customerProperty,
-  listInfo
+  listInfo,
+  secretKey
 };

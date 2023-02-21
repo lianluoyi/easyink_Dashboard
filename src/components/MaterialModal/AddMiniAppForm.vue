@@ -1,16 +1,17 @@
 <!--
  * @Description: 添加小程序素材表单
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <script>
 import GetAppIDDemo from '@/views/material/components/GetAppIDDemo.vue';
+import GetPageUrlDemo from '@/views/material/components/GetPageUrlDemo.vue';
 /**
  * 添加小程序素材表单
  */
 export default {
   name: 'AddMiniAppForm',
-  components: { GetAppIDDemo },
+  components: { GetAppIDDemo, GetPageUrlDemo },
   props: {
     /**
      * 表单数据
@@ -107,14 +108,7 @@ export default {
       :append-to-body="true"
       :before-close="() => handleClose('miniPageDrawerVisible')"
     >
-      <div class="mini-page-drawer-div">
-        <div class="content">在微信客户端进入某个小程序，当进入到指定页面后，如图所示，点击右上角“···”，在弹出的菜单中，点击“复制链接”按钮，获取到页面路径</div>
-        <el-image
-          class="part-img"
-          :src="require('@/assets/example/demo/mini-page-demo-1-1.svg')"
-          :preview-src-list="[require('@/assets/example/demo/mini-page-demo-1-1.svg')]"
-        />
-      </div>
+      <GetPageUrlDemo />
     </el-drawer>
   </div>
 </template>
@@ -143,15 +137,5 @@ export default {
     height: calc(100% - 43px);
   }
 }
-.mini-page-drawer-div {
-  padding: 0 20px;
-  .content {
-    text-indent: 2em;
-  }
-  .part-img {
-    margin: 5px 0;
-  }
-}
-
 </style>
 

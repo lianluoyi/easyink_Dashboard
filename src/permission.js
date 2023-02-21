@@ -14,7 +14,7 @@ const checkLogin = (from, data, next) => {
   // 这里判断登录的时候页面的跳转
   if (from.path === '/login') {
     if (!data || (!data.corpId || !data.contactSecret || (data.status === NUMBER))) {
-      next({ path: '/system/sysSetting/enterpriseWechat' });
+      next({ path: '/system/configCenter/enterpriseWechat' });
     }
   }
 };

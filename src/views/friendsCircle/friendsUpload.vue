@@ -213,7 +213,7 @@ export default {
       </div>
     </draggable>
     <el-upload
-      :class="{uoloadSty:showBtnDealImg,disUoloadSty:noneBtnImg}"
+      :class="{uploadSty:showBtnDealImg,disuploadSty:noneBtnImg}"
       :action="action"
       list-type="picture-card"
       :file-list="fileList"
@@ -249,12 +249,12 @@ export default {
 
 <style lang="scss" scoped>
 // 隐藏上传按钮
-/deep/.uoloadSty .el-upload--picture-card{
+/deep/.uploadSty .el-upload--picture-card{
   width:70px !important;
   height:70px!important;
   line-height:70px;
 }
-/deep/.disUoloadSty .el-upload--picture-card{
+/deep/.disuploadSty .el-upload--picture-card{
   display:none;   /* 上传按钮隐藏 */
 }
 /deep/ .el-upload--picture-card {

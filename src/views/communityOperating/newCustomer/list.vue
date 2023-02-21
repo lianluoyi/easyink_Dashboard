@@ -9,8 +9,6 @@ import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
-import ClipboardJS from 'clipboard';
-import { Notification } from 'element-ui';
 import ListUserShow from '@/components/ListUserShow';
 
 export default {
@@ -39,8 +37,7 @@ export default {
         1: '发给客户群'
       },
       queryUser: [], // 搜索框选择的添加人
-      ids: [],
-      clipboard: null
+      ids: []
     };
   },
   computed: {},
@@ -71,25 +68,6 @@ export default {
         <div>指在客户通过员工活码加为好友后，员工自动推送入群引导语和群活码，客户可通过群活码扫码入群。</div>
       `
     );
-  },
-  mounted() {
-    this.clipboard = new ClipboardJS('.copy-btn');
-
-    this.clipboard.on('success', (e) => {
-      Notification.closeAll();
-      this.$notify({
-        title: '成功',
-        message: '链接已复制到剪切板，可粘贴。',
-        type: 'success'
-      });
-    });
-
-    this.clipboard.on('error', (e) => {
-      this.msgError('链接复制失败');
-    });
-  },
-  destroyed() {
-    this.clipboard.destroy();
   },
   methods: {
     // 获取新客数据
@@ -317,9 +295,8 @@ export default {
                 >下载</el-button>
                 <br>
                 <el-button
+                  v-copy="row.qrCode"
                   type="text"
-                  class="copy-btn"
-                  :data-clipboard-text="row.qrCode"
                 >复制链接</el-button>
               </div>
             </template>

@@ -215,7 +215,7 @@ export default {
   methods: {
     /** 转换菜单数据结构 */
     normalizer(node) {
-      if (node.children && !node.children.length) {
+      if (node.children && !node.children?.length) {
         delete node.children;
       }
       return {

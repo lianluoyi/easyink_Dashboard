@@ -1,7 +1,7 @@
 <!--
  * @Description: 空值缺省图
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 
 <script>
@@ -90,6 +90,11 @@ export default {
     btnPermiKey: {
       type: Array,
       default: () => []
+    },
+    // 按钮loading
+    btnLoading: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -155,6 +160,7 @@ export default {
           class="empty-btn"
           type="primary"
           :icon="btnIcon"
+          :loading="btnLoading"
           @click="onBtnClick"
         >{{ btnText }}</el-button>
         <slot name="customBtn" />

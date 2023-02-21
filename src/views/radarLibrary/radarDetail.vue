@@ -1,7 +1,7 @@
 <!--
  * @Description: 雷达详情
  * @Author: wJiaaa
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="radar-detail-page">
@@ -37,7 +37,6 @@
       </div>
     </div>
     <Statistics
-      :nums-list="numsList"
       :show-uptime="false"
       :col-list="colList"
       title="数据总览"
@@ -143,24 +142,24 @@ export default {
       radarTagList: [],
       // 折线图时间选项
       activeTime: [],
-      // 数据总览
-      numsList: {},
       // 数据总览的属性配置
       colList: [
         {
           title: '总点击人数',
           showPopover: true,
           placement: 'top',
-          content: '统计有点击雷达链接的客户，已去重'
+          content: '统计有点击雷达链接的客户，已去重',
+          filed: 'sumClickPersonNum'
         },
-        { title: '总点击次数', showPopover: false, content: '' },
+        { title: '总点击次数', showPopover: false, content: '', filed: 'sumClickNum' },
         {
           title: '今日点击人数',
           showPopover: true,
           placement: 'top',
-          content: '统计有点击雷达链接的客户，已去重'
+          content: '统计有点击雷达链接的客户，已去重',
+          filed: 'nowadaysClickPersonNum'
         },
-        { title: '今日点击次数', showPopover: false, content: '' }
+        { title: '今日点击次数', showPopover: false, content: '', filed: 'nowadaysClickNum' }
       ],
       channelName: '', // 图表下拉框选择的渠道名
       channelList: [], // 渠道点击人数排行列表
@@ -307,7 +306,12 @@ export default {
      */
     getOverview() {
       getRadarDetailOverview({ radarId: this.radarId }).then((res) => {
-        this.numsList = res.data;
+        this.colList = this.colList.map((item) => {
+          return {
+            ...item,
+            [item.filed]: res.data[item.filed]
+          };
+        });
       });
     },
     /**
