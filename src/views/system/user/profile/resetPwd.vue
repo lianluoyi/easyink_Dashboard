@@ -18,7 +18,7 @@
 
 <script>
 import { updateUserPwd } from '@/api/system/user';
-
+import { RSAECBEncrypt } from '@/utils/jsencrypt';
 export default {
   data() {
     const equalToPassword = (rule, value, callback) => {
@@ -56,7 +56,11 @@ export default {
     submit() {
       this.$refs['form'].validate(valid => {
         if (valid) {
-          updateUserPwd(this.user.oldPassword, this.user.newPassword).then(
+          const publicKey = this.$store.state?.secretKey?.RSAPublicKey;
+          updateUserPwd(
+            RSAECBEncrypt(this.user.oldPassword, publicKey),
+            RSAECBEncrypt(this.user.newPassword, publicKey)
+          ).then(
             response => {
               this.msgSuccess('修改成功');
             }

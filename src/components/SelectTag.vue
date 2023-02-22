@@ -115,6 +115,8 @@ export default {
       if (!val) {
         this.Pselected = [];
         this.removeTag = [];
+      } else {
+        this.dealSelectTag(this.selected);
       }
     }
   },

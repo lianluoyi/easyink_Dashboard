@@ -1,10 +1,10 @@
 <!--
  * @Description: 获取小程序appid教程
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <script>
-
+import { WX_PAAS_URL } from '@/utils/constant';
 export default {
   name: 'GetAppIDDemo',
   components: {},
@@ -12,7 +12,9 @@ export default {
 
   },
   data() {
-    return {};
+    return {
+      WX_PAAS_URL
+    };
   }
 };
 </script>
@@ -46,7 +48,7 @@ export default {
         </div>
         <div>
           <div class="content">登录
-            <el-link type="primary" href="https://mp.weixin.qq.com/" target="_blank">小程序管理后台</el-link>
+            <el-link type="primary" :href="WX_PAAS_URL" target="_blank">小程序管理后台</el-link>
             -设置-关联设置，找到关联到企业微信-前往关联的入口</div>
           <el-image
             class="part-img"
@@ -71,7 +73,7 @@ export default {
         <div class="main-title">在微信公众平台获取AppID</div>
         <div>
           <div class="content">1. 前往
-            <el-link type="primary" href="https://mp.weixin.qq.com/" target="_blank">微信公众平台</el-link>
+            <el-link type="primary" :href="WX_PAAS_URL" target="_blank">微信公众平台</el-link>
             ，登录企业的微信小程序</div>
           <el-image
             class="part-img"

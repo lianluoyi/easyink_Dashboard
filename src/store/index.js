@@ -10,6 +10,7 @@ import materialInfo from './modules/materialInfo';
 import customerProperty from './modules/customerPropertyList';
 import listInfo from './modules/listInfo';
 import requestButton from './modules/requestButton';
+import secretKey from './modules/secretKey';
 
 Vue.use(Vuex);
 
@@ -23,7 +24,8 @@ const store = new Vuex.Store({
     materialInfo,
     customerProperty,
     listInfo,
-    requestButton
+    requestButton,
+    secretKey
   },
   getters
 });

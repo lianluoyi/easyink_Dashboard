@@ -42,7 +42,6 @@ export default {
       dialogVisible: false,
       tagDialogLoading: false,
       // 已被选择的标签
-      selected: [],
       selectedTag: [],
       oldCustomList: [],
       oldBaseList: [],
@@ -200,7 +199,7 @@ export default {
       this.customer?.weFlowerCustomerTagRels.map(item => {
         tagList.push({ ...item, name: item.tagName });
       });
-      this.selected = tagList;
+      this.selectedTag = tagList;
     },
 
     /**
@@ -549,7 +548,7 @@ export default {
         :visible.sync="dialogVisible"
         title="客户标签"
         type="search"
-        :selected="selected"
+        :selected="selectedTag"
         info-msg="请选择要为已勾选客户打上的标签"
         :loading="tagDialogLoading"
         :is-show-add="true"

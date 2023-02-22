@@ -281,17 +281,19 @@ export default {
     setKey(thisKey) {
       this.$refs.tree.setCurrentKey(thisKey);
       var node = this.$refs.tree.getNode(thisKey);
-      this.setData(node.data);
+      this.setData(node?.data);
     },
     // 单选：设置、初始化对象
     setData(data) {
       this.options = [];
-      this.options.push({
-        label: data[this.obj.label],
-        value: data[this.obj.id]
-      });
-      this.returnDatas = data;
-      this.returnDataKeys = data[this.obj.id];
+      if (data) {
+        this.options.push({
+          label: data[this.obj.label],
+          value: data[this.obj.id]
+        });
+        this.returnDatas = data;
+        this.returnDataKeys = data[this.obj.id];
+      }
     },
     // 多选:设置、初始化值 keys
     setKeys(thisKeys) {

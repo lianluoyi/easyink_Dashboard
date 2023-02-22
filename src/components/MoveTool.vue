@@ -1,7 +1,7 @@
 <!--
  * @Description: 移动工具
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="tool-div">
@@ -124,7 +124,7 @@ export default {
     },
     // 判断是否为最后一个
     checkLastItem(index) {
-      return index === this.list.length - 1;
+      return index === this.list?.length - 1;
     }
   }
 

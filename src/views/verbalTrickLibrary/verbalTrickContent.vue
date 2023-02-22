@@ -1,7 +1,7 @@
 <!--
  * @Description: 话术管理页面（分组+列表）
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="verbal-trick-content-page">
@@ -46,12 +46,21 @@
               />
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="edit"><i class="iconfont el-icon-edit-outline" />编辑</el-dropdown-item>
-                <el-dropdown-item command="placedAtTop" :class="dealList(data).index === 0 ? ' disabled-tool' : ''">
+                <el-dropdown-item
+                  command="placedAtTop"
+                  :disabled="dealList(data).index === 0"
+                >
                   <i class="iconfont icon-placedAtTop" />置顶
                 </el-dropdown-item>
-                <el-dropdown-item command="moveTop" :class="(dealList(data).index === 0 ? 'disabled-tool' : '')">
+                <el-dropdown-item
+                  command="moveTop"
+                  :disabled="dealList(data).index === 0"
+                >
                   <i class="iconfont el-icon-top" />上移</el-dropdown-item>
-                <el-dropdown-item command="moveBottom" :class="checkLastItem(dealList(data)) ? ' disabled-tool' : ''">
+                <el-dropdown-item
+                  command="moveBottom"
+                  :disabled="checkLastItem(dealList(data))"
+                >
                   <i class="iconfont el-icon-bottom" />下移</el-dropdown-item>
                 <el-dropdown-item command="delete"><i class="iconfont el-icon-delete" />删除</el-dropdown-item>
               </el-dropdown-menu>
@@ -309,7 +318,7 @@ export default {
     },
     // 判断是否为最后一个
     checkLastItem(dealObj) {
-      return dealObj.index === dealObj.list.length - 1;
+      return dealObj.index === dealObj.list?.length - 1;
     }
   }
 
@@ -353,13 +362,6 @@ export default {
 }
 .icon-tool-edit, .icon-tool-delete {
   font-size: 14px;
-}
-.disabled-tool {
-  cursor: not-allowed;
-  color: $grayColor;
-  .iconfont {
-    color: $grayColor;
-  }
 }
 /deep/ .el-dropdown-menu__item {
   padding: 0 8px;

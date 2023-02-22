@@ -1,5 +1,6 @@
 <script>
 import VideoModal from '@/views/conversation/component/videoModal.vue';
+import FormPreview from './PhoneDialog/FormPreview.vue';
 import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, DEFAULT_IMG, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_TEXT, MEDIA_TYPE_RADARLINK } from '@/utils/constant';
 import { getFileIcon, filterSize } from '@/utils/common';
 /**
@@ -7,7 +8,7 @@ import { getFileIcon, filterSize } from '@/utils/common';
  * @displayName PhoneDialog(手机对话框样式)
  */
 export default {
-  components: { VideoModal },
+  components: { VideoModal, FormPreview },
   props: {
     /**
      * 文字（聊天内容）
@@ -83,6 +84,22 @@ export default {
     unShowVideoCover: {
       type: Boolean,
       default: false
+    },
+    /**
+     * 是否是表单预览样式
+     */
+    isFormPreview: {
+      type: Boolean,
+      default: false
+    },
+    formSetting: {
+      type: Object,
+      default: () => {}
+    },
+    // TODO  编辑/新增表单 表单详情 表单预览页的字段需要修改 用单个对象传递即可。去掉多余的formSetting字段，自行在使用组件的地方组装
+    form: {
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -132,7 +149,10 @@ export default {
 </script>
 
 <template>
-  <div class="preview ac">
+  <div v-if="isFormPreview" class="preview" style="padding:29px 18px 13px;">
+    <FormPreview class="preview-content" :form-setting="formSetting" :form="form" />
+  </div>
+  <div v-else class="preview ac">
     <div class="preview-content">
       <div class="top">{{ title }}</div>
       <ul class="msg-ul">
@@ -364,6 +384,7 @@ export default {
     }
   }
 }
+
 .el-avatar {
   flex: none;
   background: none;

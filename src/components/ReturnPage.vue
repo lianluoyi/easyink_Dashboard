@@ -1,7 +1,7 @@
 <!--
  * @Description: 返回组件
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="return-page-div" v-bind="$attrs">
@@ -10,14 +10,17 @@
         <use href="#icon-restore" />
       </svg>返回
     </el-button>
+    <el-button v-if="showNextStep" type="primary" @click="$emit('nextStep')">下一步</el-button>
   </div>
 </template>
 <script>
+import { goRouteWithQuery } from '@/utils/index';
+import { CUSTOMER_LABEL_TYPE, DATA_DIMENSION } from '@/utils/constant';
 export default {
   name: '',
   components: {},
   props: {
-    // 组件若接受path，则路由返回到该path
+    // 组件若接受path，则路由跳转到该path
     path: {
       type: String,
       default: ''
@@ -26,6 +29,16 @@ export default {
     query: {
       type: Object,
       default: () => {}
+    },
+    // 是否显示下一步
+    showNextStep: {
+      type: Boolean,
+      default: false
+    },
+    // 是否需要使用自定义的返回方法
+    customBackMethod: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -36,10 +49,26 @@ export default {
   mounted() {},
   methods: {
     handlleReturn() {
+      if (this.customBackMethod) {
+        return this.$emit('customBackMethod');
+      }
       // 跳转到客户资料的不需要在组件中添加path 返回时会丢失原本的路由数据，若需要在详情页修改 ，可以在query里添加数据
       if (this.path) {
         this.$router.push(!Object.keys(this.query || {}).length ? this.path : { path: this.path, query: this.query });
       } else {
+        // TODO: 客户联系页将Tab使用url参数判断，可将此处代码优化
+        // 回页面需要 客户活跃度，客户维度
+        if (window.sessionStorage.getItem('from') === '/dataStatistics/dataStatistics/customerContact') {
+          goRouteWithQuery(
+            this.$router,
+            window.sessionStorage.getItem('from'),
+            {
+              activeName: CUSTOMER_LABEL_TYPE['activeness'], // 选择客户活跃度
+              detailsActiveName: DATA_DIMENSION['client'] // 数据详情选择客户维度
+            }
+          );
+          return;
+        }
         // 由于客户详情页来自的页面不同 在此单独处理
         if (window.sessionStorage.getItem('from') !== '/customerManage/customerCenter/customer') {
           this.$router.go(-1);
@@ -62,8 +91,11 @@ export default {
     width: 100%;
     height: 48px;
     border-bottom: 1px solid rgba(238, 238, 238, 100);
-    padding-left: 15px;
+    padding: 0 15px;
     z-index: 900;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #fff;
     .icon-restore{
       vertical-align: middle;

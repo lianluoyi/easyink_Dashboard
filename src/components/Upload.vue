@@ -157,7 +157,7 @@ export default {
       const form = new FormData();
       form.append('file', newFile);
       form.append('mediaType', this.type);
-      if (this.customFileName) form.append('fileName', newFileName);
+      form.append('fileName', newFileName);
       uploadFile2Cos(form).then(res => {
         // 自行处理各种情况
         this.onSuccess(res, file);

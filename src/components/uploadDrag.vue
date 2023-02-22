@@ -1,7 +1,7 @@
 <!--
  * @Description: 上传拖拽组件
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div v-if="fileObj.url" class="preview-div">
@@ -150,6 +150,7 @@ export default {
       const form = new FormData();
       form.append('file', newFile);
       form.append('mediaType', this.mediaType);
+      form.append('fileName', newFile.name);
       uploadFile2Cos(form).then(res => {
         // 自行处理各种情况
         this.onSuccess(res, newFile);

@@ -317,6 +317,23 @@ export const VERBAL_TRICK_TYPE = {
   'personal': PERSONAL_VERBAL_TRICK
 };
 
+// 企业表单
+const ENTERPRISE_FORM = 1;
+// 部门表单
+const DEPARTMENT_FORM = 2;
+// 我的表单
+const PERSONAL_FORM = 3;
+
+// 智能表单的表单tab类型
+export const INTELLIGENT_FORM_TYPE = {
+  'enterprise': ENTERPRISE_FORM,
+  'department': DEPARTMENT_FORM,
+  'personal': PERSONAL_FORM
+};
+
+// 树的"全部"节点的id
+export const TREE_ALL_GROUP_ID = '0';
+
 // 不自动通过
 const UN_AUTO_ADD = 0;
 // 全天生效
@@ -658,6 +675,17 @@ export const redeemCodeMsgType = {
 export const NORMAL_WORD = 0; // 普通欢迎语
 export const ACTIVE_WORD = 1; // 活动欢迎语
 
+// 公众号类型
+export const SUBSCRIBE_OFF_ACCOUNT = 0; // 订阅号
+export const UPDATED_SUBSCRIBE_OFF_ACCOUNT = 1; // 历史老账号的订阅号
+export const SERVICE_OFF_ACCOUNT = 2; // 服务号
+
+// 微信公众号平台URL
+export const WX_PAAS_URL = 'https://mp.weixin.qq.com/';
+// 配置介绍文档Url
+export const CONFIG_INTRODUCE_URL = 'https://xsxda94vjq.feishu.cn/docx/ZtSad9QWgo7ayfxreP7c8CvDnle';
+// 企微管理后台 客户与上下游
+export const MANAGE_BACKSTAGE_URL = 'https://work.weixin.qq.com/wework_admin/loginpage_wx?redirect_uri=https%3A%2F%2Fwork.weixin.qq.com%2Fwework_admin%2Fframe#customer/analysis';
 // 企业雷达
 const ENTERPRISE_RADAR = 3;
 // 部门雷达
@@ -688,3 +716,82 @@ export const SORT = {
   'ascending': true, // 升序
   'descending': false // 降序
 };
+
+// 智能表单组件枚举
+/** 单选 */
+export const RADIO_COMPONENT = 1;
+/** 多选 */
+export const CHECKBOX_COMPONENT = 2;
+/** 下拉框 */
+export const SELECT_COMPONENT = 3;
+/** 单行文本 */
+export const ONE_LINE_TEXT_COMPONENT = 4;
+/** 多行文本 */
+export const MANY_LINE_TEXT_COMPONENT = 5;
+/** 日期时间 */
+export const DATE_TIME_COMPONENT = 6;
+/** 评分 */
+export const SCORE_COMPONENT = 7;
+/** NPS */
+export const NPS_COMPONENT = 8;
+/** 文字 */
+export const TEXT_COMPONENT = 9;
+/** 图片 */
+export const IMAGE_COMPONENT = 10;
+/** 轮播图 */
+export const CAROUSEL_COMPONENT = 11;
+
+// 截止时间类型
+/** 永久有效 */
+export const FORVER_EFFECT = 1;
+/** 自定义日期 */
+export const CUSTOMER_DATE = 2;
+
+// 提交次数类型
+/** 不限制次数 */
+export const NOT_LIMIT = 1;
+/** 每个客户限提交一次 */
+export const ONE_TIME = 2;
+
+// 提交结果
+/** 不跳转 */
+export const NOT_JUMP = 1;
+/** 跳转结果页面  */
+export const JUMP_RESULT_PAGE = 2;
+/** 跳转链接 */
+export const JUMP_LINK = 3;
+
+/** 客户概况*/
+export const CUSTOMER_OVERVIEW = 1;
+/** 客户活跃度*/
+export const CUSTOMER_ACTIVENESS = 2;
+/** 客户联系label*/
+export const CUSTOMER_LABEL_TYPE = {
+  'overview': CUSTOMER_OVERVIEW,
+  'activeness': CUSTOMER_ACTIVENESS
+};
+/** 日期维度*/
+export const DATE_DIMENSION = 1;
+/** 员工维度*/
+export const STAFF_DIMENSION = 2;
+/** 客户维度*/
+export const CLIENT_DIMENSION = 3;
+/** 数据维度*/
+export const DATA_DIMENSION = {
+  'date': DATE_DIMENSION,
+  'staff': STAFF_DIMENSION,
+  'client': CLIENT_DIMENSION
+};
+
+// 表单上传展示类型
+/** 拖拽单个上传 */
+export const DRAG_ONE_TYPE = 1;
+/** 多选上传 */
+export const MULTIPLE_TYPE = 3;
+/** 单个上传 */
+export const UPLOAD_ONE_TYPE = 4;
+/** 字数 */
+export const TEXT_LENGTH_TYPE = 2;
+//
+/** 表单默认头图 */
+export const FORM_DEFAULT_HEAD_IMAGE_URL = 'https://wecomsaas-1253559996.cos.ap-guangzhou.myqcloud.com/2023/02/09/数据时代.png';

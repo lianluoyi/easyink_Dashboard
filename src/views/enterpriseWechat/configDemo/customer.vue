@@ -1,6 +1,4 @@
 <script>
-import ClipboardJS from 'clipboard';
-import { Notification } from 'element-ui';
 import { ENTERPRISE_WECHAT_CONFIG_STEP_TEXT, PUBLIC_KEY_BEGIN, PUBLIC_KEY_END } from '@/utils/constant';
 import { handleGetChatPublicKey } from '@/utils/enterpriseWechat';
 
@@ -23,23 +21,7 @@ export default {
   },
   watch: {},
   created() {},
-  mounted() {
-    this.clipboard = new ClipboardJS('.copy-btn');
-
-    this.clipboard.on('success', (e) => {
-      Notification.closeAll();
-      this.$notify({
-        title: '成功',
-        message: '链接已复制到剪切板，可粘贴。',
-        type: 'success'
-      });
-    });
-
-    this.clipboard.on('error', (e) => {
-      this.msgError('链接复制失败');
-    });
-    this.getPublicKey();
-  },
+  mounted() {},
   methods: {
     next() {
       // eslint-disable-next-line no-magic-numbers
@@ -132,10 +114,9 @@ export default {
           </div>
           <el-button
             v-if="PUBLIC_KEY"
+            v-copy="showPublicKey"
             size="mini"
             type="text"
-            class="copy-btn"
-            :data-clipboard-text="showPublicKey"
           >复制</el-button>
         </div>
       </div>

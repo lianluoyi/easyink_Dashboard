@@ -6,8 +6,6 @@ import {
   downloadBatch,
   download
 } from '@/api/drainageCode/group';
-import ClipboardJS from 'clipboard';
-import { Notification } from 'element-ui';
 import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
@@ -35,8 +33,7 @@ export default {
       openGroupCodeId: null, // 打开实际群码关联的群活码ID
       openGroupCodeStatus: -1, // 打开实际群码的检索状态
       // 打开实际群码的入群方式
-      openCreateType: CREATE_TYPE,
-      clipboard: null // 拷贝对象
+      openCreateType: CREATE_TYPE
     };
   },
   watch: {
@@ -53,22 +50,6 @@ export default {
     realCodeDialog(val) {
       if (val === false) this.getGroupCodes();
     }
-  },
-  mounted() {
-    this.clipboard = new ClipboardJS('.copy-btn');
-
-    this.clipboard.on('success', (e) => {
-      Notification.closeAll();
-      this.$notify({
-        title: '成功',
-        message: '链接已复制到剪切板，可粘贴。',
-        type: 'success'
-      });
-    });
-
-    this.clipboard.on('error', (e) => {
-      this.msgError('链接复制失败');
-    });
   },
   created() {
     if (this.$route.query) {
@@ -87,9 +68,6 @@ export default {
         <div>群活码原理为把多个群二维码统一为固定的活码，群满自动切换新群，无需手动更新二维码，并未改变微信原有入群规则。</div>
       `
     );
-  },
-  destroyed() {
-    this.clipboard.destroy();
   },
   methods: {
     // 获取活码数据
@@ -329,10 +307,9 @@ export default {
                 >下载</el-button>
                 <br>
                 <el-button
+                  v-copy="row.codeUrl"
                   type="text"
                   size="mini"
-                  class="copy-btn"
-                  :data-clipboard-text="row.codeUrl"
                 >复制链接</el-button>
               </div>
             </template>

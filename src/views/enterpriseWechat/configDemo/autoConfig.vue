@@ -2,8 +2,6 @@
 import { getAdminLoginQrcode, checkAdminLoginQrcode, autoConfig } from '@/api/admin';
 import * as api from '@/api/enterpriseId';
 import { setDefaultConfig } from '@/utils/enterpriseWechat';
-import ClipboardJS from 'clipboard';
-import { Notification } from 'element-ui';
 import { SERVER_TYPE_THIRD } from '@/utils/constant';
 import { getDefaultDomainConfig } from '@/api/admin';
 import CodeValidata from '../codeValidata.vue';
@@ -79,20 +77,6 @@ export default {
     if (this.isThirdType) {
       this.initConfig();
     }
-    this.clipboard = new ClipboardJS('.copy-btn');
-
-    this.clipboard.on('success', (e) => {
-      Notification.closeAll();
-      this.$notify({
-        title: '成功',
-        message: '内容已复制到剪切板，可粘贴。',
-        type: 'success'
-      });
-    });
-
-    this.clipboard.on('error', (e) => {
-      this.msgError('内容复制失败');
-    });
   },
   methods: {
     async checkQrcode(qrcodeKey) {

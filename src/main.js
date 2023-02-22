@@ -107,7 +107,7 @@ Vue.use(directive);
 Vue.config.productionTip = false;
 
 router.beforeEach((to, from, next) => {
-  const whitePathName = ['ConversionCodeAdd', 'Role', 'AddRule', 'CustomerCenter/customerDetail', 'StaffAdd', 'CustomerGroupDetail', 'NewCustomerAev', 'OldCustomerAev', 'WelcomeAdd', 'GroupWelcomeAdd', 'Add', 'Release', 'AddSOP']; // 拦截需要提示的路由name //所有的编辑页
+  const whitePathName = ['EditForm', 'ConversionCodeAdd', 'Role', 'AddRule', 'CustomerCenter/customerDetail', 'StaffAdd', 'CustomerGroupDetail', 'NewCustomerAev', 'OldCustomerAev', 'WelcomeAdd', 'GroupWelcomeAdd', 'Add', 'Release', 'AddSOP']; // 拦截需要提示的路由name //所有的编辑页
   if (from.path !== '/' && !whitePathName.includes(from.name)) {
     window.sessionStorage.setItem('from', from.path); // 设置编辑页从哪个路由跳转来 在返回的时候使用push
   }

@@ -12,11 +12,11 @@
         placeholder="请输入话术标题或内容，回车搜索"
         @keyup.enter.native="onSearch"
       />
-      <div class="operate-btn">
-        <el-button v-if="roleKey" class="btn-reset" @click="importVerbalTrick">导入话术</el-button>
-        <el-button v-if="roleKey" class="btn-reset" @click="batchUpdateGroup">批量修改分组</el-button>
-        <el-button v-if="roleKey" class="btn-reset" @click="batchDelete">批量删除</el-button>
-        <el-button v-if="roleKey" type="primary" @click="addVerbalTrick">添加话术</el-button>
+      <div v-if="roleKey" class="operate-btn">
+        <el-button class="btn-reset" @click="importVerbalTrick">导入话术</el-button>
+        <el-button class="btn-reset" @click="batchUpdateGroup">批量修改分组</el-button>
+        <el-button class="btn-reset" @click="batchDelete">批量删除</el-button>
+        <el-button type="primary" @click="addVerbalTrick">添加话术</el-button>
       </div>
     </div>
     <div class="content-container">

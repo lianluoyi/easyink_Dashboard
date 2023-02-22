@@ -196,7 +196,7 @@ li {
 
 .mr2{
   margin-right: 2px;
-} 
+}
 
 .mr5 {
   margin-right: 5px;
@@ -256,6 +256,10 @@ li {
 
 .mb20 {
   margin-bottom: 20px;
+}
+
+.mb50 {
+  margin-bottom: 50px;
 }
 
 .ml20 {
@@ -399,4 +403,10 @@ li {
 
 .f14 {
   font-size: 14px;
+}
+
+.fcc {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -33,6 +33,14 @@ export function addUser(data) {
   });
 }
 
+// 查询用户详细
+export function getUserInfo(params) {
+  return request({
+    url: '/wecom/user/' + params?.userId,
+    method: 'get'
+  });
+}
+
 export function getJoinQrCode(params) {
   return request({
     url: '/wecom/user/getJoinQrCode',

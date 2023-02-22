@@ -1,7 +1,7 @@
 /*
  * @Description: 雷达库接口
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
  */
 import request from '@/utils/request';
 const service = window.CONFIG.services.wecom + '/radar';
@@ -193,5 +193,31 @@ export function getCustomerClickRecordDetail(params) {
     url: service + '/record/getCustomerClickRecordDetail',
     method: 'get',
     params
+  });
+}
+
+/**
+ * 获取雷达公众号配置
+ * @param {*} params
+ * @returns
+ */
+export function getRadarConfig(params) {
+  return request({
+    url: service + '/config',
+    method: 'get',
+    params
+  });
+}
+
+/**
+ * 设置雷达公众号配置
+ * @param {*} data
+ * @returns
+ */
+export function setRadarConfig(data) {
+  return request({
+    url: service + '/config',
+    method: 'post',
+    data
   });
 }

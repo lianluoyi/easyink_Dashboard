@@ -4,9 +4,7 @@ import {
   getTimeRangeAnalyseCount,
   download
 } from '@/api/drainageCode/staff';
-import ClipboardJS from 'clipboard';
 import echarts from 'echarts';
-import { Notification } from 'element-ui';
 import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE, SCOPELIST_TYPE } from '@/utils/constant';
 import PhoneDialog from '@/components/PhoneDialog';
 import TagUserShow from '@/components/TagUserShow';
@@ -56,20 +54,6 @@ export default {
     const id = this.$route.query.id;
     id && this.getDetail(id);
     // this.getList()
-  },
-  mounted() {
-    var clipboard = new ClipboardJS('.copy-btn');
-    clipboard.on('success', (e) => {
-      Notification.closeAll();
-      this.$notify({
-        title: '成功',
-        message: '链接已复制到剪切板，可粘贴。',
-        type: 'success'
-      });
-    });
-    clipboard.on('error', (e) => {
-      this.msgError('链接复制失败');
-    });
   },
   methods: {
     /** 获取详情 */
@@ -251,9 +235,8 @@ export default {
           <div>
             <el-button type="text" @click="download()">下载二维码</el-button>
             <el-button
+              v-copy="form.qrCode"
               type="text"
-              class="copy-btn"
-              :data-clipboard-text="form.qrCode"
             >复制链接</el-button>
           </div>
         </div>

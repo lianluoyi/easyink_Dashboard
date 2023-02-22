@@ -8,8 +8,6 @@ import {
 } from '@/api/drainageCode/staff';
 import SelectUser from '@/components/SelectUser/index.vue';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
-import ClipboardJS from 'clipboard';
-import { Notification } from 'element-ui';
 import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT, STAFF_CODE_TYPE } from '@/utils/constant';
 import RightContainer from '@/components/RightContainer';
@@ -67,20 +65,6 @@ export default {
         <div>支持单人、批量单人及多人方式新建员工活码，客户可以通过扫描员工活码添加员工为好友，并支持自动给客户打标签和发送欢迎语。</div>
       `
     );
-  },
-  mounted() {
-    var clipboard = new ClipboardJS('.copy-btn');
-    clipboard.on('success', (e) => {
-      Notification.closeAll();
-      this.$notify({
-        title: '成功',
-        message: '链接已复制到剪切板，可粘贴。',
-        type: 'success'
-      });
-    });
-    clipboard.on('error', (e) => {
-      this.msgError('链接复制失败');
-    });
   },
   methods: {
     getList(page) {
@@ -333,9 +317,9 @@ export default {
                   @click="download(row.id, row.useUserName, row.scenario)"
                 >下载</el-button>
                 <el-button
+                  v-copy="row.qrCode"
                   type="text"
                   class="copy-btn"
-                  :data-clipboard-text="row.qrCode"
                 >复制链接</el-button>
               </div>
             </template>

@@ -176,7 +176,7 @@ export default {
 
       const type = this.createType === CREATE_TYPE['group'] ? 'dialog' : 'enterpriseCodeDialog';
       this[type] = true;
-      this.$refs[type].form = { ...realCode, groupList: realCode.groupDetailVOList };
+      this.$refs[type] && (this.$refs[type].form = { ...realCode, groupList: realCode.groupDetailVOList });
     },
     // 更新群二维码
     update() {

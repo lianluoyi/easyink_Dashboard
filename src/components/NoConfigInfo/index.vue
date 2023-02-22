@@ -2,6 +2,7 @@
 import store from '@/store';
 const NO_CONFIG_CONTACT_SECRET = '当前企业尚未配置“通讯录”功能';
 const NO_CONFIG_CUSTOM_SECRET = '当前企业尚未配置“客户联系”功能';
+const NO_CONFIG_SESSION_ARCHIVE_SECRET = '当前企业尚未配置“会话存档”功能';
 const NO_CONFIG_CUSTOM_SECRET_AND_CONTACT_SECRET = '当前企业尚未配置“通讯录”和“客户联系”功能';
 const NO_CONFIG_INFO_TAIL = '，无法[pageTitle]，请联系系统管理员前往【系统设置】完成企微配置';
 function getMessageByOneConfigKeys(configKeys) {
@@ -11,6 +12,10 @@ function getMessageByOneConfigKeys(configKeys) {
   // 如果只判断客户联系
   if (configKeys.indexOf('customSecret') >= 0) {
     return NO_CONFIG_CUSTOM_SECRET + NO_CONFIG_INFO_TAIL;
+  }
+  // 如果只判断会话存档
+  if (configKeys.indexOf('chatSecret') >= 0) {
+    return NO_CONFIG_SESSION_ARCHIVE_SECRET + NO_CONFIG_INFO_TAIL;
   }
 }
 function getMessageByTowEnterPriseWechatConfig(enterPriseWechatConfig) {

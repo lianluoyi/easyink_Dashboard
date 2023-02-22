@@ -120,7 +120,7 @@
               />
               <i class="iconfont icon-password" />
               <i
-                :class="[!pwdVisible ? 'icon-invisible' : 'icon-visible', 'iconfont']"
+                :class="[!pwdVisible ? 'icon-ciphertext' : 'icon-plaintext', 'iconfont']"
                 @click="changePwdVisible"
               />
             </el-form-item>
@@ -169,7 +169,6 @@
 <script>
 import { getCodeImg, findWxQrLoginInfo, getPreAuthCode, getPreLoginParam, getPermanentCode, webLogin } from '@/api/login';
 import Cookies from 'js-cookie';
-import { encrypt, decrypt } from '@/utils/jsencrypt';
 import { clearSearchWithoutReload, getNowTheme } from '@/utils/common';
 import { Notification } from 'element-ui';
 import { SERVER_TYPE_THIRD } from '@/utils/constant';
@@ -250,6 +249,7 @@ export default {
     this.getServerType();
     this.checkCode();
     this.checkAuthCode();
+    this.getPublicKey();
   },
   created() {
     getNowTheme();
@@ -366,6 +366,10 @@ export default {
         this.icp = res?.data?.icp;
       });
     },
+    // 获取RSA私钥
+    getPublicKey() {
+      this.$store.dispatch('GetPublicKey');
+    },
     getWxConfig(isThird) {
       if (isThird) {
         getPreLoginParam().then(res => {
@@ -452,7 +456,7 @@ export default {
       this.loginForm = {
         username: username === undefined ? this.loginForm.username : username,
         password:
-          password === undefined ? this.loginForm.password : decrypt(password),
+          password === undefined ? this.loginForm.password : password,
         rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
       };
     },
@@ -464,7 +468,7 @@ export default {
         if (valid) {
           this.loading = true;
           if (this.loginForm.rememberMe) {
-            Cookies.set(this.loginForm.username, encrypt(this.loginForm.password), {
+            Cookies.set(this.loginForm.username, this.loginForm.password, {
               expires: COOKIE_EXPIRE
             });
             Cookies.set('rememberMe', this.loginForm.rememberMe, {
@@ -476,10 +480,10 @@ export default {
           }
           this.loginForm.uuid = this.uuid;
           this.$store
-            .dispatch('Login', this.loginForm)
+            .dispatch('Login', { ...this.loginForm, publicKey: this.$store.state?.secretKey?.RSAPublicKey })
             .then(() => {
               if (!this.hasEnterprise) {
-                this.$router.push({ path: '/system/sysSetting/enterpriseWechat', query: null });
+                this.$router.push({ path: '/system/configCenter/enterpriseWechat', query: null });
               } else {
                 this.$router.push({ path: this.redirect || '/', query: null });
               }
@@ -691,16 +695,10 @@ export default {
     top: 1px;
     color: #a6a6a6;
   }
-  .icon-invisible, .icon-visible {
+  .icon-ciphertext, .icon-plaintext {
     left: unset;
     right: 26px;
     top: 2px;
-  }
-  .icon-invisible {
-    font-size: 8px;
-  }
-  .icon-visible{
-    font-size: 11px;
   }
 }
 .el-form-item:hover {
