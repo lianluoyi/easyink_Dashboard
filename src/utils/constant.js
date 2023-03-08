@@ -782,6 +782,14 @@ export const DATA_DIMENSION = {
   'staff': STAFF_DIMENSION,
   'client': CLIENT_DIMENSION
 };
+/** sessionStorage保存的客户联系->客户活跃度的搜索参数的Key*/
+export const CUSTOMER_CONTACT_SESSION_SAVE_KEY = {
+  'addDateRange': 'activeness_addDateRange',
+  'sendDateRange': 'activeness_sendDateRange',
+  'userAndDepartmentList': 'activeness_userAndDepartmentList'
+};
+/** 客户详情页的path*/
+export const CUSTOMER_DEATIL_PATH = '/customerManage/customerCenter/customerDetail';
 
 // 表单上传展示类型
 /** 拖拽单个上传 */

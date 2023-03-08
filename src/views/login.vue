@@ -249,7 +249,6 @@ export default {
     this.getServerType();
     this.checkCode();
     this.checkAuthCode();
-    this.getPublicKey();
   },
   created() {
     getNowTheme();
@@ -365,10 +364,6 @@ export default {
         this.getWxConfig(this.isThird);
         this.icp = res?.data?.icp;
       });
-    },
-    // 获取RSA私钥
-    getPublicKey() {
-      this.$store.dispatch('GetPublicKey');
     },
     getWxConfig(isThird) {
       if (isThird) {

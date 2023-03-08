@@ -227,7 +227,7 @@ import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
 import ImportFile from '@/components/ImportFile.vue';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 import RightContainer from '@/components/RightContainer';
 import * as conversionCode from '@/api/redeem';
 import { goRouteWithQuery } from '@/utils';
@@ -333,7 +333,7 @@ export default {
      * 跳转到客户详情
      */
     goRoute(row) {
-      goRouteWithQuery(this.$router, '/customerManage/customerCenter/customerDetail',
+      goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH,
         this.query, {
           id: row.receiveUserId,
           prePageType: 'conversionCodeDetail'

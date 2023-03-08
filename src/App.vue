@@ -6,6 +6,15 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  mounted() {
+    this.getPublicKey();
+  },
+  methods: {
+    // 获取RSA私钥
+    getPublicKey() {
+      this.$store.dispatch('GetPublicKey');
+    }
+  }
 };
 </script>

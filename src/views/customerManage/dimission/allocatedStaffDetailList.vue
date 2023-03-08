@@ -3,7 +3,7 @@ import {
   getAllocateCustomersPlus,
   getAllocateGroupsPlus
 } from '@/api/customer/dimission';
-import { PAGE_LIMIT, DIMISSION_STATUS_MAP, INHERIT_STATUS_INHERITING } from '@/utils/constant';
+import { PAGE_LIMIT, DIMISSION_STATUS_MAP, INHERIT_STATUS_INHERITING, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import AllocateModal from './allocateModal.vue';
 
@@ -83,7 +83,7 @@ export default {
         });
       } else {
         this.$router.push({
-          path: '/customerManage/customerCenter/customerDetail',
+          path: CUSTOMER_DEATIL_PATH,
           query: {
             id: scope.row.externalUserid,
             userId: scope.row.handoverUserId,

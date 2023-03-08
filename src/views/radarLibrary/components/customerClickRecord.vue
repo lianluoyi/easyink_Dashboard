@@ -85,7 +85,7 @@
 <script>
 // 渠道名称最大长度
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT, DEFAULT_PAGE_NUM, SORT } from '@/utils/constant';
+import { PAGE_LIMIT, DEFAULT_PAGE_NUM, SORT, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getCustomerClickRecord, getCustomerClickRecordDetail } from '@/api/radar';
 import { goRouteWithQuery } from '@/utils';
@@ -135,7 +135,7 @@ export default {
      * 查看客户资料
      */
     checkCustomerInfo(row) {
-      goRouteWithQuery(this.$router, '/customerManage/customerCenter/customerDetail',
+      goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH,
         this.query, {
           id: row.externalId,
           prePageType: 'customerClickRecord'

@@ -85,10 +85,10 @@ export default {
   mounted() {
     const defaultList = [];
     // 找出二级菜单的路由
-    this.permission_routes.map(item => {
+    this.permission_routes?.map(item => {
       defaultList.push(`${item.path}`);
       if (!item.hidden) {
-        item.children.map(childItem => {
+        item.children?.map(childItem => {
           if (!childItem.hidden) {
             defaultList.push(`${item.path}/${childItem.path}/${childItem.path}`);
           }

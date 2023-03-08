@@ -1,7 +1,7 @@
 <!--
  * @Description: 在职继承-分配记录
  * @Author: 佚名
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <template>
   <div>
@@ -126,7 +126,7 @@
 import { goRouteWithQuery } from '@/utils';
 import { dealAtInfo } from '@/utils/common';
 import { PAGE_LIMIT, WX_TYPE, INHERIT_STATUS_INHERITED, INHERIT_STATUS_INHERITING, INHERIT_STATUS_REFUSE,
-  INHERIT_STATUS_FAIL, INHERIT_STATUS_USER_REACHED_UPPER_LIMIT } from '@/utils/constant';
+  INHERIT_STATUS_FAIL, INHERIT_STATUS_USER_REACHED_UPPER_LIMIT, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 
 import { getRecordList } from '@/api/transfer';
 
@@ -174,7 +174,7 @@ export default {
     goRoute(row) {
       goRouteWithQuery(
         this.$router,
-        '/customerManage/customerCenter/customerDetail',
+        CUSTOMER_DEATIL_PATH,
         this.query,
         {
           id: row.externalUserid,
