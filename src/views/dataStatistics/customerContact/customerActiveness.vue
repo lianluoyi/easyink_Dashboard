@@ -85,16 +85,16 @@
         <div class="data-details">
           <div class="details-title">数据详情</div>
           <div class="forms-handle-btn">
-            <el-radio-group v-model="activeName" class="radio-group-div" size="medium">
+            <el-radio-group v-model="activeName" class="radio-group-div" size="medium" @input="radioGroupChange">
               <el-radio-button :label="DATA_DIMENSION['date']">日期维度</el-radio-button>
               <el-radio-button :label="DATA_DIMENSION['staff']">员工维度</el-radio-button>
               <el-radio-button :label="DATA_DIMENSION['client']">客户维度</el-radio-button>
             </el-radio-group>
-            <!-- <el-button
+            <el-button
               v-hasPermi="['statistic:customerContact:export']"
               class="btn-reset"
               @click="exportForms"
-            >导出报表</el-button> -->
+            >导出报表</el-button>
           </div>
           <el-table
             v-loading="loading"
@@ -211,7 +211,7 @@
 </template>
 <script>
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT, DATA_DIMENSION } from '@/utils/constant';
+import { PAGE_LIMIT, DATA_DIMENSION, CUSTOMER_CONTACT_SESSION_SAVE_KEY, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 import ClientDetailsDialog from './clientDetailsDialog.vue';
 import Graphics from './graphics.vue';
 import UserItem from './userItem.vue';
@@ -229,8 +229,7 @@ import {
   exportCustomerActivityOfUser,
   exportCustomerActivityOfCustomer
 } from '@/api/statistics';
-import { goRouteWithQuery } from '@/utils/index';
-import { getQueryObject } from '@/utils/index';
+import { goRouteWithQuery, getQueryObject, changeURLParams } from '@/utils/index';
 export default {
   name: '',
   components: { RightContainer, ClientDetailsDialog, Graphics, UserItem, EmptyDefaultIcon, TagUserShow, SelectUser },
@@ -293,25 +292,52 @@ export default {
         clientSendMessageList: [],
         // 员工发送消息数
         userSendMessageList: []
-      }
+      },
+      // 是否跳转到客户详情页
+      isSkipToCustomerDetail: false
     };
   },
   watch: {
     // 切换数据详情的维度时
-    activeName(val) {
-      this.getList(true);
+    activeName: {
+      handler: function(val) {
+        this.getList(true);
+      }
     }
   },
   created() {
+    this.setQueryParams();
     const queryObject = getQueryObject();
-    if (queryObject.detailsActiveName_) {
-      this.activeName = Number(queryObject.detailsActiveName_);
+    if (queryObject.detailsActiveName) {
+      this.activeName = Number(queryObject.detailsActiveName);
     } else {
       this.getList(true);
     }
     this.getChartData();
   },
+  beforeDestroy() {
+    // 组件销毁前，如果不是跳转到客户详情，则删除sessionStorage数据
+    if (!this.isSkipToCustomerDetail) {
+      const allNeedClearSessionKey = Object.values(CUSTOMER_CONTACT_SESSION_SAVE_KEY);
+      allNeedClearSessionKey.map(item => sessionStorage.removeItem(item));
+    }
+  },
   methods: {
+    // 当手动改变单选tab时，将tab选项设置到url上
+    radioGroupChange(val) {
+      changeURLParams('detailsActiveName', val);
+    },
+    /**
+     * @description 读取sessionStorage中保存的搜索数据并设置
+     */
+    setQueryParams() {
+      const sAddDateRange = sessionStorage.getItem(CUSTOMER_CONTACT_SESSION_SAVE_KEY['addDateRange']);
+      const sSendDateRange = sessionStorage.getItem(CUSTOMER_CONTACT_SESSION_SAVE_KEY['sendDateRange']);
+      const sUserAndDepartmentList = sessionStorage.getItem(CUSTOMER_CONTACT_SESSION_SAVE_KEY['userAndDepartmentList']);
+      this.addDateRange = sAddDateRange ? JSON.parse(sAddDateRange) : [YESTERDAY_TIME, YESTERDAY_TIME];
+      this.sendDateRange = sSendDateRange ? JSON.parse(sSendDateRange) : [YESTERDAY_TIME, YESTERDAY_TIME];
+      this.userAndDepartmentList = sUserAndDepartmentList ? JSON.parse(sUserAndDepartmentList) : [];
+    },
     /**
      * @description 选择员工/部门的回调
      */
@@ -344,7 +370,17 @@ export default {
         this.query.departmentIds = [];
         this.query.userIds = [];
       }
+      this.setSessionStorage();
       return this.query;
+    },
+    // 将查询条件保存到sessionStorage中
+    setSessionStorage() {
+      // 添加时间日期范围的保存
+      sessionStorage.setItem(CUSTOMER_CONTACT_SESSION_SAVE_KEY['addDateRange'], JSON.stringify(this.addDateRange));
+      // 发送时间日期范围的保存
+      sessionStorage.setItem(CUSTOMER_CONTACT_SESSION_SAVE_KEY['sendDateRange'], JSON.stringify(this.sendDateRange));
+      // 员工/部门选择的保存
+      sessionStorage.setItem(CUSTOMER_CONTACT_SESSION_SAVE_KEY['userAndDepartmentList'], JSON.stringify(this.userAndDepartmentList));
     },
     /**
      * @description: 获取数据详情各维度数据
@@ -426,9 +462,10 @@ export default {
     },
     // 跳转到客户资料详情页
     skipToUserDetails(row) {
+      this.isSkipToCustomerDetail = true;
       goRouteWithQuery(
         this.$router,
-        '/customerManage/customerCenter/customerDetail',
+        CUSTOMER_DEATIL_PATH,
         {},
         {
           id: row.externalUserId,

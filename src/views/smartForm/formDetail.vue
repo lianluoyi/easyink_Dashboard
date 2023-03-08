@@ -1,7 +1,7 @@
 <!--
  * @Description: 表单详情
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="form-detail-page">
@@ -318,7 +318,8 @@ import { FORVER_EFFECT,
   MANY_LINE_TEXT_COMPONENT,
   DATE_TIME_COMPONENT,
   SCORE_COMPONENT,
-  NPS_COMPONENT
+  NPS_COMPONENT,
+  CUSTOMER_DEATIL_PATH
 } from '@/utils/constant';
 import Statistics from '@/components/Statistics';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
@@ -483,7 +484,7 @@ export default {
      * 查看客户资料
      */
     checkCustomerInfo(row) {
-      goRouteWithQuery(this.$router, '/customerManage/customerCenter/customerDetail',
+      goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH,
         this.searchForm, {
           id: row.externalUserId,
           prePageType: 'staffClickRecord'

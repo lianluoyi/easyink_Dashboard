@@ -78,12 +78,12 @@
                     <p>新增客户数：查询时间内员工添加的客户数量</p>
                     <p>流失客户数：查询时间内添加的客户，把员工删除/拉黑的数量</p>
                     <p>新客留存率：查询时间内，未将员工删除、拉黑的新增客户/新增客户</p>
-                    <p>新增开口率：查询时间内，在添加当天给员工发消息的新增客户/新增客户</p>
+                    <p>新客开口率：查询时间内，在添加当天给员工发消息的新增客户/新增客户</p>
                     <p>服务响应率：查询时间内，员工首次向客户发送消息后，客户在30分钟内回复/会话客户</p>
                   </div>
                   <div class="line" />
                   <div class="notice">
-                    注意：新增开口率、服务响应率的统计数据来源于会话存档，若员工未开启会话存档或客户拒绝存档，统计数将受影响
+                    注意：新客开口率、服务响应率的统计数据来源于会话存档，若员工未开启会话存档或客户拒绝存档，统计数将受影响
                   </div>
                 </div>
                 <div slot="reference" class="statistic theme-text-color">统计说明</div>
@@ -93,11 +93,11 @@
         </div>
         <div class="table-overview">
           <div class="forms-handle-btn">
-            <!-- <el-button
+            <el-button
               v-hasPermi="['statistic:customerContact:export']"
               class="btn-reset"
               @click="exportForms"
-            >导出报表</el-button> -->
+            >导出报表</el-button>
           </div>
           <el-table
             ref="showTable"
@@ -118,20 +118,20 @@
                 <UserItem :data="row" :is-staff="true" />
               </template>
             </el-table-column>
-            <el-table-column prop="totalContactCnt" label="客户总数" min-width="180" />
-            <el-table-column prop="contactLossCnt" label="流失客户数" min-width="180" />
-            <el-table-column prop="newContactCnt" label="新增客户数" min-width="180" />
-            <el-table-column prop="newContactRetentionRate" label="新客留存率" min-width="180">
+            <el-table-column sortable="custom" prop="totalContactCnt" label="客户总数" min-width="180" />
+            <el-table-column sortable="custom" prop="contactLossCnt" label="流失客户数" min-width="180" />
+            <el-table-column sortable="custom" prop="newContactCnt" label="新增客户数" min-width="180" />
+            <el-table-column sortable="custom" prop="newContactRetentionRate" label="新客留存率" min-width="180">
               <template #default="{ row }">
                 {{ row.newContactRetentionRate + '%' }}
               </template>
             </el-table-column>
-            <el-table-column prop="newContactStartTalkRate" label="新客开口率" min-width="180">
+            <el-table-column sortable="custom" prop="newContactStartTalkRate" label="新客开口率" min-width="180">
               <template #default="{ row }">
                 {{ row.newContactStartTalkRate + '%' }}
               </template>
             </el-table-column>
-            <el-table-column prop="serviceResponseRate" label="服务响应率" min-width="180">
+            <el-table-column sortable="custom" prop="serviceResponseRate" label="服务响应率" min-width="180">
               <template #default="{ row }">
                 {{ row.serviceResponseRate + '%' }}
               </template>
@@ -323,7 +323,7 @@ export default {
     },
     // 导出报表
     exportForms() {
-      exportCustomerOverViewOfUser(this.getSearchPayload()).then((res) => {
+      exportCustomerOverViewOfUser({ ...this.getSearchPayload(), ...this.sortParams }).then((res) => {
         this.download(res.data.msg, true);
       }).catch(() => {
         this.msgError('导出失败!');

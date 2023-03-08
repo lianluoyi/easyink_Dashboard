@@ -14,8 +14,6 @@
   </div>
 </template>
 <script>
-import { goRouteWithQuery } from '@/utils/index';
-import { CUSTOMER_LABEL_TYPE, DATA_DIMENSION } from '@/utils/constant';
 export default {
   name: '',
   components: {},
@@ -56,19 +54,6 @@ export default {
       if (this.path) {
         this.$router.push(!Object.keys(this.query || {}).length ? this.path : { path: this.path, query: this.query });
       } else {
-        // TODO: 客户联系页将Tab使用url参数判断，可将此处代码优化
-        // 回页面需要 客户活跃度，客户维度
-        if (window.sessionStorage.getItem('from') === '/dataStatistics/dataStatistics/customerContact') {
-          goRouteWithQuery(
-            this.$router,
-            window.sessionStorage.getItem('from'),
-            {
-              activeName: CUSTOMER_LABEL_TYPE['activeness'], // 选择客户活跃度
-              detailsActiveName: DATA_DIMENSION['client'] // 数据详情选择客户维度
-            }
-          );
-          return;
-        }
         // 由于客户详情页来自的页面不同 在此单独处理
         if (window.sessionStorage.getItem('from') !== '/customerManage/customerCenter/customer') {
           this.$router.go(-1);

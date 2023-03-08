@@ -1,7 +1,7 @@
 <!--
  * @Description: 渠道点击记录
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <!-- 中间表格 -->
@@ -120,7 +120,7 @@
 
 <script>
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT, DEFAULT_PAGE_NUM } from '@/utils/constant';
+import { PAGE_LIMIT, DEFAULT_PAGE_NUM, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { goRouteWithQuery } from '@/utils';
 import { getChannelClickRecord, getChannelClickRecordDetail } from '@/api/radar';
@@ -194,7 +194,7 @@ export default {
       window.sessionStorage.setItem('clickRecord', CLICK_RECORD['channel']);
       // 存储链接详情信息 防止返回时空白
       window.sessionStorage.setItem('channelName', JSON.stringify(this.channelDetailQuery));
-      goRouteWithQuery(this.$router, '/customerManage/customerCenter/customerDetail',
+      goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH,
         this.query, {
           id: row.externalId,
           prePageType: 'channelClickRecord'

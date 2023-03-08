@@ -13,7 +13,7 @@ import SelectTag from '@/components/SelectTag';
 import { EventBus } from '@/event-bus.js';
 import { goRouteWithQuery } from '@/utils';
 import { dealAtInfo } from '@/utils/common';
-import { PAGE_LIMIT, WX_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, WX_TYPE, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 export default {
   name: 'LossRemind',
   components: { SelectUser, SelectTag, RightContainer, EmptyDefaultIcon },
@@ -175,7 +175,7 @@ export default {
       });
     },
     goRoute(item) {
-      goRouteWithQuery(this.$router, '/customerManage/customerCenter/customerDetail', this.query, { id: item.externalUserid, userId: item.userId, userName: item.userName, prePageType: 'lossRemind' });
+      goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH, this.query, { id: item.externalUserid, userId: item.userId, userName: item.userName, prePageType: 'lossRemind' });
     },
     /**
      * 处理 @微信 的字样

@@ -1,7 +1,7 @@
 <!--
  * @Description: 在职继承
  * @Author: 佚名
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div>
@@ -216,7 +216,7 @@
 <script>
 import { goRouteWithQuery } from '@/utils';
 import { dealAtInfo } from '@/utils/common';
-import { PAGE_LIMIT, INHERIT_STATUS_INHERITING, WX_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, INHERIT_STATUS_INHERITING, WX_TYPE, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 import { getCustomerList, transfer, getTransferConfig, editConfig } from '@/api/transfer';
 
 import RightContainer from '@/components/RightContainer';
@@ -286,7 +286,7 @@ export default {
       });
     },
     goRoute(row) {
-      goRouteWithQuery(this.$router, '/customerManage/customerCenter/customerDetail', this.query, {
+      goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH, this.query, {
         id: row.externalUserid,
         userId: row.userId,
         prePageType: 'customer'

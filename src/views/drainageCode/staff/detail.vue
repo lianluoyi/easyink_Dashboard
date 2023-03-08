@@ -121,6 +121,9 @@ export default {
         this.loading = false;
 
         const option = {
+          tooltip: {
+            trigger: 'axis'
+          },
           xAxis: {
             type: 'category',
             data: dateList

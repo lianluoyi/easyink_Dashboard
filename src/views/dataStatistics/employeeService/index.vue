@@ -99,21 +99,19 @@
         />
         <div class="table-overview">
           <div class="forms-handle-btn">
-            <!-- TODO 暂时屏蔽 -->
-            <!-- <el-button
+            <el-button
               v-hasPermi="['statistic:employeeService:export']"
               class="btn-reset"
               @click="exportForms"
-            >导出报表</el-button> -->
+            >导出报表</el-button>
           </div>
-          <!-- TODO 暂时屏蔽 -->
-          <!-- sortable="customer"
-            :default-sort="{ prop: 'chatTotal', order: 'descending' }"
-            @sort-change="changeTableSort" -->
+
           <el-table
             ref="table"
             v-loading="loading"
             :data="list"
+            :default-sort="{ prop: 'chatTotal', order: 'descending' }"
+            @sort-change="changeTableSort"
           >
             <template slot="empty">
               <empty-default-icon :length="list.length" />
@@ -129,26 +127,26 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="chatTotal" label="聊天总数" min-width="120" />
-            <el-table-column prop="sendContactCnt" label="发送消息数" min-width="120" />
-            <el-table-column prop="averageChatTotal" label="平均会话数" min-width="120" />
-            <el-table-column prop="averageFirstReplyDuration" label="平均首次回复时长" min-width="160">
+            <el-table-column sortable="custom" prop="chatTotal" label="聊天总数" min-width="120" />
+            <el-table-column sortable="custom" prop="sendContactCnt" label="发送消息数" min-width="120" />
+            <el-table-column sortable="custom" prop="averageChatTotal" label="平均会话数" min-width="120" />
+            <el-table-column sortable="custom" prop="averageFirstReplyDuration" label="平均首次回复时长" min-width="160">
               <template slot-scope="scope">
                 <span>{{ scope.row.averageFirstReplyDuration + '分钟' }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="replyRate" label="回复率" min-width="120">
+            <el-table-column sortable="custom" prop="replyRate" label="回复率" min-width="120">
               <template slot-scope="scope">
                 <span>{{ scope.row.replyRate + '%' }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="effectiveCommunicationCustomerCnt" label="有效沟通客户数" min-width="160" />
-            <el-table-column prop="effectiveCommunicationRate" label="有效沟通率" min-width="120">
+            <el-table-column sortable="custom" prop="effectiveCommunicationCustomerCnt" label="有效沟通客户数" min-width="160" />
+            <el-table-column sortable="custom" prop="effectiveCommunicationRate" label="有效沟通率" min-width="120">
               <template slot-scope="scope">
                 <span>{{ scope.row.effectiveCommunicationRate + '%' }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="customerPositiveCommentsRate" label="客户好评率" min-width="120">
+            <el-table-column sortable="custom" prop="customerPositiveCommentsRate" label="客户好评率" min-width="120">
               <template slot-scope="scope">
                 <span>{{ scope.row.customerPositiveCommentsRate + '%' }}</span>
               </template>
@@ -259,8 +257,7 @@ export default {
         { title: '客户好评率', filed: 'customerPositiveCommentsRate', showPopover: false, unit: '%' }
       ],
       /** 当前排序规则 */
-      // sortRule: { chatTotal: 'DESC' }
-      sortRule: {}
+      sortRule: { chatTotalSort: 'DESC' }
     };
   },
   computed: {
@@ -334,9 +331,10 @@ export default {
       this.query = this.$options.data().query;
       this.dateRange = this.$options.data().dateRange;
       this.userAndDepartmentList = [];
-      // this.sortRule = { chatTotal: 'DESC' };
+      this.sortRule = { chatTotalSort: 'DESC' };
+      // 重置的时候会主动调用this.getList();
       this.$refs.table.sort('chatTotal', 'descending');
-      this.onSearch();
+      this.getDataOverview();
     },
     /**
      * @description 选择员工/部门的回调
@@ -351,7 +349,7 @@ export default {
      * @description 导出报表
      */
     exportForms() {
-      exportUserServiceOfUser(this.dealSearchPayload()).then((res) => {
+      exportUserServiceOfUser({ ...this.sortRule, ...this.dealSearchPayload() }).then((res) => {
         this.download(res.data.msg, true);
       }).catch(() => {
         this.msgError('导出失败!');
@@ -367,7 +365,8 @@ export default {
         'descending': 'DESC',
         'null': null
       };
-      this.sortRule = { [prop]: SORT_TYPE[order] };
+      const sortFiled = prop + 'Sort';
+      this.sortRule = { [sortFiled]: SORT_TYPE[order] };
       this.getList();
     }
   }

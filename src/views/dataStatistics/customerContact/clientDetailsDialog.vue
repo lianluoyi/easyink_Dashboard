@@ -22,24 +22,26 @@
         style="width: 240px"
         @keydown.enter.native="getList(true)"
       />
-      <el-table
-        v-loading="loading"
-        :data="list"
-      >
-        <template slot="empty">
-          <empty-default-icon :length="list.length" />
-        </template>
-        <el-table-column
-          prop="codeUrl"
-          label="客户"
+      <div class="table-wrap">
+        <el-table
+          v-loading="loading"
+          :data="list"
         >
-          <template slot-scope="{ row }">
-            <UserItem :data="row" />
+          <template slot="empty">
+            <empty-default-icon :length="list.length" />
           </template>
-        </el-table-column>
-        <el-table-column prop="customerSendMessageCnt" label="客户发送消息数" />
-        <el-table-column prop="userSendMessageCnt" label="员工发送消息数" />
-      </el-table>
+          <el-table-column
+            prop="codeUrl"
+            label="客户"
+          >
+            <template slot-scope="{ row }">
+              <UserItem :data="row" />
+            </template>
+          </el-table-column>
+          <el-table-column prop="customerSendMessageCnt" label="客户发送消息数" />
+          <el-table-column prop="userSendMessageCnt" label="员工发送消息数" />
+        </el-table>
+      </div>
       <pagination
         :total="total * 1"
         :page.sync="query.pageNum"
@@ -134,5 +136,9 @@ export default {
 <style scoped lang='scss'>
 .search-input {
   margin-bottom: 22px;
+}
+.table-wrap {
+  max-height: 500px;
+  overflow: scroll;
 }
 </style>

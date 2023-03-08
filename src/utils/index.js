@@ -595,3 +595,17 @@ export const dealAppendixTypeToMaterial = (list) => {
     return { ...item, ...materialObj, mediaType: WELCOME_TO_MEDIA_TYPE[item.type], isAdded: true };
   });
 };
+
+// 更新URL上的某个参数值，并且页面不跳转
+export function changeURLParams(key, value) {
+  const url = window.location.href;
+  const queryObj = getQueryObject(url); // 获取查询参数 (hash不可使用window.location.search)
+  const params = new URLSearchParams(queryObj);
+  // 更新特定参数值
+  params.set(key, value);
+  // 更新后的查询字符串
+  const updateQueryString = params.toString();
+  // 更新后的url
+  const updateUrl = url.split('?')[0] + '?' + updateQueryString;
+  window.history.pushState({}, 0, updateUrl);
+}
