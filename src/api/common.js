@@ -2,7 +2,7 @@ import request from '@/utils/request';
 import { dataURLtoFile } from '@/utils/common';
 
 const service = window.CONFIG.services.common;
-
+const wecomService = window.CONFIG.services.wecom;
 export function upload(data) {
   return request({
     url: service + '/uploadFile2Cos',
@@ -53,5 +53,19 @@ export function uploadFile2Cos(data) {
     method: 'POST',
     data,
     headers: window.CONFIG.headers
+  });
+}
+
+/**
+ * 获取应用的jsapi_ticket
+ * @param {*} url 页面url
+ */
+export function getAgentTicket(url, agentId) {
+  return request({
+    url: wecomService + '/ticket/getAgentTicket',
+    params: {
+      url,
+      agentId
+    }
   });
 }

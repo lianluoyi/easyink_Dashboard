@@ -1,7 +1,7 @@
 <!--
  * @Description: 表单详情
  * @Author: wJiaaa
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="form-detail-page">
@@ -185,7 +185,7 @@
                       <img :src="scope.row.userHeadImage || require('@/assets/image/card-avatar.svg')" alt="">
                       <div class="user-info-userName">
                         <span>{{ scope.row.userName }}</span>
-                        <span class="user-info-departmentName">{{ companName + '/' + scope.row.departmentName }}</span>
+                        <span class="user-info-departmentName">{{ companName }}{{ companName && scope.row.departmentName && '/' }}{{ scope.row.departmentName }}</span>
                       </div>
                     </div>
                   </template>

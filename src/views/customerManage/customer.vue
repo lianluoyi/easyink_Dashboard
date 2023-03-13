@@ -683,6 +683,19 @@ export default {
                 <i slot="reference" class="iconfont icon-question" style="font-size: 14px;" />
               </el-popover>
             </div>
+            <div v-else-if="colunmItem.id === 'tag'">
+              <span>{{ colunmItem.name }}</span>
+              <el-popover
+                placement="top-start"
+                trigger="hover"
+                popper-class="tip-popover"
+              >
+                <div>
+                  <div>受限于企微官方规则，仅展示客户被打上的企业标签，个人标签不可见</div>
+                </div>
+                <i slot="reference" class="iconfont icon-question" style="font-size: 14px;" />
+              </el-popover>
+            </div>
             <span v-else>
               {{ colunmItem.name }}
             </span>
@@ -813,6 +826,7 @@ export default {
       <SelectUser
         :visible.sync="dialogVisibleSelectUser"
         title="选择添加人"
+        :selected-user-list="queryUser"
         @success="selectedUser"
       />
 

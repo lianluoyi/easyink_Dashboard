@@ -7,8 +7,11 @@ import store from '@/store';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import CommonTree from '@/components/CommonTree';
 import UserItem from './UserItem.vue';
-import { groupBy } from 'lodash';
+import { groupBy, cloneDeep } from 'lodash';
+import uniqBy from 'lodash/uniqBy';
+import { DEFAULT_ROOT_PARENTID } from '@/utils/constant';
 
+// 根部门Id
 const DEFAULT_ROOT_DEPARTMENT_ID = '1';
 const USER_PAGE_LIMIT = '1000';
 /**
@@ -113,7 +116,9 @@ export default {
       // 是否显示提示语
       showTip: false,
       // 正在搜索
-      isSearching: false
+      isSearching: false,
+      // 是否显示根部门
+      isShowMainDep: false
     };
   },
   computed: {
@@ -126,18 +131,22 @@ export default {
         this.$emit('update:visible', val);
         if (!val) { this.$emit('close'); }
       }
+    },
+    departmentInfo() {
+      return this.$store.state.departmentInfo;
     }
   },
   watch: {
     // 监听当前窗口是否打开 若清空人员列表点击取消后 再次打开弹窗会出现已选择的人员为空的情况 在窗口打开为userList进行赋值
     Pvisible(val) {
       if (val) {
-        this.userList = this.selectedUserList;
+        this.userList = cloneDeep(this.selectedUserList);
       }
     },
     filterText(val) {
-      this.searchTreeData = [];
-      this.isSearching = false;
+      if (!val) {
+        this.searchList();
+      }
     },
     // 监听不同的敏感词的审计范围人员列表和审计人员
     selectUserList(val) {
@@ -189,7 +198,7 @@ export default {
      * @param list 员工列表
      * @param _data 当前树数据结构
      */
-    setUserIntoTree(firstDepartData, list, _data) {
+    setUserIntoFirstDep(firstDepartData, list, _data) {
       // 增加树节点-“查看更多”
       if (USER_PAGE_LIMIT <= list.length) {
         list.push({
@@ -211,36 +220,77 @@ export default {
       data = this.addChildrenLoading(data);
       const _data = this.handleTreeFilterLoading(data);
       const firstDepartData = _data[0];
-      // 自动展开第一个部门节点
-      this.defaultExpandNode = (data && firstDepartData) ? [firstDepartData.key] : [];
-      const res = await this.getUserList(firstDepartData && firstDepartData[this.departmentIdKey]);
-      const { list } = res;
-      this.setUserIntoTree(firstDepartData, list, _data);
-      this.treeData = [..._data];
+      // 当有根部门的时候自动展开
+      if ((firstDepartData && firstDepartData.parentId === DEFAULT_ROOT_PARENTID) || (_data.length === 1 && !this.departmentInfo.otherUserListTotal)) {
+        this.isShowMainDep = true;
+        // 自动展开第一个部门节点
+        this.defaultExpandNode = (data && firstDepartData) ? [firstDepartData.key] : [];
+        const res = await this.getUserList(firstDepartData && firstDepartData[this.departmentIdKey]);
+        const { list } = res;
+        // 将一级部门员工塞到部门中并且展示
+        this.setUserIntoFirstDep(firstDepartData, list, _data);
+        this.treeData = [..._data];
+      } else {
+        this.treeData = [..._data, ...this.departmentInfo.otherUserList, this.getMoreNodeTreeData(firstDepartData)];
+        if (this.departmentInfo.otherUserList.length === this.departmentInfo.otherUserListTotal) {
+          this.treeData = this.treeData.filter((item) => !item?.key?.startsWith(this.moreFlag));
+        }
+      }
+    },
+    /**
+     * @description 无根部门的情况下获取其他员工
+     */
+    async getOtherUserList(func) {
+      const data = await this.$store.dispatch('GetOtherUserList', {
+        isActivate: 1,
+        lastId: this.departmentInfo.otherUserList[this.departmentInfo.otherUserList.length - 1]?.userId,
+        pageSize: USER_PAGE_LIMIT
+      });
+      this.treeData = this.treeData.filter((item) => !item?.key?.startsWith(this.moreFlag));
+      this.treeData = [...uniqBy([...this.treeData, ...data]), this.getMoreNodeTreeData(this.treeData[0])];
+      if (this.departmentInfo.otherUserList.length === this.departmentInfo.otherUserListTotal) {
+        this.treeData = this.treeData.filter((item) => !item?.key?.startsWith(this.moreFlag));
+      }
+      func && func();
+    },
+    /**
+     * @description 获取含有“获取更多”节点
+     * @param firstDepartData 第一个部门
+     */
+    getMoreNodeTreeData(firstDepartData) {
+      return {
+        key: `${this.moreFlag}${firstDepartData && firstDepartData[this.departmentIdKey]}`,
+        mainDepartment: undefined,
+        lastId: this.departmentInfo.otherUserList[this.departmentInfo.otherUserList.length - 1]?.userId,
+        lastIndex: (firstDepartData?.children?.length || 0) + (this.departmentInfo.otherUserList.length - 1)
+      };
     },
     // 处理选中的左侧列表复选框
     dealNodeList(val) {
       const defaultCheckedKeys = this.dealSelectUser(this.allUserList, val);
       this.$refs.tree && this.$refs.tree.$refs.commonTree.setCheckedKeys(defaultCheckedKeys);
     },
+
     async getTreeList() {
-      const treeRes = await api.getTree({
-        isActivate: 1
-      });
-      const { data } = treeRes;
-      let deptList = [...data];
-      deptList = deptList.map(item => {
-        return {
-          ...item,
-          [this.departmentIdKey]: item.id
-        };
-      });
-      this.deptList = [...deptList];
-      this.rootDeptId = deptList[0] ? deptList[0][this.departmentIdKey] : this.rootDeptId;
-      deptList.forEach((element) => {
-        element.key = createUniqueString();
-      });
-      return deptList;
+      try {
+        const data = await this.$store.dispatch('GetDepartmentList');
+        let deptList = cloneDeep(data);
+        deptList = deptList.map(item => {
+          return {
+            ...item,
+            [this.departmentIdKey]: item.id
+          };
+        });
+        this.deptList = [...deptList];
+        this.rootDeptId = deptList[0] ? deptList[0][this.departmentIdKey] : this.rootDeptId;
+        deptList.forEach((element) => {
+          element.key = createUniqueString();
+        });
+        return deptList;
+      } catch (error) {
+        this.msgError('获取部门列表异常');
+        return [];
+      }
     },
     /**
      * 分批获取获取员工列表
@@ -345,6 +395,7 @@ export default {
       if (this.isSearching) return;
       this.updateUserList(data[this.departmentIdKey], data);
     },
+
     async updateUserList(departId, data, params) {
       const res = await this.getUserList(departId, params);
       const filterList = data.children?.filter(item => item.userId || item[this.departmentIdKey]) || [];
@@ -388,12 +439,32 @@ export default {
      */
     async searchList() {
       // 如果没有填写要搜索的员工姓名则不进行调用接口搜索，走原先的逻辑
-      if (!this.filterText) return;
-      this.isSearching = true;
-      this.searchTreeData = [];
+      if (!this.filterText) {
+        this.searchTreeData = [];
+        this.isSearching = false;
+        this.$nextTick(() => {
+          this.$refs.tree.filter(this.filterText);
+        });
+        return;
+      }
       const res = await this.getUserList(null, { name: this.filterText, pageNum: undefined, pageSize: undefined });
-      const deptTreeData = this.dealUserIntoDept(res.list);
-      this.searchTreeData = [...deptTreeData];
+      // 没有部门的情况
+      if (!this.departmentInfo.departmentList.length) {
+        this.searchTreeData = [...res.list];
+      } else {
+        // 有根部门的情况
+        if (this.departmentInfo.departmentList[0] === DEFAULT_ROOT_PARENTID) {
+          const deptTreeData = this.dealUserIntoDept(res.list);
+          this.searchTreeData = [...deptTreeData];
+        } else {
+        // 没有根部门的情况
+        // 先把是部门里面的人塞进对应的部门
+          const deptTreeData = this.dealUserIntoDept(res.list);
+          // 遍历找到的员工列表 并且判断是否是其他员工(可见范围没有在部门下的人)，若不是其他员工则去除
+          const diffOtherUserByRes = res.list.filter((item) => this.departmentInfo.otherUserList.map((item) => item.userId).includes(item.userId));
+          this.searchTreeData = [...deptTreeData, ...diffOtherUserByRes];
+        }
+      }
       // 由于接口只能筛选员工数据，无法筛选部门，所以需要在页面更新后调用树的过滤方法
       this.$nextTick(() => {
         this.$refs.tree.filter(this.filterText);
@@ -499,6 +570,8 @@ export default {
                 :is-sigle-select="isSigleSelect"
                 :is-only-leaf="isOnlyLeaf"
                 :department-id-key="departmentIdKey"
+                :is-show-main-dep="isShowMainDep"
+                @getOtherUserList="getOtherUserList"
                 @handleUpdateKeyChildren="handleUpdateKeyChildren"
               />
             </div>

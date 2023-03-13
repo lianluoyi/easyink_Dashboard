@@ -36,10 +36,10 @@
           <!-- 标题 -->
           <div v-if="showTitle(item.type)" slot="label" class="form-label">
             <span v-if="item.type === ONE_LINE_TEXT_COMPONENT || item.type === MANY_LINE_TEXT_COMPONENT">
-              <span :class="item.required ? 'required' : ''">{{ formSetValue.showSortFlag ? `${getSortIndex(item,index)}. ${item.title}` : item.title }}</span>
+              <span :class="item.required ? 'required' : ''">{{ formSetValue.showSortFlag ? `${getSortIndex(item)}. ${item.title}` : item.title }}</span>
               <span v-if="item.valueLimitType === TEXT_LENGTH_TYPE && item.max" class="label-limit">{{ `(0/${item.max})` }}</span>
             </span>
-            <span v-else :class="item.required ? 'required' : ''">{{ formSetValue.showSortFlag ? `${getSortIndex(item,index)}. ${item.title}` : item.title }}</span>
+            <span v-else :class="item.required ? 'required' : ''">{{ formSetValue.showSortFlag ? `${getSortIndex(item)}. ${item.title}` : item.title }}</span>
           </div>
           <!-- 单选 -->
           <div v-if="item.type === RADIO_COMPONENT" class="radio-component">
@@ -294,10 +294,12 @@ export default {
     changeToFormSetting() {
       EventBus.$emit('formSetting');
     },
+
     // 是否是图片或者轮播图
     isImageOrCarousel(type) {
       return [IMAGE_COMPONENT, CAROUSEL_COMPONENT].includes(type);
     },
+
     clickComponent(item) {
       EventBus.$emit('clickComponents', item);
       // 点击控件的时候把控件传给显示条件组件
@@ -305,6 +307,7 @@ export default {
       this.isActiveId = item.id;
       this.lastIndex = this.checkLastIndex();
     },
+
     changeSort(item, index, type) {
       if (type === 'delete') {
         this.prewievForm = this.prewievForm.filter((previewItem) => previewItem.id !== item.id);
@@ -314,12 +317,14 @@ export default {
       this.swapArray(index, type);
       this.lastIndex = this.checkLastIndex();
     },
+
     /**
      * @description 判断是否是最后一个 根据isActiveId是否等于prewievForm最后一个对象的id
      */
     checkLastIndex() {
       return this.isActiveId === this.prewievForm[this.prewievForm.length - 1].id;
     },
+
     /**
      1. type 为moveTop 上移， moveBottom 为下移 delete为删除
      2. index 为需要移动的 数组的下标
@@ -331,14 +336,15 @@ export default {
       const data = this.prewievForm.splice(bottomFlag ? index + 1 : index, 1, fItem);
       this.prewievForm.splice(bottomFlag ? index : index - 1, 1, ...data);
     },
+
     /**
      * @description 获取序号
      */
-    getSortIndex(item) {
+    getSortIndex(componentItem) {
       // 过滤掉当前不需要显示序号的控件  TEXT_COMPONENT,IMAGE_COMPONENT, CAROUSEL_COMPONENT,
       const newArr = this.prewievForm.filter((item) => ![TEXT_COMPONENT, IMAGE_COMPONENT, CAROUSEL_COMPONENT].includes(item.type));
       // +1是因为从0开始的
-      return indexOf(newArr, item) + 1;
+      return indexOf(newArr, componentItem) + 1;
     }
   }
 };

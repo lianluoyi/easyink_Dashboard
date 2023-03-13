@@ -122,7 +122,7 @@
                   <img :src="scope.row.userHeadImage || require('@/assets/image/card-avatar.svg')" alt="">
                   <div class="user-info-userName inoneline">
                     <span class="inoneline">{{ scope.row.userName }}</span>
-                    <span class="user-info-departmentName inoneline">{{ companName + '/' + scope.row.departmentName }}</span>
+                    <span class="user-info-departmentName inoneline">{{ companName }}{{ companName && scope.row.departmentName && '/' }}{{ scope.row.departmentName }}</span>
                   </div>
                 </div>
               </template>

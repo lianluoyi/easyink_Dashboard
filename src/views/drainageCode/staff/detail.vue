@@ -2,7 +2,8 @@
 import {
   getDetail,
   getTimeRangeAnalyseCount,
-  download
+  download,
+  exportTimeRangeAnalyseCount
 } from '@/api/drainageCode/staff';
 import echarts from 'echarts';
 import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE, SCOPELIST_TYPE } from '@/utils/constant';
@@ -109,10 +110,7 @@ export default {
     },
     /**  */
     getList() {
-      this.query.beginTime = this.dateRange[0];
-      this.query.endTime = this.dateRange[1];
-      this.query.userId = this.selectedUser;
-      getTimeRangeAnalyseCount(this.query).then(({ data }) => {
+      getTimeRangeAnalyseCount(this.getPayload()).then(({ data }) => {
         this.total = data.total;
         const list = data.list;
         const dateList = list.map(item => item.time);
@@ -173,7 +171,8 @@ export default {
       const date = this.getHandledValue(d.getDate());
       return year + '-' + month + '-' + date;
     },
-    download() {
+
+    downloadQrCode() {
       let name = '';
       if (this.form.scenario) {
         name = this.form.scenario + '.png';
@@ -198,6 +197,7 @@ export default {
         }
       });
     },
+
     goBack() {
       this.$router.go(-1);
     },
@@ -212,6 +212,25 @@ export default {
      */
     hanldePreview() {
       this.previewVisible = true;
+    },
+    /**
+     * @description 获取传参
+     */
+    getPayload() {
+      this.query.beginTime = this.dateRange[0];
+      this.query.endTime = this.dateRange[1];
+      this.query.userId = this.selectedUser;
+      return this.query;
+    },
+    /**
+     * @description 导出报表
+     */
+    exportReport() {
+      exportTimeRangeAnalyseCount(this.getPayload()).then((res) => {
+        this.download(res.data.msg, true);
+      }).catch(() => {
+        this.msgError('导出失败!');
+      });
     }
   }
 };
@@ -236,7 +255,7 @@ export default {
           />
           <div v-else class="err-img">加载失败</div>
           <div>
-            <el-button type="text" @click="download()">下载二维码</el-button>
+            <el-button type="text" @click="downloadQrCode()">下载二维码</el-button>
             <el-button
               v-copy="form.qrCode"
               type="text"
@@ -347,6 +366,13 @@ export default {
             :value="item.businessId"
           />
         </el-select>
+        <div class="export-btn">
+          <el-button
+            v-hasPermi="['wecom:codeAnalyse:export']"
+            class="btn-reset"
+            @click="exportReport"
+          >导出报表</el-button>
+        </div>
       </div>
       <div ref="chart" class="chart" style="width: 90%;height:400px;" />
     </div>
@@ -420,8 +446,10 @@ export default {
     display: flex;
     align-items: center;
     margin-bottom: 32px;
-    .btn-reset {
-      margin-left: 10px;
+    .export-btn {
+      display: flex;
+      flex: 1;
+      justify-content: flex-end;
     }
   }
   .welcome-div {

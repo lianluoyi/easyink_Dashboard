@@ -16,7 +16,7 @@
             node-key="id"
             :data="treeData"
             :props="defaultProps"
-            :default-expanded-keys="treeData[0] ? [treeData[0].id] : []"
+            :default-expanded-keys="treeData[0] && treeData[0] === DEFAULT_ROOT_PARENTID ? [treeData[0].id] : []"
             :filter-node-method="filterNode"
             :node-click="handleNodeClick"
           >
@@ -314,7 +314,7 @@ import {
 import {
   yearMouthDay, downloadFile, filterSize, downloadAMR, changeDeptTreeData
 } from '@/utils/common.js';
-import { PAGE_LIMIT, MSG_TYPE, MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO } from '@/utils/constant';
+import { PAGE_LIMIT, MSG_TYPE, MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO, DEFAULT_ROOT_PARENTID } from '@/utils/constant';
 import { groupBy } from 'lodash';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import CommonTree from '@/components/CommonTree';
@@ -376,7 +376,7 @@ export default {
       allChatStack: [],
       // template中要用到的常量
       CONTACT_TYPE_INNER, CONTACT_TYPE_EXTERNAL,
-      MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO
+      MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO, DEFAULT_ROOT_PARENTID
     };
   },
   computed: {
@@ -528,21 +528,18 @@ export default {
       if (data.roomId) this.chat.receiveName = data.roomInfo.groupName;
       this.loadMessageList('');
     },
-    getTree() {
-      api.getTree().then(({
-        data
-      }) => {
-        this.treeData = this.handleTree(data);
-        let departmentIds = '';
-        data.map((item, index) => {
-          if (index !== 0) {
-            departmentIds = departmentIds + ',';
-          }
-          departmentIds = departmentIds + item.id;
-        });
-        // 根据部门id获取员工列表
-        this.getUserList(departmentIds);
+    async getTree() {
+      const data = await this.$store.dispatch('GetDepartmentList');
+      this.treeData = [...this.handleTree(data), ...this.$store.state.departmentInfo.otherUserList];
+      let departmentIds = '';
+      data.map((item, index) => {
+        if (index !== 0) {
+          departmentIds = departmentIds + ',';
+        }
+        departmentIds = departmentIds + item.id;
       });
+      // 根据部门id获取员工列表
+      this.getUserList(departmentIds);
     },
     // 加载内/外联系人或群聊列表
     loadContactList() {

@@ -177,3 +177,13 @@ export function syncUser() {
     url: serviceUser + '/synchWeUser'
   });
 }
+
+/**
+ * 不同可见范围的员工列表
+ */
+export function getDeparmentAndOtherList(params) {
+  return request({
+    url: service + '/organization',
+    params
+  });
+}

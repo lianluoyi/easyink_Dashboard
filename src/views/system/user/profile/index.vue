@@ -23,8 +23,6 @@ import userInfo from './userInfo';
 import resetPwd from './resetPwd';
 import { getUserProfile } from '@/api/system/user';
 import { getUser } from '@/api/system/staff';
-import { getTree } from '@/api/organization';
-
 export default {
   name: 'Profile',
   components: { userAvatar, userInfo, resetPwd },
@@ -68,10 +66,9 @@ export default {
         });
       }
     },
-    getDept() {
-      getTree().then(({ data }) => {
-        this.deptList = data;
-      });
+    async getDept() {
+      const data = await this.$store.dispatch('GetDepartmentList');
+      this.deptList = data;
     }
   }
 };

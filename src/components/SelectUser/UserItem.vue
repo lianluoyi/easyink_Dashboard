@@ -1,7 +1,7 @@
 <!--
  * @Description: 员工弹窗中 员工列表的单个节点样式布局
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="user-item-div">
@@ -77,6 +77,13 @@ export default {
     departmentIdKey: {
       type: String,
       default: 'id'
+    },
+    /**
+     * 是否显示根部门
+     */
+    isShowMainDep: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -141,10 +148,18 @@ export default {
      */
     showMore() {
       if (this.loading) return;
-      this.loading = true;
-      this.$emit('handleUpdateKeyChildren', this.data.mainDepartment, this.node?.parent?.data?.key, { lastId: this.data?.lastId, lastIndex: this.data?.lastIndex }, () => {
-        this.loading = false;
-      });
+      //  || this.node.data.mainDepartment添加这个条件 防止在部门下员工列表查看更多的时候不走该逻辑
+      if (this.isShowMainDep || this.node.data.mainDepartment) {
+        this.loading = true;
+        this.$emit('handleUpdateKeyChildren', this.data.mainDepartment, this.node?.parent?.data?.key, { lastId: this.data?.lastId, lastIndex: this.data?.lastIndex }, () => {
+          this.loading = false;
+        });
+      } else {
+        this.loading = true;
+        this.$emit('getOtherUserList', () => {
+          this.loading = false;
+        });
+      }
     },
     /**
      * TODO

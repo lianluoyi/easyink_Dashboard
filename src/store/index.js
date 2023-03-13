@@ -11,7 +11,7 @@ import customerProperty from './modules/customerPropertyList';
 import listInfo from './modules/listInfo';
 import requestButton from './modules/requestButton';
 import secretKey from './modules/secretKey';
-
+import departmentInfo from './modules/departmentInfo';
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
@@ -25,7 +25,8 @@ const store = new Vuex.Store({
     customerProperty,
     listInfo,
     requestButton,
-    secretKey
+    secretKey,
+    departmentInfo
   },
   getters
 });

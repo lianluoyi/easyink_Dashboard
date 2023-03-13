@@ -77,3 +77,16 @@ export function sendCaptcha(params) {
     params
   });
 }
+
+/**
+ * 获取员工隐私信息
+ * @param {*} params
+ * @returns
+ */
+export function getDepartMemberInfo(params) {
+  return request({
+    url: service + '/getDepartMemberInfo',
+    method: 'get',
+    params
+  });
+}

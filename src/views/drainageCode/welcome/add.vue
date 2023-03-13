@@ -418,7 +418,6 @@ export default {
     </div>
     <!-- 选择使用员工弹窗 -->
     <SelectUser
-      v-if="dialogVisibleSelectUser"
       :key="form.codeType"
       :visible.sync="dialogVisibleSelectUser"
       title="选择使用员工"

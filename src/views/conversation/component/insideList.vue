@@ -21,7 +21,7 @@
             <el-row style="padding: 10px">
               <span class="fl">
                 <img
-                  :src="item.receiveWeUser.avatarMediaid"
+                  :src="getHeadImgUrl(item.receiveWeUser.avatarMediaid)"
                 ></span>
               <span class="fl" style="margin-left: 10px">
                 <p>{{ item.receiveWeUser.name }}</p>
@@ -37,6 +37,7 @@
 </template>
 <script>
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
+import { getHeadImgUrl } from '@/utils/common';
 import { dealTime } from '@/utils';
 export default {
   components: { EmptyDefaultIcon },
@@ -87,6 +88,7 @@ export default {
     dealTime(time) {
       return dealTime(time);
     },
+    getHeadImgUrl,
     // 输入框值改变时
     input(value) {
       // 当输入框值变为空的时候

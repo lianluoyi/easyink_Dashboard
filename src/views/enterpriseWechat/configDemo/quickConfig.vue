@@ -97,6 +97,9 @@ export default {
        * 抽屉显示状态更改
        */
     extraDrawer(val) {
+      if (val) {
+        this.reGetQrcode();
+      }
       this.checkTimeStart = val;
     }
   },
@@ -244,6 +247,9 @@ export default {
     reGetQrcode() {
       this.qrcodeUrl = '';
       this.scanLoginError = false;
+      this.needCode = false;
+      this.tlKey = '';
+      this.qrcodeUrl = '';
       this.checkTimeStart = true;
       this.timerCount = TIMER_COUNT;
       this.getQrcode();

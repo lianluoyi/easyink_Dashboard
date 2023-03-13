@@ -1,7 +1,7 @@
 <!--
  * @Description: 在职继承
  * @Author: 佚名
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div>
@@ -172,6 +172,7 @@
       is-sigle-select
       :visible="selectUserType === 'query'"
       title="选择查询员工"
+      :selected-user-list="queryUser"
       @click="selectUserType = 'query'"
       @success="submitSelectUser"
       @close="selectUserType = ''"

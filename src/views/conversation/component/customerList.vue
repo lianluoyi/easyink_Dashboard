@@ -11,7 +11,7 @@
       <div v-if="personList.length>=1" style="margin-top:45px">
         <ul class="customer-list">
           <li v-for="(item,index) in list" :key="index" :class="{'liActive': index == personIndex}" @click="liClick(item, index)">
-            <div class="img-div"><img :src="item.receiveWeUser && item.receiveWeUser.avatarMediaid"></div>
+            <div class="img-div"><img :src="getHeadImgUrl(item.receiveWeUser && item.receiveWeUser.avatarMediaid)"></div>
             <div class="info-div">
               <p>{{ item.receiveWeUser && item.receiveWeUser.name }} <span class="fr gray">{{ item.finalChatContext ? parseTime(item.finalChatContext.msgtime) : '' }}</span></p>
               <p v-if="item.finalChatContext && item.finalChatContext.text" class="gray padt10 toe">{{ item.finalChatContext ? item.finalChatContext.text.content : '' }}</p>
@@ -25,6 +25,7 @@
 </template>
 <script>
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
+import { getHeadImgUrl } from '@/utils/common';
 export default {
   components: { EmptyDefaultIcon },
   props: {
@@ -59,6 +60,7 @@ export default {
     }
   },
   methods: {
+    getHeadImgUrl,
     // 输入框值改变时
     input(value) {
       // 当输入框值变为空的时候

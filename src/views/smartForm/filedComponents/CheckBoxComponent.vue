@@ -119,6 +119,7 @@ export default {
   mounted() {
     // 在组件挂载的时候将值传回去给预览组件
     this.filedForm = { ...this.filedForm, ...this.component };
+    this.setSelectOptionsNums();
   },
   methods: {
     initFiledForm() {

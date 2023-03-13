@@ -30,7 +30,6 @@
 <script>
 import { INTELLIGENT_FORM_TYPE } from '@/utils/constant';
 import IntelligentFormContent from './intelligentFormContent.vue';
-import { getTree } from '@/api/organization';
 import { getUserInfo } from '@/api/system/staff';
 import SelectTree from '@/components/SelectTree';
 import store from '@/store';
@@ -98,7 +97,7 @@ export default {
      * @return {*}
      */
     async getDepartmentTree() {
-      const { data } = await getTree({});
+      const data = await this.$store.dispatch('GetOrUpdateDepartmentList');
       const departmentId = this.getDepartmentId();
       const index = data?.findIndex(item => item.id === departmentId);
       let newData = data;

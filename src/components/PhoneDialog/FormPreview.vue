@@ -31,7 +31,7 @@
       <!-- 表单预览 -->
       <el-form label-position="top" label-width="80px" style="min-height:240px">
         <div
-          v-for="(item, index) in prewievForm"
+          v-for="item in prewievForm"
           :key="item.id"
           class="form-preview-item"
           :style="!isImageOrCarousel(item.type) ? 'padding : 5px 10px' : 'margin-top:10px'"
@@ -40,10 +40,10 @@
             <!-- 标题 -->
             <div v-if="showTitle(item.type)" slot="label" class="form-label">
               <span v-if="item.type === ONE_LINE_TEXT_COMPONENT || item.type === MANY_LINE_TEXT_COMPONENT">
-                <span :class="item.required ? 'required' : ''">{{ formSetValue.showSortFlag ? `${getSortIndex(item,index)}. ${item.title}` : item.title }}</span>
+                <span :class="item.required ? 'required' : ''">{{ formSetValue.showSortFlag ? `${getSortIndex(item)}. ${item.title}` : item.title }}</span>
                 <span v-if="item.valueLimitType === TEXT_LENGTH_TYPE && item.max" class="label-limit">{{ `(${(item.answer && item.answer.length) || 0}/${item.max})` }}</span>
               </span>
-              <span v-else :class="item.required ? 'required' : ''">{{ formSetValue.showSortFlag ? `${getSortIndex(item,index)}. ${item.title}` : item.title }}</span>
+              <span v-else :class="item.required ? 'required' : ''">{{ formSetValue.showSortFlag ? `${getSortIndex(item)}. ${item.title}` : item.title }}</span>
             </div>
             <!-- 单选 -->
             <div v-if="item.type === RADIO_COMPONENT" :key="item.id" class="radio-component">
@@ -55,7 +55,7 @@
             </div>
             <!-- 多选 -->
             <div v-if="item.type === CHECKBOX_COMPONENT" :key="item.id" class="checkBox-component">
-              <el-checkbox-group v-model="item.answer">
+              <el-checkbox-group v-model="item.answer" @change="(e) => checkBoxChange(e, item)">
                 <el-checkbox v-for="checkBox in item.options" :key="checkBox.id" :label="checkBox">
                   {{ checkBox.label }}
                 </el-checkbox>
@@ -296,10 +296,12 @@ export default {
     showTitle(type) {
       return ![TEXT_COMPONENT, IMAGE_COMPONENT, CAROUSEL_COMPONENT].includes(type);
     },
+
     // 是否是图片或者轮播图
     isImageOrCarousel(type) {
       return [IMAGE_COMPONENT, CAROUSEL_COMPONENT].includes(type);
     },
+
     /**
      * @description 选择NPS分数
      * @param 当前的控件
@@ -311,6 +313,7 @@ export default {
         answer: scoreItem
       });
     },
+
     /**
      * @description 校验当前题目设置的条件
      * @param arr 当前题目详情
@@ -449,24 +452,27 @@ export default {
       });
       return balidationFailedArr;
     },
+
     /**
      * @description 获取评分组件辅助文字
      * @param 评分组件辅助文字数组
      * @param answer 当前选择的星星数量
      */
-    getAuxiliaryText(auxiliaryTextOptions = [], answer) {
-      const textObj = find(auxiliaryTextOptions, { scoreType: answer });
+    getAuxiliaryText(auxiliaryTextOptions, answer) {
+      const textObj = find(auxiliaryTextOptions || [], { scoreType: answer });
       return textObj?.text;
     },
+
     /**
      * @description 获取序号
      */
-    getSortIndex(item) {
+    getSortIndex(componentItem) {
       // 过滤掉当前不需要显示序号的控件  TEXT_COMPONENT,IMAGE_COMPONENT, CAROUSEL_COMPONENT,
       const newArr = this.prewievForm.filter((item) => ![TEXT_COMPONENT, IMAGE_COMPONENT, CAROUSEL_COMPONENT].includes(item.type) && this.isShowComponent(item));
       // +1是因为从0开始的
-      return indexOf(newArr, item) + 1;
+      return indexOf(newArr, componentItem) + 1;
     },
+
     /**
      * @description 获取当前题目详情
      * @return {formResult} 根据不同类型的控件的数据转换成后续校验和提交表单的数据
@@ -541,14 +547,15 @@ export default {
         });
       return newArr;
     },
+
     /**
      * @description 多选框修改的回调
      * @param argItem 回调值，当前已经选择的项
-     * @param item 当前选择的控件
+     * @param chooseItem 当前选择的控件
      */
-    checkBoxChange(argItem, item) {
+    checkBoxChange(argItem, chooseItem) {
       // 根据设置的最多选择选项设置选项是否禁用
-      const { maxSelectNums, options } = item;
+      const { maxSelectNums, options } = chooseItem;
       // 当前选择的数量大于设置的maxSelectNums值时，在options过滤掉当前选择的选项，其他禁用
       const selectArr = argItem.map((selectItem) => {
         return JSON.parse(selectItem).id;
@@ -560,6 +567,7 @@ export default {
           selectArr.indexOf(item.id) === -1;
       });
     },
+
     /**
      * @description 根据当前组件设置的显示条件判断是否显示
      * @param item 当前控件
@@ -615,7 +623,7 @@ export default {
             }
           });
           ruleItem.canShow = !ruleItemAnswer.filter(
-            (arg) => arg.meetCondition === false
+            (arg) => !arg.meetCondition
           ).length;
         }
       });

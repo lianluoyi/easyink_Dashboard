@@ -1,7 +1,7 @@
 <!--
  * @Description: 员工以及客户表格内的展示
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="user-wrap">
@@ -11,7 +11,7 @@
     <div v-if="isStaff" class="user-textinfo">
       <div class="name oneline">{{ userName }}</div>
       <div class="department oneline">
-        {{ companName + '/' + data.departmentName }}
+        {{ companName }}{{ companName && data.departmentName && '/' }}{{ data.departmentName }}
       </div>
     </div>
     <div v-else class="user-name intwoline">

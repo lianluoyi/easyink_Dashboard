@@ -6,7 +6,6 @@ import {
   downloadBatch,
   download
 } from '@/api/drainageCode/staff';
-import SelectUser from '@/components/SelectUser/index.vue';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT, STAFF_CODE_TYPE } from '@/utils/constant';
@@ -15,7 +14,7 @@ import ListUserShow from '@/components/ListUserShow';
 
 export default {
   name: 'CodeStaff',
-  components: { SelectUser, EmptyDefaultIcon, RightContainer, ListUserShow },
+  components: { EmptyDefaultIcon, RightContainer, ListUserShow },
   data() {
     return {
       // 查询参数
@@ -31,7 +30,6 @@ export default {
       },
       // 日期范围
       dateRange: [],
-      dialogVisible: false,
       // 遮罩层
       loading: false,
       // 选中数组
@@ -390,12 +388,6 @@ export default {
         />
       </template>
     </RightContainer>
-    <!-- 批量新建弹窗 -->
-    <SelectUser
-      :visible.sync="dialogVisible"
-      title="组织架构"
-      @success="selectedUser"
-    />
   </div>
 </template>
 

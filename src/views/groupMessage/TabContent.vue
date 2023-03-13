@@ -11,7 +11,7 @@ import {
 } from '@/utils/constant';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
-
+import { getHeadImgUrl } from '@/utils/common';
 const MAX_SEND_TARGET_NUM = 5;
 export default {
   components: { RightContainer, EmptyDefaultIcon },
@@ -65,6 +65,7 @@ export default {
   },
   mounted() {},
   methods: {
+    getHeadImgUrl,
     /** 查询 */
     getList(page) {
       page && (this.query.pageNum = page);
@@ -102,8 +103,9 @@ export default {
       });
     },
     getSendTargets(pushResult) {
-      return pushResult.customers.split('、').length > MAX_SEND_TARGET_NUM
-        ? pushResult.customers.split('、').slice(0, MAX_SEND_TARGET_NUM).join('、') + '等' + pushResult.customers.split('、').length + (this.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER ? '人' : '个')
+      const customerList = pushResult.customers.split('、');
+      return customerList.length > MAX_SEND_TARGET_NUM
+        ? customerList.slice(0, MAX_SEND_TARGET_NUM).join('、') + '等' + customerList.length + (this.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER ? '人' : '个')
         : pushResult.customers;
     },
     getUserHeadImg(userId) {
@@ -161,7 +163,7 @@ export default {
           <el-table-column v-if="type === GROUP_MESSAGE_SEND_STATUS_UNEXEC" label="员工" align="center" prop="userName">
             <template slot-scope="scope">
               <div class="user-info">
-                <img :src="scope.row.headImageUrl">
+                <img :src="getHeadImgUrl(scope.row.headImageUrl)">
                 <span>{{ scope.row.userName }}</span>
               </div>
             </template>
