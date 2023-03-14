@@ -17,7 +17,6 @@
       <span v-if="!isAgainGetCode" class="code-time">{{ codeTime }}s后可重新获取</span>
       <el-button v-else type="text" class="code-time" @click="againGetCode">重新获取</el-button>
     </div>
-    <!-- <el-button @click="closeTime">关闭定时器</el-button> -->
     <RequestButton
       button-type="validate"
       :request-method="validate"

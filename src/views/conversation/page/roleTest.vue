@@ -125,8 +125,6 @@ import chat from '../component/chatItem.vue';
 import { dealAtInfo } from '@/utils/common';
 import { PAGE_LIMIT, CORP_TYPE } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
-import * as api from '@/api/organization';
-
 export default {
   components: { RightContainer, chat, EmptyDefaultIcon },
   data() {
@@ -182,17 +180,15 @@ export default {
     this.getDepartmentList();
   },
   methods: {
-    getDepartmentList() {
-      api.getTree().then((res) => {
-        const data = res.data;
-        const departmentList = {};
-        if (data.length > 0) {
-          for (let i = 0; i < data.length; i++) {
-            departmentList[data[i].id] = data[i];
-          }
+    async getDepartmentList() {
+      const data = await this.$store.dispatch('GetDepartmentList');
+      const departmentList = {};
+      if (data.length > 0) {
+        for (let i = 0; i < data.length; i++) {
+          departmentList[data[i].id] = data[i];
         }
-        this.departmentList = departmentList;
-      });
+      }
+      this.departmentList = departmentList;
     },
     defImg(event) {
       const img = event.srcElement;

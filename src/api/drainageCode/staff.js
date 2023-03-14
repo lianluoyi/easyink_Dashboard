@@ -165,6 +165,17 @@ export function getTimeRangeAnalyseCount(params) {
   });
 }
 /**
+ * 导出员工活码详情
+ * @param {*} params
+ */
+export function exportTimeRangeAnalyseCount(params) {
+  return request({
+    url: service + '/exportTimeRangeAnalyseCount',
+    params
+  });
+}
+
+/**
  * 获取员工活码的使用员工数据
  * @param {*} params
  */

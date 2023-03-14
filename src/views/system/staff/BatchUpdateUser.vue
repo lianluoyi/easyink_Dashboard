@@ -1,7 +1,7 @@
 <!--
  * @Description: 批量修改员工
  * @Author: 佚名
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <el-dialog v-bind="$attrs" width="500px" custom-class="dialog" @close="$emit('update:visible', false)">
@@ -74,12 +74,10 @@
 <script>
 import { download } from '@/utils/download';
 import { listRole } from '@/api/system/role';
-import { getTree } from '@/api/organization';
 
 const ROLE_TYPE = 1;
 const POSITION_TYPE = 2;
 const DEPARTMENT_TYPE = 3;
-
 export default {
   name: '',
   components: {},
@@ -143,17 +141,17 @@ export default {
       this.form = {};
     }
   },
-  created() {
+  async created() {
     // 获取角色列表
     listRole().then(res => { this.roleData = res.rows; });
     // 获取部门数据
-    getTree().then(({ data }) => {
-      const scopeDeptList = data.filter(ele => ele.enable);
-      this.treeData = this.handleTree(scopeDeptList);
-    }).catch(() => {
+    try {
+      const data = await this.$store.dispatch('GetDepartmentList');
+      this.treeData = this.handleTree(data || []);
+    } catch (error) {
       this.scopeDeptList = [];
       this.treeData = [];
-    });
+    }
   },
   methods: {
     submit() {

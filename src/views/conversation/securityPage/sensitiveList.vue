@@ -112,6 +112,7 @@
             :visible.sync="dialogVisibleSelectUser"
             title="选择添加人"
             :is-sigle-select="true"
+            :selected-user-list="queryUser"
             @success="selectedUser"
           />
         </template>
@@ -131,7 +132,6 @@ import setSensitiveWord from './setSensitiveWord';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { dealAtInfo } from '@/utils/common';
-import * as api from '@/api/organization';
 export default {
   components: {
     SelectUser,
@@ -191,17 +191,15 @@ export default {
     this.getDepartmentList();
   },
   methods: {
-    getDepartmentList() {
-      api.getTree().then((res) => {
-        const data = res.data;
-        const departmentList = {};
-        if (data.length > 0) {
-          for (let i = 0; i < data.length; i++) {
-            departmentList[data[i].id] = data[i];
-          }
+    async getDepartmentList() {
+      const data = await this.$store.dispatch('GetDepartmentList');
+      const departmentList = {};
+      if (data.length > 0) {
+        for (let i = 0; i < data.length; i++) {
+          departmentList[data[i].id] = data[i];
         }
-        this.departmentList = departmentList;
-      });
+      }
+      this.departmentList = departmentList;
     },
     /**
      * @description: 获取异常消息列表

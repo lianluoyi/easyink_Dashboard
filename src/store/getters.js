@@ -19,6 +19,7 @@ const getters = {
   userList: state => state.listInfo.userList,
   tagList: state => state.listInfo.tagList,
   groupTagList: state => state.listInfo.groupTagList,
-  customerProperList: state => state.customerProperty.customerProperList
+  customerProperList: state => state.customerProperty.customerProperList,
+  departmentList: state => state.departmentInfo.departmentList
 };
 export default getters;

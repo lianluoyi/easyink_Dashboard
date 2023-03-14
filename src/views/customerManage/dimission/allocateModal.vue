@@ -1,7 +1,7 @@
 <!--
  * @Description: 选择离职继承分配的员工弹窗
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <script>
 import { allocateUser } from '@/api/customer/dimission';
@@ -114,6 +114,7 @@ export default {
 
 <template>
   <SelectUser
+    v-if="Pvisible"
     :visible.sync="Pvisible"
     title="选择分配人"
     :is-sigle-select="true"

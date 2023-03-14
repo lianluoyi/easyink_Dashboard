@@ -280,7 +280,7 @@ export const GET_INFO_ERROR = 'GET_INFO_ERROR';
 // 企业配置完成通知
 export const ENTERPRISE_CONFIG_TIP = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;企业完成配置后，系统会为员工初始化系统角色，不同角色有不同的操作权限（详情见【角色管理】），可根据企业自身情况在【员工管理】中为员工选择合适的角色。';
 
-export const DEFAULT_AVATAR = require('@/assets/image/default-avatar.svg');
+export const DEFAULT_AVATAR = require('@/assets/image/card-avatar.svg');
 
 // 客户类型
 // 微信客户
@@ -800,6 +800,9 @@ export const MULTIPLE_TYPE = 3;
 export const UPLOAD_ONE_TYPE = 4;
 /** 字数 */
 export const TEXT_LENGTH_TYPE = 2;
-//
+
 /** 表单默认头图 */
 export const FORM_DEFAULT_HEAD_IMAGE_URL = 'https://wecomsaas-1253559996.cos.ap-guangzhou.myqcloud.com/2023/02/09/数据时代.png';
+
+/** 根部门父Id */
+export const DEFAULT_ROOT_PARENTID = '0';

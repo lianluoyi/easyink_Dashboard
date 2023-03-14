@@ -364,6 +364,7 @@ export default {
       <SelectUser
         :visible.sync="dialogVisibleSelectUser"
         title="选择添加人"
+        :selected-user-list="queryUser"
         @success="selectedUser"
       />
     </template>

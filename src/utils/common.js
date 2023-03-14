@@ -744,6 +744,15 @@ export const changeButtonLoading = (store, type) => {
 };
 
 /**
+ * @description: 获取头像链接
+ * @param {*} url
+ * @return {*}
+ */
+export const getHeadImgUrl = (url) => {
+  return url || require('@/assets/image/card-avatar.svg');
+};
+
+/**
  * 通过传入符号分割字符串
  * @param {*} str
  * @param {*} sign 通过某符号进行分割，默认采用空格

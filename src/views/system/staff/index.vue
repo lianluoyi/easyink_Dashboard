@@ -14,10 +14,10 @@ import AddMemberTip from './AddMemberTip';
 import BatchUpdateUser from './BatchUpdateUser';
 import { getFMdate, changeButtonLoading } from '@/utils/common';
 import RequestButton from '@/components/Button/RequestButton.vue';
+import SyncMemberInfo from './SyncMemberInfo.vue';
 const EMAIL_LENGTH = 200;
 const EXPIRATION_NUMBER = 7;
 const WAIT_TIME = 8000;
-
 const defaultUpdateUserRes = {
   successCount: 0,
   failCount: 0,
@@ -34,7 +34,8 @@ export default {
     InviteForm,
     AddMemberTip,
     BatchUpdateUser,
-    RequestButton
+    RequestButton,
+    SyncMemberInfo
   },
   props: {},
 
@@ -154,7 +155,8 @@ export default {
       updateUserVisible: false,
       updateUserLoading: false,
       // 批量修改的响应参数
-      updateUserRes: { ...defaultUpdateUserRes }
+      updateUserRes: { ...defaultUpdateUserRes },
+      SyncMemberInfoDrawerVisible: false
     };
   },
   computed: {
@@ -181,22 +183,20 @@ export default {
         this.roleOptions = response.rows;
       });
     },
-    getTree() {
-      api
-        .getTree()
-        .then(({ data }) => {
-          this.scopeDeptList = data;
-          this.treeData = this.handleTree(this.scopeDeptList);
-          this.treeMap = this.getDeptMap(data);
-          this.query.departments = '';
-          this.getList();
-        })
-        .catch(() => {
-          this.scopeDeptList = [];
-          this.treeData = [];
-          this.treeMap = {};
-          this.query.departments = [];
-        });
+    async getTree() {
+      try {
+        const data = await this.$store.dispatch('GetOrUpdateDepartmentList');
+        this.scopeDeptList = data;
+        this.treeData = this.handleTree(this.scopeDeptList);
+        this.treeMap = this.getDeptMap(data);
+        this.query.departments = '';
+        this.getList();
+      } catch (error) {
+        this.scopeDeptList = [];
+        this.treeData = [];
+        this.treeMap = {};
+        this.query.departments = [];
+      }
     },
     getDeptMap(deptOption) {
       const map = {};
@@ -393,7 +393,7 @@ export default {
       this.addMemberFailDrawerVisible = true;
       this.addMemberFailDrawerActive = type;
     },
-    handleCloseAddMemberFailDrawer(done) {
+    handleCloseDrawer(done) {
       done();
     },
     download() {
@@ -575,6 +575,15 @@ export default {
               </div>
             </template>
             <template v-slot:operate-btn>
+              <el-button
+                type="text"
+                size="medium"
+                style="color: rgba(153, 153, 153, 100)"
+                @click="SyncMemberInfoDrawerVisible = true"
+              >
+                员工头像不显示？
+              </el-button>
+              <div class="divider" />
               <el-button
                 v-if="!isDKCorp"
                 type="text"
@@ -892,12 +901,27 @@ export default {
         title="成员加入失败"
         :visible.sync="addMemberFailDrawerVisible"
         :direction="direction"
-        :before-close="handleCloseAddMemberFailDrawer"
+        :before-close="handleCloseDrawer"
         :append-to-body="true"
         size="780px"
       >
         <AddMemberTip :type="addMemberFailDrawerActive" />
       </el-drawer>
+
+      <!-- 同步成员信息 -->
+      <el-drawer
+        class="extra-drawer-div"
+        title="同步成员信息"
+        :visible.sync="SyncMemberInfoDrawerVisible"
+        :before-close="handleCloseDrawer"
+        :close-on-press-escape="false"
+        :wrapper-closable="false"
+        :append-to-body="true"
+        size="780px"
+      >
+        <SyncMemberInfo :extra-drawer="SyncMemberInfoDrawerVisible" @closeDrawer="SyncMemberInfoDrawerVisible = false" @getList="getList" />
+      </el-drawer>
+
       <BatchUpdateUser
         title="批量修改信息"
         :visible.sync="updateUserVisible"
@@ -1093,5 +1117,33 @@ export default {
 }
 /deep/ .el-textarea .el-textarea__inner {
   padding-right: 45px;
+}
+.divider {
+  margin: 0 10px;
+  border: 1px solid #BBBBBB;
+  height: 18px;
+  display: inline-block;
+  margin-bottom: -4px;
+}
+.drawer-div, .extra-drawer-div {
+  /deep/ .el-drawer__container {
+    .el-drawer {
+      width: 780px !important;
+      .el-drawer__header {
+        >span {
+          font-size: 20px;
+          color: #333;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  /deep/ .el-drawer__header {
+    margin-bottom: 15px;
+  }
+  /deep/ .el-drawer__body {
+    padding: 0 20px;
+    height: calc(100% - 43px);
+  }
 }
 </style>

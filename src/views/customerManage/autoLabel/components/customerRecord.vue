@@ -431,6 +431,7 @@ export default {
       <SelectUser
         :visible.sync="dialogVisibleSelectUser"
         title="选择添加人"
+        :selected-user-list="selectUserList"
         @success="selectedUser"
       />
       <div class="trigger-detail">

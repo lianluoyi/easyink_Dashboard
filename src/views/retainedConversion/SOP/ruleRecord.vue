@@ -1,7 +1,7 @@
 <!--
  * @Description: 规则执行记录
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="rule-record">
@@ -73,7 +73,7 @@
           <template slot-scope="scope">
             <div class="flex user-info-div">
               <div class="user-img">
-                <el-image :src="scope.row.headImageUrl" style="width: 35px; height: 35px;">
+                <el-image :src="getHeadImgUrl(scope.row.headImageUrl)" style="width: 35px; height: 35px;">
                   <div slot="error" class="image-slot">
                     <i class="iconfont icon-unknown-gender" style="font-size: 35px;vertical-align: text-top;" />
                   </div>
@@ -194,7 +194,7 @@ import RemindPerform from '../components/RemindPerform.vue';
 import PerformRecordModal from './performRecordModal.vue';
 import CyclePerformRecordModal from './cyclePerformRecordModal.vue';
 import CalendarPerformRecordModal from './calendarPerformRecordModal.vue';
-
+import { getHeadImgUrl } from '@/utils/common';
 export default {
   name: '',
   components: { EmptyDefaultIcon, RemindPerform, PerformRecordModal, CyclePerformRecordModal, CalendarPerformRecordModal },
@@ -265,6 +265,7 @@ export default {
     this.dealGetList(1);
   },
   methods: {
+    getHeadImgUrl,
     dealGetList(pageNum) {
       const type = this.type;
       switch (type) {

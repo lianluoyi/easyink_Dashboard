@@ -1,7 +1,7 @@
 <!--
  * @Description: 朋友圈发布记录详情列表
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <script>
 import { sendToUser, refreshMomentTask } from '@/api/friends.js';
@@ -11,6 +11,7 @@ import {
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { listOfMomentPublishDetail } from '@/api/friends';
+import { getHeadImgUrl } from '@/utils/common';
 const MAX_SEND_TARGET_NUM = 5;
 // 待发布
 const RELEASED = 0;
@@ -70,6 +71,7 @@ export default {
   },
   mounted() {},
   methods: {
+    getHeadImgUrl,
     // 查询
     listOfMomentPublishDetail(page) {
       page && (this.query.pageNum = page);
@@ -177,7 +179,7 @@ export default {
           <el-table-column class="trest1" label="员工" align="center" prop="userName">
             <template slot-scope="scope">
               <div class="user-info">
-                <img :src="scope.row.headImageUrl">
+                <img :src="getHeadImgUrl(scope.row.headImageUrl)">
                 <span>{{ scope.row.userName }}</span>
               </div>
             </template>

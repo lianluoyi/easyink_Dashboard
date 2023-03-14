@@ -133,7 +133,7 @@
       title="选择审计人"
       is-sigle-select
       :ignore-permission="true"
-      :select-user-list="auditUser"
+      :selected-user-list="auditUser"
       @success="selectedAuditUser"
     />
   </div>
