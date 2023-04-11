@@ -1,15 +1,27 @@
 <template>
   <transition name="fade-transform" mode="out-in">
-    <router-view :key="key" class="page app-main" />
+    <keep-alive v-if="isKeep">
+      <router-view v-if="$route.meta.keepAlive" :key="key" class="page app-main" />
+      <router-view v-else :key="key + new Date().getTime()" />
+    </keep-alive>
+    <router-view v-else :key="key" class="page app-main" />
   </transition>
 </template>
 
 <script>
+import { CUSTOMER_PATH, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+
 export default {
   name: 'AppMain',
   computed: {
     key() {
       return this.$route.path;
+    },
+    /**
+     * 从详情页返回客户页时,使用keep-alive保留查询条件和页码
+     */
+    isKeep() {
+      return this.$route.path === CUSTOMER_DEATIL_PATH || this.$route.path === CUSTOMER_PATH;
     }
   }
 };

@@ -1,7 +1,7 @@
 <!--
  * @Description: 获取小程序appid教程
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <script>
 import { WX_PAAS_URL } from '@/utils/constant';
@@ -70,7 +70,7 @@ export default {
         </div>
       </el-tab-pane>
       <el-tab-pane label="微信公众平台获取">
-        <div class="main-title">在微信公众平台获取AppID</div>
+        <div class="main-title">在微信公众平台获取原始ID和AppID</div>
         <div>
           <div class="content">1. 前往
             <el-link type="primary" :href="WX_PAAS_URL" target="_blank">微信公众平台</el-link>
@@ -82,19 +82,16 @@ export default {
           />
         </div>
         <div>
-          <div class="content">2. 登录之后,点击左侧的"开发管理"==>点击"开发设置"</div>
+          <div class="content">2. 登录之后,点击左侧的"设置"==>点击"基础设置"，复制账号信息下的原始ID和AppID</div>
           <el-image
             class="part-img"
-            :src="require('@/assets/example/demo/appid-demo-2-2.svg')"
-            :preview-src-list="[require('@/assets/example/demo/appid-demo-2-2.svg')]"
+            :src="require('@/assets/example/demo/appid-demo-2-2.png')"
+            :preview-src-list="[require('@/assets/example/demo/appid-demo-2-2.png')]"
           />
-        </div>
-        <div>
-          <div class="content">3. 复制小程序的AppID</div>
         </div>
       </el-tab-pane>
       <el-tab-pane label="微信客户端获取">
-        <div class="main-title">在微信客户端获取AppID</div>
+        <div class="main-title">在微信客户端获取原始ID和AppID</div>
         <div>
           <div class="content">1. 在微信客户端进入某个小程序，如图所示，点击右上角“···”，在弹出的菜单中，点击小程序的详情按钮</div>
           <el-image
@@ -112,11 +109,12 @@ export default {
           />
         </div>
         <div>
-          <div class="content">3. 在“更多资料”页面中，找到AppID，长按并复制</div>
+          <div class="content">3. 在“更多资料”页面中，找到账号ID和AppID，长按并复制</div>
           <el-image
             class="part-img"
-            :src="require('@/assets/example/demo/appid-demo-3-3.svg')"
-            :preview-src-list="[require('@/assets/example/demo/appid-demo-3-3.svg')]"
+            style="width:250px;border:1px solid #ccc"
+            :src="require('@/assets/example/demo/appid-demo-3-3.jpeg')"
+            :preview-src-list="[require('@/assets/example/demo/appid-demo-3-3.jpeg')]"
           />
         </div>
       </el-tab-pane>

@@ -136,7 +136,7 @@
           <el-input v-model="searchForm.customerName" clearable style="width:240px" class="ml10 mr10" placeholder="请输入客户名称" />
           <el-select v-model="searchForm.channelType" clearable style="width:240px;" placeholder="请选择点击渠道">
             <el-option
-              v-for="item in channelTypeOptions"
+              v-for="item in getChannelTypeOptions()"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -291,13 +291,35 @@ const CLICK_RECORD = {
 const CLICK_TIME = 1;
 // 提交时间
 const SUBMIT_TIME = 2;
+
 /** 侧边栏-智能表单 4: */
 const CHANNEL_SIDEBAR = 4;
 /** 推广 11*/
 const CHANNEL_EXTENSION = 11;
+/** 员工活码 */
+const CHANNEL_EMPLE_CODE = 1;
+/** 群发 */
+const CHANNEL_GROUP_SEND = 3;
+/** 欢迎语 */
+const CHANNEL_WELCOME_MSG = 5;
+/** 客户SOP */
+const CHANNEL_CUSTOMER_SOP = 6;
+/** 群SOP */
+const CHANNEL_GROUP_SOP = 7;
+/** 新客进群 */
+const CHANNEL_NEW_IN_GROUP = 8;
+/** 群日历 */
+const CHANNEL_GROUP_CALENDAR = 9;
 const CLICK_CHANNEL = {
   [CHANNEL_SIDEBAR]: '侧边栏',
-  [CHANNEL_EXTENSION]: '推广'
+  [CHANNEL_EXTENSION]: '推广',
+  [CHANNEL_EMPLE_CODE]: '员工活码',
+  [CHANNEL_GROUP_SEND]: '群发',
+  [CHANNEL_WELCOME_MSG]: '欢迎语',
+  [CHANNEL_GROUP_SOP]: '群SOP',
+  [CHANNEL_NEW_IN_GROUP]: '新客进群',
+  [CHANNEL_GROUP_CALENDAR]: '群日历',
+  [CHANNEL_CUSTOMER_SOP]: '客户SOP'
 };
 const SUBMIT_NUMS = {
   [NOT_LIMIT]: '不限制次数',
@@ -341,16 +363,6 @@ export default {
         {
           value: SUBMIT_TIME,
           label: '提交时间' }
-      ]),
-      /** 渠道类型选项 */
-      channelTypeOptions: Object.freeze([
-        {
-          value: CHANNEL_SIDEBAR,
-          label: '侧边栏'
-        },
-        {
-          value: CHANNEL_EXTENSION,
-          label: '推广' }
       ]),
       FORVER_EFFECT,
       SUBMIT_NUMS,
@@ -436,6 +448,13 @@ export default {
     this.search();
   },
   methods: {
+    getChannelTypeOptions() {
+      const newArr = [];
+      Object.keys(CLICK_CHANNEL).forEach(item => {
+        newArr.push({ value: +item, label: CLICK_CHANNEL[item] });
+      });
+      return newArr;
+    },
     /**
      * 获取表单设置
      */

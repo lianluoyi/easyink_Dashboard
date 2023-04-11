@@ -5,6 +5,7 @@ import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
 const NOT_API_POWER = 48002;
 const INVALID_ACCOUNT_CODE = 48003;
+const ORDINARY_EMPLOYEES = '3';// 普通员工编号
 export default {
   name: 'InviteForm',
   components: { RequestButton },
@@ -84,7 +85,7 @@ export default {
         name: '', // 用户名称
         position: '', // 职务
         qqAccount: '', // QQ号
-        roleId: null, // 角色
+        roleId: ORDINARY_EMPLOYEES, // 角色
         userId: '' // 账号
       },
       rules: {
@@ -113,8 +114,14 @@ export default {
       }
     }
   },
-  created() {},
-  mounted() {},
+  watch: {
+    departmentData(val) {
+      // 如果存在根部门，则设置默认的所属部门为根部门
+      if (val.length === 1 && !this.form.mainDepartment) {
+        this.form.mainDepartment = val[0].id;
+      }
+    }
+  },
   methods: {
     handleAvatarSuccess() {},
     beforeAvatarUpload() {},
@@ -317,7 +324,9 @@ export default {
 
 <style lang="scss" scoped>
 @import '~@/styles/mixin.scss';
-
+/deep/.el-form-item:hover {
+  background: unset;
+}
 /deep/.el-alert__title {
   font-size: 12px;
 }

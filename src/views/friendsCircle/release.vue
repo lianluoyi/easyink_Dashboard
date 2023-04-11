@@ -473,7 +473,7 @@ export default {
               this.link.title = item.materialName;
               this.link.addressUrl = item.url || item.materialUrl;
               if (item.mediaType === Number(MEDIA_TYPE_RADARLINK)) {
-                this.link.radarId = item.radarId;
+                this.link.extraId = item.extraId;
               }
               return;
             }

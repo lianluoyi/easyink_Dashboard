@@ -1,7 +1,7 @@
 <!--
  * @Description: 特殊时段欢迎语
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: Xzz
 -->
 <template>
   <div class="special-step-page">
@@ -174,7 +174,7 @@ export default {
   created() {},
   mounted() {
     this.specialMaterialList = [...this.ruleItem.specialMaterialList];
-    this.timeStamp = [this.ruleItem.weekendBeginTime || '', this.ruleItem.weekendEndTime || ''];
+    this.timeStamp = [this.ruleItem.weekendBeginTime || '00:00:00', this.ruleItem.weekendEndTime || '23:59:59'];
   },
   methods: {
     /**

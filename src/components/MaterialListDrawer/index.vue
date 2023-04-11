@@ -11,12 +11,15 @@ import {
   MEDIA_TYPE_MINIAPP,
   MEDIA_TYPE,
   MEDIA_TYPE_RADARLINK,
-  RADAR_TYPE
+  RADAR_TYPE,
+  MEDIA_TYPE_SMARTFORM,
+  INTELLIGENT_FORM_TYPE
 } from '@/utils/constant';
 import { restoreMaterial, removeMaterial } from '@/api/material';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getCategoryList } from '@/utils/material';
-
+import { isOtherMaterialType, getUserDepartmentInfo } from '@/utils/common';
+import { getGroupTree, getAllFormGroup } from '@/api/form';
 /**
  * 素材列表抽屉
  */
@@ -115,6 +118,10 @@ export default {
       type: Object,
       default: () => {}
     },
+    otherQuery: {
+      type: Object,
+      default: () => {}
+    },
     // 雷达选项是否隐藏
     radarHidden: {
       type: Boolean,
@@ -134,7 +141,12 @@ export default {
       tagIdList: [],
       RADAR_TYPE,
       // 选中素材详情列表
-      selectedMaterialList: []
+      selectedMaterialList: [],
+      MEDIA_TYPE_SMARTFORM,
+      isOtherMaterialType,
+      belongGroupOptions: [
+        { id: 'corpFormGroup', name: '企业表单', children: [] }
+      ]
     };
   },
   computed: {
@@ -199,6 +211,14 @@ export default {
     materialType(val) {
       this.activeName = val;
       this.query.pageNum = 1;
+      this.radarQuery.pageNum = 1;
+      // 当选择素材切换到智能表单的时候
+      if (val === MEDIA_TYPE_SMARTFORM) {
+        // 最开始就定义好所属分组 不需要等待接口返回 默认为企业分组/默认分组
+        this.otherQuery.pageNum = 1;
+        this.otherQuery.belongGroup = ['corpFormGroup'];
+        this.getFormGoup();
+      }
       this.getList({
         mediaType: val
       });
@@ -210,6 +230,25 @@ export default {
     getCategoryList(this.$store);
   },
   methods: {
+    async getFormGoup() {
+      const depInfo = await getUserDepartmentInfo(this.$store);
+      if (!depInfo) {
+        // 当前登录用户为admin 只需要查询企业表单即可
+        getGroupTree({ sourceType: INTELLIGENT_FORM_TYPE['enterprise'], departmentId: '' }).then((res) => {
+          this.belongGroupOptions = [{ id: 'corpFormGroup', name: '企业表单', children: res.data }];
+        });
+      } else {
+        getAllFormGroup({ departmentId: depInfo.department[0] }).then((res) => {
+          const { corpFormGroup, departmentFormGroup, selfFormGroup } = res.data;
+          this.otherQuery.departmentId = depInfo.department[0];
+          this.belongGroupOptions = [
+            { id: 'corpFormGroup', name: '企业表单', children: corpFormGroup },
+            { id: 'departmentFormGroup', name: '部门表单', children: departmentFormGroup },
+            { id: 'selfFormGroup', name: '我的表单', children: selfFormGroup }
+          ];
+        });
+      }
+    },
     handleClose() {
       this.drawerVisible = false;
       this.tagIdList = [];
@@ -226,6 +265,10 @@ export default {
       this.radarQuery.type = '';
       this.radarQuery.pageNum = 1;
       this.radarQuery.searchTitle = '';
+      // TODO 考虑如何合并雷达和智能表单 后续添加其他类型不需要在重复定义搜索参数对象
+      this.otherQuery.pageNum = 1;
+      this.otherQuery.formName = '';
+      this.otherQuery.belongGroup = ['corpFormGroup'];
       this.onSearch();
     },
     /**
@@ -241,7 +284,9 @@ export default {
       this.query.mediaType = this.activeName;
     },
     onSearch() {
+      // 该处直接修改 父组件传递过来的radarQuery vue不会报错不能修改props是由于 没有直接修改radarQuery 而是修改了radarQuery的属性 其在内存中的地址并没有发生变化
       this.radarQuery.pageNum = 1;
+      this.otherQuery.pageNum = 1;
       this.getList({
         pageNum: 1,
         tagIds: this.tagIdList && this.tagIdList.join(','),
@@ -341,6 +386,19 @@ export default {
       this.drawerVisible = false;
       this.$emit('submit', this.selectedMaterialList);
       this.selectedMaterialList = [];
+    },
+    /**
+     * @description 获取分页参数
+     * @param type 当前素材类型
+     */
+    getPaginationQuery(type) {
+      if (type === MEDIA_TYPE_SMARTFORM) {
+        return this.otherQuery;
+      }
+      if (type === MEDIA_TYPE_RADARLINK) {
+        return this.radarQuery;
+      }
+      return this.query;
     }
   }
 };
@@ -371,6 +429,7 @@ export default {
           <el-radio-button :label="MEDIA_TYPE_MINIAPP" :disabled="moment">小程序</el-radio-button>
           <!-- 先注释朋友圈的雷达选项 -->
           <el-radio-button v-show="!moment && !radarHidden" :label="MEDIA_TYPE_RADARLINK" :disabled="moment && !chooseMaterial">雷达</el-radio-button>
+          <el-radio-button v-show="!moment && !radarHidden" :label="MEDIA_TYPE_SMARTFORM" :disabled="moment && !chooseMaterial">智能表单</el-radio-button>
         </el-radio-group>
         <div class="tab-right-btn">
           <slot name="tab-right-btn" />
@@ -378,11 +437,12 @@ export default {
       </div>
       <div class="search-container">
         <div class="search-item">
-          <el-input v-if="activeName!== MEDIA_TYPE_RADARLINK" v-model="query.search" placeholder="请输入素材标题" clearable style="width: 240px" />
-          <el-input v-else v-model="radarQuery.searchTitle" placeholder="输入雷达/链接标题" clearable style="width: 240px" />
+          <el-input v-if="!isOtherMaterialType(activeName)" v-model="query.search" placeholder="请输入素材标题" clearable style="width: 240px" />
+          <el-input v-else-if="activeName === MEDIA_TYPE_RADARLINK" v-model="radarQuery.searchTitle" placeholder="输入雷达/链接标题" clearable style="width: 240px" />
+          <el-input v-else v-model="otherQuery.formName" placeholder="输入表单名称" clearable style="width: 240px" />
         </div>
         <div class="search-item">
-          <div v-show="activeName!== MEDIA_TYPE_RADARLINK">
+          <div v-show="!isOtherMaterialType(activeName)">
             <el-select
               v-model="tagIdList"
               clearable
@@ -406,6 +466,15 @@ export default {
               <el-option v-for="(item, index) in radarSelect" :key="index" :label="item.name" :value="item.type" />
             </el-select>
           </div>
+          <div v-if="activeName === MEDIA_TYPE_SMARTFORM">
+            <el-cascader
+              v-model="otherQuery.belongGroup"
+              :options="belongGroupOptions"
+              :props="{ expandTrigger: 'hover', label: 'name', value: 'id',checkStrictly: true }"
+              placeholder="请选择表单所属分组"
+              style="width:240px"
+            />
+          </div>
         </div>
         <el-button type="primary" @click="onSearch()">查询</el-button>
         <el-button class="btn-reset" @click="resetQuery()">重置</el-button>
@@ -415,9 +484,11 @@ export default {
           <div class="operate-container">
             <div class="data-stat">
               共 <span class="num theme-text-color">{{ total }}</span> 个{{ type === 'search' ? '过期的' : ''
-              }}{{ MEDIA_TYPE[activeName] }}素材
+              }}{{ MEDIA_TYPE[activeName] }}<span v-show="activeName!==MEDIA_TYPE_SMARTFORM">素材</span>
+              <!-- 智能表单隐藏了素材2字 -->
             </div>
-            <div v-if="activeName !== MEDIA_TYPE_RADARLINK" class="right-btn">
+            <!-- 雷达链接/智能表单隐藏新增按钮 -->
+            <div v-if="activeName !== MEDIA_TYPE_RADARLINK && activeName !== MEDIA_TYPE_SMARTFORM" class="right-btn">
               <slot name="right-btn" />
             </div>
           </div>
@@ -501,6 +572,18 @@ export default {
                   :desc-field="'digest'"
                   @getList="getList"
                 />
+                <FileItem
+                  v-if="activeName === MEDIA_TYPE_SMARTFORM"
+                  :key="index"
+                  :item="item"
+                  :type="MEDIA_TYPE_SMARTFORM"
+                  :show-expire-time="false"
+                  :selected-material-list="selectedMaterialList"
+                  :select-material="selectMaterial"
+                  :hide-status="type === 'search'"
+                  :desc-field="'digest'"
+                  @getList="getList"
+                />
               </template>
             </div>
           </empty-default-icon>
@@ -510,23 +593,13 @@ export default {
           :style="type === 'select' && total > 0 ? { justifyContent: 'space-between' } : { justifyContent: 'end' }"
         >
           <pagination
-            v-show="total > 0 && activeName !== MEDIA_TYPE_RADARLINK"
+            v-if="total > 0"
             :total="total"
-            :page.sync="query.pageNum"
-            :limit.sync="query.pageSize"
+            :page.sync="getPaginationQuery(activeName).pageNum"
+            :limit.sync="getPaginationQuery(activeName).pageSize"
             :layout="type === 'select' ? 'sizes, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
             @pagination="getAndClearSelected"
           />
-          <template v-if="Object.keys(radarQuery || {}).length">
-            <pagination
-              v-show="total > 0 && activeName === MEDIA_TYPE_RADARLINK "
-              :total="total"
-              :page.sync="radarQuery.pageNum"
-              :limit.sync="radarQuery.pageSize"
-              :layout="type === 'select' ? 'sizes, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
-              @pagination="getAndClearSelected"
-            />
-          </template>
           <div v-show="type === 'select'" class="dialog-footer">
             <el-button @click="drawerVisible = false">取 消</el-button>
             <el-button type="primary" @click="submit">确 定</el-button>

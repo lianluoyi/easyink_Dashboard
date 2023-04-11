@@ -240,7 +240,7 @@ export default {
 </script>
 
 <template>
-  <el-dialog class="tag-dialog" :title="title" :visible.sync="Pvisible" :close-on-click-modal="false" @closed="closed">
+  <el-dialog class="tag-dialog" :title="title" :visible.sync="Pvisible" :close-on-click-modal="false" append-to-body @closed="closed">
     <el-alert
       v-show="infoMsg"
       :title="infoMsg"

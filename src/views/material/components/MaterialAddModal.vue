@@ -9,7 +9,6 @@ import {
   MEDIA_TYPE_FILE,
   MEDIA_TYPE_MINIAPP,
   MEDIA_TYPE_IMGLINK,
-  MEDIA_TYPE_RADARLINK,
   IMG_LINK_DIGEST,
   RADAR_TYPE
 } from '@/utils/constant';
@@ -86,7 +85,6 @@ export default {
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_MINIAPP,
       MEDIA_TYPE_IMGLINK,
-      MEDIA_TYPE_RADARLINK,
       IMG_LINK_DIGEST,
       titlePlaceholder: {
         [MEDIA_TYPE_POSTER]: '请输入海报标题，不填写则默认取文件名',
@@ -145,7 +143,8 @@ export default {
       },
 
       miniAppRules: {
-        content: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
+        appid: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
+        accountOriginalId: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         materialUrl: [
           { required: true, message: '该项为必填项', trigger: 'blur' }
         ],

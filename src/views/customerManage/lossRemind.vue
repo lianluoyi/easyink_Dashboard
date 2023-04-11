@@ -3,20 +3,28 @@ import {
   getList,
   exportCustomer,
   lossRemind,
-  getLossRemindStatus
+  getCustomerLossSwitch
 } from '@/api/customer';
+import {
+  addLossTag,
+  selectLossTag
+} from '@/api/customer/lossTags';
 import { getList as getListTag } from '@/api/customer/tag';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
+import RequestButton from '@/components/Button/RequestButton.vue';
 import { EventBus } from '@/event-bus.js';
 import { goRouteWithQuery } from '@/utils';
-import { dealAtInfo } from '@/utils/common';
+import differenceBy from 'lodash/differenceBy';
+import { dealAtInfo, changeButtonLoading } from '@/utils/common';
 import { PAGE_LIMIT, WX_TYPE, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+const IS_OPEN = '1'; // 切换开关
+
 export default {
   name: 'LossRemind',
-  components: { SelectUser, SelectTag, RightContainer, EmptyDefaultIcon },
+  components: { SelectUser, SelectTag, RightContainer, EmptyDefaultIcon, RequestButton },
   props: {},
   data() {
     return {
@@ -30,6 +38,15 @@ export default {
         endTime: '', // "结束时间"
         status: 1
       },
+      showLoss: false,
+      lossFrom: { // 流失设置表单
+        customerChurnNoticeSwitch: '',
+        customerLossTagSwitch: ''
+      },
+      dialogVisibleSelectTag: false,
+      IS_OPEN,
+      removeTagList: [],
+      customerTags: [], // 为流失打上标签
       queryTag: [], // 搜索框选择的标签
       queryUser: [], // 搜索框选择的添加人
       dateRange: [], // 添加日期
@@ -107,9 +124,15 @@ export default {
         });
       });
     },
+    /**
+     * 初始化流失提醒信息
+     */
     getLossRemindStatus() {
-      getLossRemindStatus().then(({ data }) => {
-        this.isNotice = data;
+      getCustomerLossSwitch().then(({ data }) => {
+        this.lossFrom = data;
+      });
+      selectLossTag().then(({ data }) => {
+        this.customerTags = data.weTags;
       });
     },
     showTagDialog() {
@@ -173,6 +196,41 @@ export default {
       lossRemind(val).then(() => {
         this.msgSuccess('操作成功');
       });
+    },
+    setLoss() {
+      if (!this.showLoss) {
+        this.getLossRemindStatus();
+      }
+      this.showLoss = !this.showLoss;
+    },
+    saveLossTag() {
+      const lossTagIdList = this.customerTags.map(item => item.tagId);
+      const { customerChurnNoticeSwitch, customerLossTagSwitch } = this.lossFrom;
+      const data = {
+        customerChurnNoticeSwitch,
+        customerLossTagSwitch,
+        lossTagIdList
+      };
+      addLossTag(data).then(() => {
+        this.showLoss = false;
+        changeButtonLoading(this.$store, 'save');
+        this.msgSuccess('操作成功');
+      });
+    },
+    submitSelectcustomerTag(data) {
+      // 过滤出弹窗中取消选中的标签
+      let removeList = differenceBy(this.customerTags, data, 'tagId');
+      this.customerTags = [...data];
+      this.dialogVisibleSelectTag = false;
+      removeList = this.removeTagList.concat(removeList);
+      this.removeTagList = removeList;
+    },
+    /**
+     * 移除客户标签
+     */
+    closeTag(item, index) {
+      this.customerTags.splice(index, 1);
+      this.removeTagList.push(item);
     },
     goRoute(item) {
       goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH, this.query, { id: item.externalUserid, userId: item.userId, userName: item.userName, prePageType: 'lossRemind' });
@@ -249,19 +307,73 @@ export default {
         </el-form-item>
       </el-form>
     </template>
-    <template v-slot:data-stat>
-      <div v-hasPermi="['wechat:corp:startCustomerChurnNoticeSwitch']">
-        客户流失提醒<el-switch
-          v-model="isNotice"
-          class="ml10 mr10"
-          active-value="1"
-          inactive-value="0"
-          inactive-color="#DDD"
-          @change="remindSwitch"
-        />
-      </div>
-    </template>
     <template v-slot:operate-btn>
+      <el-popover
+        v-model="showLoss"
+        placement="bottom-end"
+        width="405"
+        trigger="manual"
+      >
+        <div class="wrap-body-form loss-set">
+          <el-form
+            ref="form"
+            :model="lossFrom"
+            label-width="70px"
+            class="form"
+          >
+            <el-form-item label="流失提醒">
+              <div>
+                <el-switch
+                  v-model="lossFrom.customerChurnNoticeSwitch"
+                  class="ml10 mr10"
+                  active-value="1"
+                  inactive-value="0"
+                  inactive-color="#DDD"
+                />
+                <span class="we-emple-code-tags-tip">开启后，客户将员工删除，员工将收到应用通知</span>
+              </div>
+            </el-form-item>
+            <el-form-item label="客户标签">
+              <div>
+                <el-switch
+                  v-model="lossFrom.customerLossTagSwitch"
+                  class="ml10 mr10"
+                  active-value="1"
+                  inactive-value="0"
+                  inactive-color="#DDD"
+                />
+                <span class="we-emple-code-tags-tip">开启后，为删除员工的客户打上客户标签</span>
+              </div>
+            </el-form-item>
+            <el-form-item v-show="lossFrom.customerLossTagSwitch === IS_OPEN" label="" prop="customerTags">
+              <div>
+                <el-button
+                  class="mr10"
+                  icon="el-icon-plus"
+                  size="mini"
+                  @click="dialogVisibleSelectTag = true"
+                >添加标签</el-button>
+                <el-tag
+                  v-for="(item, index) in customerTags"
+                  :key="item.tagId"
+                  size="medium"
+                  closable
+                  @close="closeTag(item, index)"
+                >{{ item.tagName || item.name }}</el-tag>
+              </div>
+            </el-form-item>
+          </el-form>
+          <div class="confirm-btn-div">
+            <el-button @click="showLoss = false">取消</el-button>
+            <RequestButton
+              type="primary"
+              button-type="save"
+              :request-method="saveLossTag"
+            >确定</RequestButton>
+          </div>
+        </div>
+        <el-button slot="reference" v-hasPermi="['wechat:corp:loss:setting']" @click="setLoss">流失设置</el-button>
+      </el-popover>
       <el-button
         v-hasPermi="['customerManage:lossRemind:export']"
         class="btn-reset"
@@ -367,6 +479,16 @@ export default {
         :selected-user-list="queryUser"
         @success="selectedUser"
       />
+      <!-- 选择标签弹窗 -->
+      <SelectTag
+        :visible.sync="dialogVisibleSelectTag"
+        :selected="customerTags"
+        title="客户标签"
+        type="search"
+        info-msg="请选择要为流失客户打上的标签"
+        :is-show-add="true"
+        @success="submitSelectcustomerTag"
+      />
     </template>
   </RightContainer>
 </template>
@@ -386,12 +508,31 @@ export default {
 .bfc-d + .bfc-d .el-checkbox:first-child {
   margin-left: 10px;
 }
-.el-tag {
+.data-container .el-tag {
   height: 18px;
   line-height: 12px;
   font-size: 12px;
   padding: 3px;
   border-radius: 3px;
   margin-bottom: 2px;
+}
+.loss-set {
+  padding-top: 0;
+  /deep/ .el-form-item {
+    padding: 0;
+  }
+  /deep/ .ml10 {
+    margin-left: 0;
+  }
+  .we-emple-code-tags-tip {
+    font-size: 12px;
+    padding-left: 0;
+  }
+
+  .confirm-btn-div {
+    display: flex;
+    justify-content: flex-end;
+    margin: 18px 15px 0px 0px;
+  }
 }
 </style>

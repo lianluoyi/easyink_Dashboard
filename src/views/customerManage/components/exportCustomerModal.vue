@@ -1,7 +1,7 @@
 <!--
  * @Description: 导出客户弹窗
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <el-dialog v-bind="$attrs" title="导出客户" class="export-customer-modal" v-on="$listeners" @close="onClose">
@@ -95,7 +95,7 @@ export default {
       }
       const queryParams = {
         ...this.query,
-        selectedProperties: selectedProperties.join(',')
+        selectedProperties
       };
       window.localStorage.setItem(`exportProperty-${this.loginUserId}-${store.getters.corpId}`, JSON.stringify({ list: this.selected }));
       this.loading = true;

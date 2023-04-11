@@ -239,7 +239,9 @@ export default {
             title: '',
             content: '',
             coverUrl: '',
-            isDefined: DEFAULT_LINK
+            isDefined: DEFAULT_LINK,
+            appid: '',
+            accountOriginalId: ''
           });
           break;
         }

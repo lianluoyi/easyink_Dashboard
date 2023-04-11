@@ -64,21 +64,6 @@ export default {
             trigger: 'blur'
           }
         ],
-        sendValue: [
-          {
-            required: true,
-            validator: (rule, value, callback) => {
-              const { codeSuccessMsg, codeFailMsg, codeRepeatMsg } = this.codeMsg;
-              if (!(codeSuccessMsg || codeFailMsg || codeRepeatMsg)) {
-                this.msgError('请至少填写一项发送内容');
-                callback(new Error('该项为必填项'));
-              } else {
-                callback();
-              }
-            },
-            trigger: 'blur'
-          }
-        ],
         exchangeActivities: [
           {
             type: 'object',
@@ -255,7 +240,6 @@ export default {
     submit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.loading = true;
           if (this.form.isAutoPass && this.form.skipVerify === SELECT_TIME_TYPE) {
             this.form.effectTimeOpen = this.time[0];
             this.form.effectTimeClose = this.time[1];
@@ -273,7 +257,13 @@ export default {
               codeRepeatMsg,
               codeSuccessMsg
             };
+            if (!(codeSuccessMsg || codeFailMsg || codeRepeatMsg)) {
+              this.msgError('请至少填写一项发送内容');
+              changeButtonLoading(this.$store, 'save');
+              return;
+            }
           }
+          this.loading = true;
           if (this.newGroupId) {
             update(this.newGroupId, this.form)
               .then(() => {

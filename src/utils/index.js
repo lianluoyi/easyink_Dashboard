@@ -1,9 +1,26 @@
 import { parseTime } from './common';
 import { MEDIA_TO_WELCOME_TYPE, WELCOME_APPENDIX_TYPE, WELCOME_TO_MEDIA_TYPE } from '@/utils/constant';
 import moment from 'moment';
+import { Notification } from 'element-ui';
 const MS_TO_SECONDS = 1000;
 const ONE_HOUR = 3600;
 const ONE_DAY = 24;
+
+// 赋值到剪贴板
+export function copyText(text) {
+  const input = document.createElement('input');
+  input.value = text.toLocaleString();
+  document.body.appendChild(input);
+  input.select();
+  document.execCommand('Copy');
+  document.body.removeChild(input);
+  Notification.closeAll();
+  Notification({
+    title: '成功',
+    message: '链接已复制到剪切板，可Ctrl+V粘贴',
+    type: 'success'
+  });
+}
 
 // 聊天记录时间格式化
 export function dealTime(time) {
@@ -545,6 +562,10 @@ export const dealAppendixType = (list) => {
           url: item.materialUrl,
           content: item.materialName
         };
+        break;
+      }
+      case WELCOME_APPENDIX_TYPE['smartForm']: {
+        materialObj = { ...item };
         break;
       }
     }

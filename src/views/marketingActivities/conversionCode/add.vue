@@ -103,9 +103,10 @@ const ENABLE_ALARM_OR_LIMITED = {
   'open': 1,
   'close': 0
 };
+/** 一天的毫秒时间 */
+const DAY_TIME_MILLISECOND = 86400000;
 // 告警通知里的通知类型为员工
 const employeesType = 2;
-const DAY_TIME = 86400000;
 export default {
   name: 'Add',
   components: { RequestButton, SelectUser },
@@ -122,7 +123,7 @@ export default {
       },
       pickerOptions: { // 禁用当前日期之前的日期
         disabledDate(time) {
-          return time.getTime() < new Date().getTime() - DAY_TIME;
+          return time.getTime() < new Date().getTime() - DAY_TIME_MILLISECOND;
         }
       },
       activeTime: [], // 活动时间

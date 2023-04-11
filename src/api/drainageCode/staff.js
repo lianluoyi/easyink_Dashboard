@@ -185,3 +185,13 @@ export function getUserByEmplyCode(id) {
   });
 }
 
+/**
+ * 根据id获取员工活码小程序链接
+ * @param {*} params
+ */
+export function getApplink(params) {
+  return request({
+    url: service + '/appLink',
+    params
+  });
+}

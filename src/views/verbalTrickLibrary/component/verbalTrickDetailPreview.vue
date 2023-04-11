@@ -12,8 +12,15 @@
       :content="item.content"
     />
   </div>
+  <div v-else-if="item.mediaType === MEDIA_TYPE_SMARTFORM" class="content-item-div">
+    <svg-icon icon-class="form-preview" class-name="form-preview" />
+    <div class="file-info">
+      <div class="inoneline">{{ item.formName || item.form.formName }}</div>
+      <div class="desc">{{ item.description || item.form.description }}</div>
+    </div>
+  </div>
   <div v-else>
-    <div v-if="item.mediaType.toString() === MEDIA_TYPE_TEXT" class="content-item-div">1{{ item.content }}</div>
+    <div v-if="item.mediaType.toString() === MEDIA_TYPE_TEXT" class="content-item-div">{{ item.content }}</div>
     <div v-else class="content-item-div">
       <div class="cover-img">
         <svg v-if="item.mediaType.toString() === MEDIA_TYPE_FILE" class="icon" aria-hidden="true" width="60" height="60">
@@ -36,7 +43,7 @@
   </div>
 </template>
 <script>
-import { MEDIA_TYPE_TEXT, MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_FILE } from '@/utils/constant';
+import { MEDIA_TYPE_TEXT, MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_FILE, MEDIA_TYPE_SMARTFORM } from '@/utils/constant';
 import { filterSize, getFileIcon } from '@/utils/common';
 import RadarLink from '@/views/radarLibrary/components/radarLink.vue';
 export default {
@@ -54,7 +61,8 @@ export default {
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_VIDEO,
       MEDIA_TYPE_IMGLINK,
-      MEDIA_TYPE_RADARLINK
+      MEDIA_TYPE_RADARLINK,
+      MEDIA_TYPE_SMARTFORM
     };
   },
   computed: {
@@ -121,5 +129,15 @@ export default {
       flex: 1;
       overflow: hidden;
     }
+  .form-preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 3px;
+  }
+  .msg-card-info {
+    width: calc(100% - 45px);
+    text-align: left;
+    margin-right: 5px;
+  }
 }
 </style>

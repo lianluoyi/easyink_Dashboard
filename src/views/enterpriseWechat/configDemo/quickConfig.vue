@@ -43,7 +43,8 @@ export default {
         dashboardDomain: '',
         dashboardPort: '8091',
         weComSystemDomain: '',
-        weComSystemPort: '8090'
+        weComSystemPort: '8090',
+        dependableIp: ''
       },
       qrcodeUrl: '',
       // 二维码框显示加载状态
@@ -218,8 +219,8 @@ export default {
      * @returns true(全部填写)/false(部分未填写)
      */
     checkInput() {
-      const { sidebarDomain, sidebarPort, dashboardDomain, dashboardPort, weComSystemDomain, weComSystemPort } = this.domainConfig;
-      if (!sidebarDomain || !sidebarPort || !dashboardDomain || !dashboardPort || !weComSystemDomain || !weComSystemPort) {
+      const { sidebarDomain, sidebarPort, dashboardDomain, dashboardPort, weComSystemDomain, weComSystemPort, dependableIp } = this.domainConfig;
+      if (!sidebarDomain || !sidebarPort || !dashboardDomain || !dashboardPort || !weComSystemDomain || !weComSystemPort || !dependableIp) {
         return false;
       }
       return true;
@@ -338,11 +339,12 @@ export default {
           weComSystemDomain: defaultDomainParams.scrm
         };
       } else {
-        const { sidebarDomain, sidebarPort, dashboardDomain, dashboardPort, weComSystemDomain, weComSystemPort } = this.domainConfig;
+        const { sidebarDomain, sidebarPort, dashboardDomain, dashboardPort, weComSystemDomain, weComSystemPort, dependableIp } = this.domainConfig;
         domainParams = {
           dashboardDomain: `${dashboardDomain}:${dashboardPort}`,
           sidebarDomain: `${sidebarDomain}:${sidebarPort}`,
-          weComSystemDomain: `${weComSystemDomain}:${weComSystemPort}`
+          weComSystemDomain: `${weComSystemDomain}:${weComSystemPort}`,
+          ipList: dependableIp
         };
       }
       this.loadProgress();
@@ -482,8 +484,9 @@ export default {
         <el-steps direction="vertical" :active="active" finish-status="success">
           <el-step v-if="!isThirdType" title="服务器信息">
             <template slot="description" class="first-desc">
-              <div class="orange tip">将服务解析的域名填写如下，并确保可通过该端口号访问。</div>
-              <div class="orange tip">域名的企业主体须与当前配置企业一致，否则会导致部分功能异常。</div>
+              <div class="black tip">填写服务解析的域名及IP地址，域名需确保可通过该端口号访问。</div>
+              <div class="orange tip">（1）域名的企业主体须与当前配置企业一致，否则会导致部分功能异常。</div>
+              <div class="orange tip">（2）企业可信IP为WeComSystem服务器的IP地址，仅所配IP可通过接口获取企业数据。</div>
               <div class="domain-config">
                 <div class="domain-item">
                   <div class="label">
@@ -525,6 +528,15 @@ export default {
                   <div class="input-item">
                     <div class="port-pre">端口号</div>
                     <el-input v-model="domainConfig.weComSystemPort" class="port-input" />
+                  </div>
+                </div>
+                <div class="domain-item">
+                  <div class="label">
+                    <span class="require">*</span>
+                    企业可信IP
+                  </div>
+                  <div class="input-item">
+                    <el-input v-model="domainConfig.dependableIp" type="textarea" class="domain-textarea" placeholder="请配置企业可信IP。IP地址以英文“;”分隔，最多120个" />
                   </div>
                 </div>
               </div>
@@ -692,6 +704,9 @@ export default {
     .orange {
         color: $orange;
     }
+    .black {
+      color:$black;
+    }
     .step-div {
         margin-top: 20px;
         /deep/ .el-step.is-vertical .el-step__line {
@@ -758,6 +773,16 @@ export default {
                     .domain-input {
                         /deep/ input {
                             width: 210px;
+                        }
+                    }
+                    .domain-textarea {
+                        /deep/ textarea {
+                          padding:5px 5px;
+                          width: 379px;
+                          border: 0;
+                          min-height: 54px !important;
+                          border: 1px solid #d9d9d9;
+                          border-radius: 3px;
                         }
                     }
                     .port-input {

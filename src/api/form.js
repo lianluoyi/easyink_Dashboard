@@ -251,3 +251,14 @@ export function exportUserSendRecord(params) {
     params
   });
 }
+/**
+ * @description 获取所有表单分组
+ * @param  params 部门id
+ */
+export function getAllFormGroup(params) {
+  return request({
+    url: service + '/group/trees',
+    method: 'get',
+    params
+  });
+}

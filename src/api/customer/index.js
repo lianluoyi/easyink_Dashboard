@@ -3,7 +3,7 @@ const service = window.CONFIG.services.wecom + '/customer';
 
 /**
  * 客户列表
- * @param {*} params
+ * @param {*} data
  * {
     "pageNum": "当前页",
     "pageSize": "每页显示条数",
@@ -15,11 +15,11 @@ const service = window.CONFIG.services.wecom + '/customer';
     status: 0 客户状态 0正常 1删除
 }
  */
-export function getList(params) {
+export function getList(data) {
   return request({
     url: service + '/listV2',
-    method: 'get',
-    params
+    method: 'POST',
+    data
   });
 }
 
@@ -32,25 +32,6 @@ export function sync() {
   });
 }
 
-/**
- * 编辑客户标签
- * @param {*} data
- * {
-    "externalUserid": "外部联系人userid",
-    "addTag": [{
-        "id": "标签id",
-        "groupId": "标签组id",
-        "name": "标签名"
-    }]
-}
- */
-export function makeLabel(data) {
-  return request({
-    url: service + '/makeLabel',
-    method: 'post',
-    data
-  });
-}
 export function makeLabelbatch(data) {
   return request({
     url: service + '/makeLabelbatch',
@@ -99,8 +80,8 @@ export function updateCustomerDetail(data) {
 export function exportCustomer(query) {
   return request({
     url: service + '/export',
-    method: 'get',
-    params: query
+    method: 'post',
+    data: query
   });
 }
 
@@ -129,22 +110,24 @@ export function lossRemind(status) {
   });
 }
 
-export function getLossRemindStatus(status) {
+/**
+ * 客户流失状态
+ */
+export function getCustomerLossSwitch() {
   return request({
-    url: window.CONFIG.services.wecom + '/corp/getCustomerChurnNoticeSwitch/'
+    url: window.CONFIG.services.wecom + '/corp/getCustomerLossSwitch'
   });
 }
-
 /**
  * 查询企业客户统计数据
- * @param {*} params
+ * @param {*} data
  * @returns
  */
-export function getCustomerSum(params) {
+export function getCustomerSum(data) {
   return request({
     url: service + '/sum',
-    method: 'get',
-    params
+    method: 'POST',
+    data
   });
 }
 

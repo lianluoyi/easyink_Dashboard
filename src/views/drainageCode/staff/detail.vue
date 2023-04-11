@@ -6,7 +6,7 @@ import {
   exportTimeRangeAnalyseCount
 } from '@/api/drainageCode/staff';
 import echarts from 'echarts';
-import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE, SCOPELIST_TYPE } from '@/utils/constant';
+import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE, SCOPELIST_TYPE, MEDIA_TYPE_SMARTFORM, MEDIA_TO_WELCOME_TYPE } from '@/utils/constant';
 import PhoneDialog from '@/components/PhoneDialog';
 import TagUserShow from '@/components/TagUserShow';
 
@@ -48,7 +48,9 @@ export default {
       // 欢迎语预览弹窗
       previewVisible: false,
       // 员工类型(员工/部门)
-      SCOPELIST_TYPE
+      SCOPELIST_TYPE,
+      MEDIA_TYPE_SMARTFORM,
+      MEDIA_TO_WELCOME_TYPE
     };
   },
   created() {
@@ -68,7 +70,6 @@ export default {
       // });
       getDetail(id).then(({ data }) => {
         this.userByEmplyCodeList = data.weEmpleCodeUseScops;
-        this.query.userId = data.weEmpleCodeUseScops[0].businessId;
         this.form = data;
         this.form.welcomeMsg = this.getFirstMsg(this.form).welcomeMsg;
         this.form.materialList = this.getFirstMsg(this.form).materialList;
@@ -219,7 +220,22 @@ export default {
     getPayload() {
       this.query.beginTime = this.dateRange[0];
       this.query.endTime = this.dateRange[1];
-      this.query.userId = this.selectedUser;
+      if (!this.selectedUser) {
+        delete this.query.userId;
+        delete this.query.departmentId;
+        return this.query;
+      }
+      // 判断是部门还是员工，部门的话传departmentId，员工的话传userId
+      const index = this.userByEmplyCodeList.findIndex((item) => item.businessId === this.selectedUser);
+      if (index >= 0) {
+        if (this.userByEmplyCodeList[index].businessIdType === this.SCOPELIST_TYPE.DEPARTMENT) {
+          this.query.departmentId = this.selectedUser;
+          delete this.query.userId;
+        } else {
+          this.query.userId = this.selectedUser;
+          delete this.query.departmentId;
+        }
+      }
       return this.query;
     },
     /**
@@ -304,7 +320,10 @@ export default {
               <div class="welcome-div-content">
                 <div v-if="form.welcomeMsg">[文字] {{ form.welcomeMsg }}</div>
                 <div v-for="(materialItem, index) in form.materialList" :key="index">
-                  <div>{{ `[${MESSAGE_MEDIA_TYPE[materialItem.mediaType]}] ${materialItem.materialName}` }}</div>
+                  <div v-if="materialItem.mediaType === MEDIA_TO_WELCOME_TYPE[MEDIA_TYPE_SMARTFORM]">
+                    <div>{{ `[${MESSAGE_MEDIA_TYPE[materialItem.mediaType]}] ${materialItem.form.formName}` }}</div>
+                  </div>
+                  <div v-else>{{ `[${MESSAGE_MEDIA_TYPE[materialItem.mediaType]}] ${materialItem.materialName}` }}</div>
                 </div>
               </div>
               <div v-if="form.materialList && form.materialList.length || form.welcomeMsg" class="preview theme-text-color" @click="hanldePreview">预览效果</div>
@@ -364,7 +383,12 @@ export default {
             :key="index"
             :label="item.businessName"
             :value="item.businessId"
-          />
+          >
+            <div class="select_option">
+              <i v-if="item.businessIdType == SCOPELIST_TYPE.DEPARTMENT" class="iconfont icon-folder" />
+              <span>{{ item.businessName }}</span>
+            </div>
+          </el-option>
         </el-select>
         <div class="export-btn">
           <el-button
@@ -471,6 +495,12 @@ export default {
     /deep/ .preview {
       margin: 0 auto;
     }
+  }
+}
+.select_option {
+  .iconfont {
+    margin-right: 5px;
+    margin-left: 0;
   }
 }
 </style>

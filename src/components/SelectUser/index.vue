@@ -9,10 +9,12 @@ import CommonTree from '@/components/CommonTree';
 import UserItem from './UserItem.vue';
 import { groupBy, cloneDeep } from 'lodash';
 import uniqBy from 'lodash/uniqBy';
-import { DEFAULT_ROOT_PARENTID } from '@/utils/constant';
+import { USER_AND_DEPARTMENT_LIMIT, IS_ACTIVATE } from '@/utils/constant';
 
 // 根部门Id
 const DEFAULT_ROOT_DEPARTMENT_ID = '1';
+// 根部门父id
+const DEFAULT_ROOT_PARENTID = '0';
 const USER_PAGE_LIMIT = '1000';
 /**
  * 员工选择树弹窗
@@ -242,9 +244,9 @@ export default {
      */
     async getOtherUserList(func) {
       const data = await this.$store.dispatch('GetOtherUserList', {
-        isActivate: 1,
+        isActivate: IS_ACTIVATE,
         lastId: this.departmentInfo.otherUserList[this.departmentInfo.otherUserList.length - 1]?.userId,
-        pageSize: USER_PAGE_LIMIT
+        pageSize: USER_AND_DEPARTMENT_LIMIT
       });
       this.treeData = this.treeData.filter((item) => !item?.key?.startsWith(this.moreFlag));
       this.treeData = [...uniqBy([...this.treeData, ...data]), this.getMoreNodeTreeData(this.treeData[0])];
@@ -300,7 +302,7 @@ export default {
         pageNum: params.lastId ? undefined : 1,
         pageSize: USER_PAGE_LIMIT,
         departmentStr,
-        isActivate: 1,
+        isActivate: IS_ACTIVATE,
         ...params
       };
       const res = await api[this.ignorePermission ? 'getBriefList' : 'getList'](querys);
@@ -520,7 +522,7 @@ export default {
 };
 </script>
 <template>
-  <el-dialog :title="title" :visible.sync="Pvisible" :close-on-click-modal="false" class="dialog-div">
+  <el-dialog :title="title" :visible.sync="Pvisible" :close-on-click-modal="false" class="dialog-div" append-to-body>
     <el-alert
       v-if="alertText"
       class="alert"

@@ -377,15 +377,16 @@ export default {
       }
       findWxQrLoginInfo().then(res => {
         if (res.data) {
-          const { corpId, agentId, status, h5DoMainName } = res.data;
+          const { corpId, agentId, status } = res.data;
           const WwLogin = window.WwLogin;
           new WwLogin({
             id: 'qrcode',
             'appid': corpId,
             'agentid': agentId,
-            'redirect_uri': (h5DoMainName.match(/https?:\/\/(.*)/) ? '' : 'http://') + h5DoMainName.slice(0, h5DoMainName.lastIndexOf(':') === -1 ? h5DoMainName.length : h5DoMainName.lastIndexOf(':')) + ':' + window.location.port,
+            'redirect_uri': window.location.origin,
             'state': status,
-            href: 'https://wechattest-1253559996.cos.ap-guangzhou.myqcloud.com/qrcode.css',
+            // 将在线地址转为base64格式，节省流量
+            href: 'data:text/css;base64,LmltcG93ZXJCb3ggLnFyY29kZSB7d2lkdGg6IDE2NXB4O30KLmltcG93ZXJCb3ggLndycF9jb2RlIHsKICAgIHdpZHRoOiAyMDBweDsKICAgIGhlaWdodDogMjAwcHg7CiAgICBib3JkZXI6IDFweCBzb2xpZCAjZDdkN2Q3OwogICAgcGFkZGluZzogMTdweDsKICAgIGJveC1zaXppbmc6IGJvcmRlci1ib3g7CiAgICBtYXJnaW46IDIwcHggYXV0byAwIWltcG9ydGFudDsKfQouaW1wb3dlckJveCAudGl0bGUge2Rpc3BsYXk6IG5vbmU7fQouc3RhdHVzX2ljb24ge2Rpc3BsYXk6IG5vbmUgICFpbXBvcnRhbnR9Ci5pbXBvd2VyQm94IC5zdGF0dXMge3RleHQtYWxpZ246IGNlbnRlcjt9CiN3eF9kZWZhdWx0X3RpcCBwOm50aC1jaGlsZCgyKSB7CiAgICBkaXNwbGF5OiBub25lOwp9Cgog',
             'lang': 'zh'
           });
         } else {

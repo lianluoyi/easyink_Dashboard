@@ -33,6 +33,7 @@
       :file-tool-list="['download']"
       :miniapp-tool-list="[]"
       :query.sync="query"
+      :other-query="otherQuery"
       :radar-query.sync="radarQuery"
       :type="'select'"
       :total="total"
@@ -46,11 +47,12 @@
 <script>
 import {
   MEDIA_TYPE_POSTER, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK, RADAR_TYPE,
-  MEDIA_TYPE_MINIAPP, PAGE_LIMIT, MEDIA_TYPE, DEFAULT_LINK
+  MEDIA_TYPE_MINIAPP, PAGE_LIMIT, MEDIA_TYPE, DEFAULT_LINK, MEDIA_TYPE_SMARTFORM, INTELLIGENT_FORM_TYPE
 } from '@/utils/constant';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import { getList } from '@/api/material';
 import { getRadaList } from '@/api/radar';
+import { getFormPageList } from '@/api/form';
 const MATERIAL_SELECT = 'materialSelect';
 export default {
   name: '',
@@ -119,6 +121,10 @@ export default {
         pageNum: 1,
         pageSize: PAGE_LIMIT,
         searchTitle: ''
+      },
+      otherQuery: {
+        pageNum: 1,
+        pageSize: PAGE_LIMIT
       }
     };
   },
@@ -158,7 +164,9 @@ export default {
             title: '',
             content: '',
             coverUrl: '',
-            isDefined: DEFAULT_LINK
+            isDefined: DEFAULT_LINK,
+            appid: '',
+            accountOriginalId: ''
           });
           break;
         }
@@ -180,40 +188,87 @@ export default {
      */
     getMaterialList(params) {
       this.isLoadingMaterial = true;
-      if (params.mediaType !== MEDIA_TYPE_RADARLINK) {
-        getList({
-          ...this.query,
-          ...params
-        }).then(res => {
-          this.materialList = res.rows;
-          this.total = Number(res.total);
-          this.isLoadingMaterial = false;
-        });
-      } else {
-        getRadaList(this.radarQuery).then(res => {
-          const newArr = res.rows.map((item) => {
-            return {
-              // 链接标题
-              title: item.weRadarUrl.title,
-              // 链接摘要
-              content: item.weRadarUrl.content,
-              // 链接封面
-              coverUrl: item.weRadarUrl.coverUrl,
-              // 链接URL
-              url: item.weRadarUrl.url,
-              // 雷达标题
-              radarTitle: item.radarTitle,
-              radarId: item.radarId,
-              tagList: item.radarTagList,
-              mediaType: +MEDIA_TYPE_RADARLINK,
-              categoryId: this.$store.state.materialInfo?.categoryInfo[+MEDIA_TYPE_RADARLINK]?.id || '',
-              tagIdList: item.radarTagList
-            };
+
+      switch (params.mediaType) {
+        case MEDIA_TYPE_SMARTFORM: {
+          // 表单sourceType 对应的值
+          const FORM_GROUP = {
+            'corpFormGroup': INTELLIGENT_FORM_TYPE['enterprise'],
+            'departmentFormGroup': INTELLIGENT_FORM_TYPE['department'],
+            'selfFormGroup': INTELLIGENT_FORM_TYPE['personal']
+          };
+          let groupId = '';
+          const { pageNum, pageSize, formName, belongGroup, departmentId } = this.otherQuery;
+          if (belongGroup.length !== 1) {
+            groupId = belongGroup[belongGroup.length - 1];
+          }
+          const sourceType = FORM_GROUP[belongGroup && belongGroup[0]];
+          // 需要素材库自行组装数据传递 sourceType formName groupId pageNum pageSize departmentId
+          const payload = {
+            pageNum,
+            pageSize,
+            sourceType,
+            formName,
+            groupId,
+            ...(sourceType === INTELLIGENT_FORM_TYPE['department'] && { departmentId }),
+            enableFlag: true
+          };
+          getFormPageList(payload).then((res) => {
+            this.total = res.total;
+            this.isLoadingMaterial = false;
+            const newArr = res.rows.map((item) => {
+              const payload = {
+                ...item,
+                extraId: item.id,
+                mediaType: +MEDIA_TYPE_SMARTFORM,
+                categoryId: this.$store.state.materialInfo?.categoryInfo[+MEDIA_TYPE_SMARTFORM]?.id || ''
+              };
+              // 删除id 后端传递id会报错
+              delete payload.id;
+              return payload;
+            });
+            this.materialList = newArr;
           });
-          this.materialList = newArr;
-          this.total = Number(res.total);
-          this.isLoadingMaterial = false;
-        });
+          break;
+        }
+        case MEDIA_TYPE_RADARLINK:
+          // 雷达不从素材库获取 从雷达列表中获取
+          getRadaList(this.radarQuery).then(res => {
+            const newArr = res.rows.map((item) => {
+              return {
+              // 链接标题
+                title: item.weRadarUrl.title,
+                // 链接摘要
+                content: item.weRadarUrl.content,
+                // 链接封面
+                coverUrl: item.weRadarUrl.coverUrl,
+                // 链接URL
+                url: item.weRadarUrl.url,
+                // 雷达标题
+                radarTitle: item.radarTitle,
+                extraId: item.radarId,
+                materialUrl: item.weRadarUrl.url,
+                materialName: item.weRadarUrl.title,
+                radarTagList: item.radarTagList,
+                mediaType: +MEDIA_TYPE_RADARLINK,
+                categoryId: this.$store.state.materialInfo?.categoryInfo[+MEDIA_TYPE_RADARLINK]?.id || ''
+              };
+            });
+            this.materialList = newArr;
+            this.total = Number(res.total);
+            this.isLoadingMaterial = false;
+          });
+          break;
+        default:
+          getList({
+            ...this.query,
+            ...params
+          }).then(res => {
+            this.materialList = res.rows;
+            this.total = Number(res.total);
+            this.isLoadingMaterial = false;
+          });
+          break;
       }
     },
     /**
@@ -245,15 +300,19 @@ export default {
               title: item.materialName,
               content: item.content,
               coverUrl: item.coverUrl,
-              isDefined: DEFAULT_LINK
+              isDefined: DEFAULT_LINK,
+              appid: '',
+              accountOriginalId: ''
             });
             break;
           }
+          case MEDIA_TYPE_SMARTFORM:
           case MEDIA_TYPE_RADARLINK: {
             newList.push({
               mediaType,
               ...item
             });
+            break;
           }
         }
       });
