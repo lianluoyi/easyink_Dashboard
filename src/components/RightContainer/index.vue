@@ -50,6 +50,7 @@ export default {
     <div class="search-form-container">
       <!-- @slot 搜索区域(template根元素需传el-form) -->
       <slot name="search" />
+      <slot name="show-search-value" />
       <slot name="search-operate-btn" />
     </div>
     <!-- 展示数据 -->

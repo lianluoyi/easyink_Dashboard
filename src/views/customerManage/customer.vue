@@ -9,24 +9,13 @@ import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import { EventBus } from '@/event-bus.js';
 import { goRouteWithQuery } from '@/utils';
-import { PAGE_LIMIT, CUSTOMER_PROPERTY_VALUE, WX_TYPE } from '@/utils/constant';
+import { SCREENING_ADD_WAY_MAP, SCREENING_GENDER_TYPE, PAGE_LIMIT, CUSTOMER_PROPERTY_VALUE, WX_TYPE, CUSTOMER_STATUS, COMMON_TYPE, LOSS_TYPE, TO_INHERIT_TYPE, TRANSFER_TYPE, ALL_TYPE, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 import PropertySetting from './components/propertySetting.vue';
 import { dealShowText, dealAtInfo } from '@/utils/common';
 import ExportCustomerModal from './components/exportCustomerModal.vue';
 import { download } from '@/utils/download';
-
-const COMMON_TYPE = '0';
-const LOSS_TYPE = '1';
-const TRANSFER_TYPE = '4';
-const TO_INHERIT_TYPE = '3';
-const ALL_TYPE = '-1';
-const CUSTOMER_STATUS = {
-  [COMMON_TYPE]: '正常',
-  [LOSS_TYPE]: '已流失',
-  [TO_INHERIT_TYPE]: '待继承',
-  [TRANSFER_TYPE]: '转接中',
-  [ALL_TYPE]: '全部'
-};
+import AdvancedScreening from './components/advancedScreening.vue';
+import { cloneDeep, find } from 'lodash';
 
 const fieldObj = {
   '邮箱': 'email',
@@ -35,10 +24,15 @@ const fieldObj = {
   '电话': 'remarkMobiles',
   '出生日期': 'birthday'
 };
-
+/** 系统字段 */
+const SYS_FIELD = ['addWay', 'gender', 'corpFullName'];
+const ADD_WAY = '来源';
+const GENDER = '性别';
+/** 客户设置的系统字段Name */
+const CUSTOMER_SET_SYS_FIELD_NAME = ['birthday', 'phone', 'email', 'address', 'desc'];
 export default {
   name: 'Customer',
-  components: { AddTag, SelectUser, SelectTag, RightContainer, EmptyDefaultIcon, PropertySetting, ExportCustomerModal },
+  components: { AddTag, SelectUser, SelectTag, RightContainer, EmptyDefaultIcon, PropertySetting, ExportCustomerModal, AdvancedScreening },
   props: {},
   data() {
     return {
@@ -50,13 +44,17 @@ export default {
         tagIds: '', // "标签id,多个标签，id使用逗号隔开",
         beginTime: '', // "开始时间",
         endTime: '', // "结束时间"
-        status: null
+        status: null,
+        gender: '',
+        addWay: '',
+        corpFullName: ''
       },
       queryTag: [], // 搜索框选择的标签
       queryUser: [], // 搜索框选择的添加人
       dateRange: [], // 添加日期
       loading: false,
       isMoreFilter: false,
+      fromOther: false,
       total: 0,
       // 添加标签表单
       form: {
@@ -108,7 +106,19 @@ export default {
       // 客户总数
       totalCount: 0,
       fieldObj,
-      wxType: WX_TYPE
+      wxType: WX_TYPE,
+      // 高级筛选弹窗状态
+      advancedScreeningVisible: false,
+      // 高级筛选弹窗选出的值
+      searchValueList: [],
+      // 高级筛选弹窗选出的展示值
+      showSearchValueList: [],
+      // 传递给高级筛选弹窗的值
+      searchValue: [],
+      ADD_WAY,
+      GENDER,
+      SCREENING_ADD_WAY_MAP,
+      SCREENING_GENDER_TYPE
     };
   },
   computed: {
@@ -155,6 +165,18 @@ export default {
       this.dealShowList(val);
     }
   },
+  beforeRouteEnter(to, from, next) {
+    to.meta.keepAlive = true;
+    next();
+  },
+  beforeRouteLeave(to, from, next) {
+    this.fromOther = false;
+    from.meta.keepAlive = to.path === CUSTOMER_DEATIL_PATH;
+    next();
+  },
+  activated() {
+    if (!this.fromOther) this.init();
+  },
   created() {
     if (this.$route.query) {
       Object.keys(this.query).forEach(key => {
@@ -163,11 +185,8 @@ export default {
         }
       });
     }
-    this.getPropertyList();
-    this.getList();
-    this.getCount();
-    this.getListTag();
-
+    this.init();
+    this.fromOther = true;
     this.$store.dispatch(
       'app/setBusininessDesc',
       `
@@ -177,6 +196,12 @@ export default {
   },
   mounted() {},
   methods: {
+    init() {
+      this.getPropertyList();
+      this.getList();
+      this.getCount();
+      this.getListTag();
+    },
     /**
      * 获取客户自定义字段
      */
@@ -402,12 +427,18 @@ export default {
       this.queryUser = [];
       this.selectedTags = [];
       this.$refs['queryForm'].resetFields();
-      this.query.userIds = '';
-      this.query.tagIds = '';
+      this.query = this.$options.data().query;
+      this.resetAdvanced();
       this.getList(1);
       this.getCount();
       EventBus.$emit('resetTag');
       EventBus.$emit('resetUser');
+    },
+
+    resetAdvanced() {
+      this.searchValueList = [];
+      this.showSearchValueList = [];
+      this.$refs['advancedScreening'].reset();
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -453,7 +484,10 @@ export default {
       const extraList = [{ id: 'createTime', name: '添加时间' },
         { id: 'userName', name: '所属员工' },
         { id: 'tag', name: '标签' },
-        { id: 'status', name: '客户状态' }];
+        { id: 'status', name: '客户状态' },
+        { id: 'addWay', name: '来源' },
+        { id: 'gender', name: '性别' }
+      ];
       this.showCustomerPropertyList = [
         ...extraList,
         ...list.filter(customerProperItem => customerProperItem.status)];
@@ -492,6 +526,25 @@ export default {
      * 点击查询
      */
     onSearch() {
+      // addWay gender corpFullName 三个字段已经在query中定义 该处组装参数只需要组装客户设置字段中非系统字段
+      const extendProperties = [];
+      this.showSearchValueList.filter((item) => !SYS_FIELD.includes(item.field) && !CUSTOMER_SET_SYS_FIELD_NAME.includes(item.field)).forEach((arg) => {
+        // 下拉框形式的参数传递需要将选项值分开
+        if (arg.type === CUSTOMER_PROPERTY_VALUE['selectSingle'] || arg.type === CUSTOMER_PROPERTY_VALUE['dateField']) {
+          extendProperties.push({
+            extendPropertyId: arg.field,
+            propertyValue: arg.value.join(','),
+            propertyType: arg.type
+          });
+        } else {
+          extendProperties.push({
+            extendPropertyId: arg.field,
+            propertyValue: arg.value,
+            propertyType: arg.type
+          });
+        }
+      });
+      this.query = { ...this.query, extendProperties };
       this.getList(1);
       this.getCount();
     },
@@ -503,6 +556,119 @@ export default {
     },
     renderUserInfo(item) {
       return dealAtInfo(item);
+    },
+    /**
+     * @description 高级筛选
+     */
+    openAdvancedScreening() {
+      this.advancedScreeningVisible = true;
+      // 组装数据传递给高级筛选的弹窗
+      // 1.搜索栏字段组装
+      const newArr = [];
+      const searchField = ['name', 'status', 'userIds', 'tagIds', 'addTime'];
+      searchField.forEach(key => {
+        switch (key) {
+          case 'userIds':
+            newArr.push({
+              field: key,
+              value: this.queryUser
+            });
+            break;
+          case 'tagIds':
+            newArr.push({
+              field: key,
+              value: this.queryTag
+            });
+            break;
+          case 'addTime':
+            newArr.push({
+              field: key,
+              value: this.dateRange
+            });
+            break;
+          default:
+            newArr.push({
+              field: key,
+              value: this.query[key]
+            });
+            break;
+        }
+      });
+      // 2.系统字段和客户设置字段组装
+      this.searchValue = [...newArr, ...this.searchValueList];
+    },
+    /**
+     * @description 删除高级筛选条件
+     */
+    handleClose(index, item) {
+      find(this.searchValueList, { field: item.field }).value = undefined;
+      this.showSearchValueList.splice(index, 1);
+      // addWay gender corpFullName 和CUSTOMER_SET_SYS_FIELD_NAME中的字段由于是系统字段需要单独处理
+      if (SYS_FIELD.includes(item.field) || CUSTOMER_SET_SYS_FIELD_NAME.includes(item.field)) {
+        this.query[item.field] = '';
+      }
+      this.onSearch();
+    },
+    /**
+     * @description 高级搜索弹窗搜索的值
+     * @param baseField
+     * @param systemAndSetField
+     */
+    searchByAdvanced(baseField, systemAndSetField) {
+      baseField.forEach((item) => {
+        this.query[item.field] = item.value;
+        if (item.field === 'userIds') {
+          this.queryUser = item.value;
+          this.query.userIds = item.value.map(user => user.userId) + '';
+        }
+        if (item.field === 'tagIds') {
+          this.queryTag = item.value;
+          this.query.tagIds = this.queryTag.map(tag => tag.tagId) + '';
+        }
+        if (item.type === CUSTOMER_PROPERTY_VALUE['dateField']) {
+          this.dateRange = item.value;
+          delete this.query.addTime;
+        }
+      });
+      // 由于 SYS_FIELD中的字段是在query中定义，CUSTOMER_SET_SYS_FIELD_NAME是系统字段  需要在点击查询的时候将query中系统字段置为空 在后续遍历的时候再赋值
+      [...SYS_FIELD, ...CUSTOMER_SET_SYS_FIELD_NAME].forEach((item) => {
+        this.query[item] = '';
+      });
+      this.searchValueList = systemAndSetField.map((systemAndSetFieldItem) => {
+        // addWay gender corpFullName三个字段由于是系统字段需要单独处理 以及用户自定义中的系统字段也需要单独处理
+        if (SYS_FIELD.includes(systemAndSetFieldItem.field) || CUSTOMER_SET_SYS_FIELD_NAME.includes(systemAndSetFieldItem.field)) {
+          const flag = (systemAndSetFieldItem.field === 'addWay' || systemAndSetFieldItem.field === 'gender' || systemAndSetFieldItem.field === 'birthday');
+          this.query[systemAndSetFieldItem.field] = flag ? systemAndSetFieldItem.value.join(',') : systemAndSetFieldItem.value;
+        }
+
+        let newLabel = systemAndSetFieldItem.value;
+        if (systemAndSetFieldItem.type === CUSTOMER_PROPERTY_VALUE['dateField']) {
+          newLabel = newLabel.join('~');
+        }
+
+        if (systemAndSetFieldItem.type === CUSTOMER_PROPERTY_VALUE['selectSingle']) {
+          newLabel = this.dealMultipleOption(systemAndSetFieldItem.value, systemAndSetFieldItem.options);
+        }
+
+        return {
+          ...systemAndSetFieldItem,
+          showLabel: systemAndSetFieldItem.label + ': ' + newLabel
+        };
+      });
+      this.showSearchValueList = cloneDeep(this.searchValueList);
+      this.onSearch();
+    },
+    /**
+     * @description 处理多选的结果
+     * @param arr 多选选项数组
+     * @param list 多选答案数组
+     */
+    dealMultipleOption(arr, list) {
+      const tempLabel = [];
+      arr.forEach(valueItem => {
+        tempLabel.push(find(list, (item) => { return item.value === valueItem; }).label);
+      });
+      return tempLabel.join('、');
     }
   }
 };
@@ -520,7 +686,7 @@ export default {
         size="small"
       >
         <el-form-item prop="name">
-          <el-input v-model="query.name" placeholder="请输入客户名称" />
+          <el-input v-model="query.name" placeholder="请输入客户名称/备注" />
         </el-form-item>
         <el-form-item prop="status">
           <el-select v-model="query.status" placeholder="请选择客户状态" clearable>
@@ -554,7 +720,7 @@ export default {
                 type="info"
                 closable
                 @close="deleteTag(unit)"
-              >{{ unit.name }}</el-tag>
+              >{{ unit.name || unit.tagName }}</el-tag>
             </template>
           </div>
         </el-form-item>
@@ -579,8 +745,31 @@ export default {
             class="btn-reset"
             @click="resetForm()"
           >重置</el-button>
+          <el-button
+            class="btn-reset"
+            @click="openAdvancedScreening()"
+          >
+            <div class="screening">
+              <svg-icon icon-class="screening" class-name="screening-icon" />
+              <span>高级筛选</span>
+            </div>
+          </el-button>
         </el-form-item>
       </el-form>
+    </template>
+    <template v-slot:show-search-value>
+      <div class="search-value">
+        <el-tag
+          v-for="(tag,index) in showSearchValueList"
+          :key="index"
+          closable
+          type="info"
+          size="medium"
+          @close="handleClose(index,tag)"
+        >
+          {{ tag.showLabel }}
+        </el-tag>
+      </div>
     </template>
     <template v-slot:data-stat>
       <div class="total-text">
@@ -715,10 +904,16 @@ export default {
                 v-for="(unit, unique) in row.weFlowerCustomerTagRels"
                 :key="unique"
                 type="info"
-              >{{ unit.tagName }}</el-tag>
+              >{{ unit.tagName || unit.name }}</el-tag>
             </div>
             <div v-else-if="colunmItem.id === 'status'">
               {{ CUSTOMER_STATUS[row.status] || '' }}
+            </div>
+            <div v-else-if="colunmItem.name === ADD_WAY">
+              {{ SCREENING_ADD_WAY_MAP[row.addWay] }}
+            </div>
+            <div v-else-if="colunmItem.name === GENDER">
+              {{ SCREENING_GENDER_TYPE[row.gender] }}
             </div>
             <div v-else>
               <div v-if="colunmItem.type === CUSTOMER_PROPERTY_VALUE['sysField']">
@@ -839,6 +1034,7 @@ export default {
       />
       <PropertySetting :visible.sync="properSettingVisible" :data.sync="showCustomerPropertyList" @getList="getColumnList" />
       <ExportCustomerModal :visible.sync="exportVisible" :list="exportPropertyList" :query="query" />
+      <AdvancedScreening ref="advancedScreening" :visible.sync="advancedScreeningVisible" :search-value="searchValue" @searchByAdvanced="searchByAdvanced" />
     </template>
   </RightContainer>
 
@@ -900,6 +1096,33 @@ export default {
   div {
     color: #377AFF;
     cursor: pointer;
+  }
+}
+.screening {
+  display: flex;
+  align-items: center;
+  .screening-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 5px;
+  }
+}
+.search-value {
+  background: #fff;
+  margin-bottom: 10px;
+  margin-top: -10px;
+  padding: 0 15px 15px;
+ /deep/ .el-tag {
+    background-color: #f4f4f5 !important;
+    border-color: #e9e9eb !important;
+    color: #909399 !important;
+    margin-right: 10px;
+    height: 32px;
+    padding: 0 10px;
+    line-height: 30px;
+    .el-icon-close {
+      font-size: 16px;
+    }
   }
 }
 </style>

@@ -5,7 +5,10 @@ import {
   download,
   downloadBatch
 } from '@/api/communityOperating/newCustomer';
-import { goRouteWithQuery } from '@/utils';
+import {
+  getApplink
+} from '@/api/drainageCode/staff';
+import { goRouteWithQuery, copyText } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
@@ -190,6 +193,27 @@ export default {
       paramName === 'groupName' ? `${data.map((item) => arr.push(item['chatGroupName']))}`
         : `${data.map((item) => arr.push(item[paramName]))}`;
       return arr.join('、');
+    },
+    // 获取新客进群小程序链接
+    getLink(row) {
+      if (row.appLink) {
+        copyText(row.appLink);
+        return;
+      }
+      this.loading = true;
+      getApplink({ id: row.id }).then(resp => {
+        if (resp.data) {
+          this.list.forEach(item => {
+            if (item.id === row.id) {
+              item.appLink = resp.data;
+            }
+          });
+          copyText(resp.data);
+        }
+        this.loading = false;
+      }).catch(() => {
+        this.loading = false;
+      });
     }
   }
 };
@@ -274,7 +298,7 @@ export default {
             prop="qrCode"
             label="活码预览"
             align="center"
-            width="130"
+            width="200"
             fixed
           >
             <template #default="{ row }">
@@ -297,7 +321,11 @@ export default {
                 <el-button
                   v-copy="row.qrCode"
                   type="text"
-                >复制链接</el-button>
+                >复制图片链接</el-button>
+                <el-button
+                  type="text"
+                  @click="getLink(row)"
+                >复制小程序链接</el-button>
               </div>
             </template>
             <!-- <template slot-scope="{ row }">
@@ -421,7 +449,11 @@ export default {
     display: inline-block;
     width: 60px;
     position: absolute;
-    margin-top: 7px;
+    margin-top: 3px;
+    /deep/ .el-button--small{
+      padding: 3px 0px;
+      margin-left: 0;
+    }
 }
 .code-left {
     display: inline-block;

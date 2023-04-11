@@ -5,7 +5,7 @@
  */
 import { getDeparmentAndOtherList } from '@/api/organization';
 import uniqBy from 'lodash/uniqBy';
-const USER_PAGE_LIMIT = '1000';
+import { USER_AND_DEPARTMENT_LIMIT, IS_ACTIVATE } from '@/utils/constant';
 const departmentInfo = {
 
   state: {
@@ -37,9 +37,9 @@ const departmentInfo = {
           resolve(state.departmentList);
         } else {
           getDeparmentAndOtherList({
-            isActivate: 1,
+            isActivate: IS_ACTIVATE,
             pageNum: 1,
-            pageSize: USER_PAGE_LIMIT
+            pageSize: USER_AND_DEPARTMENT_LIMIT
           }).then(res => {
             try {
               commit('SET_DEPARTMENT_LIST', res?.data?.departmentList || []);
@@ -76,9 +76,9 @@ const departmentInfo = {
     GetOrUpdateDepartmentList({ commit, state }, data = {}) {
       return new Promise((resolve, reject) => {
         getDeparmentAndOtherList({
-          isActivate: 1,
+          isActivate: IS_ACTIVATE,
           pageNum: 1,
-          pageSize: USER_PAGE_LIMIT
+          pageSize: USER_AND_DEPARTMENT_LIMIT
         }).then(res => {
           try {
             commit('SET_DEPARTMENT_LIST', res?.data?.departmentList || []);

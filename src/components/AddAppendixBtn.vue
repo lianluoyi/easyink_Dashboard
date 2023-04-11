@@ -30,12 +30,15 @@
             <i class="el-icon-remove-outline" @click="handleDeleteAppendix(index, appendix)" />
           </el-tooltip>
           <span class="appendix-type">[{{ MESSAGE_MEDIA_TYPE[appendix.mediaType] }}]</span>
-          <span v-if="appendix.mediaType == Number(MEDIA_TYPE_RADARLINK)" class="appendix-title inoneline">{{ appendix.radarTitle || appendix.radar.radarTitle }}</span>
+          <!-- 表单 使用的appendix.formName 是从素材库选出来的时候显示。appendix.form.formName 后端传过来的时候显示 雷达也是如此。-->
+          <!--TODO 用 == 是由于 从素材库选出来的是 number类型 回显的时候是 string类型 需要修改一下  -->
+          <span v-if="appendix.mediaType.toString() === MEDIA_TYPE_SMARTFORM" class="appendix-title inoneline">{{ appendix.formName || appendix.form.formName }}</span>
+          <span v-else-if="appendix.mediaType.toString() === MEDIA_TYPE_RADARLINK" class="appendix-title inoneline">{{ appendix.radarTitle || appendix.radar.radarTitle }}</span>
           <span v-else class="appendix-title inoneline">{{ appendix.materialName }}</span>
           <span class="appendix-operate-icon">
             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-              <!-- 雷达不允许编辑 使用一个空的i标签 不然会导致拖拽排序位置偏离 -->
-              <i v-if="appendix.mediaType !== Number(MEDIA_TYPE_RADARLINK)" class="iconfont icon-tool-edit" @click="() => showEditMaterial(appendix)" />
+              <!-- 雷达/智能表单不允许编辑 使用一个空的i标签 不然会导致拖拽排序位置偏离 -->
+              <i v-if="!isOtherMaterialType(appendix.mediaType+'')" class="iconfont icon-tool-edit" @click="() => showEditMaterial(appendix)" />
               <i v-else />
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="长按拖拽排序" placement="right">
@@ -78,6 +81,7 @@
       :miniapp-tool-list="[]"
       :query.sync="query"
       :radar-query.sync="radarQuery"
+      :other-query="otherQuery"
       :sub-title="subTitle"
       :type="'select'"
       :total="total"
@@ -113,12 +117,16 @@ import {
   MAX_APPENDIX_NUM,
   MEDIA_TYPE_RADARLINK,
   PAGE_LIMIT,
-  RADAR_TYPE
+  RADAR_TYPE,
+  MEDIA_TYPE_SMARTFORM,
+  INTELLIGENT_FORM_TYPE
 } from '@/utils/constant';
 import { getList as getMaterialListApi } from '@/api/material';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import { getCategoryList, getMaterialTagList } from '@/utils/material';
 import { getRadaList } from '@/api/radar';
+import { getFormPageList } from '@/api/form';
+import { isOtherMaterialType } from '@/utils/common';
 export default {
   name: 'AddAppendixBtn',
   components: { MaterialAddModal, MaterialListDrawer },
@@ -182,6 +190,12 @@ export default {
         pageSize: PAGE_LIMIT,
         searchTitle: ''
       },
+      // 素材库其他类型的查询条件
+      otherQuery: {
+        pageNum: 1,
+        pageSize: PAGE_LIMIT,
+        belongGroup: []
+      },
       isLoadingMaterial: true,
       total: 0,
       materialList: [],
@@ -193,7 +207,10 @@ export default {
       MEDIA_TYPE_FILE,
       MEDIA_TYPE_MINIAPP,
       MEDIA_TYPE_RADARLINK,
-      MAX_APPENDIX_NUM
+      MAX_APPENDIX_NUM,
+      INTELLIGENT_FORM_TYPE,
+      MEDIA_TYPE_SMARTFORM,
+      isOtherMaterialType
     };
   },
   watch: {
@@ -323,42 +340,87 @@ export default {
      */
     getMaterialList(params) {
       this.isLoadingMaterial = true;
-      if (params.mediaType !== MEDIA_TYPE_RADARLINK) {
-        getMaterialListApi({
-          ...this.query,
-          ...params
-        }).then(res => {
-          this.materialList = res.rows;
-          this.total = Number(res.total);
-          this.isLoadingMaterial = false;
-        });
-      } else {
-        // 雷达不从素材库获取 从雷达列表中获取
-        getRadaList(this.radarQuery).then(res => {
-          const newArr = res.rows.map((item) => {
-            return {
-              // 链接标题
-              title: item.weRadarUrl.title,
-              // 链接摘要
-              content: item.weRadarUrl.content,
-              // 链接封面
-              coverUrl: item.weRadarUrl.coverUrl,
-              // 链接URL
-              url: item.weRadarUrl.url,
-              // 雷达标题
-              radarTitle: item.radarTitle,
-              radarId: item.radarId,
-              materialUrl: item.weRadarUrl.url,
-              materialName: item.weRadarUrl.title,
-              radarTagList: item.radarTagList,
-              mediaType: +MEDIA_TYPE_RADARLINK,
-              categoryId: this.$store.state.materialInfo?.categoryInfo[+MEDIA_TYPE_RADARLINK]?.id || ''
-            };
+
+      switch (params.mediaType) {
+        case MEDIA_TYPE_SMARTFORM: {
+          // 表单sourceType 对应的值
+          const FORM_GROUP = {
+            'corpFormGroup': INTELLIGENT_FORM_TYPE['enterprise'],
+            'departmentFormGroup': INTELLIGENT_FORM_TYPE['department'],
+            'selfFormGroup': INTELLIGENT_FORM_TYPE['personal']
+          };
+          let groupId = '';
+          const { pageNum, pageSize, formName, belongGroup, departmentId } = this.otherQuery;
+          if (belongGroup.length !== 1) {
+            groupId = belongGroup[belongGroup.length - 1];
+          }
+          const sourceType = FORM_GROUP[belongGroup && belongGroup[0]];
+          // 需要素材库自行组装数据传递 sourceType formName groupId pageNum pageSize departmentId
+          const payload = {
+            pageNum,
+            pageSize,
+            sourceType,
+            formName,
+            groupId,
+            ...(sourceType === INTELLIGENT_FORM_TYPE['department'] && { departmentId }),
+            enableFlag: true
+          };
+          getFormPageList(payload).then((res) => {
+            this.total = res.total;
+            this.isLoadingMaterial = false;
+            const newArr = res.rows.map((item) => {
+              const payload = {
+                ...item,
+                extraId: item.id,
+                mediaType: +MEDIA_TYPE_SMARTFORM,
+                categoryId: this.$store.state.materialInfo?.categoryInfo[+MEDIA_TYPE_SMARTFORM]?.id || ''
+              };
+              // 删除id 后端传递id会报错
+              delete payload.id;
+              return payload;
+            });
+            this.materialList = newArr;
           });
-          this.materialList = newArr;
-          this.total = Number(res.total);
-          this.isLoadingMaterial = false;
-        });
+          break;
+        }
+        case MEDIA_TYPE_RADARLINK:
+          // 雷达不从素材库获取 从雷达列表中获取
+          getRadaList(this.radarQuery).then(res => {
+            const newArr = res.rows.map((item) => {
+              return {
+              // 链接标题
+                title: item.weRadarUrl.title,
+                // 链接摘要
+                content: item.weRadarUrl.content,
+                // 链接封面
+                coverUrl: item.weRadarUrl.coverUrl,
+                // 链接URL
+                url: item.weRadarUrl.url,
+                // 雷达标题
+                radarTitle: item.radarTitle,
+                extraId: item.radarId,
+                materialUrl: item.weRadarUrl.url,
+                materialName: item.weRadarUrl.title,
+                radarTagList: item.radarTagList,
+                mediaType: +MEDIA_TYPE_RADARLINK,
+                categoryId: this.$store.state.materialInfo?.categoryInfo[+MEDIA_TYPE_RADARLINK]?.id || ''
+              };
+            });
+            this.materialList = newArr;
+            this.total = Number(res.total);
+            this.isLoadingMaterial = false;
+          });
+          break;
+        default:
+          getMaterialListApi({
+            ...this.query,
+            ...params
+          }).then(res => {
+            this.materialList = res.rows;
+            this.total = Number(res.total);
+            this.isLoadingMaterial = false;
+          });
+          break;
       }
     },
     /**

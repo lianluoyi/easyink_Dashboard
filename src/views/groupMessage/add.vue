@@ -26,7 +26,8 @@ import {
   GROUP_MESSAGE_PUSH_TIME_NOW,
   GROUP_MESSAGE_GENDER_TYPE_ARRAY,
   GROUP_MESSAGE_PUSH_TIME_SET,
-  MAX_APPENDIX_NUM
+  MAX_APPENDIX_NUM,
+  MEDIA_TYPE_SMARTFORM
 } from '@/utils/constant';
 import { getFileName, changeButtonLoading, checkChange } from '@/utils/common';
 import NoConfigInfo from '@/components/NoConfigInfo';
@@ -106,7 +107,8 @@ export default {
       GROUP_MESSAGE_PUSH_TYPE_CUSTOMER,
       GROUP_MESSAGE_PUSH_TYPE_GROUP,
       GROUP_MESSAGE_PUSH_RANGE_SOME,
-      GROUP_MESSAGE_PUSH_TIME_SET
+      GROUP_MESSAGE_PUSH_TIME_SET,
+      MEDIA_TYPE_SMARTFORM
     };
   },
   computed: {
@@ -283,17 +285,24 @@ export default {
             break;
           case MEDIA_TYPE_MINIAPP:
             attatchment.miniprogramMessage = JSON.parse(attatchment.miniprogramMessage);
-            appendix.content = attatchment.miniprogramMessage.appid;
+            appendix.appid = attatchment.miniprogramMessage.appid;
+            appendix.accountOriginalId = attatchment.miniprogramMessage.accountOriginalId;
             appendix.materialUrl = attatchment.miniprogramMessage.page;
             appendix.coverUrl = attatchment.miniprogramMessage.picUrl;
             appendix.materialName = attatchment.miniprogramMessage.title;
             break;
           case MEDIA_TYPE_RADARLINK:
-            appendix.radarId = attatchment.radarMessage.radarId;
-            appendix.radarTitle = attatchment.radarMessage.radar.radarTitle;
-            appendix.title = attatchment.radarMessage.radar.weRadarUrl.title;
-            appendix.content = attatchment.radarMessage.radar.weRadarUrl.content;
-            appendix.coverUrl = attatchment.radarMessage.radar.weRadarUrl.coverUrl;
+            // extraId在新增的时候和编辑的时候不一致，后端会返回radarId/formId 统一使用extraId 在传给后端的时候再换成radarId/formId
+            appendix.extraId = attatchment.radarMessage.extraId || attatchment.radarMessage.radarId;
+            appendix.radarTitle = attatchment.radarMessage?.radar?.radarTitle;
+            appendix.title = attatchment.radarMessage.radar?.weRadarUrl?.title;
+            appendix.content = attatchment.radarMessage.radar?.weRadarUrl?.content;
+            appendix.coverUrl = attatchment.radarMessage.radar?.weRadarUrl?.coverUrl;
+            break;
+          case MEDIA_TYPE_SMARTFORM:
+            appendix.extraId = attatchment.formMessage.extraId || attatchment.formMessage.formId;
+            appendix.form = attatchment.formMessage.form;
+            break;
         }
         appendixList.push(appendix);
       });
@@ -333,7 +342,8 @@ export default {
             break;
           case MEDIA_TYPE_MINIAPP:
             attach.miniprogramMessage = {
-              appid: appendix.content,
+              appid: appendix.appid,
+              accountOriginalId: appendix.accountOriginalId,
               page: appendix.materialUrl,
               picUrl: appendix.coverUrl,
               title: appendix.materialName
@@ -341,7 +351,15 @@ export default {
             break;
           case MEDIA_TYPE_RADARLINK:
             attach.radarMessage = {
-              radarId: appendix.radarId
+              radarId: appendix.extraId,
+              linkTitle: appendix.radarTitle
+            };
+            break;
+          case MEDIA_TYPE_SMARTFORM:
+            attach.formMessage = {
+              formId: appendix.extraId,
+              // 新增时无form 编辑时有form
+              linkTitle: appendix.formName || appendix.form.formName
             };
         }
         attachments.push(attach);

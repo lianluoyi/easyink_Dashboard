@@ -60,13 +60,20 @@ export default {
 
 <template>
   <div class="miniapp-material">
-    <el-form-item label="AppID" prop="content">
+    <el-form-item label="账号原始ID" prop="accountOriginalId">
       <el-input
-        v-model="form.content"
+        v-model="form.accountOriginalId"
+        style="width: 380px"
+        placeholder="请输入与企业有关联小程序的账号原始ID"
+      />
+      <span class="help theme-text-color" @click="openDrawer('appidDrawerVisible')">如何获取？</span>
+    </el-form-item>
+    <el-form-item label="AppID" prop="appid">
+      <el-input
+        v-model="form.appid"
         style="width: 380px"
         placeholder="请输入与企业有关联小程序的AppID"
       />
-      <span class="help theme-text-color" @click="openDrawer('appidDrawerVisible')">如何获取？</span>
     </el-form-item>
     <el-form-item label="地址" prop="materialUrl">
       <el-input
@@ -94,7 +101,7 @@ export default {
     </el-form-item>
     <el-drawer
       class="appid-drawer"
-      title="获取小程序的AppID"
+      title="获取小程序的基本信息"
       :visible="appidDrawerVisible"
       :append-to-body="true"
       :before-close="() => handleClose('appidDrawerVisible')"

@@ -4,10 +4,11 @@ import {
   remove,
   batchAdd,
   downloadBatch,
-  download
+  download,
+  getApplink
 } from '@/api/drainageCode/staff';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
-import { goRouteWithQuery } from '@/utils';
+import { goRouteWithQuery, copyText } from '@/utils';
 import { PAGE_LIMIT, STAFF_CODE_TYPE } from '@/utils/constant';
 import RightContainer from '@/components/RightContainer';
 import ListUserShow from '@/components/ListUserShow';
@@ -190,6 +191,27 @@ export default {
         beginTime,
         endTime
       };
+    },
+    // 赋值小程序短链,并复制
+    getLink(row) {
+      if (row.appLink) {
+        copyText(row.appLink);
+        return;
+      }
+      this.loading = true;
+      getApplink({ id: row.id }).then(resp => {
+        if (resp.data) {
+          this.list.forEach(item => {
+            if (item.id === row.id) {
+              item.appLink = resp.data;
+            }
+          });
+          copyText(resp.data);
+        }
+        this.loading = false;
+      }).catch(() => {
+        this.loading = false;
+      });
     }
   }
 };
@@ -297,7 +319,7 @@ export default {
             />
           </template>
           <el-table-column type="selection" width="55" align="center" />
-          <el-table-column label="活码预览" align="center" prop="qrCode">
+          <el-table-column label="活码预览" align="center" width="200" prop="qrCode">
             <template #default="{ row }">
               <div class="code-left">
                 <el-popover placement="bottom" trigger="hover">
@@ -318,7 +340,12 @@ export default {
                   v-copy="row.qrCode"
                   type="text"
                   class="copy-btn"
-                >复制链接</el-button>
+                >复制图片链接</el-button>
+                <el-button
+                  type="text"
+                  class="copy-btn"
+                  @click="getLink(row)"
+                >复制小程序链接</el-button>
               </div>
             </template>
           </el-table-column>
@@ -405,7 +432,10 @@ export default {
     display: inline-block;
     width: 60px;
     position: absolute;
-    margin-top: 7px;
+    margin-top: 3px;
+    /deep/ .el-button--small{
+      padding: 3px 0px;
+    }
 }
 .code-left {
     display: inline-block;

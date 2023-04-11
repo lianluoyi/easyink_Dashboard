@@ -116,7 +116,9 @@ export default {
       }
       const treeData = this.handleTree(newData);
       this.departmentOptions = treeData;
-      const intelligentFormDepartmentId = window.sessionStorage.getItem('intelligent_form_department_id');
+      let intelligentFormDepartmentId = window.sessionStorage.getItem('intelligent_form_department_id');
+      // 防止初始化部门id为undefined 缓存取出时为字符串导致接口报错
+      intelligentFormDepartmentId = intelligentFormDepartmentId === 'undefined' ? undefined : intelligentFormDepartmentId;
       this.departmentSelect = intelligentFormDepartmentId || this.departmentSelect;
       window.sessionStorage.removeItem('intelligent_form_department_id');
     },

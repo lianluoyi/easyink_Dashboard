@@ -4,9 +4,10 @@ import {
   getList,
   remove,
   downloadBatch,
-  download
+  download,
+  getApplink
 } from '@/api/drainageCode/group';
-import { goRouteWithQuery } from '@/utils';
+import { goRouteWithQuery, copyText } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
@@ -198,6 +199,28 @@ export default {
         beginTime,
         endTime
       };
+    },
+    // 获取群活码小程序链接
+    getApplink(row) {
+      if (row.appLink) {
+        copyText(row.appLink);
+        return;
+      }
+      this.loading = true;
+      getApplink({ id: row.id }).then(resp => {
+        this.loading = false;
+        if (resp.data) {
+          this.groupCodes.forEach(item => {
+            if (item.id === row.id) {
+              item.appLink = resp.data;
+            }
+          });
+          copyText(resp.data);
+          this.loading = false;
+        }
+      }).catch(() => {
+        this.loading = false;
+      });
     }
   }
 };
@@ -286,7 +309,7 @@ export default {
             prop="codeUrl"
             label="活码预览"
             align="center"
-            width="150"
+            width="200"
           >
             <template #default="{ row }">
               <div class="code-left">
@@ -310,7 +333,12 @@ export default {
                   v-copy="row.codeUrl"
                   type="text"
                   size="mini"
-                >复制链接</el-button>
+                >复制图片链接</el-button>
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="getApplink(row)"
+                >复制小程序链接</el-button>
               </div>
             </template>
           </el-table-column>
@@ -437,7 +465,11 @@ export default {
     display: inline-block;
     width: 60px;
     position: absolute;
-    margin-top: 7px;
+    margin-top: 3px;
+    /deep/ .el-button--mini{
+      padding: 3px 0px;
+      margin-left: 0;
+    }
 }
 .code-left {
     display: inline-block;

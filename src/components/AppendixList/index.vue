@@ -1,6 +1,6 @@
 <script>
 import VideoModal from '@/views/conversation/component/videoModal.vue';
-import { MESSAGE_MEDIA_TYPE, MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP } from '@/utils/constant';
+import { MESSAGE_MEDIA_TYPE, MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_SMARTFORM } from '@/utils/constant';
 import { downloadFile } from '@/utils/common';
 const PROTOCAL_REGEX = /https?:\/\//;
 export default {
@@ -29,7 +29,11 @@ export default {
     getTitleField(type) {
       switch (String(type)) {
         case MEDIA_TYPE_POSTER: return 'picName';
-        case MEDIA_TYPE_IMGLINK: return 'linkTitle';
+        case MEDIA_TYPE_IMGLINK:
+        case MEDIA_TYPE_RADARLINK:
+        case MEDIA_TYPE_SMARTFORM: {
+          return 'linkTitle';
+        }
         case MEDIA_TYPE_VIDEO: return 'videoName';
         case MEDIA_TYPE_MINIAPP: return 'miniprogramTitle';
         case MEDIA_TYPE_FILE: return 'fileName';

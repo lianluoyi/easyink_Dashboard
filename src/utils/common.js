@@ -4,8 +4,9 @@
 import {
   MS_TO_SECONDS, WX_TYPE, CORP_TYPE, ICON_LIST, MEDIA_TYPE_POSTER, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO,
   MEDIA_TYPE_FILE, FILE_EXCEL_TYPE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK,
-  MEDIA_TYPE_MINIAPP, SCOPELIST_TYPE
+  MEDIA_TYPE_MINIAPP, SCOPELIST_TYPE, MEDIA_TYPE_SMARTFORM, MEDIA_TYPE_RADARLINK
 } from '@/utils/constant';
+import { getUserInfo } from '@/api/system/staff';
 import { groupBy, isEqual } from 'lodash';
 import moment from 'moment';
 const baseURL = process.env.VUE_APP_BASE_API;
@@ -672,7 +673,10 @@ export const checkContent = (rule, value, callback) => {
         return false;
       }
       case MEDIA_TYPE_MINIAPP: {
-        if (!item.content) {
+        if (!item.accountOriginalId) {
+          return callback(new Error('请填写小程序帐号原始ID'));
+        }
+        if (!item.appid) {
           return callback(new Error('请填写小程序appid'));
         }
         if (!item.url) {
@@ -773,7 +777,7 @@ export const groupByScopeType = (users) => {
 };
 
 /**
- * @Description: 属性改变监听
+ * @description: 属性改变监听
  * @param {object} newVal - 原始值
  * @param {object} oldVal - 改变的
  * @使用方法: 首先导入  import {checkChange} from '@/utils/common';   在组件的beforeUpdate生命周期中使用
@@ -782,4 +786,27 @@ export const groupByScopeType = (users) => {
  */
 export const checkChange = (oldVal, newVal) => {
   window.sessionStorage.setItem('change', !isEqual(newVal, oldVal));
+};
+
+/**
+ * @description 判断当前素材库类型是否是其他类型 (智能表单、雷达)
+ * @param {int} type 当前需要判断的素材素类型
+ * @return {Boolean} 当前是其他类型 (智能表单、雷达)
+ */
+export const isOtherMaterialType = (type) => {
+  return [MEDIA_TYPE_RADARLINK, MEDIA_TYPE_SMARTFORM].includes(type);
+};
+
+/**
+ * @description 当前账号所属的部门
+ * @param store 当前vuex实例 传进来是由于该处无法使用this
+ */
+export const getUserDepartmentInfo = async(store) => {
+  const userRes = await getUserInfo({ userId: store.getters?.userId });
+  if (!userRes?.data || !userRes?.data?.department) return false;
+  const { data: { department, departmentName }} = userRes;
+  return {
+    department,
+    departmentName
+  };
 };

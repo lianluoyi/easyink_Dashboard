@@ -69,3 +69,23 @@ export function getAgentTicket(url, agentId) {
     }
   });
 }
+
+/**
+ * @description 获取络客侧边栏配置
+ */
+export function getLockSideBar() {
+  return request({
+    url: wecomService + '/lockSideBar/list'
+  });
+}
+
+/**
+ * @description 编辑络客侧边栏配置
+ */
+export function putLockSideBar(data) {
+  return request({
+    url: wecomService + '/lockSideBar',
+    method: 'PUT',
+    data
+  });
+}

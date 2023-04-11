@@ -1,7 +1,7 @@
 <!--
  * @Description: 新增sop
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: Xzz
 -->
 <template>
   <div class="add-sop-page wrap">
@@ -555,7 +555,8 @@ export default {
             addSop(newSopForm).then((res) => {
               changeButtonLoading(this.$store, 'submit');
               this.msgSuccess('新增成功');
-              this.$router.go(-1);
+              window.history.go(-1);// 反馈可能部分浏览器无法跳转，先采用这种方式测试
+              // this.$router.go(-1);
             });
           }
         } else {

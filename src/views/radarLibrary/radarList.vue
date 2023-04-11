@@ -1,7 +1,7 @@
 <!--
  * @Description: 雷达列表
  * @Author: wJiaaa
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div style="height: 100%;">
@@ -353,15 +353,12 @@ export default {
      */
     addRadarDrawer() {
       this.radarId = '';
+      // 若该企业的雷达库没有配置过公众号则弹出操作须知弹窗
+      if (this.isDKCorp ? !this.hasOffAccount : !this.offAccountList?.length) {
+        this.openHandleHint();
+        return;
+      }
       this.addRadarDrawerVisible = true;
-      // 代开发： 若该企业的雷达库没有配置过公众号则弹出操作须知弹窗
-      if (this.isDKCorp && !this.hasOffAccount) {
-        this.openHandleHint();
-      }
-      // 自建：若该企业未配置公众号则弹出操作须知弹窗
-      if (!this.isDKCorp && !this.offAccountList?.length) {
-        this.openHandleHint();
-      }
     },
     /**
      * @description: 弹出操作须知弹窗
@@ -376,7 +373,7 @@ export default {
         if (!checkPermi(['system:offAccount:list'])) {
           this.msgError('暂无权限，需联系管理员进行公众号授权');
         } else {
-          this.$router.push({ path: '/system/configCentre/offAccount' }); // 页面跳转至“公众号授权”的页面。
+          this.$router.push({ path: '/system/configCenter/offAccount' }); // 页面跳转至“公众号授权”的页面。
         }
       });
     },

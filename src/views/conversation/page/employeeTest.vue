@@ -12,11 +12,12 @@
         <div class="ct_box ct_boxFirst">
           <common-tree
             ref="tree"
+            v-loading="loadingEmployee"
             class="filter-tree conversation-user-tree"
             node-key="id"
             :data="treeData"
             :props="defaultProps"
-            :default-expanded-keys="treeData[0] && treeData[0] === DEFAULT_ROOT_PARENTID ? [treeData[0].id] : []"
+            :default-expanded-keys="treeData[0] ? [treeData[0].id] : []"
             :filter-node-method="filterNode"
             :node-click="handleNodeClick"
           >
@@ -314,7 +315,7 @@ import {
 import {
   yearMouthDay, downloadFile, filterSize, downloadAMR, changeDeptTreeData
 } from '@/utils/common.js';
-import { PAGE_LIMIT, MSG_TYPE, MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO, DEFAULT_ROOT_PARENTID } from '@/utils/constant';
+import { PAGE_LIMIT, MSG_TYPE, MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO, USER_AND_DEPARTMENT_LIMIT, IS_ACTIVATE } from '@/utils/constant';
 import { groupBy } from 'lodash';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import CommonTree from '@/components/CommonTree';
@@ -374,9 +375,11 @@ export default {
       loading: false,
       // 显示消息栈
       allChatStack: [],
+      // 员工列表加载时的loading
+      loadingEmployee: false,
       // template中要用到的常量
       CONTACT_TYPE_INNER, CONTACT_TYPE_EXTERNAL,
-      MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO, DEFAULT_ROOT_PARENTID
+      MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO
     };
   },
   computed: {
@@ -388,6 +391,9 @@ export default {
     },
     total: function() {
       return this.currentChat?.total;
+    },
+    departmentInfo() {
+      return this.$store.state.departmentInfo;
     },
     currentPage: {
       get: function() {
@@ -530,6 +536,8 @@ export default {
     },
     async getTree() {
       const data = await this.$store.dispatch('GetDepartmentList');
+      await this.recursionGetTreeList();
+      this.loadingEmployee = false;
       this.treeData = [...this.handleTree(data), ...this.$store.state.departmentInfo.otherUserList];
       let departmentIds = '';
       data.map((item, index) => {
@@ -540,6 +548,20 @@ export default {
       });
       // 根据部门id获取员工列表
       this.getUserList(departmentIds);
+    },
+    /**
+     * @description 递归获取其他员工
+     */
+    async recursionGetTreeList() {
+      if (this.departmentInfo.otherUserList.length < this.departmentInfo.otherUserListTotal) {
+        this.loadingEmployee = true;
+        await this.$store.dispatch('GetOtherUserList', {
+          isActivate: IS_ACTIVATE,
+          lastId: this.departmentInfo.otherUserList[this.departmentInfo.otherUserList.length - 1]?.userId,
+          pageSize: USER_AND_DEPARTMENT_LIMIT
+        });
+        await this.recursionGetTreeList();
+      }
     },
     // 加载内/外联系人或群聊列表
     loadContactList() {

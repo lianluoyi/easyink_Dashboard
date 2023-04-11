@@ -78,7 +78,7 @@ export default {
       this.qrcodeUrl = getCode.data;
     },
     /**
-     * 判断管理员是否扫描二维码1
+     * 判断管理员是否扫描二维码
      */
     async isScanCode() {
       const getStatus = await api.isScanCode({});

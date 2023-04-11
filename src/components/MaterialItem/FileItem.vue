@@ -1,12 +1,12 @@
 <!--
- * @Description: 单个文件/链接/雷达链接样式
+ * @Description: 单个文件/链接/雷达链接/智能表单样式
  * @Author: broccoli
  * @LastEditors: wJiaaa
 -->
 <script>
 import TagList from './Taglist.vue';
 import { getFileIcon, filterSize, matchDealtagName } from '@/utils/common';
-import { ICON_LIST, MEDIA_TYPE_RADARLINK } from '@/utils/constant';
+import { ICON_LIST, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_SMARTFORM } from '@/utils/constant';
 import MaskItem from './ToolMaskItem.vue';
 
 /**
@@ -93,7 +93,8 @@ export default {
       srcList: [],
       checked: false,
       ICON_LIST,
-      MEDIA_TYPE_RADARLINK
+      MEDIA_TYPE_RADARLINK,
+      MEDIA_TYPE_SMARTFORM
     };
   },
   computed: {
@@ -127,14 +128,14 @@ export default {
      */
     onChecked() {
       return this.selectedMaterialList.some(selectedItem => {
-        return this.item.id ? this.item.id === selectedItem.id : this.item.radarId === selectedItem.radarId;
+        return this.item.id ? this.item.id === selectedItem.id : this.item.extraId === selectedItem.extraId;
       });
     }
   },
   methods: {
     onCheck() {
       const newIds = [...this.selectedMaterialList];
-      const index = this.selectedMaterialList.findIndex(materialItem => this.item.id ? this.item.id === materialItem.id : this.item.radarId === materialItem.radarId);
+      const index = this.selectedMaterialList.findIndex(materialItem => this.item.id ? this.item.id === materialItem.id : this.item.extraId === materialItem.extraId);
       if (index > -1) {
         newIds.splice(index, 1);
       } else {
@@ -207,20 +208,34 @@ export default {
             <!-- 链接 摘要 -->
             <div class="desc-text inoneline" :title="descText">{{ item.content }}</div>
           </div>
+          <!-- 智能表单类型 -->
+          <div v-if="type === MEDIA_TYPE_SMARTFORM" class="title">
+            <div class="inoneline title">
+              <!-- 链接 标题 -->
+              {{ item.formName }}
+            </div>
+            <!-- 链接 摘要 -->
+            <div class="desc-text intwoline" :title="descText">{{ item.description }}</div>
+          </div>
           <!-- 普通链接 -->
           <div class="desc-text inoneline" :title="descText">{{ descText }}</div>
         </div>
         <div class="right">
-          <svg v-if="showIcon" class="icon" aria-hidden="true" width="50" height="50">
-            <use :xlink:href="'#icon-' + getFileIconClass" />
-          </svg>
-          <el-image v-else :src="item.coverUrl" fit="cover">
-            <div slot="error" class="image-slot">
-              <svg class="icon-img-link" :width="25" :height="25">
-                <use href="#icon-img-link" />
-              </svg>
-            </div>
-          </el-image>
+          <!-- 智能表单 -->
+          <svg-icon v-if="type === MEDIA_TYPE_SMARTFORM" icon-class="form-preview" class-name="form-preview" />
+          <template v-else>
+            <svg v-if="showIcon" class="icon" aria-hidden="true" width="50" height="50">
+              <use :xlink:href="'#icon-' + getFileIconClass" />
+            </svg>
+            <el-image v-else :src="item.coverUrl" fit="cover">
+              <div slot="error" class="image-slot">
+                <svg class="icon-img-link" :width="25" :height="25">
+                  <use href="#icon-img-link" />
+                </svg>
+              </div>
+            </el-image>
+          </template>
+
         </div>
       </div>
       <div class="bottom-div">
@@ -326,6 +341,11 @@ export default {
   .operate {
     @include border_style($direction: bottom);
   }
+}
+.form-preview {
+  width: 45px;
+  height: 45px;
+  border-radius: 3px;
 }
 </style>
 

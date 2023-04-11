@@ -1,7 +1,7 @@
 <!--
  * @Description: 群发详情列表
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: Xzz
 -->
 <script>
 import { getPushResult, sendToUser } from '@/api/groupMessage';
@@ -104,8 +104,8 @@ export default {
     },
     getSendTargets(pushResult) {
       const customerList = pushResult.customers.split('、');
-      return customerList.length > MAX_SEND_TARGET_NUM
-        ? customerList.slice(0, MAX_SEND_TARGET_NUM).join('、') + '等' + customerList.length + (this.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER ? '人' : '个')
+      return pushResult.count > MAX_SEND_TARGET_NUM
+        ? customerList.slice(0, MAX_SEND_TARGET_NUM).join('、') + '等' + pushResult.count + (this.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER ? '人' : '个')
         : pushResult.customers;
     },
     getUserHeadImg(userId) {

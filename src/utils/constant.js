@@ -21,6 +21,9 @@ export const MEDIA_TYPE_IMGLINK = '5';
 export const MEDIA_TYPE_MINIAPP = '6';
 // 雷达链接
 export const MEDIA_TYPE_RADARLINK = '7';
+/** 智能表单链接 */
+export const MEDIA_TYPE_SMARTFORM = '8';
+
 // 素材库类型
 export const MEDIA_TYPE = {
   [MEDIA_TYPE_POSTER]: '海报',
@@ -30,7 +33,8 @@ export const MEDIA_TYPE = {
   [MEDIA_TYPE_TEXT]: '文本',
   [MEDIA_TYPE_IMGLINK]: '链接',
   [MEDIA_TYPE_MINIAPP]: '小程序',
-  [MEDIA_TYPE_RADARLINK]: '雷达链接'
+  [MEDIA_TYPE_RADARLINK]: '雷达链接',
+  [MEDIA_TYPE_SMARTFORM]: '智能表单'
 };
 // 群发附件类型
 export const MESSAGE_MEDIA_TYPE = {
@@ -39,7 +43,8 @@ export const MESSAGE_MEDIA_TYPE = {
   [MEDIA_TYPE_FILE]: '文件',
   [MEDIA_TYPE_IMGLINK]: '链接',
   [MEDIA_TYPE_MINIAPP]: '小程序',
-  [MEDIA_TYPE_RADARLINK]: '雷达链接'
+  [MEDIA_TYPE_RADARLINK]: '雷达链接',
+  [MEDIA_TYPE_SMARTFORM]: '智能表单'
 };
 
 // 链接默认摘要
@@ -88,19 +93,19 @@ export const GROUP_MESSAGE_GENDER_TYPE = {
   [GENDER_TYPE_OF_UNKNOWN]: '未知性别'
 };
 
-const UNKNOW_SOURCE = '0';
-const ADD_BY_QRCODE = '1';
-const ADD_BY_PHONE = '2';
-const ADD_BY_BUSINESS_CARD = '3';
-const ADD_BY_GROUP = '4';
-const ADD_BY_PHONE_CONTACT = '5';
-const ADD_BY_WX_CONTACT = '6';
-const ADD_BY_WX = '7';
-const ADD_BY_THIRD_APP_AUTO = '8';
-const ADD_BY_MAIL = '9';
+export const UNKNOW_SOURCE = '0';
+export const ADD_BY_QRCODE = '1';
+export const ADD_BY_PHONE = '2';
+export const ADD_BY_BUSINESS_CARD = '3';
+export const ADD_BY_GROUP = '4';
+export const ADD_BY_PHONE_CONTACT = '5';
+export const ADD_BY_WX_CONTACT = '6';
+export const ADD_BY_WX = '7';
+export const ADD_BY_THIRD_APP_AUTO = '8';
+export const ADD_BY_MAIL = '9';
 export const ADD_BY_CHANNEL = '10';
-const ADD_BY_INTERNAL_SHARE = '201';
-const ADD_BY_ADMIN = '202';
+export const ADD_BY_INTERNAL_SHARE = '201';
+export const ADD_BY_ADMIN = '202';
 export const ADD_WAY_MAP = {
   [UNKNOW_SOURCE]: '未知来源',
   [ADD_BY_QRCODE]: '通过扫描二维码添加',
@@ -536,6 +541,7 @@ const WEL_MATERIAL_MINIAPP = 3;
 const WEL_MATERIAL_FILE = 4;
 const WEL_MATERIAL_VIDEO = 5;
 const WEL_MATERIAL_RADAR_LINK = 7;
+const WEL_MATERIAL_SMARTFORM = 8;
 
 export const WELCOME_APPENDIX_TYPE = {
   'text': WEL_MATERIAL_TEXT,
@@ -544,8 +550,10 @@ export const WELCOME_APPENDIX_TYPE = {
   'miniApp': WEL_MATERIAL_MINIAPP,
   'file': WEL_MATERIAL_FILE,
   'video': WEL_MATERIAL_VIDEO,
-  'radarLink': WEL_MATERIAL_RADAR_LINK
+  'radarLink': WEL_MATERIAL_RADAR_LINK,
+  'smartForm': WEL_MATERIAL_SMARTFORM
 };
+
 /** 素材库素材类型转为欢迎语附件类型 */
 export const MEDIA_TO_WELCOME_TYPE = {
   [MEDIA_TYPE_TEXT]: WEL_MATERIAL_TEXT,
@@ -554,7 +562,8 @@ export const MEDIA_TO_WELCOME_TYPE = {
   [MEDIA_TYPE_MINIAPP]: WEL_MATERIAL_MINIAPP,
   [MEDIA_TYPE_VIDEO]: WEL_MATERIAL_VIDEO,
   [MEDIA_TYPE_FILE]: WEL_MATERIAL_FILE,
-  [MEDIA_TYPE_RADARLINK]: WEL_MATERIAL_RADAR_LINK
+  [MEDIA_TYPE_RADARLINK]: WEL_MATERIAL_RADAR_LINK,
+  [MEDIA_TYPE_SMARTFORM]: WEL_MATERIAL_SMARTFORM
 };
 
 /** 欢迎语附件类型转为素材库素材类型 */
@@ -565,7 +574,8 @@ export const WELCOME_TO_MEDIA_TYPE = {
   [WEL_MATERIAL_MINIAPP]: MEDIA_TYPE_MINIAPP,
   [WEL_MATERIAL_VIDEO]: MEDIA_TYPE_VIDEO,
   [WEL_MATERIAL_FILE]: MEDIA_TYPE_FILE,
-  [WEL_MATERIAL_RADAR_LINK]: MEDIA_TYPE_RADARLINK
+  [WEL_MATERIAL_RADAR_LINK]: MEDIA_TYPE_RADARLINK,
+  [WEL_MATERIAL_SMARTFORM]: MEDIA_TYPE_SMARTFORM
 };
 
 /** 周的文字 */
@@ -791,6 +801,8 @@ export const CUSTOMER_CONTACT_SESSION_SAVE_KEY = {
 /** 客户详情页的path*/
 export const CUSTOMER_DEATIL_PATH = '/customerManage/customerCenter/customerDetail';
 
+/** 客户列表页的path*/
+export const CUSTOMER_PATH = '/customerManage/customerCenter/customer';
 // 表单上传展示类型
 /** 拖拽单个上传 */
 export const DRAG_ONE_TYPE = 1;
@@ -804,5 +816,57 @@ export const TEXT_LENGTH_TYPE = 2;
 /** 表单默认头图 */
 export const FORM_DEFAULT_HEAD_IMAGE_URL = 'https://wecomsaas-1253559996.cos.ap-guangzhou.myqcloud.com/2023/02/09/数据时代.png';
 
-/** 根部门父Id */
-export const DEFAULT_ROOT_PARENTID = '0';
+/** 部门和其他员工列表分页限制 */
+export const USER_AND_DEPARTMENT_LIMIT = '999';
+
+/** 激活的员工 */
+export const IS_ACTIVATE = 1;
+
+export const COMMON_TYPE = '0';
+export const LOSS_TYPE = '1';
+export const TRANSFER_TYPE = '4';
+export const TO_INHERIT_TYPE = '3';
+export const ALL_TYPE = '-1';
+
+/** 客户状态 */
+export const CUSTOMER_STATUS = {
+  [COMMON_TYPE]: '正常',
+  [LOSS_TYPE]: '已流失',
+  [TO_INHERIT_TYPE]: '待继承',
+  [TRANSFER_TYPE]: '转接中',
+  [ALL_TYPE]: '全部'
+};
+
+/** 高级筛选性别下拉框 */
+export const SCREENING_GENDER_TYPE = {
+  [GENDER_TYPE_OF_UNKNOWN]: '未知',
+  [GENDER_OF_MALE]: '男性',
+  [GENDER_OF_FEMALE]: '女性'
+};
+
+export const ADD_BY_SCHEDULE_PARTICIPATION = '11';
+export const ADD_BY_CONFERENCE_PARTICIPATION = '12';
+export const ADD_BY_WX_FRIEND = '13';
+export const ADD_BY_INTELLIGENT_HARDWARE = '14';
+export const ADD_BY_ON_SITE_SERVICE = '15';
+
+export const SCREENING_ADD_WAY_MAP = {
+  [UNKNOW_SOURCE]: '未知来源',
+  [ADD_BY_QRCODE]: '扫描二维码',
+  [ADD_BY_PHONE]: '搜索手机号',
+  [ADD_BY_BUSINESS_CARD]: '名片分享',
+  [ADD_BY_GROUP]: '群聊',
+  [ADD_BY_PHONE_CONTACT]: '手机通讯录',
+  [ADD_BY_WX_CONTACT]: '微信联系人',
+  [ADD_BY_THIRD_APP_AUTO]: '安装第三方应用时自动添加的客服人员',
+  [ADD_BY_MAIL]: '搜索邮箱',
+  [ADD_BY_CHANNEL]: '视频号添加',
+  [ADD_BY_SCHEDULE_PARTICIPATION]: '通过日程参与人添加',
+  [ADD_BY_CONFERENCE_PARTICIPATION]: '通过会议参与人添加',
+  [ADD_BY_WX_FRIEND]: '添加微信好友对应的企业微信',
+  [ADD_BY_INTELLIGENT_HARDWARE]: '通过智慧硬件专属客服添加',
+  [ADD_BY_ON_SITE_SERVICE]: '通过上门服务客服添加',
+  [ADD_BY_INTERNAL_SHARE]: '内部成员共享',
+  [ADD_BY_ADMIN]: '管理员/负责人分配'
+};
+

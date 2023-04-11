@@ -34,6 +34,8 @@ export default {
       CUSTOMER_PROPERTY_VALUE,
       // 是否为编辑状态
       editStatus: false,
+      // 旧标签
+      oldTags: [],
       // 基本信息字段
       baseList: [],
       // 自定义信息字段
@@ -200,6 +202,7 @@ export default {
         tagList.push({ ...item, name: item.tagName });
       });
       this.selectedTag = tagList;
+      this.oldTags = tagList;
     },
 
     /**
@@ -305,6 +308,25 @@ export default {
     dealShowText(colunmItem, row, type) {
       return dealShowText(colunmItem, row, type);
     },
+    filterTag(oldlist, newlist) {
+      const addList = [];
+      const deleteList = [];
+      newlist.forEach(item => {
+        if (oldlist.findIndex(olditem => item.tagId === olditem.tagId) === -1) {
+          addList.push(item);
+        }
+      });
+      oldlist.forEach(item => {
+        if (newlist.findIndex(newitem => item.tagId === newitem.tagId) === -1) {
+          deleteList.push(item);
+        }
+      });
+
+      return {
+        addList,
+        deleteList
+      };
+    },
     /**
      * 过滤出有更新的字段
      */
@@ -359,7 +381,9 @@ export default {
             params[fieldObj[item.name]] = item.value || '';
           }
           if (item.id === 'tag') {
-            params.editTag = this.selectedTag;
+            const { addList, deleteList } = this.filterTag(this.oldTags, this.selectedTag);
+            params.removeTags = deleteList;
+            params.addTags = addList;
           }
         });
         const extendProperties = [];
@@ -435,6 +459,7 @@ export default {
         this.selectedTag.map(item => {
           tagList.push({ ...item, tagName: item.name });
         });
+
         baseItem.value = tagList;
         this.baseList = newList;
       }

@@ -115,3 +115,14 @@ export function download(id) {
     responseType: 'blob'
   });
 }
+
+/**
+ * 获取群活码小程序短链接
+ * @param {*} params
+ */
+export function getApplink(params) {
+  return request({
+    url: service + '/appLink',
+    params
+  });
+}

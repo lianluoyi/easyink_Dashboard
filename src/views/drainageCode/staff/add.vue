@@ -98,21 +98,6 @@ export default {
             trigger: 'blur'
           }
         ],
-        sendValue: [
-          {
-            required: true,
-            validator: (rule, value, callback) => {
-              const { codeSuccessMsg, codeFailMsg, codeRepeatMsg } = this.codeMsg;
-              if (!(codeSuccessMsg || codeFailMsg || codeRepeatMsg)) {
-                this.msgError('请至少填写一项发送内容');
-                callback(new Error('该项为必填项'));
-              } else {
-                callback();
-              }
-            },
-            trigger: 'blur'
-          }
-        ],
         exchangeActivities: [{ required: true, message: '该项为必填项' }
         ]
       }),
@@ -320,6 +305,11 @@ export default {
             };
             if (!this.activeList.length) {
               this.msgError('请选择兑换活动');
+              changeButtonLoading(this.$store, 'save');
+              return;
+            }
+            if (!(codeSuccessMsg || codeFailMsg || codeRepeatMsg)) {
+              this.msgError('请至少填写一项发送内容');
               changeButtonLoading(this.$store, 'save');
               return;
             }
