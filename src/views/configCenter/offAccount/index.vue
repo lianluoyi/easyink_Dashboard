@@ -48,13 +48,13 @@
             <div class="f14 mb5" style="line-height: 28px">将公众号的开发信息填入以下表单</div>
             <el-form ref="form" :model="form" label-width="80px" :rules="rules" label-position="right" style="width: 600px">
               <el-form-item label="AppID" prop="officialAccountAppId">
-                <el-input v-model="form.officialAccountAppId" placeholder="请输入公众号AppID" autocompleted="off" style="width: 430px" clearable />
+                <el-input v-model="form.officialAccountAppId" placeholder="请输入公众号AppID" autocompleted="new-password" style="width: 430px" clearable />
               </el-form-item>
               <el-form-item label="AppSecret" prop="officialAccountAppSecret">
                 <el-input
                   v-model="form.officialAccountAppSecret"
                   :type="pwdVisible? 'text' : 'password'"
-                  auto-complete="off"
+                  auto-complete="new-password"
                   clearable
                   style="width: 430px"
                   placeholder="请输入公众号AppSecret"
