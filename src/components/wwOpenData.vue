@@ -42,8 +42,17 @@ export default {
       return this.$store.state.enterPriseWechatConfig.agentId;
     }
   },
+  watch: {
+    agentId(val) {
+      if (val) {
+        this.showData();
+      }
+    }
+  },
   mounted() {
-    this.showData();
+    if (this.agentId) {
+      this.showData();
+    }
     const textContent = document.querySelector('ww-open-data')?.textContent;
     if (!textContent && !this.userName.includes('_')) this.showWWOpenData = false;
   },

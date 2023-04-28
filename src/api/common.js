@@ -71,7 +71,7 @@ export function getAgentTicket(url, agentId) {
 }
 
 /**
- * @description 获取络客侧边栏配置
+ * @description 获取第三方SCRM系统侧边栏配置
  */
 export function getLockSideBar() {
   return request({
@@ -80,7 +80,7 @@ export function getLockSideBar() {
 }
 
 /**
- * @description 编辑络客侧边栏配置
+ * @description 编辑第三方SCRM系统侧边栏配置
  */
 export function putLockSideBar(data) {
   return request({
