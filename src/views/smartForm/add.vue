@@ -236,6 +236,7 @@ export default {
   },
   data() {
     return {
+      // TODO 常量不应定义在data中。
       SERVER_TYPE_THIRD,
       CUSTOMER_DATE,
       FORVER_EFFECT,

@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户概览
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="overview-page">
@@ -76,10 +76,10 @@
                   <div class="info">
                     <p>客户总数：截止到查询时间，未将员工删除、拉黑的客户总数</p>
                     <p>新增客户数：查询时间内员工添加的客户数量</p>
-                    <p>流失客户数：查询时间内添加的客户，把员工删除/拉黑的数量</p>
+                    <p>流失客户数：查询时间内，把员工删除或拉黑的客户数量</p>
                     <p>新客留存率：查询时间内，未将员工删除、拉黑的新增客户/新增客户</p>
                     <p>新客开口率：查询时间内，在添加当天给员工发消息的新增客户/新增客户</p>
-                    <p>服务响应率：查询时间内，员工首次向客户发送消息后，客户在30分钟内回复/会话客户</p>
+                    <p>服务响应率：查询时间内，员工首次向客户发送消息后，客户在30分钟内回复/员工主动发起的会话</p>
                   </div>
                   <div class="line" />
                   <div class="notice">
@@ -92,7 +92,14 @@
           </Statistics>
         </div>
         <div class="table-overview">
+          <div class="detail-title">
+            数据详情
+          </div>
           <div class="forms-handle-btn">
+            <el-radio-group v-model="dimensionType" class="radio-group-div" size="medium" @input="dimensionTypeChange">
+              <el-radio-button :label="STAFF_DIMENSION">员工维度</el-radio-button>
+              <el-radio-button :label="DATE_DIMENSION">日期维度</el-radio-button>
+            </el-radio-group>
             <el-button
               v-hasPermi="['statistic:customerContact:export']"
               class="btn-reset"
@@ -110,12 +117,23 @@
               <empty-default-icon :length="list.length" />
             </template>
             <el-table-column
+              v-if="dimensionType === STAFF_DIMENSION"
               prop=""
               label="员工"
               min-width="200"
             >
               <template #default="{ row }">
                 <UserItem :data="row" :is-staff="true" />
+              </template>
+            </el-table-column>
+            <el-table-column
+              v-else
+              prop="xtime"
+              label="日期"
+              min-width="200"
+            >
+              <template #default="{ row }">
+                {{ row.xtime }}
               </template>
             </el-table-column>
             <el-table-column sortable="custom" prop="totalContactCnt" label="客户总数" min-width="180" />
@@ -151,7 +169,7 @@
 <script>
 import RightContainer from '@/components/RightContainer';
 import Statistics from '@/components/Statistics.vue';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import UserItem from './userItem.vue';
 import TagUserShow from '@/components/TagUserShow';
@@ -161,18 +179,22 @@ import { YESTERDAY_TIME, FIXED_DAYS_AGO_TIME, ONE_MOUNTH_AGO, ONE_MOUNTH_LATER }
 import {
   getCustomerOverView,
   getCustomerOverViewOfUser,
-  exportCustomerOverViewOfUser
+  exportCustomerOverViewOfUser,
+  getCustomerOverViewOfDate,
+  exportCustomerOverViewOfDate
 } from '@/api/statistics';
 // 排序字段
 const SORT = {
-  'ascending': 'asc',
-  'descending': 'desc'
+  'ascending': 'ASC',
+  'descending': 'DESC'
 };
 export default {
   name: '',
   components: { RightContainer, Statistics, EmptyDefaultIcon, UserItem, TagUserShow, SelectUser },
   data() {
     return {
+      DATE_DIMENSION,
+      STAFF_DIMENSION,
       // 选择添加人弹窗显隐
       dialogVisibleSelectUser: false,
       // 搜索框选择的员工/部门
@@ -203,11 +225,19 @@ export default {
         pageNum: 1,
         pageSize: PAGE_LIMIT,
         beginTime: undefined,
-        endTime: undefined,
-        totalContactCntSort: SORT['descending'] // 默认降序
+        endTime: undefined
       },
       // 排序参数
-      sortParams: {},
+      sortParams: {
+        // 员工默认排序
+        staffSort: {
+          totalContactCnt: 'descending'
+        },
+        dateSort: {
+          sortName: 'totalContactCnt', // 默认降序
+          sortType: null
+        }
+      },
       // 总条数
       total: 0,
       // 客户概览表格数据
@@ -215,14 +245,24 @@ export default {
       // 表格loading
       loading: false,
       // 数据总览
-      colList: []
+      colList: [],
+      dimensionType: STAFF_DIMENSION
     };
   },
   created() {
-    this.getDataOverview();
-    this.getList(true);
+    this.onSearch();
   },
   methods: {
+    dimensionTypeChange() {
+      if (this.dimensionType === STAFF_DIMENSION) {
+        Object.keys(this.sortParams.staffSort).forEach((key) => {
+          this.$refs?.showTable?.sort(key, this.sortParams.staffSort[key]);
+        });
+      } else {
+        const { sortName, sortType } = this.sortParams.dateSort;
+        this.$refs?.showTable?.sort(sortName, sortType);
+      }
+    },
     /**
      * @description 选择员工/部门的回调
      */
@@ -279,12 +319,20 @@ export default {
     getList(initPage) {
       initPage ? this.query.pageNum = 1 : null;
       this.loading = true;
-      getCustomerOverViewOfUser({ ...this.getSearchPayload(), ...this.sortParams }).then((res) => {
-        this.list = res.rows;
+      const getListFn = this.dimensionType === STAFF_DIMENSION ? getCustomerOverViewOfUser : getCustomerOverViewOfDate;
+      getListFn(this.getSearchPayload()).then((res) => {
+        this.list = this.dimensionType === STAFF_DIMENSION ? res.rows : this.dealPaging(res.rows);
         this.total = res.total || 0;
       }).finally(() => {
         this.loading = false;
       });
+    },
+    /**
+     * @description 处理日期维度表格数据分页
+     */
+    dealPaging(list) {
+      const { pageNum, pageSize } = this.query;
+      return list.slice((pageNum - 1) * pageSize, pageNum * pageSize);
     },
     // 查询
     onSearch() {
@@ -297,8 +345,14 @@ export default {
       this.query = this.$options.data().query;
       this.pickerMinDate = '';
       this.dateRange = [YESTERDAY_TIME, YESTERDAY_TIME];
+      if (this.dimensionType === STAFF_DIMENSION) {
+        this.sortParams.staffSort = this.$options.data().sortParams.staffSort;
+        this.$refs?.showTable?.sort('totalContactCnt', 'descending'); // 重置为默认排序(此处自行进行请求表单数据)
+      } else {
+        this.sortParams.dateSort = this.$options.data().sortParams.dateSort;
+        this.$refs?.showTable?.sort('totalContactCnt', null);
+      }
       this.getDataOverview();
-      this.$refs?.showTable?.sort('totalContactCnt', 'descending'); // 重置为默认排序(此处自行进行请求表单数据)
     },
     /**
      * @description 获取搜索的传参
@@ -319,11 +373,24 @@ export default {
         this.query.departmentIds = [];
         this.query.userIds = [];
       }
-      return this.query;
+      let sortPayload = {};
+      if (this.dimensionType === STAFF_DIMENSION) {
+        Object.keys(this.sortParams.staffSort).forEach((key) => {
+          sortPayload[`${key}Sort`] = SORT[this.sortParams.staffSort[key]];
+        });
+      } else {
+        const { sortName, sortType } = this.sortParams.dateSort;
+        sortPayload = {
+          sortName: sortName + 'Sort',
+          sortType: SORT[sortType]
+        };
+      }
+      return { ...this.query, ...sortPayload };
     },
     // 导出报表
     exportForms() {
-      exportCustomerOverViewOfUser({ ...this.getSearchPayload(), ...this.sortParams }).then((res) => {
+      const exportFn = this.dimensionType === STAFF_DIMENSION ? exportCustomerOverViewOfUser : exportCustomerOverViewOfDate;
+      exportFn(this.getSearchPayload()).then((res) => {
         this.download(res.data.msg, true);
       }).catch(() => {
         this.msgError('导出失败!');
@@ -331,11 +398,16 @@ export default {
     },
     // 表格排序
     changeTableSort({ prop, order }) {
-      // 清除默认排序
-      delete this.query.totalContactCntSort;
-      this.sortParams = {
-        [`${prop}Sort`]: SORT[order]
-      };
+      if (this.dimensionType === STAFF_DIMENSION) {
+        this.sortParams.staffSort = {
+          [prop]: order
+        };
+      } else {
+        this.sortParams.dateSort = {
+          sortName: prop,
+          sortType: order
+        };
+      }
       this.getList(true);
     }
   }
@@ -352,9 +424,15 @@ export default {
     padding: 15px;
     background-color: #fff;
     flex: 1;
+     .detail-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #000000;
+      margin-bottom: 15px;
+    }
     .forms-handle-btn {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       margin-bottom: 15px;
     }
 
