@@ -610,7 +610,7 @@ export default {
     handleNodeClick(data) {
       // 点击部门不做处理
       if (!data.userId) return;
-      const nowClickDom = document.querySelector(`[data-userid=${this.dealUserId(data.userId)}]`);
+      const nowClickDom = document.querySelector(`[data-userid="${this.dealUserId(data.userId)}"]`);
       if (nowClickDom) {
         if (this.employId) {
           // const oldClickDom = document.querySelector(`[data-userid=${this.dealUserId(this.employId)}]`);

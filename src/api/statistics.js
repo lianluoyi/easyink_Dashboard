@@ -1,7 +1,7 @@
 /*
  * @Description: 数据统计接口
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
  */
 import request from '@/utils/request';
 
@@ -146,6 +146,42 @@ export function exportCustomerActivityOfUser(data) {
 export function exportCustomerActivityOfCustomer(data) {
   return request({
     url: service + '/exportCustomerActivityOfCustomer',
+    method: 'post',
+    data
+  });
+}
+
+/** 客户联系日期维度 */
+export function getCustomerOverViewOfDate(data) {
+  return request({
+    url: service + '/getCustomerOverViewOfDate',
+    method: 'post',
+    data
+  });
+}
+
+/** 客户联系日期维度导出 */
+export function exportCustomerOverViewOfDate(data) {
+  return request({
+    url: service + '/exportCustomerOverViewOfDate',
+    method: 'post',
+    data
+  });
+}
+
+/** 员工服务日期维度 */
+export function getUserServiceOfTime(data) {
+  return request({
+    url: service + '/getUserServiceOfTime',
+    method: 'post',
+    data
+  });
+}
+
+/** 员工服务日期维度导出 */
+export function exportUserServiceOfTime(data) {
+  return request({
+    url: service + '/exportUserServiceOfTime',
     method: 'post',
     data
   });

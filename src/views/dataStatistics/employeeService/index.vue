@@ -81,10 +81,7 @@
                 <div class="notice">
                   注意：
                   <div>
-                    1. 聊天总数、发送消息数、平均首次回复时长、回复率的统计数据来源于企业微信；
-                  </div>
-                  <div>
-                    2. 有效沟通客户数、有效沟通率的统计数据来源于会话存档，若员工未开启会话存档或客户拒绝存档，统计数将受影响。
+                    除“客户好评率”，表中所有统计数来源于会话存档，若员工未开启会话存档或客户拒绝存档，统计数将受影响
                   </div>
                 </div>
               </div>
@@ -98,7 +95,14 @@
           :col-list="nextLineColList"
         />
         <div class="table-overview">
+          <div class="detail-title">
+            数据详情
+          </div>
           <div class="forms-handle-btn">
+            <el-radio-group v-model="dimensionType" class="radio-group-div" size="medium" @input="dimensionTypeChange">
+              <el-radio-button :label="STAFF_DIMENSION">员工维度</el-radio-button>
+              <el-radio-button :label="DATE_DIMENSION">日期维度</el-radio-button>
+            </el-radio-group>
             <el-button
               v-hasPermi="['statistic:employeeService:export']"
               class="btn-reset"
@@ -116,15 +120,14 @@
             <template slot="empty">
               <empty-default-icon :length="list.length" />
             </template>
-            <el-table-column label="员工" align="center" width="180">
-              <template slot-scope="scope">
-                <div class="user-info">
-                  <img :src="scope.row.userHeadImage || require('@/assets/image/card-avatar.svg')" alt="">
-                  <div class="user-info-userName inoneline">
-                    <span class="inoneline">{{ scope.row.userName }}</span>
-                    <span class="user-info-departmentName inoneline">{{ companName }}{{ companName && scope.row.departmentName && '/' }}{{ scope.row.departmentName }}</span>
-                  </div>
-                </div>
+            <el-table-column v-if="dimensionType === STAFF_DIMENSION" label="员工" align="center" width="180">
+              <template #default="{ row }">
+                <UserItem :data="row" :is-staff="true" />
+              </template>
+            </el-table-column>
+            <el-table-column v-else label="日期" align="center" prop="time" width="180">
+              <template #default="{ row }">
+                {{ row.time }}
               </template>
             </el-table-column>
             <el-table-column sortable="custom" prop="chatTotal" label="聊天总数" min-width="120" />
@@ -177,19 +180,27 @@ import SelectUser from '@/components/SelectUser/index.vue';
 import Statistics from '@/components/Statistics';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT } from '@/utils/constant';
+import UserItem from '../customerContact/userItem.vue';
+import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION } from '@/utils/constant';
 import moment from 'moment';
 import { cloneDeep } from 'lodash';
 import { YESTERDAY_TIME, FIXED_DAYS_AGO_TIME, groupByScopeType } from '@/utils/common';
-import { getUserServiceOfTotal, getUserServiceOfUser, exportUserServiceOfUser } from '@/api/statistics';
+import { getUserServiceOfTotal, getUserServiceOfUser, exportUserServiceOfUser, getUserServiceOfTime, exportUserServiceOfTime } from '@/api/statistics';
 // TODO 合并客户联系相同字段
 // eslint-disable-next-line no-magic-numbers
 const ONE_MONTH = 30 * 24 * 3600 * 1000;
+const SORT_TYPE = {
+  'ascending': 'ASC',
+  'descending': 'DESC',
+  'null': null
+};
 export default {
   name: '',
-  components: { RightContainer, EmptyDefaultIcon, Statistics, SelectUser, TagUserShow },
+  components: { RightContainer, EmptyDefaultIcon, Statistics, SelectUser, TagUserShow, UserItem },
   data() {
     return {
+      DATE_DIMENSION,
+      STAFF_DIMENSION,
       selectDate: '',
       // TODO 合并客户联系相同方法
       // 日期范围选择限定
@@ -256,8 +267,19 @@ export default {
         },
         { title: '客户好评率', filed: 'customerPositiveCommentsRate', showPopover: false, unit: '%' }
       ],
-      /** 当前排序规则 */
-      sortRule: { chatTotalSort: 'DESC' }
+      /**  */
+      // 当前排序规则 员工维度和日期维度传参方式不一样
+      sortParams: {
+        // 员工默认排序
+        staffSort: {
+          chatTotal: 'descending'
+        },
+        dateSort: {
+          sortName: 'chatTotal', // 默认降序
+          sortType: null
+        }
+      },
+      dimensionType: STAFF_DIMENSION
     };
   },
   computed: {
@@ -269,6 +291,16 @@ export default {
     this.onSearch();
   },
   methods: {
+    dimensionTypeChange() {
+      if (this.dimensionType === STAFF_DIMENSION) {
+        Object.keys(this.sortParams.staffSort).forEach((key) => {
+          this.$refs?.table?.sort(key, this.sortParams.staffSort[key]);
+        });
+      } else {
+        const { sortName, sortType } = this.sortParams.dateSort;
+        this.$refs?.table?.sort(sortName, sortType);
+      }
+    },
     /**
      * @description 为数据总览赋值
      * @param filedType 当前赋值的列表
@@ -306,24 +338,43 @@ export default {
         delete payload.pageNum;
         delete payload.pageSize;
       }
-      return payload;
+      let sortPayload = {};
+      if (this.dimensionType === STAFF_DIMENSION) {
+        Object.keys(this.sortParams.staffSort).forEach((key) => {
+          sortPayload[`${key}Sort`] = SORT_TYPE[this.sortParams.staffSort[key]];
+        });
+      } else {
+        const { sortName, sortType } = this.sortParams.dateSort;
+        sortPayload = {
+          sortName: sortName + 'Sort',
+          sortType: SORT_TYPE[sortType]
+        };
+      }
+      return { ...payload, ...sortPayload };
     },
     /**
      * @description 获取员工服务数据表格
      */
-    getList() {
+    getList(initPage) {
+      initPage ? this.query.pageNum = 1 : null;
       this.loading = true;
-      getUserServiceOfUser({ ...this.sortRule, ...this.dealSearchPayload() }).then((res) => {
-        this.list = res.rows || [];
+      const getListFn = this.dimensionType === STAFF_DIMENSION ? getUserServiceOfUser : getUserServiceOfTime;
+      getListFn(this.dealSearchPayload()).then((res) => {
+        this.list = this.dimensionType === STAFF_DIMENSION ? res.rows : this.dealPaging(res.rows);
         this.total = res.total;
       }).finally(() => {
         this.loading = false;
       });
     },
-
+    /**
+     * @description 处理日期维度表格数据分页
+     */
+    dealPaging(list) {
+      const { pageNum, pageSize } = this.query;
+      return list.slice((pageNum - 1) * pageSize, pageNum * pageSize);
+    },
     onSearch() {
-      this.query.pageNum = 1;
-      this.getList();
+      this.getList(true);
       this.getDataOverview();
     },
 
@@ -331,9 +382,13 @@ export default {
       this.query = this.$options.data().query;
       this.dateRange = this.$options.data().dateRange;
       this.userAndDepartmentList = [];
-      this.sortRule = { chatTotalSort: 'DESC' };
-      // 重置的时候会主动调用this.getList();
-      this.$refs.table.sort('chatTotal', 'descending');
+      if (this.dimensionType === STAFF_DIMENSION) {
+        this.sortParams.staffSort = this.$options.data().sortParams.staffSort;
+        this.$refs?.table?.sort('chatTotal', 'descending');
+      } else {
+        this.sortParams.dateSort = this.$options.data().sortParams.dateSort;
+        this.$refs?.table?.sort('chatTotal', 'null');
+      }
       this.getDataOverview();
     },
     /**
@@ -349,7 +404,8 @@ export default {
      * @description 导出报表
      */
     exportForms() {
-      exportUserServiceOfUser({ ...this.sortRule, ...this.dealSearchPayload() }).then((res) => {
+      const exportFn = this.dimensionType === STAFF_DIMENSION ? exportUserServiceOfUser : exportUserServiceOfTime;
+      exportFn(this.dealSearchPayload()).then((res) => {
         this.download(res.data.msg, true);
       }).catch(() => {
         this.msgError('导出失败!');
@@ -359,35 +415,37 @@ export default {
      * @description 表格排序
      */
     changeTableSort({ prop, order }) {
-      // TODO 合并客户联系相同方法
-      const SORT_TYPE = {
-        'ascending': 'ASC',
-        'descending': 'DESC',
-        'null': null
-      };
-      const sortFiled = prop + 'Sort';
-      this.sortRule = { [sortFiled]: SORT_TYPE[order] };
-      this.getList();
+      if (this.dimensionType === STAFF_DIMENSION) {
+        this.sortParams.staffSort = {
+          [prop]: order
+        };
+      } else {
+        this.sortParams.dateSort = {
+          sortName: prop,
+          sortType: order
+        };
+      }
+      this.getList(true);
     }
   }
 };
 </script>
 <style scoped lang='scss'>
   @import '~@/styles/mixin.scss';
-  .data-overview {
-    height: 182px;
-    width: 100%;
-    background-color: #fff;
-    margin-bottom: 10px;
-  }
   .table-overview {
     padding: 15px;
     margin-top: 10px;
     background-color: #fff;
     flex: 1;
+    .detail-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #000000;
+      margin-bottom: 15px;
+    }
     .forms-handle-btn {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       margin-bottom: 15px;
     }
 
@@ -426,29 +484,4 @@ export default {
       color: #E29836;
     }
   }
-  .user-info {
-    display: flex;
-    align-items: center;
-    i {
-      font-size: 35px;
-      @include text_btn_color($color-theme2-1);
-    }
-    img {
-      width: 35px;
-      height: 35px;
-    }
-    span {
-      color: #333;
-      padding-left: 5px;
-      line-height: 14px;
-    }
-    .user-info-userName {
-      display: flex;
-      flex-direction: column;
-      .user-info-departmentName {
-        margin-top: 5px;
-        color: #AAA;
-      }
-    }
-}
 </style>

@@ -34,7 +34,7 @@
                 <template #default>
                   <div class="popover-content" style="line-height: 30px">
                     新增客户数：查询时间内，员工添加的客户数量<br>
-                    流失客户数：查询时间内添加的客户，把员工删除/拉黑的数量<br>
+                    流失客户数：查询时间内，把员工删除/拉黑的数量<br>
                     新客留存率：查询时间内，未将员工删除、拉黑的新增客户/新增客户<br>
                     新增客户群：查询时间内，员工新创建的客户群数量<br>
                     客户群新增人数：查询时间内，客户群新增的群成员数量<br>
@@ -69,7 +69,7 @@
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:10px; text-align: center;">
             <DiffItem
-              v-for="(item,index) of ['newContactCntDiff', 'negativeFeedbackCntDiff', 'newContactRetentionRateDiff', 'newChatDiff', 'newMemberCntDiff']"
+              v-for="(item,index) of ['newContactCntDiff', 'negativeFeedbackCntDiff', 'newContactRetentionRateDiff', 'newChatCntDiff', 'newMemberCntDiff']"
               :key="index"
               :erchats-table="erchatsTable"
               :field="item"
