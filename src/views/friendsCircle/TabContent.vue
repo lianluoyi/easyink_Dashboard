@@ -1,7 +1,7 @@
 <!--
  * @Description: 朋友圈发布记录详情列表
  * @Author: wJiaaa
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <script>
 import { sendToUser, refreshMomentTask } from '@/api/friends.js';
@@ -239,7 +239,7 @@ export default {
           :total="total"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
-          @pagination="(pageInfo) => listOfMomentPublishDetail(pageInfo.page)"
+          @pagination="listOfMomentPublishDetail()"
         />
       </template>
     </RightContainer>

@@ -1,7 +1,7 @@
 <!--
  * @Description: 群发详情列表
  * @Author: broccoli
- * @LastEditors: Xzz
+ * @LastEditors: wJiaaa
 -->
 <script>
 import { getPushResult, sendToUser } from '@/api/groupMessage';
@@ -188,7 +188,7 @@ export default {
           :total="total"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
-          @pagination="(pageInfo) => getList(pageInfo.page)"
+          @pagination="getList()"
         />
       </template>
     </RightContainer>

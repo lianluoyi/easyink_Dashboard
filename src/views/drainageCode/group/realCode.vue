@@ -381,7 +381,7 @@ export default {
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
-      @pagination="getRealCodes"
+      @pagination="getRealCodes()"
     />
   </div>
 </template>

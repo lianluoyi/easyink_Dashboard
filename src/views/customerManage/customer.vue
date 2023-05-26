@@ -1041,6 +1041,11 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.search-form-container {
+  .el-form {
+    margin-bottom: 0;
+  }
+}
 .iconfont {
   font-size: 16px;
   margin-left: 4px;

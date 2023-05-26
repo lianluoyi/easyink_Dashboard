@@ -1,6 +1,6 @@
 <script>
 import { updateCustomerDetail, getDetail, getEmployeesList } from '@/api/customer';
-import { ADD_WAY_MAP, CUSTOMER_PROPERTY_VALUE, GENDER_TYPE, WX_TYPE, ADD_BY_CHANNEL } from '@/utils/constant';
+import { ADD_WAY_MAP, CUSTOMER_PROPERTY_VALUE, GENDER_TYPE, WX_TYPE, ADD_BY_CHANNEL, CUSTOMER_DETAIL } from '@/utils/constant';
 import ReturnPage from '@/components/ReturnPage.vue';
 import { dealShowText, initGetCustomerProper, dealAtInfo } from '@/utils/common';
 import BasePropertyItem from './components/basePropertyItem.vue';
@@ -9,6 +9,7 @@ import moment from 'moment';
 import SelectTag from '@/components/SelectTag';
 import { deepClone } from '@/utils/index';
 import { isEqual } from 'lodash';
+import CustomerOrGroupInfo from './components/CustomerOrGroupInfo.vue';
 const fieldObj = {
   '出生日期': 'birthday',
   '邮箱': 'email',
@@ -18,7 +19,7 @@ const fieldObj = {
 };
 export default {
   // name: 'CustomerDetail',
-  components: { ReturnPage, BasePropertyItem, CustomPropertyItem, SelectTag },
+  components: { ReturnPage, BasePropertyItem, CustomPropertyItem, SelectTag, CustomerOrGroupInfo },
   data() {
     return {
       datePickerVisible: false,
@@ -56,7 +57,9 @@ export default {
       wxType: WX_TYPE,
       ADD_BY_CHANNEL,
       // 是否有数据权限编辑客户信息
-      permission: true
+      permission: true,
+      activeTabName: CUSTOMER_DETAIL['customerInfo'],
+      CUSTOMER_DETAIL
     };
   },
   computed: {
@@ -529,42 +532,55 @@ export default {
         </div>
       </div>
       <div class="all-detail-div">
-        <el-descriptions title="基本信息" direction="vertical" :column="4" border size="medium">
-          <el-descriptions-item v-for="(baseItem, baseIndex) in baseList" :key="baseIndex" :label="baseItem.name" content-style="min-width: 100px">
-            <template slot="label">
-              <span v-if="baseItem.required" class="required-mark">*</span>
-              {{ baseItem.name }}
-            </template>
-            <BasePropertyItem
-              :item="baseItem"
-              :list.sync="baseList"
-              :index="baseIndex"
-              :edit-status="editStatus"
-              :dialog-visible.sync="dialogVisible"
-            />
-          </el-descriptions-item>
-        </el-descriptions>
-        <el-descriptions
-          title="自定义信息"
-          direction="vertical"
-          :column="4"
-          border
-          size="medium"
-        >
-          <el-descriptions-item
-            v-for="(customItem, customIndex) in customList"
-            :key="customIndex"
-            :label="customItem.name"
-          >
-            <template slot="label">
-              <span v-if="customItem.required" class="required-mark">*</span>
-              {{ customItem.name }}
-            </template>
-            <CustomPropertyItem :item="customItem" :list.sync="customList" :index="customIndex" :edit-status="editStatus" />
-          </el-descriptions-item>
-        </el-descriptions>
+        <el-tabs v-model="activeTabName">
+          <el-tab-pane label="客户资料" :name="CUSTOMER_DETAIL['customerInfo']" style="padding:20px;">
+            <el-descriptions title="基本信息" direction="vertical" :column="4" border size="medium">
+              <el-descriptions-item v-for="(baseItem, baseIndex) in baseList" :key="baseIndex" :label="baseItem.name" content-style="min-width: 100px">
+                <template slot="label">
+                  <span v-if="baseItem.required" class="required-mark">*</span>
+                  {{ baseItem.name }}
+                </template>
+                <BasePropertyItem
+                  :item="baseItem"
+                  :list.sync="baseList"
+                  :index="baseIndex"
+                  :edit-status="editStatus"
+                  :dialog-visible.sync="dialogVisible"
+                />
+              </el-descriptions-item>
+            </el-descriptions>
+            <el-descriptions
+              title="自定义信息"
+              direction="vertical"
+              :column="4"
+              border
+              size="medium"
+            >
+              <el-descriptions-item
+                v-for="(customItem, customIndex) in customList"
+                :key="customIndex"
+                :label="customItem.name"
+              >
+                <template slot="label">
+                  <span v-if="customItem.required" class="required-mark">*</span>
+                  {{ customItem.name }}
+                </template>
+                <CustomPropertyItem :item="customItem" :list.sync="customList" :index="customIndex" :edit-status="editStatus" />
+              </el-descriptions-item>
+            </el-descriptions>
+          </el-tab-pane>
+          <el-tab-pane label="信息动态" :name="CUSTOMER_DETAIL['informationDynamics']" />
+          <el-tab-pane label="活动轨迹" :name="CUSTOMER_DETAIL['activityTrack']" />
+          <el-tab-pane label="待办事项" :name="CUSTOMER_DETAIL['todo']" />
+        </el-tabs>
+        <CustomerOrGroupInfo
+          v-if="activeTabName !== CUSTOMER_DETAIL['customerInfo']"
+          :external-userid="$route.query.id"
+          :active-tab="activeTabName"
+          :user-id="employeesId"
+        />
       </div>
-      <div class="bottom-tool">
+      <div v-if="activeTabName === CUSTOMER_DETAIL['customerInfo']" class="bottom-tool">
         <el-button v-if="permission" type="primary" @click="handleSubmit">{{ editStatus ? '保存' : '编辑' }}</el-button>
       </div>
       <!-- 选择标签弹窗 -->
@@ -724,17 +740,32 @@ export default {
 .customer-detail-page {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: auto;
   .detail-div {
     flex: 1;
-    overflow: auto;
     display: flex;
     flex-direction: column;
   }
   .all-detail-div {
     flex: 1;
-    overflow: auto;
     background-color: #fff;
-    padding: 20px;
+    height: 100%;
+    position: relative;
+    /deep/ .el-tabs {
+      .el-tabs__active-bar {
+        margin-left: 5px;
+      }
+      .el-tabs__item {
+        padding: 0 15px;
+      }
+      .el-tabs__nav {
+        padding-left: 5px;
+      }
+      .el-tabs__header {
+        margin: 0;
+      }
+    }
     margin-top: 15px;
     .el-descriptions {
       margin-bottom: 20px;
@@ -750,6 +781,7 @@ export default {
     border: 1px solid rgba(238, 238, 238, 100);
     text-align: center;
     line-height: 48px;
+    box-sizing: content-box;
   }
   .required-mark {
     color: $red;
