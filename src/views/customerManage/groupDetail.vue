@@ -3,10 +3,11 @@ import * as api from '@/api/customer/group';
 import * as tagApi from '@/api/customer/grouptag';
 import SelectTag from '@/components/SelectTag';
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT, JOIN_SCENE, GROUP_ENTER_WAY_MAP, MEMBER_TYPE } from '@/utils/constant';
+import CustomerOrGroupInfo from './components/CustomerOrGroupInfo.vue';
+import { PAGE_LIMIT, JOIN_SCENE, GROUP_ENTER_WAY_MAP, MEMBER_TYPE, CUSTOMER_DETAIL } from '@/utils/constant';
 export default {
   // name: 'GroupDetail',
-  components: { SelectTag, RightContainer },
+  components: { SelectTag, RightContainer, CustomerOrGroupInfo },
   data() {
     return {
       // 遮罩层
@@ -41,7 +42,9 @@ export default {
       customerCount: 0,
       staffCount: 0,
       dialogVisible: false,
-      selectedTags: []
+      selectedTags: [],
+      activeTabName: CUSTOMER_DETAIL['groupMemInfo'],
+      CUSTOMER_DETAIL
     };
   },
   created() {
@@ -135,7 +138,7 @@ export default {
 <template>
   <div class="container">
     <!-- <el-button slot="append" circle icon="el-icon-back" @click="$router.back()"></el-button>返回 -->
-    <el-card shadow="hover">
+    <el-card shadow="hover" class="card">
       <div class="back-area">
         <i class="iconfont icon-restore" @click="handleGoBack" />
         <span @click="handleGoBack">返回</span>
@@ -168,104 +171,115 @@ export default {
         </div>
       </div>
     </el-card>
-    <div class="right-wrapper">
-      <RightContainer>
-        <template v-slot:search>
-          <el-form
-            ref="queryForm"
-            :inline="true"
-            :model="query"
-            label-width="100px"
-            class="top-search"
-            size="small"
-          >
-            <el-form-item prop="memberName" class="group-member-search">
-              <el-input v-model="query.memberName" placeholder="请输入群成员昵称" />
-            </el-form-item>
-            <el-form-item>
-              <el-date-picker
-                v-model="dateRange"
-                value-format="yyyy-MM-dd"
-                type="daterange"
-                :picker-options="pickerOptions"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
+    <div class="tab" :style="{ height:(activeTabName === CUSTOMER_DETAIL['groupMemInfo'] ? '100%' : '40px')}">
+      <el-tabs v-model="activeTabName">
+        <el-tab-pane label="群成员信息" :name="CUSTOMER_DETAIL['groupMemInfo']">
+          <RightContainer>
+            <template v-slot:search>
+              <el-form
+                ref="queryForm"
+                :inline="true"
+                :model="query"
+                label-width="100px"
+                class="top-search"
+                size="small"
+              >
+                <el-form-item prop="memberName" class="group-member-search">
+                  <el-input v-model="query.memberName" placeholder="请输入群成员昵称" />
+                </el-form-item>
+                <el-form-item>
+                  <el-date-picker
+                    v-model="dateRange"
+                    value-format="yyyy-MM-dd"
+                    type="daterange"
+                    :picker-options="pickerOptions"
+                    range-separator="-"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                  />
+                </el-form-item>
+                <el-form-item prop="joinScene">
+                  <el-select v-model="query.joinScene" placeholder="请选择入群方式">
+                    <el-option
+                      v-for="item in statusOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </el-form-item>
+                <el-form-item>
+                  <el-button
+                    type="primary"
+                    @click="getList(1)"
+                  >查询</el-button>
+                  <el-button
+                    class="btn-reset"
+                    @click="resetQuery"
+                  >重置</el-button>
+                </el-form-item>
+              </el-form>
+            </template>
+            <template v-slot:data-stat>
+              <span>群内客户<span class="data-count-num">{{ customerCount }}</span>人，企业成员<span class="data-count-num">{{ staffCount }}</span>人</span>
+            </template>
+            <template v-slot:data>
+              <el-table
+                v-loading="loading"
+                :data="list"
+                @selection-change="handleSelectionChange"
+              >
+                <el-table-column label="群成员" prop="memberName">
+                  <template slot-scope="scope">
+                    <span v-if="scope.row.userId === group.owner" class="owner-label theme-text-color">群主</span>
+                    {{ scope.row.memberName }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="成员类型" prop="joinType">
+                  <template slot-scope="scope">
+                    <span>{{ memberType[scope.row.joinType] }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="入群时间" prop="joinTime" />
+                <el-table-column label="入群方式" prop="joinScene">
+                  <template slot-scope="scope">
+                    <span>{{ joinScene[scope.row.joinScene] }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="邀请者" prop="invitorName">
+                  <template #header>
+                    <span>邀请者</span>
+                    <el-popover
+                      placement="top-start"
+                      content="仅本企业内部成员邀请入群时显示邀请者"
+                      trigger="hover"
+                      popper-class="tip-popover"
+                    >
+                      <i slot="reference" class="iconfont icon-question" style="font-size: 14px;" />
+                    </el-popover>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <pagination
+                v-show="total > 0"
+                :total="total"
+                :page.sync="query.pageNum"
+                :limit.sync="query.pageSize"
+                @pagination="getList()"
               />
-            </el-form-item>
-            <el-form-item prop="joinScene">
-              <el-select v-model="query.joinScene" placeholder="请选择入群方式">
-                <el-option
-                  v-for="item in statusOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-button
-                type="primary"
-                @click="getList(1)"
-              >查询</el-button>
-              <el-button
-                class="btn-reset"
-                @click="resetQuery"
-              >重置</el-button>
-            </el-form-item>
-          </el-form>
-        </template>
-        <template v-slot:data-stat>
-          <span>群内客户<span class="data-count-num">{{ customerCount }}</span>人，企业成员<span class="data-count-num">{{ staffCount }}</span>人</span>
-        </template>
-        <template v-slot:data>
-          <el-table
-            v-loading="loading"
-            :data="list"
-            @selection-change="handleSelectionChange"
-          >
-            <el-table-column label="群成员" prop="memberName">
-              <template slot-scope="scope">
-                <span v-if="scope.row.userId === group.owner" class="owner-label theme-text-color">群主</span>
-                {{ scope.row.memberName }}
-              </template>
-            </el-table-column>
-            <el-table-column label="成员类型" prop="joinType">
-              <template slot-scope="scope">
-                <span>{{ memberType[scope.row.joinType] }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="入群时间" prop="joinTime" />
-            <el-table-column label="入群方式" prop="joinScene">
-              <template slot-scope="scope">
-                <span>{{ joinScene[scope.row.joinScene] }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="邀请者" prop="invitorName">
-              <template #header>
-                <span>邀请者</span>
-                <el-popover
-                  placement="top-start"
-                  content="仅本企业内部成员邀请入群时显示邀请者"
-                  trigger="hover"
-                  popper-class="tip-popover"
-                >
-                  <i slot="reference" class="iconfont icon-question" style="font-size: 14px;" />
-                </el-popover>
-              </template>
-            </el-table-column>
-          </el-table>
-          <pagination
-            v-show="total > 0"
-            :total="total"
-            :page.sync="query.pageNum"
-            :limit.sync="query.pageSize"
-            @pagination="getList()"
-          />
-        </template>
-      </RightContainer>
+            </template>
+          </RightContainer>
+        </el-tab-pane>
+        <el-tab-pane label="待办事项" :name="CUSTOMER_DETAIL['todo']" />
+      </el-tabs>
     </div>
-
+    <div v-if="activeTabName === CUSTOMER_DETAIL['todo']" class="todo-tab">
+      <CustomerOrGroupInfo
+        :active-tab="CUSTOMER_DETAIL['todo']"
+        :external-userid="query.chatId"
+        is-group
+      />
+    </div>
     <SelectTag
       ref="selectTag"
       :visible.sync="dialogVisible"
@@ -347,13 +361,44 @@ export default {
 .container {
   display: flex;
   flex-direction: column;
-  .right-wrapper {
-    flex: 1;
+  .tab {
+    margin-top: 10px;
+    /deep/ .el-form {
+      margin-top: 0;
+    }
+    /deep/ .search-form-container {
+      background-color: #eee;
+    }
   }
-  /deep/ .el-card__body {
-    display: flex;
+  .todo-tab {
+    flex: 1;
     position: relative;
-    padding-top: 60px;
+    /deep/ .customer-info-list {
+      height: 100%;
+    }
+  }
+  /deep/ .el-tabs {
+    height: 100%;
+    background-color: #fff;
+    .el-tabs__active-bar {
+      margin-left: 5px;
+    }
+    .el-tabs__item {
+      padding: 0 15px;
+    }
+    .el-tabs__nav {
+      padding-left: 5px;
+    }
+    .el-tabs__header {
+      margin: 0;
+    }
+  }
+  .card {
+    /deep/ .el-card__body {
+      display: flex;
+      position: relative;
+      padding-top: 60px;
+    }
   }
 }
 .creator-div {

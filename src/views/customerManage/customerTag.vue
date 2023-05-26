@@ -180,6 +180,7 @@ export default {
           break;
         }
         case 'group': {
+          // TODO 为什么要调用2次？？？ 若不需要在全局存储 则删除该处调用并将vuex中的模块删除
           this.$store.dispatch('listInfo/getGroupTagList');
           groupTagApi
             .getGroupTagListByPage({ ...this.query })

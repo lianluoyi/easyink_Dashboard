@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 // 每页大小
 export const PAGE_LIMIT = 10;
 export const PAGE_LIMIT_TWENTY = 20;
@@ -123,7 +124,6 @@ export const ADD_WAY_MAP = {
 };
 
 // 视频播放速度
-// eslint-disable-next-line no-magic-numbers
 export const PLAYBACK_RATES = [0.7, 1.0, 1.5, 2.0];
 
 export const VIDEO_TYPE_MP4 = 'video/mp4';
@@ -621,27 +621,21 @@ export const WEEK_OPTIONS = [{
   value: 1,
   label: '周一'
 }, {
-  // eslint-disable-next-line no-magic-numbers
   value: 2,
   label: '周二'
 }, {
-  // eslint-disable-next-line no-magic-numbers
   value: 3,
   label: '周三'
 }, {
-  // eslint-disable-next-line no-magic-numbers
   value: 4,
   label: '周四'
 }, {
-  // eslint-disable-next-line no-magic-numbers
   value: 5,
   label: '周五'
 }, {
-  // eslint-disable-next-line no-magic-numbers
   value: 6,
   label: '周六'
 }, {
-  // eslint-disable-next-line no-magic-numbers
   value: 7,
   label: '周日'
 }];
@@ -667,18 +661,14 @@ export const PUBLIC_KEY_END = '-----END PUBLIC KEY-----';
  * 1为部门，2为员工,3为全部员工
  */
 export const SCOPELIST_TYPE = {
-  // eslint-disable-next-line no-magic-numbers
   ALL_USER: 3,
-  // eslint-disable-next-line no-magic-numbers
   USER: 2,
   DEPARTMENT: 1
 };
 // 欢迎语发送内容类型
 export const redeemCodeMsgType = {
   'success': 1, // 可以使用兑换码
-  // eslint-disable-next-line no-magic-numbers
   'fail': 2, // 没有可使用的兑换码
-  // eslint-disable-next-line no-magic-numbers
   'repeat': 3 // 兑换码过期
 };
 // 欢迎语类型
@@ -718,7 +708,6 @@ export const FRIEND_PUSH_RANGE = {
 // 发布朋友圈是否选择员工（2：未选择 1：已选择）
 export const FRIEND_SELECT_USER = {
   IS_SELECT: 1,
-  // eslint-disable-next-line no-magic-numbers
   NO_SELECT: 2
 };
 // 排序
@@ -870,3 +859,19 @@ export const SCREENING_ADD_WAY_MAP = {
   [ADD_BY_ADMIN]: '管理员/负责人分配'
 };
 
+/**
+ * @description 查看客户/客户群具体内容
+ */
+export const CUSTOMER_DETAIL = {
+  'customerInfo': '2', // 客户资料
+  'informationDynamics': '1', // 信息动态
+  'activityTrack': '3', // 活动轨迹
+  'todo': '4', // 待办事项
+  'groupMemInfo': '5' // 群成员信息
+};
+
+/** 标签统计类型  */
+export const TAG_LABEL_TYPE = {
+  'customer': 1,
+  'group': 2
+};

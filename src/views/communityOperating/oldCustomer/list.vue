@@ -216,8 +216,8 @@ export default {
 
       this.getStat(1);
     },
-    changePage(pageInfo) {
-      this.getStat(pageInfo.page);
+    changePage() {
+      this.getStat();
     },
     getString(data, paramName) {
       const arr = [];

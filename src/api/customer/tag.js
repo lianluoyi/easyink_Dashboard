@@ -101,3 +101,10 @@ export function addAutoRule(data) {
     data
   });
 }
+
+/** 获取客户标签组 */
+export function tagGroupList() {
+  return request({
+    url: service + '/tagGroupList'
+  });
+}

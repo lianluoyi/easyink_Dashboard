@@ -186,3 +186,57 @@ export function exportUserServiceOfTime(data) {
     data
   });
 }
+
+/** 客户标签-表格视图 */
+export function getCustomerTagTableView(data) {
+  return request({
+    url: service + '/getCustomerTagTableView',
+    method: 'post',
+    data
+  });
+}
+
+/** 客户标签-图表视图 */
+export function getCustomerTagChartView(data) {
+  return request({
+    url: service + '/getCustomerTagChartView',
+    method: 'post',
+    data
+  });
+}
+
+/** 导出客户标签 */
+export function exportCustomerTagsView(data) {
+  return request({
+    url: service + '/exportCustomerTagsView',
+    method: 'post',
+    data
+  });
+}
+
+/** 群标签-表格视图 */
+export function getGroupTagTableView(data) {
+  return request({
+    url: service + '/getGroupTagTableView',
+    method: 'post',
+    data
+  });
+}
+
+/** 群标签-图表视图 */
+export function getGroupTagChartView(data) {
+  return request({
+    url: service + '/getGroupTagChartView',
+    method: 'post',
+    data
+  });
+}
+
+/** 导出群标签 */
+export function exportGroupTagsView(data) {
+  return request({
+    url: service + '/exportGroupTagsView',
+    method: 'post',
+    data
+  });
+}

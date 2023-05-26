@@ -1,7 +1,7 @@
 /*
  * @Description: 群标签相关接口
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
  */
 import request from '@/utils/request';
 const service = window.CONFIG.services.wecom + '/grouptag';
@@ -108,5 +108,12 @@ export function batchDelTagRel(data) {
     url: service + '/batchDelTagRel',
     method: 'post',
     data
+  });
+}
+
+/** 获取群标签组 */
+export function groupTagList() {
+  return request({
+    url: service + '/getGroupTagList'
   });
 }

@@ -418,7 +418,7 @@ export default {
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           :select-data-len="multiGroupCode.length"
-          @pagination="getGroupCodes"
+          @pagination="getGroupCodes()"
         />
       </template>
     </RightContainer>

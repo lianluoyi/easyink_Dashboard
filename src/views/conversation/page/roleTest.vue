@@ -217,7 +217,7 @@ export default {
         this.tableHeight = domHeight - PAGINATION_HEIGHT;
       }
     },
-    currentChange(e) {
+    currentChange() {
       this.init(true);
     },
     init(flag) {

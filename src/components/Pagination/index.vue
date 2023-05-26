@@ -16,7 +16,7 @@
 
 <script>
 import { scrollTo } from '@/utils/scroll-to';
-import { PAGE_LIMIT, PAGE_LIMIT_TWENTY, PAGE_LIMIT_THIRTY, PAGE_LIMIT_FIFTY } from '@/utils/constant';
+import { PAGE_LIMIT, PAGE_LIMIT_TWENTY, PAGE_LIMIT_THIRTY, PAGE_LIMIT_FIFTY, DEFAULT_PAGE_NUM } from '@/utils/constant';
 const SCROLL_TO_DISTANCE = 800;
 
 /**
@@ -32,7 +32,7 @@ export default {
     },
     page: {
       type: Number,
-      default: 1
+      default: DEFAULT_PAGE_NUM
     },
     limit: {
       type: Number,
@@ -90,8 +90,9 @@ export default {
     }
   },
   methods: {
-    handleSizeChange(val) {
-      this.$emit('pagination', { page: this.currentPage, limit: val });
+    handleSizeChange() {
+      this.$emit('update:page', DEFAULT_PAGE_NUM);
+      this.$emit('pagination');
       if (this.autoScroll) {
         scrollTo(0, SCROLL_TO_DISTANCE);
       }

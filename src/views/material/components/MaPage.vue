@@ -186,7 +186,7 @@ export default {
     },
     // 获取素材列表
     getList(page_) {
-      const page = page_ ? page_.page || page_ : this.query.pageNum;
+      const page = page_ || this.query.pageNum;
       page && (this.query.pageNum = page);
       this.loading = true;
       const params = {
@@ -506,7 +506,7 @@ export default {
         :total="total"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"
-        @pagination="(page) => getList(page)"
+        @pagination="getList()"
       />
     </div>
     <MaterialAddModal

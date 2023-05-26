@@ -217,7 +217,7 @@ export default {
         :limit.sync="query.pageSize"
         :pager-count="5"
         class="footer-left"
-        @pagination="(pageInfo) => getList(pageInfo.page)"
+        @pagination="getList()"
       />
       <div class="footer-right">
         <el-button @click="Pvisible = false">取 消</el-button>
