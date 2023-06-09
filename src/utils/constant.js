@@ -107,20 +107,29 @@ export const ADD_BY_MAIL = '9';
 export const ADD_BY_CHANNEL = '10';
 export const ADD_BY_INTERNAL_SHARE = '201';
 export const ADD_BY_ADMIN = '202';
+export const ADD_BY_SCHEDULE_PARTICIPATION = '11';
+export const ADD_BY_CONFERENCE_PARTICIPATION = '12';
+export const ADD_BY_WX_FRIEND = '13';
+export const ADD_BY_INTELLIGENT_HARDWARE = '14';
+export const ADD_BY_ON_SITE_SERVICE = '15';
 export const ADD_WAY_MAP = {
   [UNKNOW_SOURCE]: '未知来源',
-  [ADD_BY_QRCODE]: '通过扫描二维码添加',
-  [ADD_BY_PHONE]: '通过搜索手机号添加',
-  [ADD_BY_BUSINESS_CARD]: '通过名片分享添加',
-  [ADD_BY_GROUP]: '通过群聊添加',
-  [ADD_BY_PHONE_CONTACT]: '通过手机通讯录添加',
-  [ADD_BY_WX_CONTACT]: '通过微信联系人添加',
-  [ADD_BY_WX]: '通过来自微信的添加好友申请添加',
-  [ADD_BY_THIRD_APP_AUTO]: '通过安装第三方应用时自动添加的客服人员添加',
-  [ADD_BY_MAIL]: '通过搜索邮箱添加',
-  [ADD_BY_CHANNEL]: '通过视频号',
-  [ADD_BY_INTERNAL_SHARE]: '通过内部成员共享添加',
-  [ADD_BY_ADMIN]: '通过管理员/负责人分配添加'
+  [ADD_BY_QRCODE]: '扫描二维码',
+  [ADD_BY_PHONE]: '搜索手机号',
+  [ADD_BY_BUSINESS_CARD]: '名片分享',
+  [ADD_BY_GROUP]: '群聊',
+  [ADD_BY_PHONE_CONTACT]: '手机通讯录',
+  [ADD_BY_WX_CONTACT]: '微信联系人',
+  [ADD_BY_THIRD_APP_AUTO]: '安装第三方应用时自动添加的客服人员',
+  [ADD_BY_MAIL]: '搜索邮箱',
+  [ADD_BY_CHANNEL]: '视频号添加',
+  [ADD_BY_SCHEDULE_PARTICIPATION]: '通过日程参与人添加',
+  [ADD_BY_CONFERENCE_PARTICIPATION]: '通过会议参与人添加',
+  [ADD_BY_WX_FRIEND]: '添加微信好友对应的企业微信',
+  [ADD_BY_INTELLIGENT_HARDWARE]: '通过智慧硬件专属客服添加',
+  [ADD_BY_ON_SITE_SERVICE]: '通过上门服务客服添加',
+  [ADD_BY_INTERNAL_SHARE]: '内部成员共享',
+  [ADD_BY_ADMIN]: '管理员/负责人分配'
 };
 
 // 视频播放速度
@@ -833,32 +842,6 @@ export const SCREENING_GENDER_TYPE = {
   [GENDER_OF_FEMALE]: '女性'
 };
 
-export const ADD_BY_SCHEDULE_PARTICIPATION = '11';
-export const ADD_BY_CONFERENCE_PARTICIPATION = '12';
-export const ADD_BY_WX_FRIEND = '13';
-export const ADD_BY_INTELLIGENT_HARDWARE = '14';
-export const ADD_BY_ON_SITE_SERVICE = '15';
-
-export const SCREENING_ADD_WAY_MAP = {
-  [UNKNOW_SOURCE]: '未知来源',
-  [ADD_BY_QRCODE]: '扫描二维码',
-  [ADD_BY_PHONE]: '搜索手机号',
-  [ADD_BY_BUSINESS_CARD]: '名片分享',
-  [ADD_BY_GROUP]: '群聊',
-  [ADD_BY_PHONE_CONTACT]: '手机通讯录',
-  [ADD_BY_WX_CONTACT]: '微信联系人',
-  [ADD_BY_THIRD_APP_AUTO]: '安装第三方应用时自动添加的客服人员',
-  [ADD_BY_MAIL]: '搜索邮箱',
-  [ADD_BY_CHANNEL]: '视频号添加',
-  [ADD_BY_SCHEDULE_PARTICIPATION]: '通过日程参与人添加',
-  [ADD_BY_CONFERENCE_PARTICIPATION]: '通过会议参与人添加',
-  [ADD_BY_WX_FRIEND]: '添加微信好友对应的企业微信',
-  [ADD_BY_INTELLIGENT_HARDWARE]: '通过智慧硬件专属客服添加',
-  [ADD_BY_ON_SITE_SERVICE]: '通过上门服务客服添加',
-  [ADD_BY_INTERNAL_SHARE]: '内部成员共享',
-  [ADD_BY_ADMIN]: '管理员/负责人分配'
-};
-
 /**
  * @description 查看客户/客户群具体内容
  */
@@ -875,3 +858,6 @@ export const TAG_LABEL_TYPE = {
   'customer': 1,
   'group': 2
 };
+
+/** 来源 */
+export const ADD_WAY = 'addWay';

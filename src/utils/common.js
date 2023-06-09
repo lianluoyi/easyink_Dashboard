@@ -4,7 +4,7 @@
 import {
   MS_TO_SECONDS, WX_TYPE, CORP_TYPE, ICON_LIST, MEDIA_TYPE_POSTER, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO,
   MEDIA_TYPE_FILE, FILE_EXCEL_TYPE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK,
-  MEDIA_TYPE_MINIAPP, SCOPELIST_TYPE, MEDIA_TYPE_SMARTFORM, MEDIA_TYPE_RADARLINK
+  MEDIA_TYPE_MINIAPP, SCOPELIST_TYPE, MEDIA_TYPE_SMARTFORM, MEDIA_TYPE_RADARLINK, ADD_WAY_MAP
 } from '@/utils/constant';
 import { getUserInfo } from '@/api/system/staff';
 import { groupBy, isEqual } from 'lodash';
@@ -80,7 +80,6 @@ export function yearMouthDay(data) {
   var year = time.getFullYear();
   var month = time.getMonth() + 1;
   var date = time.getDate();
-  console.log(year + '-' + add0(month) + '-' + add0(date));
   return year + '-' + add0(month) + '-' + add0(date);
 }
 function add0(m) {
@@ -809,4 +808,21 @@ export const getUserDepartmentInfo = async(store) => {
     department,
     departmentName
   };
+};
+
+/**
+ * @description 获取来源选项
+ * @param key 来源选项的key值
+ * @param value 来源选项的value值
+ */
+export const getSourceLabel = (options) => {
+  const { key, value } = options;
+  const sourceOptionList = [];
+  Object.keys(ADD_WAY_MAP).forEach(k => {
+    sourceOptionList.push({
+      [key]: k,
+      [value]: ADD_WAY_MAP[k]
+    });
+  });
+  return sourceOptionList;
 };

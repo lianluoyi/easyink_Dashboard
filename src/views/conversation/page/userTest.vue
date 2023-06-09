@@ -8,7 +8,7 @@
             <el-input v-model="employName" placeholder="输入客户昵称，回车搜索" prefix-icon="el-icon-search" @keyup.enter.native="customerList" />
           </div>
         </div>
-        <div class="ct_box ct_boxFirst">
+        <div v-loading="userListLoading" class="ct_box ct_boxFirst">
           <empty-default-icon
             text="暂无客户"
             desc="若首次加载，请耐心等待后台数据同步，稍后回来"
@@ -18,7 +18,8 @@
             <ul>
               <li v-for="(i,t) in CList" :key="t" :class="{'liActive':t==personIndex}" @click="personCheck(i,t)">
                 <div class="customer-item">
-                  <img v-if="i.avatar" :src="i.avatar" alt="头像">
+
+                  <img :src="i.avatar || require('@/assets/image/card-avatar.svg')" alt="头像">
                   <div class="toe">{{ i.name }}</div>
                 </div>
               </li>
@@ -55,7 +56,7 @@
         <div class=" hd_tabthree">
           <el-tabs v-model="activeNameThree" class="tabthree-tabs" @tab-click="activeNameThreeClick()">
             <el-tab-pane class="tabthree-tab-pane" label="全部" :name="MSG_TYPE_ALL">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <el-date-picker
                     v-model="takeTime"
@@ -81,7 +82,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane class="tabthree-tab-pane" label="图片" :name="MSG_TYPE_IMG">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <el-date-picker
                     v-model="takeTime"
@@ -107,7 +108,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane class="tabthree-tab-pane" label="视频" :name="MSG_TYPE_VIDEO">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <el-date-picker
                     v-model="takeTime"
@@ -133,7 +134,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane class="tabthree-tab-pane" label="文件" :name="MSG_TYPE_FILE">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <el-date-picker
                     v-model="takeTime"
@@ -182,7 +183,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane class="tabthree-tab-pane" label="图文链接" :name="MSG_TYPE_LINK">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <el-date-picker
                     v-model="takeTime"
@@ -208,7 +209,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane class="tabthree-tab-pane" label="语音通话" :name="MSG_TYPE_VOICE">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <el-date-picker
                     v-model="takeTime"
@@ -282,7 +283,7 @@ export default {
   },
   data() {
     return {
-      employAmount: 1,
+      employAmount: 0,
       employName: '',
       talkName: '',
       chatContent: '',
@@ -312,7 +313,9 @@ export default {
       MSG_TYPE_FILE,
       MSG_TYPE_LINK,
       MSG_TYPE_VOICE,
-      MSG_TYPE_ALL
+      MSG_TYPE_ALL,
+      contentLoading: false,
+      userListLoading: true
     };
   },
   mounted() {
@@ -385,15 +388,20 @@ export default {
       } else {
         query.receiveId = this.chatData.receiveId;
       }
+      this.contentLoading = true;
       if (isGroup) {
         content.chatGrounpList(query).then(res => {
           this.total = Number(res.data.total);
           this.resortData(res.data);
+        }).finally(() => {
+          this.contentLoading = false;
         });
       } else {
         content.chatList(query).then(res => {
           this.total = Number(res.data.total);
           this.resortData(res.data);
+        }).finally(() => {
+          this.contentLoading = false;
         });
       }
     },
@@ -441,9 +449,12 @@ export default {
         isOpenChat: '1',
         queryType: 1
       };
+      this.userListLoading = true;
       listDistinct(querys).then(res => {
         this.CList = res.rows;
         this.employAmount = res.total;
+      }).finally(() => {
+        this.userListLoading = false;
       });
     },
     download(e) {
@@ -580,6 +591,9 @@ export default {
           width: 40px;
           height: 40px;
         };
+      }
+      .liActive {
+        background-color: #eeeeee;
       }
       .hds_time {
         text-align: left;

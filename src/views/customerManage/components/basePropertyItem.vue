@@ -1,7 +1,7 @@
 <!--
  * @Description: 基本信息字段
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="base-property-item">
@@ -28,14 +28,27 @@
       <i v-if="editStatus" class="el-icon-edit theme-text-color" @click="openModal" />
     </div>
     <div v-if="item.name === '出生日期'">
-      <el-date-picker
-        v-if="editStatus"
-        v-model="item.value"
-        type="date"
-        :picker-options="pickerOptions"
-        value-format="yyyy-MM-dd"
-        placeholder="请选择出生日期"
-      />
+      <template v-if="editStatus">
+        <el-date-picker
+          v-if="!isCustomerScoped"
+          v-model="item.value"
+          type="date"
+          :picker-options="pickerOptions"
+          value-format="yyyy-MM-dd"
+          placeholder="请选择出生日期"
+        />
+        <el-date-picker
+          v-else
+          v-model="item.value"
+          style="width:240px"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          format="yyyy-MM-dd"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        />
+      </template>
       <span v-else>{{ item.value }}</span>
     </div>
     <div v-if="['邮箱', '电话'].includes(item.name)">
@@ -81,6 +94,11 @@ export default {
      * 是否可编辑
      */
     editStatus: {
+      type: Boolean,
+      default: false
+    },
+    // 是否是客户范围
+    isCustomerScoped: {
       type: Boolean,
       default: false
     }

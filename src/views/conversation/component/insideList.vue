@@ -65,6 +65,7 @@ export default {
   watch: {
     personList(newval) {
       // 在personlist更新时赋值给list
+      this.personIndex = -1;
       this.list = newval;
       if (this.insideretrieveName) {
         this.list = this.personList.filter(item => {

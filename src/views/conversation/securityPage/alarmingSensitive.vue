@@ -5,7 +5,7 @@
 -->
 <template>
   <div class="alarming">
-    <el-tabs v-model="activeName" class="white-tabs" @tab-click="handleClick">
+    <el-tabs v-model="activeName" class="white-tabs">
       <el-tab-pane v-hasPermi="['wecom:sensitiveact:list']" label="敏感行为记录" name="record">
         <RightContainer>
           <template v-slot:data>
@@ -131,9 +131,6 @@ export default {
       sensitiveApis.updateSensitive(item).then(res => {
         this.msgSuccess('操作成功');
       });
-    },
-    handleClick(tab, event) {
-      console.log(tab, event);
     },
     renderUserInfo(item, key) {
       return dealAtInfo(item, key);

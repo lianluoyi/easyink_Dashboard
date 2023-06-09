@@ -82,11 +82,12 @@
 </template>
 
 <script>
-import { SCREENING_GENDER_TYPE, SCREENING_ADD_WAY_MAP, CUSTOMER_PROPERTY_VALUE, CUSTOMER_STATUS, COMMON_TYPE, LOSS_TYPE, TRANSFER_TYPE, TO_INHERIT_TYPE, ALL_TYPE, GENDER_TYPE_OF_UNKNOWN, GENDER_OF_FEMALE, GENDER_OF_MALE } from '@/utils/constant';
+import { SCREENING_GENDER_TYPE, CUSTOMER_PROPERTY_VALUE, CUSTOMER_STATUS, COMMON_TYPE, LOSS_TYPE, TRANSFER_TYPE, TO_INHERIT_TYPE, ALL_TYPE, GENDER_TYPE_OF_UNKNOWN, GENDER_OF_FEMALE, GENDER_OF_MALE } from '@/utils/constant';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import { findIndex } from 'lodash';
 import moment from 'moment';
+import { getSourceLabel } from '@/utils/common';
 const SELECT_USER_TYPE = 11;
 const SELECT_TAG_TYPE = 12;
 /** 客户自定义中系统字段名*/
@@ -157,7 +158,7 @@ export default {
         { field: 'tagIds', baseField: true, label: '客户标签', value: [], type: SELECT_TAG_TYPE, placeholder: '请选择标签' },
         { field: 'corpFullName', label: '企业名称', value: undefined, placeholder: '请输入企业名称', type: CUSTOMER_PROPERTY_VALUE['singleText'] },
         { field: 'addWay', multiple: true, label: '来源', value: undefined, placeholder: '请选择来源', type: CUSTOMER_PROPERTY_VALUE['selectSingle'],
-          options: this.getSourceLabel()
+          options: getSourceLabel({ key: 'value', value: 'label' })
         },
         { field: 'gender', multiple: true, label: '性别', value: undefined, placeholder: '请选择性别', type: CUSTOMER_PROPERTY_VALUE['selectSingle'],
           options: [{
@@ -304,20 +305,6 @@ export default {
         }
       });
       this.formItemData = [...this.formItemData, ...newList];
-    },
-    /**
-     * @description 获取来源选项
-     */
-    getSourceLabel() {
-      const newArr = [];
-      // SCREENING_ADD_WAY_TYPE, SCREENING_ADD_WAY_MAP
-      Object.keys(SCREENING_ADD_WAY_MAP).forEach(key => {
-        newArr.push({
-          value: key,
-          label: SCREENING_ADD_WAY_MAP[key]
-        });
-      });
-      return newArr;
     },
 
     showTagDialog() {

@@ -58,6 +58,7 @@ export default {
     personList(newval) {
       // 在personlist更新时赋值给list
       this.list = newval;
+      this.personIndex = -1;
       if (this.listretrieveName) {
         this.list = this.personList.filter(item => {
           return item.receiveWeCustomer.name.includes(this.listretrieveName);
