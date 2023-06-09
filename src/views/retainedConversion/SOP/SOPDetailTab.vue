@@ -13,56 +13,85 @@
         <div class="title mb15">
           {{ sopDetail.name }}
         </div>
-        <div class="creator-div flex">
-          <div class="task-item flex">
+        <div class="creator-div aic">
+          <div class="task-item aic">
             <div class="label">创建时间：</div>
             <span>{{ sopDetail.createTime }}</span>
           </div>
-          <div class="task-item flex">
+          <div class="task-item aic">
             <div class="label">创建人：</div>
             <span>{{ sopDetail.createUserName }}</span>
           </div>
         </div>
-        <div v-if="sopType === SOP_TYPE['cycle']" class="cycle-div flex">
+        <div v-if="sopType === SOP_TYPE['cycle']" class="cycle-div aic">
           <div v-if="sopDetail.sopFilter" class="mt5 task-item flex">
             <div class="label">循环周期：</div>
-            <span>{{ sopDetail.sopFilter.cycleStart }} ~ {{ sopDetail.sopFilter.cycleEnd }}</span>
+            <span>{{ sopDetail.sopFilter.cycleStart }} ~
+              {{ sopDetail.sopFilter.cycleEnd }}</span>
           </div>
         </div>
-        <div class="mt5 flex task-item">
+        <div class="mt5 aic task-item">
           <div class="label">{{ dealUserTitle() }}</div>
-          <div v-if="(userOrGroupList && userOrGroupList.length) || (getDepartmentList && getDepartmentList.length)" class="message-content">
-            <div v-if="!isGroup" class="flex">
-              <ByLengthUserShow
-                :max-length="maxShowLength"
-                :user-list="userOrGroupList.filter(item => item.userId)"
-                :department-list="getDepartmentList.filter(item => item.departmentId)"
-                :usename="isActivity ? 'name' : 'userName'"
-              />
-              <span v-if="userAndDetList.length > maxShowLength">
-                等{{ userAndDetList.length }}{{ isGroup ? '个群' : '个' }}
-                <span class="look-more ml10 theme-text-color" @click="onShowMore">查看</span>
-              </span>
+          <div
+            v-if="
+              [SOP_TYPE['birthday'], SOP_TYPE['newCustomer']].includes(sopType)
+            "
+          >
+            <div
+              class="look-more theme-text-color"
+              @click="openCustomerScopeModel = true"
+            >
+              查看
             </div>
-            <template v-else>
-              <span v-for="(userItem, userIndex) in userOrGroupList.slice(0, maxShowLength)" :key="userIndex">
-                {{ dealName(userOrGroupList, userItem, userIndex) }}</span>
-              <span v-if="userOrGroupList && userOrGroupList.length > maxShowLength">
-                等{{ userOrGroupList.length }}{{ isGroup ? '个群' : '个' }}
-                <span class="look-more ml10 theme-text-color" @click="onShowMore">查看</span>
-              </span>
-            </template>
           </div>
-        </div>
-        <div v-if="showCustomerTag" class="mt15 flex task-item">
-          <div class="label">客户标签：</div>
-          <div class="message-content">
-            <el-tag
-              v-for="(item, index) in sopDetail.sopCustomerFilter.tagList"
-              :key="index"
-              type="info"
-            >{{ item.name }}</el-tag>
-          </div>
+          <template v-else>
+            <div
+              v-if="
+                (userOrGroupList && userOrGroupList.length) ||
+                  (getDepartmentList && getDepartmentList.length)
+              "
+              class="message-content"
+            >
+              <div v-if="!isGroup" class="aic">
+                <ByLengthUserShow
+                  :max-length="maxShowLength"
+                  :user-list="userOrGroupList.filter((item) => item.userId)"
+                  :department-list="
+                    getDepartmentList.filter((item) => item.departmentId)
+                  "
+                  :usename="isActivity ? 'name' : 'userName'"
+                />
+                <span v-if="userAndDetList.length > maxShowLength">
+                  等{{ userAndDetList.length }}{{ isGroup ? '个群' : '个' }}
+                  <span
+                    class="look-more ml10 theme-text-color"
+                    @click="onShowMore"
+                  >查看</span>
+                </span>
+              </div>
+              <template v-else>
+                <span
+                  v-for="(userItem, userIndex) in userOrGroupList.slice(
+                    0,
+                    maxShowLength
+                  )"
+                  :key="userIndex"
+                >
+                  {{ dealName(userOrGroupList, userItem, userIndex) }}</span>
+                <span
+                  v-if="
+                    userOrGroupList && userOrGroupList.length > maxShowLength
+                  "
+                >
+                  等{{ userOrGroupList.length }}{{ isGroup ? '个群' : '个' }}
+                  <span
+                    class="look-more ml10 theme-text-color"
+                    @click="onShowMore"
+                  >查看</span>
+                </span>
+              </template>
+            </div>
+          </template>
         </div>
       </div>
     </el-card>
@@ -70,13 +99,22 @@
       <div class="rule-list-header mb20 flex">
         <div class="config-title">SOP规则</div>
         <div>
-          <el-radio-group v-if="sopType === SOP_TYPE['groupCalendar']" v-model="ruleListType" class="rule-type" size="medium">
+          <el-radio-group
+            v-if="sopType === SOP_TYPE['groupCalendar']"
+            v-model="ruleListType"
+            class="rule-type"
+            size="medium"
+          >
             <el-radio-button label="calendar">日历</el-radio-button>
             <el-radio-button label="timeline">时间轴</el-radio-button>
           </el-radio-group>
         </div>
       </div>
-      <SOPRuleList v-if="ruleListType === 'timeline'" :rule-list="ruleList" :sop-type="sopType" />
+      <SOPRuleList
+        v-if="ruleListType === 'timeline'"
+        :rule-list="ruleList"
+        :sop-type="sopType"
+      />
       <div v-if="ruleListType === 'calendar'" class="calendar-div">
         <SopCalendar
           ref="sopCalendarRef"
@@ -85,6 +123,7 @@
         />
       </div>
     </div>
+    <CustomerScopeModel :visible.sync="openCustomerScopeModel" :sop-detail="sopDetail" />
     <UseEmployeeModal
       :title="isGroup ? '使用群聊' : isActivity ? '客户范围' : '使用员工'"
       :visible.sync="useEmployeeVisible"
@@ -109,12 +148,19 @@ import UseEmployeeModal from '../components/UseEmployeeModal.vue';
 import SopCalendar from './sopCalendar.vue';
 import AddRuleDrawer from '../components/AddRuleDrawer.vue';
 import ByLengthUserShow from '@/components/ByLengthUserShow';
-
+import CustomerScopeModel from '../components/CustomerScopeModel.vue';
 const MAX_CUSTOMER_SHOW_LENGTH = 5;
 const MAX_GROUP_SHOW_LENGTH = 3;
 export default {
   name: '',
-  components: { SOPRuleList, UseEmployeeModal, SopCalendar, AddRuleDrawer, ByLengthUserShow },
+  components: {
+    SOPRuleList,
+    UseEmployeeModal,
+    SopCalendar,
+    AddRuleDrawer,
+    ByLengthUserShow,
+    CustomerScopeModel
+  },
   props: {
     sopDetail: {
       type: Object,
@@ -130,7 +176,8 @@ export default {
       SOP_TYPE,
       useEmployeeVisible: false,
       ruleListType: 'timeline',
-      addRuleDrawerVisible: false
+      addRuleDrawerVisible: false,
+      openCustomerScopeModel: false
     };
   },
   computed: {
@@ -141,7 +188,11 @@ export default {
       return this.sopType === SOP_TYPE['activity'];
     },
     isGroup() {
-      return [SOP_TYPE['timing'], SOP_TYPE['cycle'], SOP_TYPE['groupCalendar']].includes(this.sopType);
+      return [
+        SOP_TYPE['timing'],
+        SOP_TYPE['cycle'],
+        SOP_TYPE['groupCalendar']
+      ].includes(this.sopType);
     },
     /**
      * 员工和部门列表
@@ -151,7 +202,7 @@ export default {
     },
     ruleList() {
       let ruleList = [];
-      ruleList = this.sopDetail.ruleList?.map(item => {
+      ruleList = this.sopDetail.ruleList?.map((item) => {
         const info = {};
         switch (item.alertType) {
           case RULE_PERFORM_TYPE['hourMinute']: {
@@ -216,9 +267,6 @@ export default {
     getDepartmentList() {
       const list = this.sopDetail.departmentList;
       return (list && [...list]) || [];
-    },
-    showCustomerTag() {
-      return this.sopType === SOP_TYPE['birthday'] && this.sopDetail?.sopCustomerFilter?.tagList;
     }
   },
   watch: {
@@ -252,12 +300,20 @@ export default {
       ${isGroup ? '」' : ''}`;
     },
     dealUserTitle() {
-      if (this.sopType === SOP_TYPE['activity']) return '客户范围：';
+      if (
+        [
+          SOP_TYPE['activity'],
+          SOP_TYPE['birthday'],
+          SOP_TYPE['newCustomer']
+        ].includes(this.sopType)
+      ) { return '客户范围：'; }
       return `使用${this.isGroup ? '群聊：' : '员工：'}`;
     },
     dealSplit(list, userIndex) {
       if (this.isGroup) return '';
-      return ([list.length - 1, this.maxShowLength - 1].includes(userIndex)) ? '' : '、';
+      return [list.length - 1, this.maxShowLength - 1].includes(userIndex)
+        ? ''
+        : '、';
     },
     /**
      * 点击群日历的某个规则
@@ -267,57 +323,57 @@ export default {
       this.$refs['addRuleDrawer'].formData = { ...item };
     }
   }
-
 };
 </script>
-<style scoped lang='scss'>
+<style scoped lang="scss">
 @import '~@/styles/mixin.scss';
 .sop-detail-tab {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    .detail-card-div {
-        /deep/ .el-card__body {
-            display: flex;
-            .info-div {
-                .title {
-                    font-size: 24px;
-                }
-                .task-item {
-                    margin-right: 10px;
-                    .label {
-                        color: $grayColor;
-                        line-height: 20px;
-                    }
-                    .look-more {
-                        cursor: pointer;
-                    }
-                    .message-content {
-                      line-height: 18px;
-                    }
-                }
-            }
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  .detail-card-div {
+    /deep/ .el-card__body {
+      display: flex;
+      .info-div {
+        .title {
+          font-size: 24px;
         }
-    }
-    .rule-list-container {
-        background-color: #fff;
-        flex: 1;
-        padding: 20px;
-        .rule-list-header {
-          justify-content: space-between;
-          .config-title {
-              font-size: 14px;
-              line-height: 20px;
-              text-align: left;
-              font-family: Roboto;
-              @include border_style($width: 3px, $direction: left);
-              padding-left: 15px;
-              height: 20px;
+        .task-item {
+          margin-right: 10px;
+          .label {
+            color: $grayColor;
+            line-height: 20px;
+          }
+          .look-more {
+            cursor: pointer;
+            line-height: 20px;
+          }
+          .message-content {
+            line-height: 18px;
           }
         }
-        /deep/ .sop-rule-list {
-            padding-left: 24px;
-        }
+      }
     }
+  }
+  .rule-list-container {
+    background-color: #fff;
+    flex: 1;
+    padding: 20px;
+    .rule-list-header {
+      justify-content: space-between;
+      .config-title {
+        font-size: 14px;
+        line-height: 20px;
+        text-align: left;
+        font-family: Roboto;
+        @include border_style($width: 3px, $direction: left);
+        padding-left: 15px;
+        height: 20px;
+      }
+    }
+    /deep/ .sop-rule-list {
+      padding-left: 24px;
+    }
+  }
 }
 </style>

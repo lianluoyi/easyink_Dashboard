@@ -1,7 +1,7 @@
 <!--
  * @Description: 自定义字段
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="custom-property-item">
@@ -128,15 +128,30 @@
         type="info"
       >{{ unit }}</el-tag>
     </div>
+
     <div v-else-if="item.type === CUSTOMER_PROPERTY_VALUE['dateField']">
-      <el-date-picker
-        v-if="editStatus"
-        v-model="item.value"
-        type="datetime"
-        placeholder="请选择日期时间"
-        value-format="yyyy-MM-dd HH:mm"
-        format="yyyy-MM-dd HH:mm"
-      />
+      <template v-if="editStatus">
+        <el-date-picker
+          v-if="!isCustomerScoped"
+          v-model="item.value"
+          type="datetime"
+          placeholder="请选择日期时间"
+          value-format="yyyy-MM-dd HH:mm"
+          format="yyyy-MM-dd HH:mm"
+        />
+        <el-date-picker
+          v-else
+          v-model="item.value"
+          style="width:240px"
+          value-format="yyyy-MM-dd HH:mm"
+          type="datetimerange"
+          format="yyyy-MM-dd HH:mm"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          prefix-icon="el-icon-date"
+        />
+      </template>
       <span v-else>{{ item.value }}</span>
     </div>
     <div v-else>{{ item.value }}</div>
@@ -170,6 +185,11 @@ export default {
       default: -1
     },
     selectSingleRadio: {
+      type: Boolean,
+      default: false
+    },
+    // 是否是客户范围中的其他属性
+    isCustomerScoped: {
       type: Boolean,
       default: false
     }

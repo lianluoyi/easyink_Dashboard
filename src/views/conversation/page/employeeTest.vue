@@ -9,7 +9,7 @@
             <el-input v-model="employName" placeholder="请输入内容" prefix-icon="el-icon-search" />
           </div>
         </div>
-        <div class="ct_box ct_boxFirst">
+        <div ref="userTree" class="ct_box ct_boxFirst">
           <common-tree
             ref="tree"
             v-loading="loadingEmployee"
@@ -61,10 +61,10 @@
             <!-- <span class="fr hd_nameRi">下载会话</span> -->
           </div>
         </div>
-        <div class=" hd_tabthree">
+        <div class="hd_tabthree">
           <el-tabs v-model="msgTabType" class="chat-content-tabs" @tab-click="loadMessageList()">
             <el-tab-pane label="全部" :name="MSG_TYPE_ALL">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div v-if="allChatStack.length > 1" class="chatrecord-title">
                   <el-button type="text" size="medium" @click="() => allChatStack.pop()">
                     <svg class="icon-restore" :width="18" :height="18">
@@ -103,7 +103,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane label="图片" :name="MSG_TYPE_IMG">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
@@ -134,7 +134,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane label="视频" :name="MSG_TYPE_VIDEO">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
@@ -165,7 +165,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane label="文件" :name="MSG_TYPE_FILE">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
@@ -219,7 +219,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane label="图文链接" :name="MSG_TYPE_LINK">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
@@ -250,7 +250,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane label="语音通话" :name="MSG_TYPE_VOICE">
-              <div class="ct_box">
+              <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
@@ -379,7 +379,8 @@ export default {
       loadingEmployee: false,
       // template中要用到的常量
       CONTACT_TYPE_INNER, CONTACT_TYPE_EXTERNAL,
-      MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO
+      MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO,
+      contentLoading: false
     };
   },
   computed: {
@@ -500,6 +501,7 @@ export default {
         } else {
           query.receiveId = this.chat.receiveId;
         }
+        this.contentLoading = true;
         if (this.contactTabType === CONTACT_TYPE_GROUP) {
           content.chatGrounpList(query).then(res => {
             this.allChatStack = [{
@@ -507,6 +509,8 @@ export default {
               total: +res.data.total,
               currentPage: this.currentPage
             }];
+          }).finally(() => {
+            this.contentLoading = false;
           });
         } else {
           content.chatList(query).then(res => {
@@ -515,6 +519,8 @@ export default {
               total: +res.data.total,
               currentPage: this.currentPage
             }];
+          }).finally(() => {
+            this.contentLoading = false;
           });
         }
       }
@@ -609,15 +615,13 @@ export default {
      */
     handleNodeClick(data) {
       // 点击部门不做处理
-      if (!data.userId) return;
+      if (!data.userId) {
+        this.$refs['userTree'].classList.remove('ct_box_color');
+        return;
+      }
       const nowClickDom = document.querySelector(`[data-userid="${this.dealUserId(data.userId)}"]`);
       if (nowClickDom) {
-        if (this.employId) {
-          // const oldClickDom = document.querySelector(`[data-userid=${this.dealUserId(this.employId)}]`);
-          // oldClickDom.parentElement.parentElement.style.backgroundColor = '#fff';
-        }
-        // nowClickDom.className += ' ';
-        // nowClickDom.parentElement.parentElement.style.color = '#ccc';
+        this.$refs['userTree'].classList.add('ct_box_color');
       }
       this.talkName = data.name;
       this.employId = data.userId;
@@ -893,10 +897,17 @@ export default {
       border-bottom: 1px solid #efefef;
       color: #999;
       text-align: center;
-
-      // ::-webkit-scrollbar {
-      //   display: none;
-      // }
+      /deep/.el-tree-node__content:hover {
+        background-color: #EEE;
+      }
+      /deep/ .el-tree-node:focus > .el-tree-node__content {
+        background-color: #EEE;
+      }
+    }
+    .ct_box_color {
+      /deep/ .is-current {
+        background-color: #EEE;
+      }
     }
   }
 

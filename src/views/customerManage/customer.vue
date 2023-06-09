@@ -9,7 +9,7 @@ import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import { EventBus } from '@/event-bus.js';
 import { goRouteWithQuery } from '@/utils';
-import { SCREENING_ADD_WAY_MAP, SCREENING_GENDER_TYPE, PAGE_LIMIT, CUSTOMER_PROPERTY_VALUE, WX_TYPE, CUSTOMER_STATUS, COMMON_TYPE, LOSS_TYPE, TO_INHERIT_TYPE, TRANSFER_TYPE, ALL_TYPE, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { ADD_WAY_MAP, SCREENING_GENDER_TYPE, PAGE_LIMIT, CUSTOMER_PROPERTY_VALUE, WX_TYPE, CUSTOMER_STATUS, COMMON_TYPE, LOSS_TYPE, TO_INHERIT_TYPE, TRANSFER_TYPE, ALL_TYPE, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 import PropertySetting from './components/propertySetting.vue';
 import { dealShowText, dealAtInfo } from '@/utils/common';
 import ExportCustomerModal from './components/exportCustomerModal.vue';
@@ -117,7 +117,7 @@ export default {
       searchValue: [],
       ADD_WAY,
       GENDER,
-      SCREENING_ADD_WAY_MAP,
+      ADD_WAY_MAP,
       SCREENING_GENDER_TYPE
     };
   },
@@ -910,7 +910,7 @@ export default {
               {{ CUSTOMER_STATUS[row.status] || '' }}
             </div>
             <div v-else-if="colunmItem.name === ADD_WAY">
-              {{ SCREENING_ADD_WAY_MAP[row.addWay] }}
+              {{ ADD_WAY_MAP[row.addWay] }}
             </div>
             <div v-else-if="colunmItem.name === GENDER">
               {{ SCREENING_GENDER_TYPE[row.gender] }}

@@ -20,7 +20,7 @@
               <span class="fl" style="margin-left: 10px;line-height: 25px;flex: 1;display:flex;flex-direction:column;justify-content: space-between;padding: 2px 0;overflow: hidden;">
                 <p class="flex" style="justify-content: space-between;">
                   <span class="inoneline" style="width:70px;">{{ (item.roomInfo && item.roomInfo.groupName) || (item.finalChatContext && item.finalChatContext.roomInfo && item.finalChatContext.roomInfo.name) || '' }}</span>
-                  <span v-if="item.finalChatContext && item.finalChatContext.fromInfo" class="fr gray inoneline">{{ dealTime(item.finalChatContext.fromInfo.updateTime) }}</span>
+                  <span v-if="item.finalChatContext" class="fr gray inoneline">{{ dealTime(item.finalChatContext.msgtime) }}</span>
                 </p>
                 <div v-if="item.finalChatContext && item.finalChatContext.fromInfo">
                   <p v-if="item.finalChatContext.text" class="gray inoneline" :title="item.finalChatContext.fromInfo.name + ':' + item.finalChatContext.text.content">{{ item.finalChatContext.fromInfo.name }}:{{ item.finalChatContext.text.content }}</p>
@@ -67,6 +67,11 @@ export default {
       loadings: true,
       groupIndex: -1
     };
+  },
+  watch: {
+    personList() {
+      this.groupIndex = -1;
+    }
   },
   // 点击群聊时删除session里的信息
   mounted() {

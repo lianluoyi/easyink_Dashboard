@@ -41,7 +41,6 @@ export default {
   },
   methods: {
     handleClick(tab, event) {
-      console.log(tab, event);
       // 点击tab栏时删除session
       sessionStorage.removeItem('list');
       sessionStorage.removeItem('insideList');

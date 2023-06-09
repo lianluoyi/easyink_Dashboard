@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户活跃度
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="activeness-page">
@@ -177,7 +177,6 @@
                 <!-- 员工维度 -->
                 <el-button
                   v-if="activeName === DATA_DIMENSION['staff']"
-                  v-hasPermi="['wecom:code:query']"
                   type="text"
                   @click="openClientDialog(row)"
                 >详情</el-button>
@@ -185,7 +184,7 @@
                 <!-- 跳转到客户资料详情页 -->
                 <el-button
                   v-if="activeName === DATA_DIMENSION['client']"
-                  v-hasPermi="['wecom:code:query']"
+                  v-hasPermi="['customerManage:customer:view']"
                   type="text"
                   @click="skipToUserDetails(row)"
                 >客户详情</el-button>

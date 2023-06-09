@@ -268,6 +268,7 @@ export default {
   },
   methods: {
     onClose() {
+      this.resetQuery();
       this.$emit('update:visible', false);
     },
     onSearch() {

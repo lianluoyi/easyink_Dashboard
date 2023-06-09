@@ -1,7 +1,7 @@
 <!--
  * @Description: 新增sop
  * @Author: broccoli
- * @LastEditors: Xzz
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="add-sop-page wrap">
@@ -49,104 +49,22 @@
               icon="el-icon-plus"
               size="mini"
               @click="dialogVisibleSelectUser = true"
-            >{{ useStaff.length ? '修改' : '添加' }}成员</el-button>
-            <el-tag v-for="(item, index) in useStaff" :key="index" class="user-tag iaic">
+            >{{ customerScopeInfo.useStaff.length ? '修改' : '添加' }}成员</el-button>
+            <el-tag v-for="(item, index) in customerScopeInfo.useStaff" :key="index" class="user-tag iaic">
               <TagUserShow :name="item.name" :show-icon="!item.userId" />
             </el-tag>
           </el-form-item>
-          <el-form-item v-if="sopType === SOP_TYPE['birthday']" label="客户标签">
-            <el-button class="mr10" icon="el-icon-plus" @click="openAddTag">添加标签</el-button>
-            <el-tag
-              v-for="(unit, unique) in tagList"
-              :key="unique"
-              type="info"
-              closable
-              @close="deleteOneSelectTag('tag', unit)"
-            >{{ unit.name }}</el-tag>
-          </el-form-item>
-          <el-form-item v-if="sopType === SOP_TYPE['activity']" label="客户范围" prop="range">
-            <div class="form-range-area" style="width: 713px">
-              <el-alert
-                :style="'width: 408px;margin-top:0;'"
-                title="同时满足以下条件的客户执行SOP规则"
-                type="warning"
-                :closable="false"
-              />
-              <el-form-item label="性别" label-width="68px" style="padding: 10px 0 0">
-                <el-radio-group v-model="sopForm.sopCustomerFilter.gender">
-                  <el-radio :label="GENDER_TYPE['allGender']">全部</el-radio>
-                  <el-radio :label="GENDER_TYPE['male']">男性</el-radio>
-                  <el-radio :label="GENDER_TYPE['feMale']">女性</el-radio>
-                  <el-radio :label="GENDER_TYPE['unKnown']">未知性别</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item label="客户标签" label-width="68px" style="padding: 10px 0 0">
-                <el-button icon="el-icon-plus" @click="openAddTag">添加标签</el-button>
-                <el-tag
-                  v-for="(unit, unique) in tagList"
-                  :key="unique"
-                  type="info"
-                  closable
-                  @close="deleteOneSelectTag('tag', unit)"
-                >{{ unit.name }}</el-tag>
-              </el-form-item>
-              <el-form-item label="添加时间" label-width="68px" style="padding: 10px 0">
-                <el-date-picker
-                  v-model="sopForm.sopCustomerFilter.addTime"
-                  type="daterange"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  style="width: 320px"
-                  value-format="yyyy-MM-dd"
-                />
-              </el-form-item>
-              <el-form-item label="所属员工" label-width="68px" style="padding: 10px 0">
-                <el-button icon="el-icon-plus" @click="dialogVisibleSelectUser = true">{{
-                  useStaff.length === 0 ? '添加成员' : '修改成员'
-                }}</el-button>
-                <el-tag v-for="(item, index) in useStaff" :key="index" class="user-tag iaic">
-                  <TagUserShow :show-icon="!item.userId" :name="item.name" />
-                </el-tag>
-              </el-form-item>
-              <el-form-item label="其他属性" label-width="68px" style="padding: 10px 0">
-                <div class="flex customer-property-list">
-                  <div
-                    v-for="(propertyItem, propertyIndex) in customPropertyList"
-                    :key="propertyIndex"
-                    class="mr10 mb10"
-                  >
-                    <BasePropertyItem
-                      v-if="propertyItem.name === '出生日期'"
-                      :item.sync="propertyItem"
-                      :list.sync="customPropertyList"
-                      :index="propertyIndex"
-                      :edit-status="true"
-                    />
-                    <CustomPropertyItem
-                      v-else
-                      :item.sync="propertyItem"
-                      :list.sync="customPropertyList"
-                      :index="propertyIndex"
-                      :edit-status="true"
-                      :select-single-radio="true"
-                    />
-                  </div>
-                </div>
-                <div class="add-other-property" @click="selectPropertyVisible = true"><i class="el-icon-plus" /></div>
-              </el-form-item>
-              <el-form-item label="过滤标签" label-width="68px" style="padding: 10px 0 0">
-                <el-button icon="el-icon-plus" @click="openFilterTag">添加标签</el-button>
-                <el-tag
-                  v-for="(unit, unique) in filterTagList"
-                  :key="unique"
-                  type="info"
-                  closable
-                  @close="deleteOneSelectTag('filter', unit)"
-                >{{ unit.name }}</el-tag>
-                <div class="range-item-tip">若客户包含过滤标签，则不会收到本次消息</div>
-              </el-form-item>
-            </div>
+          <el-form-item
+            v-if="[SOP_TYPE['newCustomer'],SOP_TYPE['activity'], SOP_TYPE['birthday']].includes(sopType)"
+            label="客户范围"
+            :prop="sopType === SOP_TYPE['activity'] ? 'range' : ''"
+          >
+            <CustomerScope
+              class="form-range-area"
+              style="width: 713px"
+              :customer-scope-info="customerScopeInfo"
+              @updateCustomerScopeInfo="updateCustomerScopeInfo"
+            />
           </el-form-item>
           <el-form-item
             v-if="[SOP_TYPE['timing'], SOP_TYPE['cycle']].includes(sopType)"
@@ -258,14 +176,14 @@
     </div>
     <!-- 选择使用员工弹窗 -->
     <SelectUser
-      v-if="[SOP_TYPE['newCustomer'], SOP_TYPE['activity'], SOP_TYPE['birthday']].includes(sopType)"
-      :key="sopForm.codeType"
+      v-if="[SOP_TYPE['newCustomer'], SOP_TYPE['birthday']].includes(sopType)"
       :visible.sync="dialogVisibleSelectUser"
       title="选择使用员工"
       :is-only-leaf="false"
-      :selected-user-list="useStaff"
+      :selected-user-list="customerScopeInfo.useStaff"
       @success="selectedUser"
     />
+
     <!-- 选择群主弹窗 -->
     <SelectUser
       v-if="[SOP_TYPE['timing'], SOP_TYPE['cycle']].includes(sopType)"
@@ -300,16 +218,11 @@
       :visible.sync="dialogVisibleSelectTag"
       title="选择标签"
       type="search"
-      :info-msg="
-        [SOP_TYPE['timing'], SOP_TYPE['cycle']].includes(sopType)
-          ? '筛选出被打上选中标签的客户群，执行SOP'
-          : '筛选出被打上选中标签的客户，执行SOP'
-      "
+      info-msg="筛选出被打上选中标签的客户群，执行SOP"
       :selected="tagType === 'filter' ? filterTagList : tagList"
-      :tag-type="[SOP_TYPE['timing'], SOP_TYPE['cycle']].includes(sopType) ? 'group' : 'customer'"
+      tag-type="group"
       @success="submitSelectTag"
     />
-    <SelectProperty :visible.sync="selectPropertyVisible" @submit="handleSelectProperty" />
   </div>
 </template>
 <script>
@@ -318,7 +231,6 @@ import ReturnPage from '@/components/ReturnPage.vue';
 import SelectUser from '@/components/SelectUser/index.vue';
 import AddRuleDrawer from '../components/AddRuleDrawer.vue';
 import SOPRuleList from '../components/SOPRuleList.vue';
-import TagUserShow from '@/components/TagUserShow';
 import {
   SOP_TYPE,
   CUSTOMER_PROPERTY_VALUE,
@@ -327,34 +239,22 @@ import {
   MS_TO_SECONDS,
   DEFAULT_ALERTINFO,
   RULE_PERFORM_TYPE,
-  ONE_DAY_MSECOND
+  ONE_DAY_MSECOND,
+  ADD_WAY
 } from '@/utils/constant';
 import CustomerGroupModal from '@/views/drainageCode/group/customer.vue';
 import SelectTag from '@/components/SelectTag';
 import { addSop, getSopDetail, updateSop } from '@/api/sop';
-import SelectProperty from '../components/SelectProperty.vue';
-import CustomPropertyItem from '@/views/customerManage/components/customPropertyItem.vue';
-import BasePropertyItem from '@/views/customerManage/components/basePropertyItem.vue';
-import { initGetCustomerProper, changeButtonLoading, groupByScopeType, checkChange } from '@/utils/common';
+import { initGetCustomerProper, changeButtonLoading, groupByScopeType, checkChange, getSourceLabel } from '@/utils/common';
 import moment from 'moment';
 import { deepClone } from '@/utils/index';
 import SopCalendar from './sopCalendar.vue';
-
+import CustomerScope from '../components/CustomerScope.vue';
+import TagUserShow from '@/components/TagUserShow';
 // 指定群聊
 const SPECIFIED_GROUP = 0;
 // 筛选群聊
 const FILTER_GROUP = 1;
-const ALL_MALE_TYPE = -1;
-const MALE_TYPE = 1;
-const FEMALE_TYPE = 2;
-const UNKNOWN_TYPE = 0;
-// 性别类型
-const GENDER_TYPE = {
-  allGender: ALL_MALE_TYPE,
-  male: MALE_TYPE,
-  feMale: FEMALE_TYPE,
-  unKnown: UNKNOWN_TYPE
-};
 export default {
   name: '',
   components: {
@@ -364,11 +264,9 @@ export default {
     SOPRuleList,
     CustomerGroupModal,
     SelectTag,
-    SelectProperty,
-    CustomPropertyItem,
-    BasePropertyItem,
     SopCalendar,
     RequestButton,
+    CustomerScope,
     TagUserShow
   },
   props: {},
@@ -399,20 +297,22 @@ export default {
     };
     // 校验使用员工
     const checkUseEmployee = (rule, value, callback) => {
-      if (!this.useStaff.length) return callback(new Error('请设置员工'));
+      if (!this.customerScopeInfo.useStaff.length) return callback(new Error('请设置员工'));
       return callback();
     };
     // 校验活动SOP的客户范围
     const checkRange = (rule, value, callback) => {
-      const { gender, addTime } = this.sopForm.sopCustomerFilter;
+      const { gender, tagList, filterTagList, addTime, useStaff, customPropertyList } = this.customerScopeInfo;
       if (
         typeof gender !== 'number' &&
-        !this.tagList.length &&
-        !this.filterTagList.length &&
-        !addTime &&
-        !this.useStaff.length &&
-        !this.customPropertyList.filter((prop) => prop.value || prop.optionValue).length
-      ) { return callback(new Error('请设置客户范围')); }
+        !tagList.length &&
+        !filterTagList.length &&
+        !addTime.length &&
+        !useStaff.length &&
+        !customPropertyList.filter((prop) => prop.value || prop.optionValue).length
+      ) {
+        return callback(new Error('请设置客户范围'));
+      }
       return callback();
     };
     return {
@@ -446,16 +346,9 @@ export default {
         sopType: null
       },
       SOP_TYPE,
-      GENDER_TYPE,
       groupList: [],
       // 群主
       groupOwner: [],
-      // 使用员工/部门
-      useStaff: [],
-      // 使用员工
-      useEmployeesList: [],
-      // 使用部门
-      useDepartmentList: [],
       dialogVisibleSelectGroupOwner: false,
       customerGroupVisible: false,
       // 客户群
@@ -463,8 +356,6 @@ export default {
       dialogVisibleSelectTag: false,
       // 当前选择的标签类型
       tagType: 'tag',
-      // 是否显示自定义属性弹窗
-      selectPropertyVisible: false,
       // 客户自定义属性
       customPropertyList: [],
       addRuleDrawerTitle: '添加规则',
@@ -476,7 +367,11 @@ export default {
           return time.getTime() < Date.now() - ONE_DAY * ONE_HOUR * MS_TO_SECONDS;
         }
       },
-      ruleListType: 'timeline'
+      ruleListType: 'timeline',
+      customerScopeInfo: {
+        // 这里 定义避免获取的为空导致报错
+        useStaff: []
+      }
     };
   },
   computed: {
@@ -518,8 +413,8 @@ export default {
   created() {
     const routerQuery = this.$route.query;
     this.sopInfo.sopType = Number(routerQuery.sopType);
-    // 客户sop和生日sop需要用到客户自定义字段
-    if ([SOP_TYPE['activity'], SOP_TYPE['birthday']].includes(this.sopInfo.sopType)) {
+    // 客户sop、生日sop、活动sop需要用到客户自定义字段
+    if ([SOP_TYPE['activity'], SOP_TYPE['birthday'], SOP_TYPE['newCustomer']].includes(this.sopInfo.sopType)) {
       initGetCustomerProper(this.$store);
     }
     // 群日历规则展示类型默认为日历形式
@@ -573,11 +468,11 @@ export default {
         ...sopForm,
         sopType: this.sopInfo.sopType
       };
-      const addTime = sopForm.sopFilter?.addTime;
-      const cycleTime = this.sopForm.sopFilter?.cycleTime;
       switch (this.sopType) {
         case SOP_TYPE['timing']:
         case SOP_TYPE['cycle']: {
+          const addTime = sopForm.sopFilter?.addTime;
+          const cycleTime = this.sopForm.sopFilter?.cycleTime;
           newSopForm.chatIdList = this.groupList.map((item) => item.chatId);
           newSopForm.sopFilter = {
             createTime: addTime && addTime[0],
@@ -589,38 +484,36 @@ export default {
           };
           break;
         }
-        case SOP_TYPE['activity']: {
-          const addTime = newSopForm.sopCustomerFilter?.addTime;
+        case SOP_TYPE['activity']:
+        case SOP_TYPE['newCustomer']:
+        case SOP_TYPE['birthday']:
+        {
+          const { gender, tagList, filterTagList, addTime, useEmployeesList, useDepartmentList, customPropertyList } = this.customerScopeInfo;
           newSopForm.sopCustomerFilter = {
-            ...newSopForm.sopCustomerFilter,
-            tagId: this.dealIds(this.tagList, 'tagId'),
-            filterTagId: this.dealIds(this.filterTagList, 'tagId'),
+            tagId: this.dealIds(tagList, 'tagId'),
+            filterTagId: this.dealIds(filterTagList, 'tagId'),
             startTime: addTime && addTime[0],
             endTime: addTime && addTime[1],
-            users: this.dealIds(this.useEmployeesList, 'userId'),
-            departments: this.dealIds(this.useDepartmentList, 'id'),
-            columnList: this.customPropertyList.map((item) => {
-              const value =
-                item.name === '出生日期' || item.type === CUSTOMER_PROPERTY_VALUE['dateField']
-                  ? item.value
-                  : item.optionValue;
+            users: this.dealIds(useEmployeesList, 'userId'),
+            departments: this.dealIds(useDepartmentList, 'id'),
+            gender,
+            columnList: customPropertyList.map((item) => {
+              if (item.id === ADD_WAY) {
+                return {
+                  type: ADD_WAY,
+                  propertyValue: item.optionValue
+                };
+              }
+              const value = item.type === CUSTOMER_PROPERTY_VALUE['dateField'] || item.name === '出生日期'
+                ? (item.value || []).join(',')
+                : item.optionValue;
               return {
                 extendPropertyId: item.id,
-                propertyValue: value
+                propertyValue: value,
+                type: item.type
               };
-            })
+            }).filter((item) => item.propertyValue)
           };
-          break;
-        }
-        case SOP_TYPE['newCustomer']:
-        case SOP_TYPE['birthday']: {
-          newSopForm.userIdList = this.useEmployeesList?.map((item) => item.userId);
-          newSopForm.departmentIdList = this.useDepartmentList?.map((item) => item.id);
-          if (this.sopType === SOP_TYPE['birthday']) {
-            newSopForm.sopCustomerFilter = {
-              tagId: this.dealIds(this.tagList, 'tagId')
-            };
-          }
           break;
         }
         case SOP_TYPE['groupCalendar']: {
@@ -677,13 +570,16 @@ export default {
     // 选择添加人确认按钮
     selectedUser(users) {
       const groupOwnerStatus = [SOP_TYPE['timing'], SOP_TYPE['cycle']].includes(this.sopType);
-      this[groupOwnerStatus ? 'groupOwner' : 'useStaff'] = users;
       if (!groupOwnerStatus) {
         const groupByList = groupByScopeType(users);
-        this.useEmployeesList = groupByList.useEmployeesList;
-        this.useDepartmentList = groupByList.useDepartmentList;
+        this.customerScopeInfo.useStaff = users;
+        this.customerScopeInfo.useEmployeesList = groupByList.useEmployeesList;
+        this.customerScopeInfo.useDepartmentList = groupByList.useDepartmentList;
+      } else {
+        this.groupOwner = users;
       }
     },
+
     // 客户群dialog选中数据
     handleSelectCustomerGroup() {
       this.$refs.customer.submit();
@@ -704,13 +600,6 @@ export default {
     },
     cancelClick() {
       this.customerGroupVisible = false;
-    },
-    openFilterTag() {
-      this.dialogVisibleSelectTag = true;
-      this.tagType = 'filter';
-    },
-    handleSelectProperty(list) {
-      this.customPropertyList = [...list];
     },
     dealDescription() {
       switch (this.sopType) {
@@ -758,10 +647,6 @@ export default {
         }
       }
     },
-    openAddTag() {
-      this.dialogVisibleSelectTag = true;
-      this.tagType = 'tag';
-    },
     /**
      * 获取sop详情
      */
@@ -772,7 +657,9 @@ export default {
         const resData = res.data;
         let newSopForm = { ...resData };
         newSopForm = this.dealDetailGroup(newSopForm, resData);
-        newSopForm = this.dealDetailCustomer(newSopForm, resData);
+        if ([SOP_TYPE['newCustomer'], SOP_TYPE['activity'], SOP_TYPE['birthday']].includes(this.sopType)) {
+          newSopForm = this.dealDetailCustomer(newSopForm, resData);
+        }
         newSopForm = this.dealAlertTime(newSopForm);
         this.sopForm = newSopForm;
       });
@@ -805,57 +692,67 @@ export default {
       }
       return newSopForm;
     },
+    /**
+     * @description 处理客户SOP
+     */
     dealDetailCustomer(sopForm, resData) {
       const newSopForm = { ...sopForm };
-      switch (this.sopType) {
-        case SOP_TYPE['activity']: {
-          const userInfoList = resData.sopCustomerFilter.userInfoList || [];
-          const departmentInfoList = resData.sopCustomerFilter.departmentInfoList || [];
-          const userAndDepartmentList = [...userInfoList, ...departmentInfoList];
-          this.useStaff = userAndDepartmentList.map((item) => {
-            return { ...item, name: item.userName || item.departmentName, id: item.departmentId };
-          });
-          const groupByList = groupByScopeType(this.useStaff);
-          this.useEmployeesList = groupByList.useEmployeesList;
-          this.useDepartmentList = groupByList.useDepartmentList;
-          this.tagList = resData.sopCustomerFilter.tagList ? [...resData.sopCustomerFilter.tagList] : [];
-          this.filterTagList = resData.sopCustomerFilter.filterTagList
-            ? [...resData.sopCustomerFilter.filterTagList]
-            : [];
-          const newCustomPropertyList = [];
-          const columnList = [...resData.sopCustomerFilter.columnList];
-          const customPropertyObj = this.$store.state.customerProperty.customPropertyObj;
-          columnList.map((item) => {
-            newCustomPropertyList.push({ ...customPropertyObj[item.extendPropertyId], value: item.propertyValue });
-          });
-          this.customPropertyList = newCustomPropertyList;
-          const resStartTime = resData.sopCustomerFilter.startTime;
-          const resEndTime = resData.sopCustomerFilter.endTime;
-          if (resStartTime && resEndTime) {
-            const startTime = this.parseTime(new Date(resStartTime), '{y}-{m}-{d}');
-            const endTime = this.parseTime(new Date(resEndTime), '{y}-{m}-{d}');
-            newSopForm.sopCustomerFilter.addTime = [startTime, endTime];
-          }
-          break;
+      const userInfoList = resData.sopCustomerFilter.userInfoList || [];
+      const departmentInfoList = resData.sopCustomerFilter.departmentInfoList || [];
+      const userAndDepartmentList = [...userInfoList, ...departmentInfoList];
+      this.customerScopeInfo.useStaff = userAndDepartmentList.map((item) => {
+        return { ...item, name: item.userName || item.departmentName, id: item.departmentId };
+      });
+      const groupByList = groupByScopeType(this.customerScopeInfo.useStaff);
+      this.customerScopeInfo.gender = resData.sopCustomerFilter.gender;
+      this.customerScopeInfo.useEmployeesList = groupByList.useEmployeesList;
+      this.customerScopeInfo.useDepartmentList = groupByList.useDepartmentList;
+      this.customerScopeInfo.tagList = resData.sopCustomerFilter.tagList ? [...resData.sopCustomerFilter.tagList] : [];
+      this.customerScopeInfo.filterTagList = resData.sopCustomerFilter.filterTagList
+        ? [...resData.sopCustomerFilter.filterTagList]
+        : [];
+      const newCustomPropertyList = [];
+      const columnList = [...resData.sopCustomerFilter.columnList];
+      const customPropertyObj = this.$store.state.customerProperty.customPropertyObj;
+      columnList.forEach((item) => {
+        if (item.type === ADD_WAY) {
+          newCustomPropertyList.push(
+            { id: ADD_WAY, name: '来源', optionValue: item.propertyValue, placeholder: '请选择来源', type: CUSTOMER_PROPERTY_VALUE['selectSingle'],
+              optionList: getSourceLabel({ key: 'id', value: 'multipleValue' }) }
+          );
+        } else {
+          // TODO  可以将该处optionValue与value合并成一个值 optionValue用于下拉框、多选框的回显值 value则是其他类型的回显值
+          const customPropertyItem = customPropertyObj[item.extendPropertyId];
+          // 需要对出生日期和日期类型的属性转换成数组形式
+          newCustomPropertyList.push(
+            {
+              ...customPropertyItem,
+              optionValue: item.propertyValue,
+              value: (customPropertyItem.name === '出生日期' || customPropertyItem.type === CUSTOMER_PROPERTY_VALUE['dateField']) ? this.dealDate(item.propertyValue).split(',') : item.propertyValue,
+              propertyValue: item.propertyValue
+            }
+          );
         }
-        case SOP_TYPE['newCustomer']:
-        case SOP_TYPE['birthday']: {
-          const userList = resData.userList.map((item) => {
-            return { ...item, name: item.userName };
-          });
-          const departmentList = resData.departmentList?.map((item) => {
-            return { ...item, name: item.departmentName, id: item.departmentId };
-          }) || [];
-          const useStaff = [...userList, ...departmentList];
-          this.useStaff = useStaff;
-          const groupByList = groupByScopeType(useStaff);
-          this.useEmployeesList = groupByList.useEmployeesList;
-          this.useDepartmentList = groupByList.useDepartmentList;
-          this.tagList = resData.sopCustomerFilter.tagList ? [...resData.sopCustomerFilter.tagList] : [];
-          break;
-        }
+      });
+      this.customerScopeInfo.customPropertyList = newCustomPropertyList;
+      const resStartTime = resData.sopCustomerFilter.startTime;
+      const resEndTime = resData.sopCustomerFilter.endTime;
+      if (resStartTime && resEndTime) {
+        const startTime = this.parseTime(new Date(resStartTime), '{y}-{m}-{d}');
+        const endTime = this.parseTime(new Date(resEndTime), '{y}-{m}-{d}');
+        this.customerScopeInfo.addTime = [startTime, endTime];
       }
       return newSopForm;
+    },
+    /**
+     * @description 兼容活动sop客户范围下的日期 转换成逗号分割形式
+     */
+    dealDate(value) {
+      if (value.indexOf(',') === -1) {
+        return value + ',' + value;
+      } else {
+        return value;
+      }
     },
     /**
      * 将提醒时间转成组件需要的格式
@@ -923,6 +820,9 @@ export default {
       list.push(item);
       this.removeList = list;
     },
+    /**
+     * @description 选择群主弹窗
+     */
     openUserModal(title) {
       this.dialogVisibleSelectGroupOwner = true;
       this.selectTitle = title;
@@ -972,6 +872,12 @@ export default {
           callback();
         }
       );
+    },
+    /**
+     * @description 在客户范围中修改值的回调
+     */
+    updateCustomerScopeInfo(data) {
+      this.customerScopeInfo = data;
     }
   }
 };
