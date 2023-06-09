@@ -133,46 +133,51 @@
   }
 }
 
-
 .login-form {
   .el-form-item__content {
     height: 36px;
-    .el-form-item__error{
+    .el-form-item__error {
       display: none;
     }
   }
-  .el-form-item:nth-of-type(4) .el-input__inner{
+  .el-form-item:nth-of-type(4) .el-input__inner {
     width: 210px;
   }
   .el-form-item {
-    &:not(:nth-child(4)) .el-input input{
-      height: 36px!important;
-      width: 280px!important;
-      line-height: 36px!important;
+    &:not(:nth-child(4)) .el-input input {
+      height: 36px !important;
+      width: 280px !important;
+      line-height: 36px !important;
       padding: 5px 10px 5px 35px;
     }
     &:nth-child(4) {
-      margin-top: 8px!important;
+      margin-top: 8px !important;
       width: 294px;
-      .el-input input{
-        width: 180px!important;
+      .el-input input {
+        width: 180px !important;
         padding: 5px 10px 5px 35px;
       }
     }
   }
 }
 
-.el-button--primary, .el-button--primary:hover, .el-button--primary:focus {
+.el-button--primary,
+.el-button--primary:hover,
+.el-button--primary:focus {
   @include btn_color($color-theme2-1);
 }
 
-.el-button.is-plain, .el-button.is-plain:hover, .el-button--default:hover {
+.el-button.is-plain,
+.el-button.is-plain:hover,
+.el-button--default:hover {
   @include btn_reset_color($color-theme2-1);
 }
 
-.el-button--text, .el-upload-dragger .el-upload__text em,
+.el-button--text,
+.el-upload-dragger .el-upload__text em,
 .el-radio-button:not(.is-active) .el-radio-button__inner:hover,
-.el-transfer-panel__item.el-checkbox:hover, .el-upload:focus {
+.el-transfer-panel__item.el-checkbox:hover,
+.el-upload:focus {
   @include text_btn_color($color-theme2-1);
 }
 
@@ -181,16 +186,19 @@
   color: #fff !important;
 }
 
-.el-input__inner, .el-textarea__inner, .el-select .el-input.is-focus .el-input__inner,
+.el-input__inner,
+.el-textarea__inner,
+.el-select .el-input.is-focus .el-input__inner,
 .el-range-editor.is-active {
   border-color: #d9d9d9;
-  &:focus, &:hover {
-  @include border_color();
+  &:focus,
+  &:hover {
+    @include border_color();
   }
 }
 
 .group-member-search label {
-  width: 55px!important;
+  width: 55px !important;
 }
 
 .el-dialog__body {
@@ -209,25 +217,31 @@
       transition: none;
     }
   }
-  .el-upload-list__item.is-success .el-upload-list__item-name:hover, .el-upload-list__item.is-success .el-upload-list__item-name:focus {
+  .el-upload-list__item.is-success .el-upload-list__item-name:hover,
+  .el-upload-list__item.is-success .el-upload-list__item-name:focus {
     color: #606266;
   }
 }
 
 .staff-top-search {
   .el-form-item__label {
-    width: auto!important;
+    width: auto !important;
   }
 }
 
 .el-message {
-  top: 50%!important;
+  top: 50% !important;
 }
-.el-step__title.is-success, .el-step__description.is-success, .el-step__head.is-success,
-.el-step__title.is-process, .el-step__head.is-process, .el-step__description.is-process {
+.el-step__title.is-success,
+.el-step__description.is-success,
+.el-step__head.is-success,
+.el-step__title.is-process,
+.el-step__head.is-process,
+.el-step__description.is-process {
   @include step_label_color($color-theme2-1);
 }
-.el-step__head.is-process, .el-step__head.is-success {
+.el-step__head.is-process,
+.el-step__head.is-success {
   @include border_color();
 }
 
@@ -235,9 +249,9 @@
   white-space: unset;
 }
 
-.tag-wrapper .cell{
+.tag-wrapper .cell {
   display: -webkit-box !important;
-  overfLow: hidden;
+  overflow: hidden;
   text-overflow: ellipsis;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -261,13 +275,16 @@
     padding-bottom: 5px;
   }
   // 扩大员工多选框点击区域
-  .is-leaf+.el-checkbox {
+  .is-leaf + .el-checkbox {
     position: relative;
     &:before {
       content: '';
       position: absolute;
-      top: -10px; bottom: -10px; left: -40px; right: -260px;
-    };
+      top: -10px;
+      bottom: -10px;
+      left: -40px;
+      right: -260px;
+    }
   }
 }
 .conversation-user-tree {
@@ -279,7 +296,7 @@
     padding-top: 3px;
     padding-bottom: 3px;
   }
-  .selected span{
+  .selected span {
     // color: #6BB4AB!important;
   }
 }
@@ -302,7 +319,7 @@
     font-size: 14px;
     color: #333;
     text-align: left;
-    >div:first-child {
+    > div:first-child {
       margin-top: -2px;
     }
   }
@@ -315,7 +332,7 @@
 
 .tag-dialog {
   .el-icon-info {
-    color: #6BB4AB;
+    color: #6bb4ab;
     transform: rotateZ(-15deg);
   }
   .el-input__suffix {
@@ -329,7 +346,7 @@
     border-radius: 3px 0 0 3px;
     border-right-width: 0;
   }
-  >.el-input input {
+  > .el-input input {
     border-radius: 0 3px 3px 0;
   }
 }
@@ -341,7 +358,7 @@
       background: transparent;
     }
   }
-  .el-form-item:nth-child(2)  {
+  .el-form-item:nth-child(2) {
     height: auto;
     .el-form-item__content {
       display: flex;
@@ -371,29 +388,30 @@
   }
 }
 
-.el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-  @include radio_btn_color($color-theme2-1)
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  @include radio_btn_color($color-theme2-1);
 }
-.el-checkbox__input.is-checked+.el-checkbox__label {
-  @include radio_label_color($color-theme2-1)
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  @include radio_label_color($color-theme2-1);
 }
 
 .el-tabs__item.is-active {
-  @include text_btn_color($color-theme2-1)
+  @include text_btn_color($color-theme2-1);
 }
 .el-tabs__active-bar {
-  @include tab_bg_color($color-theme2-1)
+  @include tab_bg_color($color-theme2-1);
 }
 
 .el-tabs__item:hover,
 .el-pagination.is-background .el-pager li:not(.active):hover,
 .el-select-dropdown__item.selected,
 .el-dialog__headerbtn .el-dialog__close:hover {
-    @include text_btn_color($color-theme2-1)
+  @include text_btn_color($color-theme2-1);
 }
 
 .el-pagination.is-background .el-pager li:not(.disabled).active {
-  @include bg_primary_color($color-theme2-1)
+  @include bg_primary_color($color-theme2-1);
 }
 
 .el-dropdown-menu__item {
@@ -407,7 +425,7 @@
   @include btn_color($color-theme2-1);
 }
 
-.el-radio-button__orig-radio:checked+.el-radio-button__inner {
+.el-radio-button__orig-radio:checked + .el-radio-button__inner {
   @include radio_btn_color($color-theme2-1);
 }
 
@@ -415,13 +433,18 @@
   .el-radio__input.is-checked .el-radio__inner {
     @include radio_btn_color($color-theme2-1);
   }
-  .el-radio__input.is-checked+.el-radio__label {
+  .el-radio__input.is-checked + .el-radio__label {
     @include radio_label_color($color-theme2-1);
   }
 }
 
 // 步骤条
-.el-step__title.is-finish, .el-step__description.is-finish, .el-step__head.is-finish {
+.el-step__title.is-finish,
+.el-step__description.is-finish,
+.el-step__head.is-finish {
   @include text_btn_color($color-theme2-2);
   @include border_color($color-theme2-2);
+}
+.el-link.el-link--default:hover {
+  @include text_btn_color($color-theme2-1);
 }

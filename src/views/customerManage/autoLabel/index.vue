@@ -10,10 +10,12 @@
         <el-radio-button :label="AUTOLABEL_TYPE['keyWords']">关键词打标签</el-radio-button>
         <el-radio-button :label="AUTOLABEL_TYPE['intoGroup']">入群打标签</el-radio-button>
         <el-radio-button :label="AUTOLABEL_TYPE['newCustomer']">新客打标签</el-radio-button>
+        <el-radio-button v-hasPermi="['wecom:batchtag:list']" :label="AUTOLABEL_TYPE['batch']">批量打标签</el-radio-button>
       </el-radio-group>
     </div>
     <div class="content-container">
-      <LabelList :label-type="activeName" :label-tip="dealLabelTip()" />
+      <LabelList v-if="activeName !== AUTOLABEL_TYPE['batch']" :label-type="activeName" :label-tip="dealLabelTip()" />
+      <BatchTag v-else />
     </div>
   </div>
 </template>
@@ -22,9 +24,10 @@
 import { AUTOLABEL_TYPE } from '@/utils/constant';
 import LabelList from './components/labelList.vue';
 import { removeUrlParams } from '@/utils/common';
+import BatchTag from './BatchTag.vue';
 export default {
   name: '',
-  components: { LabelList },
+  components: { LabelList, BatchTag },
   props: {},
   data() {
     return {
@@ -49,6 +52,13 @@ export default {
     const routerQuery = this.$route.query;
     const labelType = routerQuery.labelType;
     this.activeName = labelType ? Number(labelType) : AUTOLABEL_TYPE['keyWords'];
+  },
+  beforeRouteEnter(to, from, next) {
+    // TODO 是否能够在mixin中处理
+    if (from.path !== '/customerManage/customerCenter/BatchTagTaskDetail') {
+      sessionStorage.removeItem('BatchTag');
+    }
+    next();
   },
   methods: {
     // 处理不同类型表格上方的提示
@@ -78,10 +88,14 @@ export default {
 .label-page {
   display: flex;
   flex-direction: column;
+  height: 100%;
   /deep/ .content-container {
     flex: 1;
     overflow: auto;
     .label-list-page {
+      height: 100%;
+    }
+    .batch-tag {
       height: 100%;
     }
   }

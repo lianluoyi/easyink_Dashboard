@@ -543,60 +543,77 @@
 @mixin text_btn_color($color: $color-theme1-2, $important: false) {
   /*文字颜色*/
   color: $color;
+  stroke: $color;
   [data-theme='theme1'] & {
     @if $important {
       color: $color-theme1-2 !important;
+      stroke: $color-theme1-2 !important;
     } @else {
       color: $color-theme1-2;
+      stroke: $color-theme1-2;
     }
   }
   [data-theme='theme2'] & {
     @if $important {
       color: $color-theme2-2 !important;
+      stroke: $color-theme2-2 !important;
     } @else {
       color: $color-theme2-2;
+      stroke: $color-theme2-2;
     }
   }
   [data-theme='theme3'] & {
     @if $important {
       color: $color-theme3-2 !important;
+      stroke: $color-theme3-2 !important;
     } @else {
       color: $color-theme3-2;
+      stroke: $color-theme3-2;
     }
   }
   [data-theme='theme4'] & {
     @if $important {
       color: $color-theme4-1 !important;
+      stroke: $color-theme4-1 !important;
     } @else {
       color: $color-theme4-1;
+      stroke: $color-theme4-1;
     }
   }
   [data-theme='theme5'] & {
     @if $important {
       color: $color-theme5-1 !important;
+      stroke: $color-theme5-1 !important;
     } @else {
       color: $color-theme5-1;
+      stroke: $color-theme5-1;
     }
   }
   [data-theme='theme6'] & {
     @if $important {
       color: $color-theme6-1 !important;
+      stroke: $color-theme6-1 !important;
     } @else {
       color: $color-theme6-1;
+      stroke: $color-theme6-1;
     }
   }
   [data-theme='theme7'] & {
     @if $important {
       color: $color-theme7-2 !important;
+      stroke: $color-theme7-2 !important;
     } @else {
       color: $color-theme7-2;
+      stroke: $color-theme7-2;
     }
   }
   [data-theme='theme8'] & {
     @if $important {
       color: $color-theme8-2 !important;
+      stroke: $color-theme8-2 !important;
     } @else {
       color: $color-theme8-2;
+      stroke: $color-theme8-2;
     }
   }
 }

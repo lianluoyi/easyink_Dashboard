@@ -47,6 +47,8 @@ export default {
     <div class="no-config-info">
       <NoConfigInfo :message="noConfigMessage" :config-keys="configKeys" :page-title="pageTitle" />
     </div>
+    <!-- TODO 头部组件配置 可将返回组件配置在该组件中 -->
+    <slot name="header" />
     <div class="search-form-container">
       <!-- @slot 搜索区域(template根元素需传el-form) -->
       <slot name="search" />

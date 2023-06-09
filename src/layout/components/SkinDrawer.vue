@@ -1,7 +1,7 @@
 <!--
  * @Description: 换肤抽屉
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <el-drawer
@@ -46,7 +46,7 @@ export default {
     };
   },
   created() {
-    this.nowActiveTheme = localStorage.getItem('themeType') || 'theme1';
+    this.nowActiveTheme = localStorage.getItem('themeType') || 'theme2';
   },
   mounted() {},
   methods: {

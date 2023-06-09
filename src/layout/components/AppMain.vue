@@ -18,10 +18,12 @@ export default {
       return this.$route.path;
     },
     /**
-     * 从详情页返回客户页时,使用keep-alive保留查询条件和页码
+     * 从详情页返回时,使用keep-alive保留查询条件和页码
      */
     isKeep() {
-      return this.$route.path === CUSTOMER_DEATIL_PATH || this.$route.path === CUSTOMER_PATH;
+      /** 需要缓存的页面 */
+      const keepAliveList = [CUSTOMER_DEATIL_PATH, CUSTOMER_PATH, '/customerManage/customerCenter/BatchTagTaskDetail'];
+      return keepAliveList.includes(this.$route.path);
     }
   }
 };

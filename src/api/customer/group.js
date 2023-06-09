@@ -65,3 +65,11 @@ export function exportGroup(params) {
     params
   });
 }
+
+// 获取客户标签总数
+export function totalTagCnt() {
+  return request({
+    url: service + '/totalTagCnt',
+    method: 'get'
+  });
+}

@@ -615,6 +615,8 @@ const KEYWORDS_LABEL = 1;
 const INTOGROUP_LABEL = 2;
 // 新客打标签
 const NEWCUSTOMER_LABEL = 3;
+// 批量打标签
+const BATCH_LABEL = 4;
 // 自动标签类型
 export const AUTOLABEL_TYPE = {
   // 关键词
@@ -622,7 +624,8 @@ export const AUTOLABEL_TYPE = {
   // 入群
   'intoGroup': INTOGROUP_LABEL,
   // 新客
-  'newCustomer': NEWCUSTOMER_LABEL
+  'newCustomer': NEWCUSTOMER_LABEL,
+  'batch': BATCH_LABEL
 };
 
 /** 周数组 */

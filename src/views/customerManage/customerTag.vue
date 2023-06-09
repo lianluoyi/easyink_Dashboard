@@ -21,7 +21,7 @@
     </template>
     <template v-slot:data-stat>
       <div :class="`desc-div${type === 'group' ? ' group-desc-div' : ''}`">
-        <div>当前{{ type === 'group' ? '客户群' : '企业' }}标签已创建<span class="data-count-num">{{ total }}/3000</span></div>
+        <div>当前{{ type === 'group' ? '客户群' : '企业' }}标签已创建<span class="data-count-num">{{ tagTotal }}/3000</span></div>
         <div v-if="type === 'group'" class="gray-desc">群标签为系统标签，不可同步到企业微信</div>
       </div>
     </template>
@@ -100,7 +100,10 @@
         :visible.sync="dialogVisible"
         :form="form"
         :tag-type="type"
-        @success="getList(!form.groupId && 1)"
+        @success="()=>{
+          getTagTotal()
+          getList(!form.groupId && 1)
+        }"
       />
     </template>
   </RightContainer>
@@ -112,7 +115,7 @@ import AddTag from '@/components/AddTag';
 import { PAGE_LIMIT } from '@/utils/constant';
 import * as api from '@/api/customer/tag';
 import * as groupTagApi from '@/api/customer/grouptag';
-
+import { totalTagCnt } from '@/api/customer/group';
 export default {
   name: '',
   components: { AddTag, RightContainer, EmptyDefaultIcon },
@@ -144,22 +147,31 @@ export default {
       // 选中数组
       ids: [],
       // 非多个禁用
-      multiple: true
+      multiple: true,
+      tagTotal: 0
     };
   },
   watch: {
-    type(val) {
+    type() {
       this.getList(1);
+      this.getTagTotal();
     }
   },
   created() {
     this.getList();
+    this.getTagTotal();
   },
   mounted() {},
   methods: {
     onSearch() {
       // 点击查询将页码设置到第一页
       this.getList(1);
+    },
+    getTagTotal() {
+      const fn = this.type === 'customer' ? totalTagCnt : groupTagApi.groupTotalTagCnt;
+      fn().then((res) => {
+        this.tagTotal = res.data;
+      });
     },
     getList(page) {
       page && (this.query.pageNum = page);
@@ -220,6 +232,7 @@ export default {
             return api.remove(operIds)
               .then(() => {
                 this.getList(page);
+                this.getTagTotal();
                 this.msgSuccess('删除成功');
               });
           }
@@ -229,6 +242,7 @@ export default {
               delList: delList
             }).then(() => {
               this.getList(page);
+              this.getTagTotal();
               this.msgSuccess('删除成功');
             });
           }
