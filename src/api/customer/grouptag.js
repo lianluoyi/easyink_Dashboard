@@ -117,3 +117,11 @@ export function groupTagList() {
     url: service + '/getGroupTagList'
   });
 }
+
+/** 获取群标签总数 */
+export function groupTotalTagCnt() {
+  return request({
+    url: service + '/totalTagCnt',
+    method: 'get'
+  });
+}

@@ -59,6 +59,21 @@ const specialRoute = {
       title: '客户记录',
       path: '/customerManage/customerCenter/labelDetail',
       type: 'labelDetail'
+    },
+    {
+      title: '客户',
+      path: '/customerManage/customerCenter/customer',
+      type: 'BatchTagTaskDetail'
+    },
+    {
+      title: '自动标签',
+      path: '/customerManage/customerCenter/autoLabel',
+      type: 'BatchTagTaskDetail'
+    },
+    {
+      title: '任务详情',
+      path: '/customerManage/customerCenter/BatchTagTaskDetail',
+      type: 'BatchTagTaskDetail'
     }
   ],
   '/customerManage/extend/allocatedStaffList': [
@@ -190,6 +205,12 @@ const specialRoute = {
     {
       title: '智能表单',
       path: '/operationsCenter/material/intelligentForm'
+    }
+  ],
+  '/customerManage/customerCenter/BatchTagTaskDetail': [
+    {
+      title: '自动标签',
+      path: '/customerManage/customerCenter/autoLabel'
     }
   ]
 };

@@ -266,6 +266,7 @@ export default {
     showEditMaterial(appendix) {
       this.isOperatingMaterial = false;
       this.showAppendixAddModal = true;
+      appendix.isAdded = true;
       this.appendixType = appendix.mediaType;
       this.materialForm = { ...appendix };
     },

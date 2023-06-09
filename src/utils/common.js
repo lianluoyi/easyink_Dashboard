@@ -726,7 +726,11 @@ export const removeObjEmptyVal = (object) => {
  * 获取并设置当前主题
  */
 export const getNowTheme = () => {
-  const themeType = localStorage.getItem('themeType');
+  let themeType = localStorage.getItem('themeType');
+  if (!themeType) {
+    themeType = 'theme2';
+    localStorage.setItem('themeType', themeType);
+  }
   window.document.documentElement.setAttribute('data-theme', themeType);
 };
 
