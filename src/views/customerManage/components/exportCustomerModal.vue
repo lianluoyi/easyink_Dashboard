@@ -116,10 +116,30 @@ export default {
       } else {
         list = list.filter(listItem => listItem.id !== item.id);
       }
-      this.selected = [...list];
+      // 将list与this.list作比较 根据this.list的顺序排列
+      this.selected = this.reorderArray([...list], this.list);
+    },
+    /**
+     * @description 重新排列targetArr数组
+     */
+    reorderArray(targetArr, sourceArr) {
+      const result = [];
+      const map = new Map();
+      // 创建一个映射，将 sourceArr 数组中的元素与其索引对应起来
+      for (let i = 0; i < sourceArr.length; i++) {
+        map.set(sourceArr[i].id, i);
+      }
+      // 根据 sourceArr 数组中的顺序重新排列数组 targetArr
+      targetArr.forEach((element) => {
+        if (map.has(element.id)) {
+          result[map.get(element.id)] = element;
+        } else {
+          result.push(element);
+        }
+      });
+      return [...result].filter(Boolean);
     }
   }
-
 };
 </script>
 <style scoped lang='scss'>

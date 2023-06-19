@@ -251,10 +251,8 @@ export default {
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
-          this.loading = false;
           this.multipleSelection = [];
-        })
-        .catch(() => {
+        }).finally(() => {
           this.loading = false;
         });
     },
@@ -348,7 +346,7 @@ export default {
       // this.$refs.selectTag.$forceUpdate()
     },
     sync() {
-      const loading = this.$loading({
+      const syncLoading = this.$loading({
         lock: true,
         text: 'Loading',
         spinner: 'el-icon-loading',
@@ -357,11 +355,11 @@ export default {
       api
         .sync()
         .then(() => {
-          loading.close();
+          syncLoading.close();
           this.msgSuccess('后台开始同步数据，请稍后关注进度');
         })
         .catch((fail) => {
-          loading.close();
+          syncLoading.close();
           console.log(fail);
         });
     },
@@ -813,6 +811,7 @@ export default {
     <template v-slot:data>
       <el-table
         ref="table"
+        v-loading="loading"
         :data="list"
         tooltip-effect="dark"
         highlight-current-row
@@ -996,6 +995,7 @@ export default {
       </el-table>
       <pagination
         v-show="total > 0"
+        :disabled="loading"
         :total="total"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"

@@ -301,8 +301,8 @@ export default {
               content: item.content,
               coverUrl: item.coverUrl,
               isDefined: DEFAULT_LINK,
-              appid: '',
-              accountOriginalId: ''
+              appid: item.appid,
+              accountOriginalId: item.accountOriginalId
             });
             break;
           }
