@@ -73,6 +73,8 @@
               <el-button
                 type="text"
                 size="medium"
+                :disabled="row.status === TAG_TODO"
+                :style="row.status === TAG_TODO ? 'color: #ccc' : ''"
                 @click="goRoute(row)"
               >客户详情</el-button>
             </template>
@@ -120,7 +122,8 @@ export default {
       taskId: void 0,
       taskName: void 0,
       loading: false,
-      TAG_STATUS: Object.freeze(TAG_STATUS)
+      TAG_STATUS: Object.freeze(TAG_STATUS),
+      TAG_TODO
     };
   },
   beforeRouteEnter(to, from, next) {

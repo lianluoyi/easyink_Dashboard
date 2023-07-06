@@ -145,38 +145,44 @@ export function deleteKeyWordRule(data) {
 }
 /**
  * 获取新客规则列表
- * @param {*} data
+ * @param {*} data 请求体参数
+* @param params 分页参数
  * @returns
  */
-export function getCustomerList(data) {
+export function getCustomerList(data, params) {
   return request({
     url: customerService + '/list',
     method: 'post',
-    data
+    data,
+    params
   });
 }
 /**
  * 获取入群规则列表
- * @param {*} data
+ * @param {*} data 请求体参数
+ * @param params 分页参数
  * @returns
  */
-export function getGroupList(data) {
+export function getGroupList(data, params) {
   return request({
     url: groupService + '/list',
     method: 'post',
-    data
+    data,
+    params
   });
 }
 /**
  * 获取关键词标签规则列表
- * @param {*} data
+ * @param {*} data 请求体参数
+ * @param params 分页参数
  * @returns
  */
-export function getKeyWordList(data) {
+export function getKeyWordList(data, params) {
   return request({
     url: keywordService + '/list',
     method: 'post',
-    data
+    data,
+    params
   });
 }
 

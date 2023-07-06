@@ -23,7 +23,7 @@
   <div v-else class="file-info-div">
     <div class="cover-img">
       <svg
-        v-if="item.mediaType === MEDIA_TYPE_FILE"
+        v-if="item.mediaType.toString() === MEDIA_TYPE_FILE"
         class="icon"
         aria-hidden="true"
         width="60"
@@ -31,7 +31,7 @@
       >
         <use :xlink:href="'#icon-' + getFileIconClass" />
       </svg>
-      <div v-else-if="item.mediaType === MEDIA_TYPE_VIDEO" class="video-img">
+      <div v-else-if="item.mediaType.toString() === MEDIA_TYPE_VIDEO" class="video-img">
         <video :src="item.url" />
         <svg class="icon-player" :width="25" :height="25">
           <use href="#icon-player" />
@@ -105,7 +105,7 @@ export default {
       const item = { ...this.item };
       if (
         [MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE].includes(
-          this.item.mediaType
+          this.item.mediaType.toString()
         )
       ) {
         return filterSize(item[this.descField]);
@@ -129,29 +129,12 @@ export default {
         [
           MEDIA_TYPE_IMGLINK,
           MEDIA_TYPE_MINIAPP,
-          Number(MEDIA_TYPE_RADARLINK)
-        ].includes(type)
+          MEDIA_TYPE_RADARLINK
+        ].includes(type.toString())
       ) {
         return item.coverUrl;
       } else {
         return item.url;
-      }
-    },
-    /**
-     * 获取摘要内容
-     */
-    dealContent(content, type) {
-      if (
-        [
-          MEDIA_TYPE_POSTER,
-          MEDIA_TYPE_VIDEO,
-          MEDIA_TYPE_FILE,
-          Number(MEDIA_TYPE_RADARLINK)
-        ].includes(type)
-      ) {
-        return filterSize(content);
-      } else {
-        return content;
       }
     }
   }

@@ -402,6 +402,15 @@ export default {
                 type="text"
                 @click="remove(row.id)"
               >删除</el-button>
+              <el-dropdown trigger="click" placement="bottom">
+                <el-button
+                  type="text"
+                  class="ml10"
+                >更多</el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item v-copy="row.id">复制活码ID</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
             </template>
           </el-table-column>
         </el-table>

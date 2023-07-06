@@ -16,6 +16,7 @@ const SELECT_TIME_TYPE = 2;
 const CODE_TYPE_MANY = 2;
 const MAX_WELCOME_MSG_LENGTH = 2000;
 const DEPARTMENT_ID_KEY = 'businessId';
+const UN_CHOOSE_SKIPVERIFY = 0;
 export default {
   components: { PhoneDialog, SelectTag, SelectUser, SelectQrCode, ActivityPopup, RequestButton, TagUserShow, ReferCode },
   data() {
@@ -212,9 +213,11 @@ export default {
       });
       params.userIds += '';
       params.departmentIds += '';
-      getQrcode(params).then(({ data }) => {
-        this.$set(this.form, 'qrCode', data.qr_code);
-      });
+      if (!this.newGroupId) {
+        getQrcode(params).then(({ data }) => {
+          this.$set(this.form, 'qrCode', data.qr_code);
+        });
+      }
     },
     // 客户标签选择
     submitSelectTag(tags) {
@@ -225,6 +228,10 @@ export default {
           tagName: tag.name || tag.tagName
         };
       });
+    },
+    deleteTag(tag) {
+      const index = this.tags.findIndex(tag_ => tag_.tagId === tag.tagId);
+      this.tags.splice(index, 1);
     },
     // 选择二维码确认按钮
     submitSelectQrCode(data) {
@@ -243,6 +250,9 @@ export default {
           if (this.form.isAutoPass && this.form.skipVerify === SELECT_TIME_TYPE) {
             this.form.effectTimeOpen = this.time[0];
             this.form.effectTimeClose = this.time[1];
+          }
+          if (!this.form.isAutoPass) {
+            this.form.skipVerify = UN_CHOOSE_SKIPVERIFY;
           }
           if (this.form.welcomeMsgType) {
             this.form.codeActivity = this.activeList[0];
@@ -371,7 +381,7 @@ export default {
               size="mini"
               @click="dialogVisibleSelectTag = true"
             >添加标签</el-button>
-            <el-tag v-for="(item, index) in tags" :key="index" size="medium">{{ item.tagName }}</el-tag>
+            <el-tag v-for="(item, index) in tags" :key="index" closable size="medium" @close="deleteTag(item)">{{ item.tagName }}</el-tag>
           </el-form-item>
           <el-form-item label="客户备注">
             <el-switch v-model="form.isAutoSetRemark" :active-value="1" :inactive-value="0" />
