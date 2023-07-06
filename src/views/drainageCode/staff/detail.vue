@@ -50,11 +50,12 @@ export default {
       // 员工类型(员工/部门)
       SCOPELIST_TYPE,
       MEDIA_TYPE_SMARTFORM,
-      MEDIA_TO_WELCOME_TYPE
+      MEDIA_TO_WELCOME_TYPE,
+      drainageCodeId: void 0
     };
   },
   created() {
-    const id = this.$route.query.id;
+    const id = this.drainageCodeId = this.$route.query.id;
     id && this.getDetail(id);
     // this.getList()
   },
@@ -270,6 +271,7 @@ export default {
             style="width: 150px; height: 150px"
           />
           <div v-else class="err-img">加载失败</div>
+          <div class="code-id">ID:{{ drainageCodeId }}</div>
           <div>
             <el-button type="text" @click="downloadQrCode()">下载二维码</el-button>
             <el-button
@@ -449,6 +451,10 @@ export default {
     font-size: 16px;
     font-weight: 600;
     margin: 0 0 20px;
+  }
+  .code-id {
+    font-size: 12px;
+    color: #999;
   }
   .err-img {
     display: flex;

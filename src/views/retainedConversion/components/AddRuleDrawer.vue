@@ -300,7 +300,7 @@ export default {
     },
     getRemoveList(list) {
       const newFormData = { ...this.formData };
-      newFormData.delMaterialList = list.map(item => item.id);
+      newFormData.delMaterialList = [...(newFormData.delMaterialList || []), ...list.map(item => item.id)];
       this.formData = newFormData;
     },
     handleDelRule() {

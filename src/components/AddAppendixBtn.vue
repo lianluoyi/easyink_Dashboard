@@ -23,7 +23,7 @@
       <div class="appendix-list">
         <div
           v-for="(appendix, index) in appendixList"
-          :key="appendix.time"
+          :key="appendix.id"
           class="appendix-item"
         >
           <el-tooltip class="item" effect="dark" content="删除" placement="top">
@@ -429,7 +429,12 @@ export default {
      */
     handleEditAppendix(appendix) {
       const list = [...this.appendixList];
-      const index = list.findIndex(appendix_ => appendix.time === appendix_.time);
+      const index = list.findIndex(appendix_ => {
+        if (appendix.id) {
+          return appendix.id === appendix_.id;
+        }
+        return appendix.time === appendix_.time;
+      });
       list.splice(index, 1, appendix);
       this.$emit('update:appendixList', list);
     }

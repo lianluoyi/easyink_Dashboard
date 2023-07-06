@@ -322,10 +322,6 @@ export default {
           type !== 'add' && this.selectedTags.push(filter);
         });
       });
-      if (hasErrorTag.length > 0) {
-        this.msgError('已有标签[' + hasErrorTag + ']不在标签库中，或存在异常');
-        return;
-      }
       if (type === 'remove' && this.selectedTags.length === 0) {
         this.msgError('该客户没有标签，不可进行移除');
         return;
@@ -383,16 +379,10 @@ export default {
         this.tagDialogLoading = true;
         if (this.tagDialogType.type === 'add') {
           const data = this.multipleSelection.map(cus => {
-            const allTag = [...cus.weFlowerCustomerTagRels];
-            selected.forEach(sTag => {
-              if (!allTag.find(tag => tag.tagId === sTag.tagId)) {
-                allTag.push(sTag);
-              }
-            });
             return {
               externalUserid: cus.externalUserid,
               userId: cus.userId,
-              addTag: allTag
+              addTag: selected
             };
           });
           api.makeLabelbatch(data).then(() => {

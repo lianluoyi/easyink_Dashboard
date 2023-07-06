@@ -304,7 +304,7 @@ export default {
             appendix.form = attatchment.formMessage.form;
             break;
         }
-        appendixList.push(appendix);
+        appendixList.push({ ...appendix, id: attatchment.id });
       });
       return appendixList;
     },
@@ -316,7 +316,8 @@ export default {
         switch (String(appendix.mediaType)) {
           case MEDIA_TYPE_POSTER:
             attach.imageMessage = {
-              pic_url: appendix.materialUrl
+              pic_url: appendix.materialUrl,
+              title: appendix.materialName
             };
             break;
           case MEDIA_TYPE_IMGLINK:
@@ -337,7 +338,8 @@ export default {
             break;
           case MEDIA_TYPE_FILE:
             attach.fileDTO = {
-              fileUrl: appendix.materialUrl
+              fileUrl: appendix.materialUrl,
+              title: appendix.materialName
             };
             break;
           case MEDIA_TYPE_MINIAPP:

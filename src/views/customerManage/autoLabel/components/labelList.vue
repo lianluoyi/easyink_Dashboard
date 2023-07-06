@@ -1,7 +1,7 @@
 <!--
  * @Description: 自动标签列表公共样式
  * @Author: wJiaaa
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="label-list-page">
@@ -88,6 +88,7 @@
         <el-table
           ref="table"
           :key="labelType"
+          v-loading="loading"
           :data="list"
           tooltip-effect="dark"
           highlight-current-row
@@ -228,7 +229,8 @@ export default {
       // 规则列表
       list: [],
       // 多选数组
-      multipleSelection: []
+      multipleSelection: [],
+      loading: false
     };
   },
   computed: {
@@ -285,20 +287,21 @@ export default {
         status: query.status === -1 ? null : query.status,
         ...params
       };
-      let listRes;
-      switch (this.labelType) {
-        case AUTOLABEL_TYPE['keyWords']:
-          listRes = await getKeyWordList(newParams);
-          break;
-        case AUTOLABEL_TYPE['intoGroup']:
-          listRes = await getGroupList(newParams);
-          break;
-        case AUTOLABEL_TYPE['newCustomer']:
-          listRes = await getCustomerList(newParams);
-          break;
-      }
-      this.total = listRes?.total || 0;
-      this.list = listRes?.rows || [];
+      const GET_LIST_FUNC_MAP = {
+        [AUTOLABEL_TYPE['keyWords']]: getKeyWordList,
+        [AUTOLABEL_TYPE['intoGroup']]: getGroupList,
+        [AUTOLABEL_TYPE['newCustomer']]: getCustomerList
+      };
+      this.loading = true;
+      GET_LIST_FUNC_MAP[this.labelType](newParams, {
+        pageNum: newParams.pageNum,
+        pageSize: newParams.pageSize
+      }).then((listRes) => {
+        this.total = listRes?.total || 0;
+        this.list = listRes?.rows || [];
+      }).finally(() => {
+        this.loading = false;
+      });
     },
 
     /**

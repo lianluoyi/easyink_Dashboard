@@ -28,6 +28,7 @@ import ActivityPopup from '@/components/ReferCode/ActivityPopup';
 const SELECT_TIME_TYPE = 2;
 const MAX_WELCOME_MSG_LENGTH = 2000;
 const DEPARTMENT_ID_KEY = 'businessId';
+const UN_CHOOSE_SKIPVERIFY = 0;
 export default {
   components: { PhoneDialog, SelectTag, ActivityPopup, AddAppendixBtn, SelectUser, RequestButton, TagUserShow, ReferCode },
   data() {
@@ -204,7 +205,9 @@ export default {
     },
     codeTypeChange() {
       this.form.weEmpleCodeUseScops = [];
-      this.form.qrCode = '';
+      if (!this.$route.query.id) {
+        this.form.qrCode = '';
+      }
     },
     // 选择人员变化事件
     selectedUser(users) {
@@ -222,9 +225,11 @@ export default {
       });
       params.userIds += '';
       params.departmentIds += '';
-      getQrcode(params).then(({ data }) => {
-        this.$set(this.form, 'qrCode', data.qr_code);
-      });
+      if (!this.$route.query.id) {
+        getQrcode(params).then(({ data }) => {
+          this.$set(this.form, 'qrCode', data.qr_code);
+        });
+      }
     },
     submitSelectTag(data) {
       this.dialogVisibleSelectTag = false;
@@ -289,6 +294,9 @@ export default {
           if (this.form.isAutoPass && this.form.skipVerify === SELECT_TIME_TYPE) {
             this.form.effectTimeOpen = this.time[0];
             this.form.effectTimeClose = this.time[1];
+          }
+          if (!this.form.isAutoPass) {
+            this.form.skipVerify = UN_CHOOSE_SKIPVERIFY;
           }
           if (this.form.welcomeMsgType) {
             this.form.codeActivity = this.activeList[0];
@@ -356,6 +364,10 @@ export default {
       this.appendixList = [];
       Object.keys(this.codeMsg).forEach(key => { this.codeMsg[key] = ''; });
       Object.keys(this.codeMaterialList).forEach(key => { this.codeMaterialList[key] = []; });
+    },
+    deleteTag(tag) {
+      const index = this.form.weEmpleCodeTags.findIndex(tag_ => tag_.tagId === tag.tagId);
+      this.form.weEmpleCodeTags.splice(index, 1);
     }
   }
 };
@@ -413,7 +425,6 @@ export default {
             <span class="we-emple-code-tags-tip">开启后，根据使用场景做标记，自动为扫码添加的客户打上标签</span>
           </el-form-item>
           <el-form-item v-show="form.tagFlag" label="" prop="weEmpleCodeTags">
-            <!-- closable -->
             <el-button
               class="mr10"
               plain
@@ -421,7 +432,7 @@ export default {
               size="mini"
               @click="dialogVisibleSelectTag = true"
             >添加标签</el-button>
-            <el-tag v-for="(item, index) in form.weEmpleCodeTags" :key="index" size="medium">{{ item.tagName }}</el-tag>
+            <el-tag v-for="(item, index) in form.weEmpleCodeTags" :key="index" closable size="medium" @close="deleteTag(item)">{{ item.tagName }}</el-tag>
           </el-form-item>
           <el-form-item label="客户备注">
             <el-switch v-model="form.isAutoSetRemark" :active-value="1" :inactive-value="0" />

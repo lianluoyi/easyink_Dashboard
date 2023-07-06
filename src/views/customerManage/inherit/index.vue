@@ -258,14 +258,23 @@ export default {
       selectUserLoading: false,
       inheritFailDrawerVisible: false,
       inheritFail: false,
-      wxType: WX_TYPE
+      wxType: WX_TYPE,
+      remotetransferConfig: null
     };
+  },
+  watch: {
+    inheritSettingShow(val) {
+      if (!val) {
+        this.transferConfig = { ...this.remotetransferConfig };
+      }
+    }
   },
   created() {
     this.getList();
 
     getTransferConfig().then(({ data }) => {
       this.transferConfig = { ...data };
+      this.remotetransferConfig = { ...data };
     });
 
     this.$store.dispatch(
@@ -356,9 +365,9 @@ export default {
       editConfig(this.transferConfig)
         .then(() => {
           this.msgSuccess('设置成功');
-          this.inheritSettingShow = false;
+          this.remotetransferConfig = { ...this.transferConfig };
         })
-        .catch(() => {
+        .finally(() => {
           this.inheritSettingShow = false;
         });
     },
