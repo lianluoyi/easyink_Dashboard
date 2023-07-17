@@ -11,7 +11,8 @@ import { groupBy, isEqual } from 'lodash';
 import moment from 'moment';
 const baseURL = process.env.VUE_APP_BASE_API;
 const TIME_LENGTH = 10;
-
+/** 今天 */
+export const TODAY_TIME = moment().format('YYYY-MM-DD');
 // 昨天
 export const YESTERDAY_TIME = moment().subtract(1, 'days').format('YYYY-MM-DD');
 // 180天之前

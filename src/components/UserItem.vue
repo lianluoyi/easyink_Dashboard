@@ -1,7 +1,7 @@
 <!--
  * @Description: 员工以及客户表格内的展示
  * @Author: xulinbin
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <template>
   <div class="user-wrap">
@@ -9,7 +9,7 @@
       <img :src="headImg || require('@/assets/image/card-avatar.svg')">
     </div>
     <div v-if="isStaff" class="user-textinfo">
-      <div class="name oneline">{{ userName }}</div>
+      <div class="name oneline" :title="userName">{{ userName }}</div>
       <div class="department oneline">
         {{ companName }}{{ companName && data.departmentName && '/' }}{{ data.departmentName }}
       </div>

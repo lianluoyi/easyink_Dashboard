@@ -1,6 +1,6 @@
 <!--
- * @Description: 客户概览
- * @Author: xulinbin
+ * @Description: 活码统计
+ * @Author: wJiaaa
  * @LastEditors: broccoli
 -->
 <template>
@@ -13,6 +13,12 @@
       :selected-user-list="userAndDepartmentList"
       @success="selectedUserOrDepartment"
     />
+    <!-- 选择活码弹窗 -->
+    <SelectCode
+      :visible.sync="dialogVisibleSelectCode"
+      :confirm-selected-code-list="codeList"
+      @success="selectedCode"
+    />
     <RightContainer>
       <template v-slot:search>
         <el-form
@@ -23,6 +29,16 @@
           class="top-search"
           size="small"
         >
+          <el-form-item prop="code">
+            <div class="tag-input" @click="dialogVisibleSelectCode = true">
+              <span v-if="!codeList.length" class="tag-place">请选择活码</span>
+              <template v-else>
+                <div class="code-label">
+                  {{ getCodeShowLabel(codeList) }}
+                </div>
+              </template>
+            </div>
+          </el-form-item>
           <el-form-item prop="name">
             <div class="tag-input" @click="dialogVisibleSelectUser = true">
               <span v-if="!userAndDepartmentList.length" class="tag-place">请选择员工/部门</span>
@@ -74,17 +90,16 @@
               >
                 <div class="popover-content">
                   <div class="info">
-                    <p>客户总数：截止到查询时间，未将员工删除、拉黑的客户总数</p>
-                    <p>新增客户数：查询时间内员工添加的客户数量</p>
-                    <p>流失客户数：查询时间内，把员工删除或拉黑的客户数量</p>
-                    <p>新客留存率：查询时间内，未将员工删除、拉黑的新增客户/新增客户</p>
-                    <p>新客开口率：查询时间内，在添加当天给员工发消息的新增客户/新增客户</p>
-                    <p>服务响应率：查询时间内，员工首次向客户发送消息后，客户在30分钟内回复/员工主动发起的会话</p>
+                    <p>累计添加客户：截止到查询时间，累计扫码添加员工的客户数</p>
+                    <p>留存客户总数：截止到查询时间，未将员工删除的客户数</p>
+                    <p>新增客户数：查询时间内，扫码添加员工的客户数，包含流失客户</p>
+                    <p>流失客户数：查询时间内，把员工删除的客户数</p>
+                    <p>新客留存率：截止当前，未将员工删除的新增客户/新增客户数</p>
                   </div>
-                  <div class="line" />
+                  <!-- <div class="line" />
                   <div class="notice">
-                    注意：新客开口率、服务响应率的统计数据来源于会话存档，若员工未开启会话存档或客户拒绝存档，统计数将受影响
-                  </div>
+                    注意：今日统计数据将于1小时后更新，请耐心等待
+                  </div> -->
                 </div>
                 <div slot="reference" class="statistic theme-text-color">统计说明</div>
               </el-popover>
@@ -96,12 +111,13 @@
             数据详情
           </div>
           <div class="forms-handle-btn">
-            <el-radio-group v-model="dimensionType" class="radio-group-div" size="medium" @input="dimensionTypeChange">
+            <el-radio-group v-model="dimensionType" size="medium" @input="dimensionTypeChange">
+              <el-radio-button :label="CODE_DIMENSION">活码维度</el-radio-button>
               <el-radio-button :label="STAFF_DIMENSION">员工维度</el-radio-button>
               <el-radio-button :label="DATE_DIMENSION">日期维度</el-radio-button>
             </el-radio-group>
             <el-button
-              v-hasPermi="['statistic:customerContact:export']"
+              v-hasPermi="['stastistic:codeStatistics:export']"
               class="btn-reset btn-export"
               @click="exportForms"
             >导出报表</el-button>
@@ -110,15 +126,13 @@
             ref="showTable"
             v-loading="loading"
             :data="list"
-            :default-sort="{prop: 'totalContactCnt', order: 'descending'}"
-            @sort-change="changeTableSort"
           >
             <template slot="empty">
-              <empty-default-icon :length="list.length" />
+              <empty-default-icon :length="list.length" :text="showChooseCodeTips ? '请先选择活码' : '暂无数据'" />
             </template>
             <el-table-column
               v-if="dimensionType === STAFF_DIMENSION"
-              prop=""
+              prop="userName"
               label="员工"
               min-width="200"
             >
@@ -127,39 +141,44 @@
               </template>
             </el-table-column>
             <el-table-column
-              v-else
-              prop="xtime"
+              v-if="dimensionType === DATE_DIMENSION"
+              prop="time"
               label="日期"
               min-width="200"
             >
               <template #default="{ row }">
-                {{ row.xtime }}
+                {{ row.time }}
               </template>
             </el-table-column>
-            <el-table-column sortable="custom" prop="totalContactCnt" label="客户总数" min-width="180" />
-            <el-table-column sortable="custom" prop="contactLossCnt" label="流失客户数" min-width="180" />
-            <el-table-column sortable="custom" prop="newContactCnt" label="新增客户数" min-width="180" />
-            <el-table-column sortable="custom" prop="newContactRetentionRate" label="新客留存率" min-width="180">
+            <el-table-column
+              v-if="dimensionType === CODE_DIMENSION"
+              prop="empleName"
+              label="活码"
+              min-width="200"
+            >
               <template #default="{ row }">
-                {{ row.newContactRetentionRate + '%' }}
+                <el-tooltip effect="dark" :content="row.empleName" placement="top">
+                  <span class="intwoline">
+                    {{ row.empleName }}
+                  </span>
+                </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column sortable="custom" prop="newContactStartTalkRate" label="新客开口率" min-width="180">
+            <el-table-column prop="accumulateCustomerCnt" label="累计添加客户" min-width="180" />
+            <el-table-column prop="retainCustomerCnt" label="留存客户总数" min-width="180" />
+            <el-table-column prop="newCustomerCnt" label="新增客户数" min-width="180" />
+            <el-table-column prop="lossCustomerCnt" label="流失客户数" min-width="180" />
+            <el-table-column prop="retainNewCustomerRate" label="新客留存率" min-width="180">
               <template #default="{ row }">
-                {{ row.newContactStartTalkRate + '%' }}
-              </template>
-            </el-table-column>
-            <el-table-column sortable="custom" prop="serviceResponseRate" label="服务响应率" min-width="180">
-              <template #default="{ row }">
-                {{ row.serviceResponseRate + '%' }}
+                {{ row.retainNewCustomerRate === DATA_STATISTICS_DEFAULT_SHOW ? DATA_STATISTICS_DEFAULT_SHOW : row.retainNewCustomerRate + '%' }}
               </template>
             </el-table-column>
           </el-table>
           <pagination
             :total="total * 1"
-            :page.sync="query.pageNum"
-            :limit.sync="query.pageSize"
-            @pagination="getList()"
+            :page.sync="pageQuery.pageNum"
+            :limit.sync="pageQuery.pageSize"
+            @pagination="handleChangePage()"
           />
         </div>
       </template>
@@ -169,32 +188,31 @@
 <script>
 import RightContainer from '@/components/RightContainer';
 import Statistics from '@/components/Statistics.vue';
-import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION } from '@/utils/constant';
+import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION, CODE_DIMENSION, DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import UserItem from '@/components/UserItem.vue';
 import TagUserShow from '@/components/TagUserShow';
+import SelectCode from './components/SelectCode.vue';
 import SelectUser from '@/components/SelectUser/index.vue';
-import { groupByScopeType } from '@/utils/common';
-import { YESTERDAY_TIME, FIXED_DAYS_AGO_TIME, ONE_MOUNTH_AGO, ONE_MOUNTH_LATER } from '@/utils/common';
+import { YESTERDAY_TIME, FIXED_DAYS_AGO_TIME, ONE_MOUNTH_AGO, ONE_MOUNTH_LATER, groupByScopeType } from '@/utils/common';
 import {
-  getCustomerOverView,
-  getCustomerOverViewOfUser,
-  exportCustomerOverViewOfUser,
-  getCustomerOverViewOfDate,
-  exportCustomerOverViewOfDate
+  exportStatisticsByDate,
+  exportStatisticsByStaff,
+  exportStatisticsByCode,
+  listEmpleTotal,
+  emplecodeByDate,
+  emplecodeByStaff,
+  emplecodeByCode
 } from '@/api/statistics';
-// 排序字段
-const SORT = {
-  'ascending': 'ASC',
-  'descending': 'DESC'
-};
 export default {
   name: '',
-  components: { RightContainer, Statistics, EmptyDefaultIcon, UserItem, TagUserShow, SelectUser },
+  components: { RightContainer, Statistics, EmptyDefaultIcon, UserItem, TagUserShow, SelectUser, SelectCode },
   data() {
     return {
       DATE_DIMENSION,
       STAFF_DIMENSION,
+      CODE_DIMENSION,
+      DATA_STATISTICS_DEFAULT_SHOW,
       // 选择添加人弹窗显隐
       dialogVisibleSelectUser: false,
       // 搜索框选择的员工/部门
@@ -222,46 +240,72 @@ export default {
       query: {
         departmentIds: [], // 部门id列表
         userIds: [], // 用户id列表
-        pageNum: 1,
-        pageSize: PAGE_LIMIT,
-        beginTime: undefined,
-        endTime: undefined
+        beginDate: undefined,
+        endDate: undefined
       },
-      // 排序参数
-      sortParams: {
-        // 员工默认排序
-        staffSort: {
-          totalContactCnt: 'descending'
-        },
-        dateSort: {
-          sortName: 'totalContactCnt', // 默认降序
-          sortType: null
-        }
+      // 翻页参数
+      pageQuery: {
+        pageNum: 1,
+        pageSize: PAGE_LIMIT
       },
       // 总条数
       total: 0,
-      // 客户概览表格数据
+      // 表格展示的列表数据
       list: [],
+      // 日期维度查询出的列表所有页数据
+      allListByDate: [],
       // 表格loading
       loading: false,
       // 数据总览
-      colList: [],
-      dimensionType: STAFF_DIMENSION
+      colList: [
+        {
+          accumulateCustomerCnt: 0,
+          title: '累计添加客户',
+          filed: 'accumulateCustomerCnt'
+        },
+        {
+          retainCustomerCnt: 0,
+          title: '留存客户总数',
+          filed: 'retainCustomerCnt'
+        },
+        {
+          newCustomerCnt: 0,
+          title: '新增客户数',
+          filed: 'newCustomerCnt'
+        },
+        {
+          lossCustomerCnt: 0,
+          title: '流失客户数',
+          filed: 'lossCustomerCnt'
+        },
+        {
+          retainNewCustomerRate: DATA_STATISTICS_DEFAULT_SHOW,
+          title: '新客留存率',
+          unit: '%',
+          filed: 'retainNewCustomerRate',
+          defaultNotUnit: true
+        }
+      ],
+      dimensionType: CODE_DIMENSION,
+      dialogVisibleSelectCode: false,
+      // 搜索框选择的活码
+      codeList: [],
+      showChooseCodeTips: true
     };
   },
-  created() {
-    this.onSearch();
-  },
   methods: {
+    /**
+     * 切换维度查询
+     */
     dimensionTypeChange() {
-      if (this.dimensionType === STAFF_DIMENSION) {
-        Object.keys(this.sortParams.staffSort).forEach((key) => {
-          this.$refs?.showTable?.sort(key, this.sortParams.staffSort[key]);
-        });
-      } else {
-        const { sortName, sortType } = this.sortParams.dateSort;
-        this.$refs?.showTable?.sort(sortName, sortType);
-      }
+      this.getList(true);
+    },
+    /**
+     * 获取活码展示的label
+     * @param list 已经选择的活码
+     */
+    getCodeShowLabel(list) {
+      return list.map((item) => item.scenario).join('、');
     },
     /**
      * @description 选择员工/部门的回调
@@ -269,73 +313,74 @@ export default {
     selectedUserOrDepartment(list) {
       this.userAndDepartmentList = list;
     },
+    /**
+     * @description 选择活码的回调
+     */
+    selectedCode(list) {
+      this.codeList = list;
+    },
     // 获取数据总览
     getDataOverview() {
-      getCustomerOverView(this.getSearchPayload()).then(res => {
-        this.colList = [
-          {
-            totalContactCnt: res?.data?.totalContactCnt,
-            title: '客户总数',
-            filed: 'totalContactCnt'
-          },
-          {
-            newContactCnt: res?.data?.newContactCnt,
-            title: '新增客户数',
-            filed: 'newContactCnt'
-          },
-          {
-            contactLossCnt: res?.data?.contactLossCnt,
-            title: '流失客户数',
-            filed: 'contactLossCnt'
-          },
-          {
-            newContactRetentionRate: res?.data?.newContactRetentionRate,
-            title: '新客留存率',
-            unit: '%',
-            filed: 'newContactRetentionRate'
-          },
-          {
-            newContactStartTalkRate: res?.data?.newContactStartTalkRate,
-            title: '新客开口率',
-            unit: '%',
-            filed: 'newContactStartTalkRate'
-          },
-          {
-            serviceResponseRate: res?.data?.serviceResponseRate,
-            title: '服务响应率',
-            unit: '%',
-            filed: 'serviceResponseRate'
-          }
-        ];
-      }).catch(() => {
-        this.colList = [];
-      });
+      listEmpleTotal(this.getSearchPayload()).then(res => {
+        this.colList = this.colList.map((item) => {
+          item[item.filed] = res?.data?.[item.filed];
+          return item;
+        });
+      }).catch(() => {});
     },
     /**
-     * @description: 获取客户概况表格数据
+     * 获取接口分页参数
+     */
+    getSearchPageParams() {
+      // 日期维度由前端分页
+      if (this.dimensionType !== DATE_DIMENSION) {
+        return this.pageQuery;
+      }
+      return {};
+    },
+    /**
+     * @description 获取表格数据
      * @param {*} initPage  是否重置为第一页
      * @return {*}
      */
     getList(initPage) {
-      initPage ? this.query.pageNum = 1 : null;
+      if (!this.codeList.length) return;
+      initPage ? this.pageQuery.pageNum = 1 : null;
       this.loading = true;
-      const getListFn = this.dimensionType === STAFF_DIMENSION ? getCustomerOverViewOfUser : getCustomerOverViewOfDate;
-      getListFn(this.getSearchPayload()).then((res) => {
-        this.list = this.dimensionType === STAFF_DIMENSION ? res.rows : this.dealPaging(res.rows);
+      const getListFnMap = {
+        [DATE_DIMENSION]: emplecodeByDate,
+        [STAFF_DIMENSION]: emplecodeByStaff,
+        [CODE_DIMENSION]: emplecodeByCode
+      };
+      getListFnMap[this.dimensionType](this.getSearchPayload(), this.getSearchPageParams()).then((res) => {
+        const resList = [...res.rows];
+        if (this.dimensionType === DATE_DIMENSION) {
+          this.allListByDate = resList;
+          this.list = this.dealPaging(resList);
+        } else {
+          this.list = resList;
+        }
         this.total = res.total || 0;
+      }).catch(() => {
+        this.list = [];
       }).finally(() => {
         this.loading = false;
       });
     },
     /**
      * @description 处理日期维度表格数据分页
+     * @param list
      */
     dealPaging(list) {
-      const { pageNum, pageSize } = this.query;
+      const { pageNum, pageSize } = this.pageQuery;
       return list.slice((pageNum - 1) * pageSize, pageNum * pageSize);
     },
     // 查询
     onSearch() {
+      if (!this.codeList.length) {
+        return this.msgWarn('请先选择活码');
+      }
+      this.showChooseCodeTips = false;
       this.getDataOverview();
       this.getList(true);
     },
@@ -343,27 +388,25 @@ export default {
     resetForm() {
       this.userAndDepartmentList = [];
       this.query = this.$options.data().query;
+      this.codeList = [];
+      this.colList = this.$options.data().colList;
+      this.list = [];
       this.pickerMinDate = '';
+      this.showChooseCodeTips = true;
       this.dateRange = [YESTERDAY_TIME, YESTERDAY_TIME];
-      if (this.dimensionType === STAFF_DIMENSION) {
-        this.sortParams.staffSort = this.$options.data().sortParams.staffSort;
-        this.$refs?.showTable?.sort('totalContactCnt', 'descending'); // 重置为默认排序(此处自行进行请求表单数据)
-      } else {
-        this.sortParams.dateSort = this.$options.data().sortParams.dateSort;
-        this.$refs?.showTable?.sort('totalContactCnt', null);
-      }
-      this.getDataOverview();
+      this.pageQuery = this.$options.data().pageQuery;
+      this.total = this.$options.data().total;
     },
     /**
      * @description 获取搜索的传参
      */
     getSearchPayload() {
       if (this.dateRange) {
-        this.query.beginTime = this.dateRange[0];
-        this.query.endTime = this.dateRange[1];
+        this.query.beginDate = this.dateRange[0];
+        this.query.endDate = this.dateRange[1];
       } else {
-        this.query.beginTime = '';
-        this.query.endTime = '';
+        this.query.beginDate = '';
+        this.query.endDate = '';
       }
       if (this.userAndDepartmentList && this.userAndDepartmentList.length > 0) {
         const allListObj = groupByScopeType(this.userAndDepartmentList);
@@ -373,42 +416,39 @@ export default {
         this.query.departmentIds = [];
         this.query.userIds = [];
       }
-      let sortPayload = {};
-      if (this.dimensionType === STAFF_DIMENSION) {
-        Object.keys(this.sortParams.staffSort).forEach((key) => {
-          sortPayload[`${key}Sort`] = SORT[this.sortParams.staffSort[key]];
-        });
+      if (this.codeList && this.codeList.length) {
+        this.query.empleCodeIdList = this.codeList.map((item) => item.id);
       } else {
-        const { sortName, sortType } = this.sortParams.dateSort;
-        sortPayload = {
-          sortName: sortName + 'Sort',
-          sortType: SORT[sortType]
-        };
+        this.query.empleCodeIdList = [];
       }
-      return { ...this.query, ...sortPayload };
+      return this.query;
     },
     // 导出报表
     exportForms() {
-      const exportFn = this.dimensionType === STAFF_DIMENSION ? exportCustomerOverViewOfUser : exportCustomerOverViewOfDate;
-      exportFn(this.getSearchPayload()).then((res) => {
+      if (!this.codeList.length) {
+        return this.msgWarn('请先选择活码');
+      }
+      const exportFnMap = {
+        [DATE_DIMENSION]: exportStatisticsByDate,
+        [STAFF_DIMENSION]: exportStatisticsByStaff,
+        [CODE_DIMENSION]: exportStatisticsByCode
+      };
+      exportFnMap[this.dimensionType](this.getSearchPayload()).then((res) => {
         this.download(res.data.msg, true);
       }).catch(() => {
         this.msgError('导出失败!');
       });
     },
-    // 表格排序
-    changeTableSort({ prop, order }) {
-      if (this.dimensionType === STAFF_DIMENSION) {
-        this.sortParams.staffSort = {
-          [prop]: order
-        };
+    /**
+     * 表格翻页
+     */
+    handleChangePage() {
+      // 日期维度由前端分页，翻页时不需要重新获取数据
+      if (this.dimensionType === DATE_DIMENSION) {
+        this.list = this.dealPaging(this.allListByDate);
       } else {
-        this.sortParams.dateSort = {
-          sortName: prop,
-          sortType: order
-        };
+        this.getList();
       }
-      this.getList(true);
     }
   }
 };
@@ -435,7 +475,6 @@ export default {
       justify-content: space-between;
       margin-bottom: 15px;
     }
-
   }
   /deep/ .show-data-wrapper {
     background-color: transparent;
@@ -464,6 +503,12 @@ export default {
     }
     .notice {
       color: #E29836;
+    }
+  }
+  .tag-input {
+    .code-label {
+      height: 32px;
+      color: #606266;
     }
   }
 </style>

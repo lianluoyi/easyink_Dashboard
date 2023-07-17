@@ -10,7 +10,6 @@
             企业工具
           </div>
         </div>
-        <div style="height: 5px" />
         <AppInfo
           v-for="app in appList"
           :key="app.appid"
@@ -21,6 +20,7 @@
         >
           <el-button type="primary" @click="() => handleDetailsClick(app)">查看详情</el-button>
         </AppInfo>
+        <div v-if="!appList.length" class="empty"><el-empty :image="require('@/assets/image/appCenterEmpty.png')" :image-size="240" description="更多应用研发中，敬请期待.." /></div>
       </el-tab-pane>
       <el-tab-pane name="tab2">
         <div slot="label" class="tabs-name">

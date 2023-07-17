@@ -787,6 +787,8 @@ export const DATE_DIMENSION = 1;
 export const STAFF_DIMENSION = 2;
 /** 客户维度*/
 export const CLIENT_DIMENSION = 3;
+/** 活码维度 */
+export const CODE_DIMENSION = 4;
 /** 数据维度*/
 export const DATA_DIMENSION = {
   'date': DATE_DIMENSION,
@@ -864,3 +866,5 @@ export const TAG_LABEL_TYPE = {
 
 /** 来源 */
 export const ADD_WAY = 'addWay';
+// 数据统计默认占位符
+export const DATA_STATISTICS_DEFAULT_SHOW = '-';

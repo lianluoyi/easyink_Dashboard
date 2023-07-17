@@ -1,7 +1,7 @@
 <!--
  * @Description: 员工服务
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <template>
   <div class="overview-page">
@@ -105,7 +105,7 @@
             </el-radio-group>
             <el-button
               v-hasPermi="['statistic:employeeService:export']"
-              class="btn-reset"
+              class="btn-reset btn-export"
               @click="exportForms"
             >导出报表</el-button>
           </div>
@@ -180,7 +180,7 @@ import SelectUser from '@/components/SelectUser/index.vue';
 import Statistics from '@/components/Statistics';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
-import UserItem from '../customerContact/userItem.vue';
+import UserItem from '@/components/UserItem.vue';
 import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION } from '@/utils/constant';
 import moment from 'moment';
 import { cloneDeep } from 'lodash';
