@@ -1,7 +1,7 @@
 <!--
 * @Description: 发布统计
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 // TODO 重新布局 采用自适应 每行最少显示3个 可进行换行显示
 <template>
@@ -37,9 +37,9 @@
         <el-row type="flex" class="row-bg data-count theme-text-color" justify="space-between">
           <el-col v-for="(item,index) in colList" :key="index" :span="6">
             <span :style="`color: ${color} `" class="col-item theme-text-color">
-              {{ item[item.filed] || 0 }}
+              {{ item.defaultNotUnit ? (item[item.filed] === DATA_STATISTICS_DEFAULT_SHOW ? DATA_STATISTICS_DEFAULT_SHOW : item[item.filed]) : item[item.filed] || 0 }}
               <!-- 符号 -->
-              <span class="unit">{{ item.unit }}</span>
+              <span v-if="item.defaultNotUnit && item[item.filed] !== DATA_STATISTICS_DEFAULT_SHOW" class="unit">{{ item.unit }}</span>
             </span>
           </el-col>
         </el-row>
@@ -48,6 +48,7 @@
   </div>
 </template>
 <script>
+import { DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
 export default {
   props: {
     /** 是否展示更新时间 */
@@ -82,7 +83,9 @@ export default {
     }
   },
   data() {
-    return {};
+    return {
+      DATA_STATISTICS_DEFAULT_SHOW
+    };
   },
   watch: {},
   methods: {}

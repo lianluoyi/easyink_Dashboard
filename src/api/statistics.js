@@ -1,7 +1,7 @@
 /*
  * @Description: 数据统计接口
  * @Author: xulinbin
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
  */
 import request from '@/utils/request';
 
@@ -236,6 +236,71 @@ export function getGroupTagChartView(data) {
 export function exportGroupTagsView(data) {
   return request({
     url: service + '/exportGroupTagsView',
+    method: 'post',
+    data
+  });
+}
+
+/** 活码统计数据总览 */
+export function listEmpleTotal(data) {
+  return request({
+    url: service + '/emplecode/total',
+    method: 'post',
+    data
+  });
+}
+
+/** 活码统计-员工维度 */
+export function emplecodeByStaff(data, params) {
+  return request({
+    url: service + '/emplecode/user/list',
+    params,
+    method: 'post',
+    data
+  });
+}
+
+/** 活码统计-活码维度 */
+export function emplecodeByCode(data, params) {
+  return request({
+    url: service + '/emplecode/emple/list',
+    method: 'post',
+    params,
+    data
+  });
+}
+
+/** 活码统计-日期维度 */
+export function emplecodeByDate(data) {
+  return request({
+    url: service + '/emplecode/date/list',
+    method: 'post',
+    data
+  });
+}
+
+/** 活码统计-活码维度-导出报表 */
+export function exportStatisticsByCode(data) {
+  return request({
+    url: service + '/emplecode/emple/export',
+    method: 'post',
+    data
+  });
+}
+
+/** 活码统计-员工维度-导出报表 */
+export function exportStatisticsByStaff(data) {
+  return request({
+    url: service + '/emplecode/user/export',
+    method: 'post',
+    data
+  });
+}
+
+/** 活码统计-日期维度-导出报表 */
+export function exportStatisticsByDate(data) {
+  return request({
+    url: service + '/emplecode/date/export',
     method: 'post',
     data
   });

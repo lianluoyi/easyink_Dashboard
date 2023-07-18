@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户活跃度
  * @Author: xulinbin
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <template>
   <div class="activeness-page">
@@ -92,7 +92,7 @@
             </el-radio-group>
             <el-button
               v-hasPermi="['statistic:customerContact:export']"
-              class="btn-reset"
+              class="btn-reset btn-export"
               @click="exportForms"
             >导出报表</el-button>
           </div>
@@ -213,7 +213,7 @@ import RightContainer from '@/components/RightContainer';
 import { PAGE_LIMIT, DATA_DIMENSION, CUSTOMER_CONTACT_SESSION_SAVE_KEY, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
 import ClientDetailsDialog from './clientDetailsDialog.vue';
 import Graphics from './graphics.vue';
-import UserItem from './userItem.vue';
+import UserItem from '@/components/UserItem.vue';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import TagUserShow from '@/components/TagUserShow';
 import SelectUser from '@/components/SelectUser/index.vue';

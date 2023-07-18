@@ -195,3 +195,14 @@ export function getApplink(params) {
     params
   });
 }
+
+/**
+ * 获取员工活码和新客进群活码
+ * @param {*} params
+ */
+export function getCodeList(params) {
+  return request({
+    url: service + '/listByName',
+    params
+  });
+}

@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户活跃度详情弹窗
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <el-dialog
@@ -54,7 +54,7 @@
 <script>
 import { PAGE_LIMIT } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
-import UserItem from './userItem.vue';
+import UserItem from '@/components/UserItem.vue';
 import {
   getCustomerActivityOfUserDetail
 } from '@/api/statistics';
