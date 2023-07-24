@@ -17,7 +17,7 @@ export function copyText(text) {
   Notification.closeAll();
   Notification({
     title: '成功',
-    message: '链接已复制到剪切板，可Ctrl+V粘贴',
+    message: '内容已复制到剪切板，可Ctrl+V粘贴',
     type: 'success'
   });
 }

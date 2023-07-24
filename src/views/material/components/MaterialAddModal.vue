@@ -73,6 +73,10 @@ export default {
     isOperatingMaterial: {
       type: Boolean,
       default: true
+    },
+    hideVideoCover: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -457,6 +461,7 @@ export default {
             <AddVideoForm
               :form="form"
               :limit-file-name="limitFileName"
+              :hide-video-cover="hideVideoCover"
               @changeForm="changeForm"
             />
           </template>
