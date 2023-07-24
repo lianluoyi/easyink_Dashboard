@@ -367,6 +367,7 @@ export default {
                 :max-appendix-num="MAX_APPENDIX_NUM"
                 :appendix-list.sync="appendixList"
                 :remove-appendix-list.sync="removeAppendixList"
+                :hide-video-cover="true"
               />
             </el-form-item>
             <p class="config-title mt10">特殊时段欢迎语<span>可在特定时段回复不同的欢迎语，让欢迎语更灵活</span></p>

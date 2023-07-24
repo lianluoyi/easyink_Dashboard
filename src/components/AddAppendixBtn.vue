@@ -64,6 +64,7 @@
       :visible.sync="showAppendixAddModal"
       :get-list="getMaterialList"
       :is-operating-material="isOperatingMaterial"
+      :hide-video-cover="hideVideoCover"
       @submit="(appendix) => materialForm.isAdded ? handleEditAppendix(appendix) : handleAddApendix(appendix)"
     />
     <MaterialListDrawer
@@ -160,6 +161,13 @@ export default {
     },
     // 是否隐藏雷达选项
     radarHidden: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * 是否隐藏上传视频封面
+     */
+    hideVideoCover: {
       type: Boolean,
       default: false
     }

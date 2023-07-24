@@ -42,6 +42,7 @@
                 :remove-appendix-list.sync="removeAppendixList"
                 :msg-tip="`欢迎语最多支持设置${MAX_APPENDIX_NUM}个附件`"
                 :radar-hidden="true"
+                :hide-video-cover="true"
               />
             </el-form-item>
             <el-form-item v-if="!form.id" label="通知员工">

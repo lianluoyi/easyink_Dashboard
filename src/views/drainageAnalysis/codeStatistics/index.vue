@@ -1,7 +1,7 @@
 <!--
  * @Description: 活码统计
  * @Author: wJiaaa
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="overview-page">
@@ -194,7 +194,7 @@ import UserItem from '@/components/UserItem.vue';
 import TagUserShow from '@/components/TagUserShow';
 import SelectCode from './components/SelectCode.vue';
 import SelectUser from '@/components/SelectUser/index.vue';
-import { YESTERDAY_TIME, FIXED_DAYS_AGO_TIME, ONE_MOUNTH_AGO, ONE_MOUNTH_LATER, groupByScopeType } from '@/utils/common';
+import { TODAY_TIME, FIXED_DAYS_AGO_TIME, ONE_MOUNTH_AGO, ONE_MOUNTH_LATER, groupByScopeType } from '@/utils/common';
 import {
   exportStatisticsByDate,
   exportStatisticsByStaff,
@@ -228,14 +228,14 @@ export default {
           if (this.pickerMinDate) {
             const minTime = new Date(ONE_MOUNTH_AGO(this.pickerMinDate)).getTime();
             const maxTime = new Date(ONE_MOUNTH_LATER(this.pickerMinDate)).getTime();
-            return v.getTime() > maxTime || v.getTime() < minTime || v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date(YESTERDAY_TIME).getTime();
+            return v.getTime() > maxTime || v.getTime() < minTime || v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date(TODAY_TIME).getTime();
           } else {
-            return v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date(YESTERDAY_TIME).getTime();
+            return v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date(TODAY_TIME).getTime();
           }
         }
       },
       // 日期范围
-      dateRange: [YESTERDAY_TIME, YESTERDAY_TIME],
+      dateRange: [TODAY_TIME, TODAY_TIME],
       // 查询参数
       query: {
         departmentIds: [], // 部门id列表
@@ -393,7 +393,7 @@ export default {
       this.list = [];
       this.pickerMinDate = '';
       this.showChooseCodeTips = true;
-      this.dateRange = [YESTERDAY_TIME, YESTERDAY_TIME];
+      this.dateRange = [TODAY_TIME, TODAY_TIME];
       this.pageQuery = this.$options.data().pageQuery;
       this.total = this.$options.data().total;
     },

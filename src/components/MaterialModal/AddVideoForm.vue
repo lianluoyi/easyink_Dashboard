@@ -1,7 +1,7 @@
 <!--
  * @Description: 添加视频素材表单
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <script>
 import { MEDIA_TYPE_VIDEO, MEDIA_TYPE_POSTER } from '@/utils/constant';
@@ -26,6 +26,10 @@ export default {
     limitFileName: {
       type: Number,
       default: null
+    },
+    hideVideoCover: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -73,6 +77,7 @@ export default {
         </div>
       </upload>
       <upload
+        v-if="!hideVideoCover"
         :file-url.sync="form.coverUrl"
         :type="MEDIA_TYPE_POSTER"
         style="margin-left: 20px"
