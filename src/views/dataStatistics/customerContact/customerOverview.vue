@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户概览
  * @Author: xulinbin
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="overview-page">
@@ -141,7 +141,7 @@
             <el-table-column sortable="custom" prop="newContactCnt" label="新增客户数" min-width="180" />
             <el-table-column sortable="custom" prop="newContactRetentionRate" label="新客留存率" min-width="180">
               <template #default="{ row }">
-                {{ row.newContactRetentionRate + '%' }}
+                {{ row.newContactRetentionRate === DATA_STATISTICS_DEFAULT_SHOW ? DATA_STATISTICS_DEFAULT_SHOW : row.newContactRetentionRate + '%' }}
               </template>
             </el-table-column>
             <el-table-column sortable="custom" prop="newContactStartTalkRate" label="新客开口率" min-width="180">
@@ -169,7 +169,7 @@
 <script>
 import RightContainer from '@/components/RightContainer';
 import Statistics from '@/components/Statistics.vue';
-import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION } from '@/utils/constant';
+import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION, DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import UserItem from '@/components/UserItem.vue';
 import TagUserShow from '@/components/TagUserShow';
@@ -195,6 +195,7 @@ export default {
     return {
       DATE_DIMENSION,
       STAFF_DIMENSION,
+      DATA_STATISTICS_DEFAULT_SHOW,
       // 选择添加人弹窗显隐
       dialogVisibleSelectUser: false,
       // 搜索框选择的员工/部门

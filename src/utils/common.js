@@ -229,7 +229,8 @@ export function arrData(data) {
     obj.totalContactCnt.push(+a.totalContactCnt);
     obj.newContactCnt.push(+a.newContactCnt);
     obj.negativeFeedbackCnt.push(+a.negativeFeedbackCnt);
-    obj.newContactRetentionRate.push(+a.newContactRetentionRate);
+    const newContactRetentionRate = +a.newContactRetentionRate;
+    obj.newContactRetentionRate.push(isNaN(newContactRetentionRate) ? a.newContactRetentionRate : newContactRetentionRate);
     obj.chatTotal.push(+a.chatTotal);
     obj.newChatCnt.push(+a.newChatCnt);
     obj.memberTotal.push(+a.memberTotal);
@@ -424,7 +425,7 @@ export function dealExtraIcon(suffix) {
 
 /**
  * 根据标签id匹配出标签名
- * @param {*} tagList 标签泪奔
+ * @param {*} tagList 标签列表
  * @param {*} store
  * @returns
  */

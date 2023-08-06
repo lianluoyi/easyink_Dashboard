@@ -11,7 +11,10 @@
       redicon: Number(erchatsTable[field]) < 0,
     }"
   >较{{ time }}
-    <span>{{
+    <span v-if="erchatsTable[field] === DATA_STATISTICS_DEFAULT_SHOW">{{
+      DATA_STATISTICS_DEFAULT_SHOW
+    }}</span>
+    <span v-else>{{
       `${erchatsTable[field] ?
         (erchatsTable[field] > 0 ? '+' + erchatsTable[field] : erchatsTable[field])
         : 0}${unit}`
@@ -19,6 +22,8 @@
   </el-col>
 </template>
 <script>
+import { DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
+
 export default {
   name: 'DiffItem',
   components: {},
@@ -40,6 +45,11 @@ export default {
       type: String,
       default: ''
     }
+  },
+  data() {
+    return {
+      DATA_STATISTICS_DEFAULT_SHOW
+    };
   }
 };
 </script>

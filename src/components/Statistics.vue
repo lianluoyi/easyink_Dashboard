@@ -37,9 +37,12 @@
         <el-row type="flex" class="row-bg data-count theme-text-color" justify="space-between">
           <el-col v-for="(item,index) in colList" :key="index" :span="6">
             <span :style="`color: ${color} `" class="col-item theme-text-color">
-              {{ item.defaultNotUnit ? (item[item.filed] === DATA_STATISTICS_DEFAULT_SHOW ? DATA_STATISTICS_DEFAULT_SHOW : item[item.filed]) : item[item.filed] || 0 }}
-              <!-- 符号 -->
-              <span v-if="!item.defaultNotUnit || item[item.filed] !== DATA_STATISTICS_DEFAULT_SHOW" class="unit">{{ item.unit }}</span>
+              <template v-if="item[item.filed] === DATA_STATISTICS_DEFAULT_SHOW">{{ DATA_STATISTICS_DEFAULT_SHOW }}</template>
+              <template v-else>
+                {{ item[item.filed] || 0 }}
+                <!-- 符号 -->
+                <span class="unit">{{ item.unit }}</span>
+              </template>
             </span>
           </el-col>
         </el-row>

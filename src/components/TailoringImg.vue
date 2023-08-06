@@ -1,7 +1,7 @@
 <!--
  * @Description: 图片裁剪工具
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <el-dialog v-bind="$attrs" width="800px" append-to-body :close-on-click-modal="false" @opened="modalOpened" @close="onClose">
@@ -138,7 +138,8 @@ export default {
     async uploadImg() {
       const formData = new FormData();
       await this.$refs.cropper.getCropBlob(data => {
-        formData.append(this.uploadFieldName, data);
+        const newFile = new File([data], this.file.name, { type: 'image/jpeg' });
+        formData.append(this.uploadFieldName, newFile);
         formData.append('fileName', this.file.name);
         this.$emit('handleUpload', formData);
       });

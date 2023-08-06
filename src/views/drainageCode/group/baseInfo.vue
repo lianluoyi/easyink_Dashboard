@@ -68,6 +68,15 @@ export default {
     if (this.groupCodeId) this.getGroupDetail();
   },
   methods: {
+    /**
+     * @description 修改上传url
+     */
+    changeUploadUrl(url) {
+      if (url.startsWith('/profile')) {
+        return window.location.origin + url;
+      }
+      return url;
+    },
     // 新增群活码
     add() {
       this.$refs.form.validate((valid) => {
@@ -76,7 +85,13 @@ export default {
         // 新增群活码数据至数据库
         add({
           ...this.form,
+          avatarUrl: this.changeUploadUrl(this.form.avatarUrl),
+          customerServerQrCode: this.changeUploadUrl(this.form.customerServerQrCode),
           actualList: this.form.actualList.map((actualListItem, index) => {
+            // 进群方式为群二维码时拼接URL
+            if (this.form.createType === CREATE_TYPE['group']) {
+              actualListItem.actualGroupQrCode = this.changeUploadUrl(actualListItem.actualGroupQrCode);
+            }
             return { ...actualListItem, sortNo: index + 1 };
           })
         }).then((res) => {
@@ -102,7 +117,13 @@ export default {
         this.loading = true;
         update(this.groupCodeId, {
           ...this.form,
+          avatarUrl: this.changeUploadUrl(this.form.avatarUrl),
+          customerServerQrCode: this.changeUploadUrl(this.form.customerServerQrCode),
           actualList: this.form.actualList.map((actualListItem, index) => {
+            // 进群方式为群二维码时拼接URL
+            if (this.form.createType === CREATE_TYPE['group']) {
+              actualListItem.actualGroupQrCode = this.changeUploadUrl(actualListItem.actualGroupQrCode);
+            }
             return { ...actualListItem, sortNo: index + 1 };
           }),
           delActualIdList: this.removeList.map((item) => {

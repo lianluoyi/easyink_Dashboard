@@ -118,9 +118,6 @@ export default {
      * 显示的标签列表
      */
     tagList() {
-      if (this.item.mediaType === Number(MEDIA_TYPE_RADARLINK)) {
-        return this.item.radarTagList;
-      }
       return matchDealtagName(this.item.tagList || [], this.$store);
     },
     /**
@@ -130,6 +127,9 @@ export default {
       return this.selectedMaterialList.some(selectedItem => {
         return this.item.id ? this.item.id === selectedItem.id : this.item.extraId === selectedItem.extraId;
       });
+    },
+    showTag() {
+      return ![MEDIA_TYPE_RADARLINK, MEDIA_TYPE_SMARTFORM].includes(this.type);
     }
   },
   methods: {
@@ -239,7 +239,7 @@ export default {
         </div>
       </div>
       <div class="bottom-div">
-        <TagList :tag-list="tagList" />
+        <TagList v-if="showTag" :tag-list="tagList" />
         <div v-if="showExpireTime" class="expire-time-common">
           {{ item.expireTime }} 过期
         </div>
