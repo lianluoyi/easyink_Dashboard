@@ -20,14 +20,14 @@
               :app-detail="appDetail"
             />
           </el-tab-pane>
-          <!-- <el-tab-pane v-if="appName.includes('工单')" label="系统设置" name="system">
+          <el-tab-pane v-if="false && appName.includes('工单')" label="系统设置" name="system">
             <SystemSetConfig
               :update-my-application-config="handleInstallApp"
               :app-id="appId && Number(appId)"
               :app-detail="appDetail"
               @getDetail="getDetail"
             />
-          </el-tab-pane> -->
+          </el-tab-pane>
           <!-- <el-tab-pane v-if="appId !== 1" label="充值与订单" name="order">充值与订单</el-tab-pane> -->
         </el-tabs>
       </div>
@@ -39,7 +39,7 @@ import AppInfo from '../component/AppInfo';
 import {
   getApplicationDetail,
   updateMyApplicationConfig,
-  deleteMyApplication,
+  deleteMyApplication
 } from '@/api/appManage';
 import WorkSheetAssistant from './workSheetAssistant.vue';
 import SystemSetConfig from './systemSetConfig.vue';
@@ -55,15 +55,15 @@ export default {
       appId: null,
       appDetail: {},
       config: {
-        url: '',
+        url: ''
       },
-      oldConfig: null,
+      oldConfig: null
     };
   },
   computed: {
     appName() {
       return this.appDetail.name || '';
-    },
+    }
   },
   created() {
     this.appId = this.$route.query.appId;
@@ -71,7 +71,7 @@ export default {
     if (this.$route.query.config) {
       this.config = {
         url: '',
-        ...JSON.parse(decodeURIComponent(this.$route.query.config)),
+        ...JSON.parse(decodeURIComponent(this.$route.query.config))
       };
       this.oldConfig = JSON.parse(decodeURIComponent(this.$route.query.config));
     }
@@ -85,17 +85,17 @@ export default {
         {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning',
+          type: 'warning'
         }
       )
         .then(() => {
           deleteMyApplication({ appid: this.appId }).then(() => {
             this.$message({
               type: 'success',
-              message: '删除成功!',
+              message: '删除成功!'
             });
             this.$router.push({
-              path: 'myApp',
+              path: 'myApp'
             });
           });
         })
@@ -116,11 +116,11 @@ export default {
         this.oldConfig = this.config;
         this.$message({
           message: '配置成功',
-          type: 'success',
+          type: 'success'
         });
       });
-    },
-  },
+    }
+  }
 };
 </script>
 <style scoped lang="scss">
