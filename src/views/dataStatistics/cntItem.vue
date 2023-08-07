@@ -5,11 +5,13 @@
 -->
 <template>
   <el-col :span="8">{{
-    `${erchatsTable[field] ? erchatsTable[field] : 0}${unit}`
+    `${erchatsTable[field] ? erchatsTable[field] : 0}${erchatsTable[field] === DATA_STATISTICS_DEFAULT_SHOW ? '' : unit}`
   }}
   </el-col>
 </template>
 <script>
+import { DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
+
 export default {
   name: 'CntItem',
   components: {},
@@ -27,6 +29,11 @@ export default {
       type: String,
       default: ''
     }
+  },
+  data() {
+    return {
+      DATA_STATISTICS_DEFAULT_SHOW
+    };
   }
 };
 </script>

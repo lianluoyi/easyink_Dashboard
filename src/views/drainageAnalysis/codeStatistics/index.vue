@@ -1,7 +1,7 @@
 <!--
  * @Description: 活码统计
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <template>
   <div class="overview-page">
@@ -282,8 +282,7 @@ export default {
           retainNewCustomerRate: DATA_STATISTICS_DEFAULT_SHOW,
           title: '新客留存率',
           unit: '%',
-          filed: 'retainNewCustomerRate',
-          defaultNotUnit: true
+          filed: 'retainNewCustomerRate'
         }
       ],
       dimensionType: CODE_DIMENSION,

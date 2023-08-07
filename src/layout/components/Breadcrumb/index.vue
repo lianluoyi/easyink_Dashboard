@@ -42,7 +42,7 @@ const specialRoute = {
   '/customerManage/customerCenter/groupDetail': [
     {
       title: '客户群',
-      path: '/customerManage/group'
+      path: '/customerManage/customerCenter/group'
     }
   ],
   '/customerManage/customerCenter/customerDetail': [

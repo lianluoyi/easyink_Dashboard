@@ -135,6 +135,7 @@ import echarts from 'echarts';
 import NoConfigInfo from '@/components/NoConfigInfo';
 import DiffItem from './dataStatistics/diffItem.vue';
 import CntItem from './dataStatistics/cntItem.vue';
+import { DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
 
 const DEFAULT_TIMEOUT = 100;
 export default {
@@ -172,7 +173,8 @@ export default {
           showPopover: false
         },
         { title: '昨日群成员总数', filed: 'groupMemberCount', showPopover: false }
-      ]
+      ],
+      DATA_STATISTICS_DEFAULT_SHOW
     };
   },
   watch: {
@@ -274,10 +276,10 @@ export default {
           name: _arrData[index],
           type: 'line',
           smooth: true,
+          connectNulls: true,
           data: item.data,
           textStyle: {
             color: '#fff' // 主标题文字的颜色。
-
           }
         };
       });
@@ -291,7 +293,8 @@ export default {
           formatter: function(params) {
             let str = '';
             params.forEach((item, idx) => {
-              str += `${item.axisValue}<br/>${item.marker}${item.seriesName} &nbsp;&nbsp;&nbsp;&nbsp;${item.data}${unit}`;
+              const showData = item.data === DATA_STATISTICS_DEFAULT_SHOW ? `${item.data}&nbsp;` : `${item.data}${unit}`;
+              str += `${item.axisValue}<br/>${item.marker}${item.seriesName} &nbsp;&nbsp;&nbsp;&nbsp;${showData}`;
               str += idx === params.length - 1 ? '' : '<br/>';
             });
             return str;
@@ -328,7 +331,6 @@ export default {
           axisLabel: {
             formatter: `{value}${unit}`
           }
-
         },
         series: seriesArr
       };

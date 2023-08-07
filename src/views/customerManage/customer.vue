@@ -103,8 +103,6 @@ export default {
       CUSTOMER_STATUS,
       // 去重后的客户总数
       ignoreDuplicateCount: 0,
-      // 客户总数
-      totalCount: 0,
       fieldObj,
       wxType: WX_TYPE,
       // 高级筛选弹窗状态
@@ -229,7 +227,6 @@ export default {
       };
       api.getCustomerSum(params).then(({ data }) => {
         this.ignoreDuplicateCount = data?.ignoreDuplicateCount || 0;
-        this.totalCount = data?.totalCount || 0;
       });
     },
     getList(page) {
@@ -657,6 +654,9 @@ export default {
         tempLabel.push(find(list, (item) => { return item.value === valueItem; }).label);
       });
       return tempLabel.join('、');
+    },
+    checkSelectable(row) {
+      return row.status !== TO_INHERIT_TYPE;
     }
   }
 };
@@ -762,7 +762,7 @@ export default {
     <template v-slot:data-stat>
       <div class="total-text">
         <div>
-          共 <span class="theme-text-color">{{ totalCount }}</span> 个客户
+          共 <span class="theme-text-color">{{ total }}</span> 个客户
         </div>
         <div>
           去重后 <span class="theme-text-color">{{ ignoreDuplicateCount }}</span> 个客户
@@ -817,6 +817,7 @@ export default {
         </template>
         <el-table-column
           key="row-1"
+          :selectable="checkSelectable"
           type="selection"
           align="center"
           width="55"
