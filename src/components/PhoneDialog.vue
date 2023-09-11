@@ -1,7 +1,7 @@
 <script>
 import VideoModal from '@/views/conversation/component/videoModal.vue';
 import FormPreview from './PhoneDialog/FormPreview.vue';
-import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, DEFAULT_IMG, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_TEXT, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_SMARTFORM } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, DEFAULT_IMG, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_TEXT, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_SMARTFORM } from '@/utils/constant/index';
 import { getFileIcon, filterSize } from '@/utils/common';
 /**
  * 手机对话框样式

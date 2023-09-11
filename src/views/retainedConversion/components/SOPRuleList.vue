@@ -36,7 +36,7 @@
 <script>
 import moment from 'moment';
 import RuleContent from '@/components/RuleContent/index.vue';
-import { MEDIA_TYPE_TEXT, RULE_PERFORM_TYPE, SOP_TYPE } from '@/utils/constant';
+import { MEDIA_TYPE_TEXT, RULE_PERFORM_TYPE, SOP_TYPE } from '@/utils/constant/index';
 import RemindPerform from './RemindPerform.vue';
 const MAX_SHOW_RULE_LENGTH = 2;
 export default {

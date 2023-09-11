@@ -85,7 +85,7 @@
 <script>
 import { EventBus } from '@/event-bus.js';
 import UploadFile from './UploadFile.vue';
-import { DRAG_ONE_TYPE, FORM_DEFAULT_HEAD_IMAGE_URL } from '@/utils/constant';
+import { DRAG_ONE_TYPE, FORM_DEFAULT_HEAD_IMAGE_URL } from '@/utils/constant/index';
 import { checkChange } from '@/utils/common';
 export default {
   components: { UploadFile },

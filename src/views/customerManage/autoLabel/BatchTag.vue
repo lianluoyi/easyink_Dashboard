@@ -173,7 +173,7 @@ import ImportTask from './components/ImportTask.vue';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { selectBatchTaskList, deleteTask } from '@/api/batchTagTask';
 import { goRouteWithQuery } from '@/utils';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 export default {
   name: 'BatchTag',
   components: { RightContainer, EmptyDefaultIcon, SelectTag, ImportTask },

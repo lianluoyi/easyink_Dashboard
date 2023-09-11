@@ -171,7 +171,7 @@ import { getCodeImg, findWxQrLoginInfo, getPreAuthCode, getPreLoginParam, getPer
 import Cookies from 'js-cookie';
 import { clearSearchWithoutReload, getNowTheme } from '@/utils/common';
 import { Notification } from 'element-ui';
-import { SERVER_TYPE_THIRD } from '@/utils/constant';
+import { SERVER_TYPE_THIRD } from '@/utils/constant/index';
 import { setToken } from '@/utils/auth';
 
 const CODE = 'CODE';

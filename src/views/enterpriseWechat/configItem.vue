@@ -1,7 +1,7 @@
 <script>
 import * as api from '@/api/enterpriseId';
 import { setDefaultConfig } from '@/utils/enterpriseWechat';
-import { ENTERPRISE_CONFIG_TIP, SERVER_TYPE_THIRD } from '@/utils/constant';
+import { ENTERPRISE_CONFIG_TIP, SERVER_TYPE_THIRD } from '@/utils/constant/index';
 
 export default {
   components: {},

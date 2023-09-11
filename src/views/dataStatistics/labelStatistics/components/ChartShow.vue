@@ -73,7 +73,7 @@
 
 <script>
 import { getCustomerTagChartView, getCustomerTagTableView, getGroupTagChartView, getGroupTagTableView } from '@/api/statistics';
-import { PAGE_LIMIT, DEFAULT_PAGE_NUM, TAG_LABEL_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, DEFAULT_PAGE_NUM, TAG_LABEL_TYPE } from '@/utils/constant/index';
 import Graphics from './Graphics.vue';
 import { uniqBy, findIndex } from 'lodash';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';

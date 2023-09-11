@@ -120,7 +120,7 @@
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import TagUserShow from '@/components/TagUserShow';
-import { PAGE_LIMIT, SOP_TYPE, WX_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, SOP_TYPE, WX_TYPE } from '@/utils/constant/index';
 import { dealAtInfo } from '@/utils/common';
 
 export default {

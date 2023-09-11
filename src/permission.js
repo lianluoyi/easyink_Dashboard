@@ -2,7 +2,7 @@ import router from './router';
 import store from './store';
 import { Message } from 'element-ui';
 import { getToken } from '@/utils/auth';
-import { GET_INFO_ERROR } from '@/utils/constant';
+import { GET_INFO_ERROR } from '@/utils/constant/index';
 import { getNowTheme } from '@/utils/common';
 
 const whiteList = ['/login', '/bind', '/register', '/test'];

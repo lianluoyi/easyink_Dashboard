@@ -1,7 +1,7 @@
 <!--
- * @Description: 活码统计
+ * @Description: 渠道统计
  * @Author: wJiaaa
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="overview-page">
@@ -13,11 +13,11 @@
       :selected-user-list="userAndDepartmentList"
       @success="selectedUserOrDepartment"
     />
-    <!-- 选择活码弹窗 -->
-    <SelectCode
-      :visible.sync="dialogVisibleSelectCode"
-      :confirm-selected-code-list="codeList"
-      @success="selectedCode"
+    <!-- 选择渠道弹窗 -->
+    <SelectChannel
+      :visible.sync="dialogVisibleSelectChannel"
+      :confirm-selected-code-list="channelList"
+      @success="selectedChannel"
     />
     <RightContainer>
       <template v-slot:search>
@@ -30,11 +30,11 @@
           size="small"
         >
           <el-form-item prop="code">
-            <div class="tag-input" @click="dialogVisibleSelectCode = true">
-              <span v-if="!codeList.length" class="tag-place">请选择活码</span>
+            <div class="tag-input" @click="dialogVisibleSelectChannel = true">
+              <span v-if="!channelList.length" class="tag-place">请选择渠道</span>
               <template v-else>
                 <div class="code-label">
-                  {{ getCodeShowLabel(codeList) }}
+                  {{ getCodeShowLabel(channelList) }}
                 </div>
               </template>
             </div>
@@ -90,9 +90,9 @@
               >
                 <div class="popover-content">
                   <div class="info">
-                    <p>累计添加客户：截止到查询时间，累计扫码添加员工的客户数</p>
+                    <p>累计添加客户：截止到查询时间，累计通过渠道添加员工的客户数</p>
                     <p>留存客户总数：截止到查询时间，未将员工删除的客户数</p>
-                    <p>新增客户数：查询时间内，扫码添加员工的客户数，包含流失客户</p>
+                    <p>新增客户数：查询时间内，通过渠道添加员工的客户数，包含流失客户</p>
                     <p>流失客户数：查询时间内，把员工删除的客户数</p>
                     <p>新客留存率：截止当前，未将员工删除的新增客户/新增客户数</p>
                   </div>
@@ -112,12 +112,12 @@
           </div>
           <div class="forms-handle-btn">
             <el-radio-group v-model="dimensionType" size="medium" @input="dimensionTypeChange">
-              <el-radio-button :label="CODE_DIMENSION">活码维度</el-radio-button>
+              <el-radio-button :label="CODE_DIMENSION">渠道维度</el-radio-button>
               <el-radio-button :label="STAFF_DIMENSION">员工维度</el-radio-button>
               <el-radio-button :label="DATE_DIMENSION">日期维度</el-radio-button>
             </el-radio-group>
             <el-button
-              v-hasPermi="['stastistic:codeStatistics:export']"
+              v-hasPermi="['stastistic:channelStatistics:export']"
               class="btn-reset btn-export"
               @click="exportForms"
             >导出报表</el-button>
@@ -128,7 +128,7 @@
             :data="list"
           >
             <template slot="empty">
-              <empty-default-icon :length="list.length" :text="showChooseCodeTips ? '请先选择活码' : '暂无数据'" />
+              <empty-default-icon :length="list.length" :text="showChooseCodeTips ? '请先选择渠道' : '暂无数据'" />
             </template>
             <el-table-column
               v-if="dimensionType === STAFF_DIMENSION"
@@ -153,7 +153,7 @@
             <el-table-column
               v-if="dimensionType === CODE_DIMENSION"
               prop="empleName"
-              label="活码"
+              label="渠道"
               min-width="200"
             >
               <template #default="{ row }">
@@ -188,11 +188,11 @@
 <script>
 import RightContainer from '@/components/RightContainer';
 import Statistics from '@/components/Statistics.vue';
-import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION, CODE_DIMENSION, DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
+import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION, CODE_DIMENSION, DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import UserItem from '@/components/UserItem.vue';
 import TagUserShow from '@/components/TagUserShow';
-import SelectCode from './components/SelectCode.vue';
+import SelectChannel from './components/SelectChannel.vue';
 import SelectUser from '@/components/SelectUser/index.vue';
 import { TODAY_TIME, FIXED_DAYS_AGO_TIME, ONE_MOUNTH_AGO, ONE_MOUNTH_LATER, groupByScopeType } from '@/utils/common';
 import {
@@ -206,7 +206,7 @@ import {
 } from '@/api/statistics';
 export default {
   name: '',
-  components: { RightContainer, Statistics, EmptyDefaultIcon, UserItem, TagUserShow, SelectUser, SelectCode },
+  components: { RightContainer, Statistics, EmptyDefaultIcon, UserItem, TagUserShow, SelectUser, SelectChannel },
   data() {
     return {
       DATE_DIMENSION,
@@ -286,9 +286,9 @@ export default {
         }
       ],
       dimensionType: CODE_DIMENSION,
-      dialogVisibleSelectCode: false,
-      // 搜索框选择的活码
-      codeList: [],
+      dialogVisibleSelectChannel: false,
+      // 搜索框选择的渠道
+      channelList: [],
       showChooseCodeTips: true
     };
   },
@@ -300,8 +300,8 @@ export default {
       this.getList(true);
     },
     /**
-     * 获取活码展示的label
-     * @param list 已经选择的活码
+     * 获取渠道展示的label
+     * @param list 已经选择的渠道
      */
     getCodeShowLabel(list) {
       return list.map((item) => item.scenario).join('、');
@@ -313,10 +313,10 @@ export default {
       this.userAndDepartmentList = list;
     },
     /**
-     * @description 选择活码的回调
+     * @description 选择渠道的回调
      */
-    selectedCode(list) {
-      this.codeList = list;
+    selectedChannel(list) {
+      this.channelList = list;
     },
     // 获取数据总览
     getDataOverview() {
@@ -343,7 +343,7 @@ export default {
      * @return {*}
      */
     getList(initPage) {
-      if (!this.codeList.length) return;
+      if (!this.channelList.length) return;
       initPage ? this.pageQuery.pageNum = 1 : null;
       this.loading = true;
       const getListFnMap = {
@@ -376,8 +376,8 @@ export default {
     },
     // 查询
     onSearch() {
-      if (!this.codeList.length) {
-        return this.msgWarn('请先选择活码');
+      if (!this.channelList.length) {
+        return this.msgWarn('请先选择渠道');
       }
       this.showChooseCodeTips = false;
       this.getDataOverview();
@@ -387,7 +387,7 @@ export default {
     resetForm() {
       this.userAndDepartmentList = [];
       this.query = this.$options.data().query;
-      this.codeList = [];
+      this.channelList = [];
       this.colList = this.$options.data().colList;
       this.list = [];
       this.pickerMinDate = '';
@@ -415,8 +415,8 @@ export default {
         this.query.departmentIds = [];
         this.query.userIds = [];
       }
-      if (this.codeList && this.codeList.length) {
-        this.query.empleCodeIdList = this.codeList.map((item) => item.id);
+      if (this.channelList && this.channelList.length) {
+        this.query.empleCodeIdList = this.channelList.map((item) => item.id);
       } else {
         this.query.empleCodeIdList = [];
       }
@@ -424,8 +424,8 @@ export default {
     },
     // 导出报表
     exportForms() {
-      if (!this.codeList.length) {
-        return this.msgWarn('请先选择活码');
+      if (!this.channelList.length) {
+        return this.msgWarn('请先选择渠道');
       }
       const exportFnMap = {
         [DATE_DIMENSION]: exportStatisticsByDate,

@@ -1,7 +1,7 @@
 <!--
  * @Description: 素材选择标签弹窗
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <script>
 import { addMaterialTag, delMaterialTag } from '@/api/material';
@@ -194,7 +194,7 @@ export default {
       append-to-body
       :close-on-click-modal="false"
     >
-      <el-alert :title="alertTitle" type="info" show-icon :closable="false" />
+      <el-alert class="theme-el-alert" :title="alertTitle" type="info" show-icon :closable="false" />
       <el-input
         v-model="tagName"
         placeholder="请输入标签"
@@ -250,12 +250,6 @@ export default {
 <style lang="scss" scoped>
 @import '~@/styles/mixin.scss';
 .tag-dialog {
-  .el-alert {
-    border-color: #c4e1dd;
-    color: #7f7f7f;
-    background: $bgLightBaseColor;
-    margin: -15px 0 15px;
-  }
   .tag-manage {
     margin-top: 10px;
     display: flex;

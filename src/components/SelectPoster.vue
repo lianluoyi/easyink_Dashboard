@@ -3,7 +3,7 @@ import {
   getTree,
   getList
 } from '@/api/material';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 const POSTER_MEDIATYPE = 5;
 const MATH_CEIL = 10;
 

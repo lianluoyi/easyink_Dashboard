@@ -39,7 +39,7 @@ import {
   TEXT_COMPONENT,
   IMAGE_COMPONENT,
   CAROUSEL_COMPONENT
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import { EventBus } from '@/event-bus.js';
 export default {
   data() {

@@ -12,6 +12,8 @@ export const successCode = 200;
 export const readyStateSucCode = 4;
 // 登录过期
 const LOGIN_OVERDUE = 401;
+// 公用异常状态码，此状态码使用后端返回的msg提示
+export const ERR_CODE = 400;
 // 被后台强制退出
 const FORCED_EXIT = 405;
 // 管理员变更CORPID强制退出

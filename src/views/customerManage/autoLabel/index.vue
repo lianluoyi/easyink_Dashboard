@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { AUTOLABEL_TYPE } from '@/utils/constant';
+import { AUTOLABEL_TYPE } from '@/utils/constant/index';
 import LabelList from './components/labelList.vue';
 import { removeUrlParams } from '@/utils/common';
 import BatchTag from './BatchTag.vue';

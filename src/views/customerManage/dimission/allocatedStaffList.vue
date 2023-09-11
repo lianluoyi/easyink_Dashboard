@@ -1,7 +1,7 @@
 <script>
 import { getAllocateList } from '@/api/customer/dimission';
 import { goRouteWithQuery } from '@/utils';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 

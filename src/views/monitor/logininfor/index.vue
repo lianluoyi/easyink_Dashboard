@@ -117,7 +117,7 @@
 
 <script>
 import { list, delLogininfor, cleanLogininfor, exportLogininfor } from '@/api/monitor/logininfor';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 
 export default {

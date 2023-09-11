@@ -61,7 +61,7 @@ import {
   MEDIA_TYPE_FILE,
   MEDIA_TYPE_MINIAPP,
   MEDIA_TYPE_SMARTFORM
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import RadarLink from '@/views/radarLibrary/components/radarLink.vue';
 export default {
   name: '',

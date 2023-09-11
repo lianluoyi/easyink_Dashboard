@@ -88,7 +88,7 @@
 <script>
 import { uploadFile2Cos } from '@/api/common';
 import { dealFormat, dealUploadSize, getFileIcon } from '@/utils/common';
-import { IMAGE_COMPONENT, CAROUSEL_COMPONENT, MEDIA_TYPE_POSTER, UPLOAD_ONE_TYPE, MAX_APPENDIX_NUM, DRAG_ONE_TYPE } from '@/utils/constant';
+import { IMAGE_COMPONENT, CAROUSEL_COMPONENT, MEDIA_TYPE_POSTER, UPLOAD_ONE_TYPE, MAX_APPENDIX_NUM, DRAG_ONE_TYPE } from '@/utils/constant/index';
 const UPLOAD_BYTE = 2;
 export default {
   name: '',

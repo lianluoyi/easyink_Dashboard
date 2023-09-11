@@ -100,7 +100,7 @@
 
 <script>
 import SceneList from './sceneList.vue';
-import { AUTOLABEL_TYPE } from '@/utils/constant';
+import { AUTOLABEL_TYPE } from '@/utils/constant/index';
 import { getKeywordRuleInfo, getIntoGroupRuleInfo, getNewCustomerRuleInfo } from '@/api/customer/auto';
 import UseEmployeeModal from '@/views/retainedConversion/components/UseEmployeeModal.vue';
 import ByLengthUserShow from '@/components/ByLengthUserShow';

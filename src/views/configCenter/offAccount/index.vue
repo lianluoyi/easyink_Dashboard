@@ -88,7 +88,7 @@
 <script>
 import OffAccountCard from './offAccountCard.vue';
 import { getConfig, updateConfig, getWechatOpenAuthUrl, getWechatOpenDomain } from '@/api/wechatopen';
-import { CONFIG_INTRODUCE_URL, WX_PAAS_URL, MANAGE_BACKSTAGE_URL } from '@/utils/constant';
+import { CONFIG_INTRODUCE_URL, WX_PAAS_URL, MANAGE_BACKSTAGE_URL } from '@/utils/constant/index';
 import { checkPermi } from '@/utils/permission';
 import DEFAULT_ICON from '@/assets/image/conversation-unconfig.svg';
 export default {

@@ -43,7 +43,7 @@
   </div>
 </template>
 <script>
-import { MEDIA_TYPE_TEXT, MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_FILE, MEDIA_TYPE_SMARTFORM } from '@/utils/constant';
+import { MEDIA_TYPE_TEXT, MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_FILE, MEDIA_TYPE_SMARTFORM } from '@/utils/constant/index';
 import { filterSize, getFileIcon } from '@/utils/common';
 import RadarLink from '@/views/radarLibrary/components/radarLink.vue';
 export default {

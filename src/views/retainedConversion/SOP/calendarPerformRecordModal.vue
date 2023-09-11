@@ -146,7 +146,7 @@
 </template>
 <script>
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT, SOP_TYPE, PAGE_LIMIT_INFINITE } from '@/utils/constant';
+import { PAGE_LIMIT, SOP_TYPE, PAGE_LIMIT_INFINITE } from '@/utils/constant/index';
 import { getSopRulesRecordList, getTimingSopRulesDetailList } from '@/api/sop';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 

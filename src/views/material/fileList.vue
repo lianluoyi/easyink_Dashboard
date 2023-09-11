@@ -6,7 +6,7 @@
 <script>
 import MaPage from '@/views/material/components/MaPage';
 import FileItem from '@/components/MaterialItem/FileItem.vue';
-import { MEDIA_TYPE_FILE } from '@/utils/constant';
+import { MEDIA_TYPE_FILE } from '@/utils/constant/index';
 
 export default {
   name: 'FileList',

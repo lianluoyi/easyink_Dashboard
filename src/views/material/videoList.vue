@@ -1,7 +1,7 @@
 <script>
 import MaPage from '@/views/material/components/MaPage';
 import VideoItem from '@/components/MaterialItem/VideoItem.vue';
-import { MEDIA_TYPE_VIDEO } from '@/utils/constant';
+import { MEDIA_TYPE_VIDEO } from '@/utils/constant/index';
 
 /**
  * 素材库视频列表

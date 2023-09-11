@@ -74,7 +74,7 @@ import ReturnPage from '@/components/ReturnPage.vue';
 import { editGroupWelMsg, addGroupWelMsg, getWelcomeDetaiById } from '@/api/tlp';
 import { dealAppendixType, dealAppendixTypeToMaterial } from '@/utils/index';
 import { checkChange, changeButtonLoading } from '@/utils/common';
-import { INTO_GROUP } from '@/utils/constant';
+import { INTO_GROUP } from '@/utils/constant/index';
 // 入群欢迎语内容上限
 const MAX_GROUP_WELCOME_MSG_LENGTH = 1000;
 // 附件选择上限

@@ -1,6 +1,6 @@
 <script>
 import { uploadFile2Cos } from '@/api/common';
-import { MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO } from '@/utils/constant/index';
 import { dealUploadSize, dealFormat } from '@/utils/common';
 
 const FILE_NAME_LENGTH = 100;

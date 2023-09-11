@@ -7,7 +7,7 @@
 <script>
 import MaPage from '@/views/material/components/MaPage';
 import MiniAppItem from '@/components/MaterialItem/MiniAppItem.vue';
-import { MEDIA_TYPE_MINIAPP } from '@/utils/constant';
+import { MEDIA_TYPE_MINIAPP } from '@/utils/constant/index';
 
 export default {
   name: 'MiniAppList',

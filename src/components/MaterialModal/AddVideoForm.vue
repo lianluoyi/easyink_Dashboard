@@ -4,7 +4,7 @@
  * @LastEditors: wJiaaa
 -->
 <script>
-import { MEDIA_TYPE_VIDEO, MEDIA_TYPE_POSTER } from '@/utils/constant';
+import { MEDIA_TYPE_VIDEO, MEDIA_TYPE_POSTER } from '@/utils/constant/index';
 const MAX_BYTE = 1024;
 const MAX_VIDEO_BYTE = 10;
 const MAX_MAX_VIDEO_BYTE = 50;

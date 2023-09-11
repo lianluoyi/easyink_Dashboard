@@ -1,6 +1,6 @@
 <script>
 import VideoModal from '@/views/conversation/component/videoModal.vue';
-import { MESSAGE_MEDIA_TYPE, MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_SMARTFORM } from '@/utils/constant';
+import { MESSAGE_MEDIA_TYPE, MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_SMARTFORM } from '@/utils/constant/index';
 import { downloadFile } from '@/utils/common';
 const PROTOCAL_REGEX = /https?:\/\//;
 export default {

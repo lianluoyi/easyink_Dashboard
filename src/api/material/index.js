@@ -79,22 +79,6 @@ export function remove(id) {
 }
 
 /**
- * 上传素材信息
- * @param {*} data
- * {
- * file:文件
-type:0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)
-}
- */
-export function upload(data) {
-  return request({
-    url: service + '/upload',
-    method: 'post',
-    data
-  });
-}
-
-/**
  * 素材移动分组
  * @param {*} data
  * {
@@ -173,6 +157,7 @@ export function removeTree(ids) {
 type [string] 是	素材类型
 name [string] 是	文件名称
  */
+// 以下无用
 export function getMaterialMediaId(data) {
   return request({
     url: service + '/temporaryMaterialMediaIdForWeb',

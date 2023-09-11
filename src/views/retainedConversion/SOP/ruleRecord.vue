@@ -188,7 +188,7 @@
 </template>
 <script>
 import { getSopRulesRecordList, getSopEmployeeRecordList } from '@/api/sop';
-import { PAGE_LIMIT, SOP_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, SOP_TYPE } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import RemindPerform from '../components/RemindPerform.vue';
 import PerformRecordModal from './performRecordModal.vue';

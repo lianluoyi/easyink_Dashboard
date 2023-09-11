@@ -166,7 +166,7 @@ import {
   IMAGE_COMPONENT,
   CAROUSEL_COMPONENT,
   TEXT_LENGTH_TYPE
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import { EventBus } from '@/event-bus.js';
 import Sort from './Sort.vue';
 import { indexOf } from 'lodash';

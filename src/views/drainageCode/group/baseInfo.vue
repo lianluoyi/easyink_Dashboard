@@ -4,7 +4,7 @@ import PhoneDialog from '@/components/PhoneDialog';
 import CustomerGroupModal from './customerGroupModal.vue';
 import EnterpriseCodeModal from './enterpriseCodeModal.vue';
 import ActuaList from './actuaList.vue';
-import { CREATE_TYPE } from '@/utils/constant';
+import { CREATE_TYPE } from '@/utils/constant/index';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading, checkChange } from '@/utils/common';
 export default {

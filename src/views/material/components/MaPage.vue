@@ -9,7 +9,7 @@ import {
   removeMaterial,
   showMaterialSwitch
 } from '@/api/material';
-import { PAGE_LIMIT_TWENTY, MEDIA_TYPE, MEDIA_TYPE_POSTER } from '@/utils/constant';
+import { PAGE_LIMIT_TWENTY, MEDIA_TYPE, MEDIA_TYPE_POSTER } from '@/utils/constant/index';
 import MaterialAddModal from './MaterialAddModal.vue';
 import SelectTagModal from './SelectTagModal.vue';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';

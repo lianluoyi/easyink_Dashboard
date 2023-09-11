@@ -4,7 +4,7 @@
  * @LastEditors: wJiaaa
 -->
 <script>
-import { CUSTOM_LINK, DEFAULT_LINK, DEFAULT_IMG, IMG_LINK_DIGEST, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH } from '@/utils/constant';
+import { CUSTOM_LINK, DEFAULT_LINK, DEFAULT_IMG, IMG_LINK_DIGEST, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH } from '@/utils/constant/index';
 import VerbalTrickImgLink from '../../views/verbalTrickLibrary/component/verbalTrickPreview/verbalTrickImgLink.vue';
 import { getWordsUrlContent } from '@/api/wordsGroup';
 /**

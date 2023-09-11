@@ -28,7 +28,7 @@
   </div>
 </template>
 <script>
-import { INTELLIGENT_FORM_TYPE } from '@/utils/constant';
+import { INTELLIGENT_FORM_TYPE } from '@/utils/constant/index';
 import IntelligentFormContent from './intelligentFormContent.vue';
 import { getUserInfo } from '@/api/system/staff';
 import SelectTree from '@/components/SelectTree';

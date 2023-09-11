@@ -48,7 +48,7 @@
 import {
   MEDIA_TYPE_POSTER, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK, RADAR_TYPE,
   MEDIA_TYPE_MINIAPP, PAGE_LIMIT, MEDIA_TYPE, DEFAULT_LINK, MEDIA_TYPE_SMARTFORM, INTELLIGENT_FORM_TYPE
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import { getList } from '@/api/material';
 import { getRadaList } from '@/api/radar';

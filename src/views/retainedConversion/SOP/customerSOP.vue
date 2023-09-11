@@ -24,7 +24,7 @@
 </template>
 <script>
 import SOPList from '../components/SOPList.vue';
-import { SOP_TYPE } from '@/utils/constant';
+import { SOP_TYPE } from '@/utils/constant/index';
 import { removeUrlParams } from '@/utils/common';
 export default {
   name: '',

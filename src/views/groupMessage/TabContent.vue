@@ -8,7 +8,7 @@ import { getPushResult, sendToUser } from '@/api/groupMessage';
 import {
   PAGE_LIMIT, GROUP_MESSAGE_SEND_STATUS_MAP, GROUP_MESSAGE_PUSH_TYPE_CUSTOMER, GROUP_MESSAGE_PUSH_TYPE_GROUP,
   GROUP_MESSAGE_SEND_STATUS_UNEXEC, GROUP_MESSAGE_SEND_STATUS_EXECED
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { getHeadImgUrl } from '@/utils/common';

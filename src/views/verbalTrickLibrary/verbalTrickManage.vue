@@ -20,7 +20,7 @@
   </div>
 </template>
 <script>
-import { VERBAL_TRICK_TYPE } from '@/utils/constant';
+import { VERBAL_TRICK_TYPE } from '@/utils/constant/index';
 import VerbalTrickContent from './verbalTrickContent.vue';
 import store from '@/store';
 export default {

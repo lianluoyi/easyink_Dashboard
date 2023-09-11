@@ -78,10 +78,12 @@ export function updateCustomerDetail(data) {
 
 // 导出用户
 export function exportCustomer(query) {
+  const TIMEOUT = 180000;
   return request({
     url: service + '/export',
     method: 'post',
-    data: query
+    data: query,
+    timeout: TIMEOUT
   });
 }
 

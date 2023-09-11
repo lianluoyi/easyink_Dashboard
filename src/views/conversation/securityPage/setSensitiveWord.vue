@@ -141,7 +141,7 @@
 <script>
 import * as sensitiveApis from '@/api/conversation/security';
 import SelectUser from '@/components/SelectUser/index.vue';
-import { PAGE_LIMIT_INFINITE, SCOPE_TYPE, SCOPELIST_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT_INFINITE, SCOPE_TYPE, SCOPELIST_TYPE } from '@/utils/constant/index';
 import StrategyItem from './strategyItem.vue';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import TagUserShow from '@/components/TagUserShow';

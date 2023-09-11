@@ -3,7 +3,7 @@ import { MessageBox } from 'element-ui';
 import * as api from '@/api/organization';
 import { listStaff, getJoinQrCode, download, batchUpdateUser } from '@/api/system/staff';
 import { listRole } from '@/api/system/role';
-import { PAGE_LIMIT, STAFF_STATUS, STAFF_STATUS_ACTIVATE, PAGE_LIMIT_TWENTY } from '@/utils/constant';
+import { PAGE_LIMIT, STAFF_STATUS, STAFF_STATUS_ACTIVATE, PAGE_LIMIT_TWENTY } from '@/utils/constant/index';
 import { validSpecialCharacters } from '@/utils/validate';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import CommonTree from '@/components/CommonTree';

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { SERVER_TYPE_INTERNAL } from '@/utils/constant';
+import { SERVER_TYPE_INTERNAL } from '@/utils/constant/index';
 export default {
   name: 'App',
   computed: {

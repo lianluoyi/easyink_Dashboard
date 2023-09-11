@@ -3,7 +3,8 @@ import {
   getAllocateCustomersPlus,
   getAllocateGroupsPlus
 } from '@/api/customer/dimission';
-import { PAGE_LIMIT, DIMISSION_STATUS_MAP, INHERIT_STATUS_INHERITING, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { PAGE_LIMIT, DIMISSION_STATUS_MAP, INHERIT_STATUS_INHERITING } from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import AllocateModal from './allocateModal.vue';
 

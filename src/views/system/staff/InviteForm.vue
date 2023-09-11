@@ -1,6 +1,6 @@
 <script>
 import * as api from '@/api/system/staff';
-import { MEDIA_TYPE_POSTER } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER } from '@/utils/constant/index';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
 const NOT_API_POWER = 48002;

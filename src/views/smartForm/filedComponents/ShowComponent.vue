@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { TEXT_COMPONENT, IMAGE_COMPONENT, CAROUSEL_COMPONENT, MAX_APPENDIX_NUM, MULTIPLE_TYPE, DRAG_ONE_TYPE } from '@/utils/constant';
+import { TEXT_COMPONENT, IMAGE_COMPONENT, CAROUSEL_COMPONENT, MAX_APPENDIX_NUM, MULTIPLE_TYPE, DRAG_ONE_TYPE } from '@/utils/constant/index';
 import { EventBus } from '@/event-bus.js';
 import UploadFile from '../components/UploadFile.vue';
 export default {

@@ -141,7 +141,7 @@ import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getWordsList, deleteWords, importWords } from '@/api/wordsGroup';
 import AddVerbalTrickDrawer from './component/addVerbalTrickDrawer.vue';
 import ImportFile from '@/components/ImportFile.vue';
-import { VERBAL_TRICK_TYPE, MEDIA_TYPE_TEXT, MEDIA_TYPE_POSTER, PAGE_LIMIT } from '@/utils/constant';
+import { VERBAL_TRICK_TYPE, MEDIA_TYPE_TEXT, MEDIA_TYPE_POSTER, PAGE_LIMIT } from '@/utils/constant/index';
 import VerbalTrickDetailPreview from './component/verbalTrickDetailPreview.vue';
 import VerbalTrickDetailDrawer from './component/verbalTrickDetailDrawer.vue';
 import BatchUpdateGroup from './component/batchUpdateGroup.vue';

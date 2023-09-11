@@ -1,6 +1,6 @@
 <script>
 import { addEmployWelMsg, getWelcomeDetaiById, editEmployWel } from '@/api/tlp';
-import { EMPLOYEES_WELCOME, MAX_APPENDIX_NUM, MEDIA_TO_WELCOME_TYPE, WELCOME_APPENDIX_TYPE } from '@/utils/constant';
+import { EMPLOYEES_WELCOME, MAX_APPENDIX_NUM, MEDIA_TO_WELCOME_TYPE, WELCOME_APPENDIX_TYPE } from '@/utils/constant/index';
 import ReturnPage from '@/components/ReturnPage.vue';
 import SelectUser from '@/components/SelectUser/index.vue';
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';

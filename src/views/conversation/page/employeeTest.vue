@@ -315,7 +315,7 @@ import {
 import {
   yearMouthDay, downloadFile, filterSize, downloadAMR, changeDeptTreeData
 } from '@/utils/common.js';
-import { PAGE_LIMIT, MSG_TYPE, MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO, USER_AND_DEPARTMENT_LIMIT, IS_ACTIVATE } from '@/utils/constant';
+import { PAGE_LIMIT, MSG_TYPE, MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO, USER_AND_DEPARTMENT_LIMIT, IS_ACTIVATE } from '@/utils/constant/index';
 import { groupBy } from 'lodash';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import CommonTree from '@/components/CommonTree';

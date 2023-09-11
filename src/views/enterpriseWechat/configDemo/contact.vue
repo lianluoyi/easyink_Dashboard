@@ -1,5 +1,5 @@
 <script>
-import { ENTERPRISE_WECHAT_AUTH_STEP_TEXT, SERVER_TYPE_THIRD } from '@/utils/constant';
+import { ENTERPRISE_WECHAT_AUTH_STEP_TEXT, SERVER_TYPE_THIRD } from '@/utils/constant/index';
 import { replaceUrlProtocol } from '@/utils/common';
 const LAST_STEP_NUMBER = 3;
 export default {

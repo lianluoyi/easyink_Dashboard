@@ -200,12 +200,12 @@
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading, checkChange } from '@/utils/common';
 import ReturnPage from '@/components/ReturnPage.vue';
-import { AUTOLABEL_TYPE } from '@/utils/constant';
+import { AUTOLABEL_TYPE } from '@/utils/constant/index';
 import SceneList from './components/sceneList.vue';
 import SelectUser from '@/components/SelectUser';
 import SelectTag from '@/components/SelectTag';
 import { addNewCustomerRule, addIntoGroupRule, addKeywordRule, getKeywordRuleInfo, getIntoGroupRuleInfo, getNewCustomerRuleInfo, updateKeywordRule, updateIntoGroupRule, updateNewCustomerRule } from '@/api/customer/auto';
-import { ONE_DAY, ONE_HOUR, MS_TO_SECONDS, NEWCUSOMTER_SCENE_TYPE, SCOPELIST_TYPE } from '@/utils/constant';
+import { ONE_DAY, ONE_HOUR, MS_TO_SECONDS, NEWCUSOMTER_SCENE_TYPE, SCOPELIST_TYPE } from '@/utils/constant/index';
 import differenceBy from 'lodash/differenceBy';
 import { groupBy } from 'lodash';
 import TagUserShow from '@/components/TagUserShow';

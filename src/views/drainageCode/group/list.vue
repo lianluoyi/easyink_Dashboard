@@ -8,10 +8,10 @@ import {
   getApplink
 } from '@/api/drainageCode/group';
 import { goRouteWithQuery, copyText } from '@/utils';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
-import { CREATE_TYPE } from '@/utils/constant';
+import { CREATE_TYPE } from '@/utils/constant/index';
 
 export default {
   components: { RealCode, EmptyDefaultIcon, RightContainer },

@@ -101,7 +101,7 @@
 </template>
 <script>
 import { getGroupTree, removeGroupTreeLeaf, changeGroupTreeSort } from '@/api/form';
-import { INTELLIGENT_FORM_TYPE, TREE_ALL_GROUP_ID } from '@/utils/constant';
+import { INTELLIGENT_FORM_TYPE, TREE_ALL_GROUP_ID } from '@/utils/constant/index';
 import GroupModal from './groupModal.vue';
 import { dealChildIdList } from '@/utils/common';
 import { checkPermi } from '@/utils/permission';

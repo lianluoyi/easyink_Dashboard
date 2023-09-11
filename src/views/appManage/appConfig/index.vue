@@ -20,14 +20,14 @@
               :app-detail="appDetail"
             />
           </el-tab-pane>
-          <el-tab-pane v-if="false && appName.includes('工单')" label="系统设置" name="system">
+          <!-- <el-tab-pane v-if="appName.includes('工单')" label="系统设置" name="system">
             <SystemSetConfig
               :update-my-application-config="handleInstallApp"
               :app-id="appId && Number(appId)"
               :app-detail="appDetail"
               @getDetail="getDetail"
             />
-          </el-tab-pane>
+          </el-tab-pane> -->
           <!-- <el-tab-pane v-if="appId !== 1" label="充值与订单" name="order">充值与订单</el-tab-pane> -->
         </el-tabs>
       </div>
@@ -42,11 +42,11 @@ import {
   deleteMyApplication
 } from '@/api/appManage';
 import WorkSheetAssistant from './workSheetAssistant.vue';
-import SystemSetConfig from './systemSetConfig.vue';
+// import SystemSetConfig from './systemSetConfig.vue';
 
 export default {
   name: '',
-  components: { AppInfo, WorkSheetAssistant, SystemSetConfig },
+  components: { AppInfo, WorkSheetAssistant },
   props: {},
   data() {
     return {

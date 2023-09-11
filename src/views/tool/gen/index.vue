@@ -182,7 +182,7 @@
 import { listTable, previewTable, delTable, genCode } from '@/api/tool/gen';
 import importTable from './importTable';
 import { downLoadZip } from '@/utils/zipdownload';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 
 export default {
   name: 'Gen',

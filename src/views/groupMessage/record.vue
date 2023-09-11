@@ -1,7 +1,7 @@
 <script>
 import { getList, syncMsg, deleteGroupTask, getCopyInfo } from '@/api/groupMessage';
 import { goRouteWithQuery } from '@/utils';
-import { PAGE_LIMIT, GROUP_MESSAGE_PUSH_TYPE_GROUP, MESSAGE_MEDIA_TYPE, MEDIA_TYPE_TEXT, GROUP_MESSAG_STATUS_SENDED } from '@/utils/constant';
+import { PAGE_LIMIT, GROUP_MESSAGE_PUSH_TYPE_GROUP, MESSAGE_MEDIA_TYPE, MEDIA_TYPE_TEXT, GROUP_MESSAG_STATUS_SENDED } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
 

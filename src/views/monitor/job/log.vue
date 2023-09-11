@@ -167,7 +167,7 @@
 
 <script>
 import { listJobLog, delJobLog, exportJobLog, cleanJobLog } from '@/api/monitor/jobLog';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 
 export default {
   name: 'JobLog',

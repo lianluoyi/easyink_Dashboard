@@ -19,7 +19,8 @@ import { EventBus } from '@/event-bus.js';
 import { goRouteWithQuery } from '@/utils';
 import differenceBy from 'lodash/differenceBy';
 import { dealAtInfo, changeButtonLoading } from '@/utils/common';
-import { PAGE_LIMIT, WX_TYPE, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { PAGE_LIMIT, WX_TYPE } from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 const IS_OPEN = '1'; // 切换开关
 
 export default {

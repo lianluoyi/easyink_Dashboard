@@ -11,7 +11,7 @@ import {
   MEDIA_TYPE_IMGLINK,
   IMG_LINK_DIGEST,
   RADAR_TYPE
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import { add, update } from '@/api/material';
 import SelectTagModal from './SelectTagModal.vue';
 import AddPosterForm from '@/components/MaterialModal/AddPosterForm.vue';
@@ -598,7 +598,7 @@ export default {
                       <el-radio v-if="!isAdmin" :label="RADAR_TYPE['personal']">个人</el-radio>
                     </el-radio-group>
                   </el-form-item>
-                  <el-form-item label="行为通知" prop="enableClickNotice" class="iiii">
+                  <el-form-item label="行为通知" prop="enableClickNotice">
                     <el-switch
                       v-model="radarForm.enableClickNotice"
                       :active-value="true"

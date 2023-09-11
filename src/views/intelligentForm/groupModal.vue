@@ -24,7 +24,7 @@
 </template>
 <script>
 import { addGroupTreeLeaf, editGroupTree } from '@/api/form';
-import { INTELLIGENT_FORM_TYPE } from '@/utils/constant';
+import { INTELLIGENT_FORM_TYPE } from '@/utils/constant/index';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
 export default {

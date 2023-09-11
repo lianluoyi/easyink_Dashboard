@@ -86,7 +86,7 @@
 </template>
 <script>
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
-import { weekNum, MAX_APPENDIX_NUM } from '@/utils/constant';
+import { weekNum, MAX_APPENDIX_NUM } from '@/utils/constant/index';
 import PhoneDialog from '@/components/PhoneDialog';
 
 export default {

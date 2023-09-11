@@ -1,7 +1,7 @@
 <!--
  * @Description: 新增sop
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <template>
   <div class="add-sop-page wrap">
@@ -241,7 +241,7 @@ import {
   RULE_PERFORM_TYPE,
   ONE_DAY_MSECOND,
   ADD_WAY
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import CustomerGroupModal from '@/views/drainageCode/group/customer.vue';
 import SelectTag from '@/components/SelectTag';
 import { addSop, getSopDetail, updateSop } from '@/api/sop';
@@ -675,20 +675,12 @@ export default {
       if (this.checkGetGroupList(resData)) {
         this.groupList = [...resData.groupSopList];
       }
-      switch (this.sopType) {
-        case SOP_TYPE['timing']: {
-          // 筛选群聊
-          if (resData.filterType === FILTER_GROUP) {
-            this.groupOwner = resData.sopFilter.ownerList ? [...resData.sopFilter.ownerList] : [];
-            this.tagList = resData.sopFilter.tagList ? [...resData.sopFilter.tagList] : [];
-            if (resData.sopFilter.createTime && resData.sopFilter.endTime) { newSopForm.sopFilter.addTime = [resData.sopFilter.createTime, resData.sopFilter.endTime]; }
-          }
-          break;
-        }
-        case SOP_TYPE['cycle']: {
-          newSopForm.sopFilter.cycleTime = [resData.sopFilter.cycleStart, resData.sopFilter.cycleEnd];
-          break;
-        }
+      if (this.sopType === SOP_TYPE['cycle']) newSopForm.sopFilter.cycleTime = [resData.sopFilter.cycleStart, resData.sopFilter.cycleEnd];
+
+      if (resData.filterType === FILTER_GROUP) {
+        this.groupOwner = resData.sopFilter.ownerList ? [...resData.sopFilter.ownerList] : [];
+        this.tagList = resData.sopFilter.tagList ? [...resData.sopFilter.tagList] : [];
+        if (resData.sopFilter.createTime && resData.sopFilter.endTime) { newSopForm.sopFilter.addTime = [resData.sopFilter.createTime, resData.sopFilter.endTime]; }
       }
       return newSopForm;
     },

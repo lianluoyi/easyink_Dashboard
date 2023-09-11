@@ -204,7 +204,7 @@ import {
   RADAR_TYPE,
   IMG_LINK_DIGEST,
   DEFAULT_IMG
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 const LIMIT_FILENAME = 32;
 export default {
   components: { SelectTag, VerbalTrickImgLink, UploadDrag, RequestButton },

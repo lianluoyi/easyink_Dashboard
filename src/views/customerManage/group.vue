@@ -8,7 +8,7 @@ import { goRouteWithQuery } from '@/utils';
 import {
   PAGE_LIMIT, MILI_SECOND_OF_ONE_WEEK, MILI_SECOND_OF_ONE_MONTH, MILI_SECOND_OF_ONE_SEASON,
   GROUP_STATUS_MAP, GROUP_STATUS_ORDER
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 export default {
   name: 'Group',
   components: { RightContainer, EmptyDefaultIcon, SelectTag },

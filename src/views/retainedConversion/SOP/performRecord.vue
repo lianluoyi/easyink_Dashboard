@@ -80,7 +80,7 @@ const RULE_RECORD = 0;
 const EMPLOYEES_RECORD = 1;
 import { getSopCount } from '@/api/sop';
 import RuleRecord from './ruleRecord.vue';
-import { SOP_TYPE } from '@/utils/constant';
+import { SOP_TYPE } from '@/utils/constant/index';
 
 export default {
   name: '',

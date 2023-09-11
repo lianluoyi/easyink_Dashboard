@@ -82,7 +82,7 @@ import VerbalTrickItem from './verbalTrickItem.vue';
 import {
   MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK,
   MEDIA_TYPE_MINIAPP, VERBAL_TRICK_TYPE, DEFAULT_LINK, IMG_LINK_DIGEST
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import { addWords, updateWords } from '@/api/wordsGroup';
 import AddVerbalTrickButton from '@/components/AddVerbalTrickButton.vue';
 import { checkContent, changeButtonLoading } from '@/utils/common';

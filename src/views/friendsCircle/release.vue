@@ -10,7 +10,7 @@ import SelectTag from '@/components/SelectTag';
 import TagUserShow from '@/components/TagUserShow';
 import {
   PAGE_LIMIT, MEDIA_TYPE, RADAR_TYPE, MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, DEFAULT_IMG, CUSTOM_LINK, DEFAULT_LINK, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH, MEDIA_TYPE_RADARLINK
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import VerbalTrickImgLink from './Link.vue';
 import { getList } from '@/api/material';

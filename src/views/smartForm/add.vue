@@ -222,7 +222,7 @@ import {
   JUMP_RESULT_PAGE,
   JUMP_LINK,
   UPLOAD_ONE_TYPE
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import { EventBus } from '@/event-bus.js';
 import { getGroupTree, addForm, editForm } from '@/api/form';
 const UPLOAD_NUMS_LIMIT = 1;

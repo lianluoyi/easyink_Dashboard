@@ -7,7 +7,7 @@
 import { sendToUser, refreshMomentTask } from '@/api/friends.js';
 import {
   PAGE_LIMIT
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { listOfMomentPublishDetail } from '@/api/friends';
@@ -123,10 +123,6 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          });
           sendToUser({
             userIds, sendTime, type, momentTaskId
           }).then(res => {

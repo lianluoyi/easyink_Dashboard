@@ -9,7 +9,7 @@ import { getMomentTaskBasicInfo } from '@/api/friends';
 import Statistics from '@/components/Statistics';
 import VerbalTrickImgLink from './Link.vue';
 import ContentVideo from './ContentVideo.vue';
-import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_TEXT, FRIEND_SELECT_USER, FRIEND_PUSH_RANGE } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, MEDIA_TYPE_TEXT, FRIEND_SELECT_USER, FRIEND_PUSH_RANGE } from '@/utils/constant/index';
 // 发布类型  1:个人 0：企业
 const SELF = 1;
 // 任务类型（0：立即发送 1：定时发送）
@@ -166,12 +166,13 @@ export default {
       </div>
     </el-card>
     <Statistics
-      :show-uptime="true"
-      :uptime="uptime"
       :col-list="colList"
       title="发布统计"
-    />
-
+    >
+      <template slot="extraButton">
+        <span class="fontgay">更新于{{ uptime }}</span>
+      </template>
+    </Statistics>
     <el-tabs v-if="data.momentTaskId" class="group-message-detail-page-table mt15">
       <TabContent :users-id="data.users" :moment-task-id="data.momentTaskId" :send-time="data.sendTime" :type="data.type" @refshTime="refshTime" />
     </el-tabs>
@@ -290,5 +291,11 @@ export default {
   font-size: 14px;
   width: 70px;
   text-align: right;
+}
+.fontgay {
+  text-indent: 4em;
+  color: #999;
+  font-size: 14px;
+  font-weight: 200;
 }
 </style>

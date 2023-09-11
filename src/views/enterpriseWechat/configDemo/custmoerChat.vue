@@ -1,5 +1,5 @@
 <script>
-import { ENTERPRISE_WECHAT_CONFIG_STEP_TEXT, PUBLIC_KEY_BEGIN, PUBLIC_KEY_END } from '@/utils/constant';
+import { ENTERPRISE_WECHAT_CONFIG_STEP_TEXT, PUBLIC_KEY_BEGIN, PUBLIC_KEY_END } from '@/utils/constant/index';
 import { handleGetChatPublicKey } from '@/utils/enterpriseWechat';
 
 export default {

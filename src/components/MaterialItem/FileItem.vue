@@ -6,7 +6,7 @@
 <script>
 import TagList from './Taglist.vue';
 import { getFileIcon, filterSize, matchDealtagName } from '@/utils/common';
-import { ICON_LIST, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_SMARTFORM } from '@/utils/constant';
+import { ICON_LIST, MEDIA_TYPE_RADARLINK, MEDIA_TYPE_SMARTFORM } from '@/utils/constant/index';
 import MaskItem from './ToolMaskItem.vue';
 
 /**

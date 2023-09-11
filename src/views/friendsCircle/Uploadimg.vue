@@ -5,7 +5,7 @@
 -->
 <script>
 import { uploadFile2Cos } from '@/api/common';
-import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK } from '@/utils/constant/index';
 import { dealUploadSize, dealFormat } from '@/utils/common';
 const IMAGELENGTH = 1;
 // 上传图片的大小

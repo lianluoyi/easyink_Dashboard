@@ -19,16 +19,13 @@ import {
   SCOPELIST_TYPE,
   NORMAL_WORD,
   ACTIVE_WORD
-} from '@/utils/constant';
+} from '@/utils/constant/index';
+import { SELECT_TIME_TYPE, MAX_WELCOME_MSG_LENGTH, DEPARTMENT_ID_KEY, UN_CHOOSE_SKIPVERIFY, REMARK_TYPE } from '@/utils/constant/drainageCode';
 import TagUserShow from '@/components/TagUserShow';
 import ReferCode from '@/components/ReferCode';
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
 import ActivityPopup from '@/components/ReferCode/ActivityPopup';
-// 欢迎语类型
-const SELECT_TIME_TYPE = 2;
-const MAX_WELCOME_MSG_LENGTH = 2000;
-const DEPARTMENT_ID_KEY = 'businessId';
-const UN_CHOOSE_SKIPVERIFY = 0;
+
 export default {
   components: { PhoneDialog, SelectTag, ActivityPopup, AddAppendixBtn, SelectUser, RequestButton, TagUserShow, ReferCode },
   data() {
@@ -50,9 +47,8 @@ export default {
         weEmpleCodeTags: [],
         weEmpleCodeUseScops: [],
         scenario: '',
-        isShowWeEmpleCodeTags: false,
         isAutoSetRemark: 0,
-        remarkType: 1,
+        remarkType: REMARK_TYPE['previous'],
         remarkName: '',
         welcomeMsg: '',
         skipVerify: SKIP_VERIFY['allDay'],
@@ -108,6 +104,7 @@ export default {
       dragTarget: undefined,
       SCOPELIST_TYPE,
       DEPARTMENT_ID_KEY,
+      REMARK_TYPE,
       // 活动列表
       activeList: [],
       // 控制兑换活动弹窗
@@ -238,16 +235,6 @@ export default {
         tagName: tag.name || tag.tagName
       }));
     },
-    // 选择素材确认按钮
-    submitSelectMaterial(text, image, file) {
-      this.form.mediaId = image.id;
-      this.materialSelected = image.materialUrl;
-      this.dialogVisibleSelectMaterial = false;
-    },
-    removeMaterial() {
-      this.form.mediaId = '';
-      this.materialSelected = '';
-    },
     // 欢迎语确认按钮
     selectWelcome() {
       this.form.welcomeMsg = this.welSelected.welcomeMsg;
@@ -259,9 +246,6 @@ export default {
       if (val) {
         this.welSelected = val;
       }
-    },
-    handleDeleteAppendix(index) {
-      this.appendixList.splice(index, 1);
     },
     dealAttachemnts(appendixList) {
       const attachments = [];
@@ -445,13 +429,13 @@ export default {
               />
               <el-form-item label="备注位置" label-width="68px">
                 <el-radio-group v-model="form.remarkType">
-                  <el-radio :label="1">在昵称前</el-radio>
-                  <el-radio :label="2">在昵称后</el-radio>
+                  <el-radio :label="REMARK_TYPE['previous']">在昵称前</el-radio>
+                  <el-radio :label="REMARK_TYPE['after']">在昵称后</el-radio>
                 </el-radio-group>
                 <el-form-item prop="remarkName">
                   <el-input v-model="form.remarkName" placeholder="请输入备注" :maxlength="12" show-word-limit>
-                    <template v-if="form.remarkType === 2" slot="prepend">客户昵称-</template>
-                    <template v-if="form.remarkType === 1" slot="append">-客户昵称</template>
+                    <template v-if="form.remarkType === REMARK_TYPE['after']" slot="prepend">客户昵称-</template>
+                    <template v-if="form.remarkType === REMARK_TYPE['previous']" slot="append">-客户昵称</template>
                   </el-input>
                 </el-form-item>
               </el-form-item>

@@ -95,7 +95,6 @@
       </div>
     </div>
     <Statistics
-      :show-uptime="false"
       :col-list="colList"
       title="数据总览"
     />
@@ -310,6 +309,8 @@ const CHANNEL_GROUP_SOP = 7;
 const CHANNEL_NEW_IN_GROUP = 8;
 /** 群日历 */
 const CHANNEL_GROUP_CALENDAR = 9;
+/** 获客助手 */
+const CHANNEL_CUSTOMER_ASSISTANT = 12;
 const CLICK_CHANNEL = {
   [CHANNEL_SIDEBAR]: '侧边栏',
   [CHANNEL_EXTENSION]: '推广',
@@ -319,7 +320,8 @@ const CLICK_CHANNEL = {
   [CHANNEL_GROUP_SOP]: '群SOP',
   [CHANNEL_NEW_IN_GROUP]: '新客进群',
   [CHANNEL_GROUP_CALENDAR]: '群日历',
-  [CHANNEL_CUSTOMER_SOP]: '客户SOP'
+  [CHANNEL_CUSTOMER_SOP]: '客户SOP',
+  [CHANNEL_CUSTOMER_ASSISTANT]: '获客助手'
 };
 const SUBMIT_NUMS = {
   [NOT_LIMIT]: '不限制次数',
@@ -340,9 +342,9 @@ import { FORVER_EFFECT,
   MANY_LINE_TEXT_COMPONENT,
   DATE_TIME_COMPONENT,
   SCORE_COMPONENT,
-  NPS_COMPONENT,
-  CUSTOMER_DEATIL_PATH
-} from '@/utils/constant';
+  NPS_COMPONENT
+} from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import Statistics from '@/components/Statistics';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
@@ -515,7 +517,8 @@ export default {
     openFormDetail(row) {
       this.drawerVisible = true;
       const payload = {
-        formId: this.formId
+        formId: this.formId,
+        channelType: this.searchForm.channelType || ''
       };
       getFormResult(payload).then((res) => {
         // 根据recordId 查找后端返回的formResult 中 recordId 相同的表单
@@ -578,7 +581,6 @@ export default {
      */
     exportReport() {
       const isCustomerRecord = this.activeRecord === CLICK_RECORD['customer'];
-
       // exportCustomerRecord exportUserSendRecord
       (isCustomerRecord ? exportCustomerRecord : exportUserSendRecord)(this.getSearchPayload()).then((res) => {
         this.download(res.data.msg, true);

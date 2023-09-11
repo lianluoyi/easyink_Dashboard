@@ -3,7 +3,7 @@ import * as api from '@/api/enterpriseId';
 import HeaderComponent from './header.vue';
 import ConfigItemComponent from './configItem.vue';
 import SelfListComponent from './selfList.vue';
-import { NO_ENTERPRISE_CONFIG_CODE, SERVER_TYPE_THIRD } from '@/utils/constant';
+import { NO_ENTERPRISE_CONFIG_CODE, SERVER_TYPE_THIRD } from '@/utils/constant/index';
 import { getDefaultDomainConfig } from '@/api/admin';
 
 export default {

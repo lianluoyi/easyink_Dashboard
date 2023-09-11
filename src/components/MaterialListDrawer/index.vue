@@ -14,7 +14,7 @@ import {
   RADAR_TYPE,
   MEDIA_TYPE_SMARTFORM,
   INTELLIGENT_FORM_TYPE
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import { restoreMaterial, removeMaterial } from '@/api/material';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getCategoryList } from '@/utils/material';

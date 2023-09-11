@@ -1,6 +1,6 @@
 <script>
 import { getTree, getList } from '@/api/material';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 const DEFAULT_PAGE_NUM = 1;
 // 文本类型
 const TEXT_MEDIATYPE = '4';

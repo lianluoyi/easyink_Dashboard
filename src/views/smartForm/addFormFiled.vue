@@ -38,7 +38,7 @@ import FormPreview from './components/FormPreview.vue';
 import FromComponentSelect from './components/FromComponentSelect.vue';
 import FromSetting from './components/FormSetting.vue';
 import ReturnPage from '@/components/ReturnPage.vue';
-import { FORM_DEFAULT_HEAD_IMAGE_URL } from '@/utils/constant';
+import { FORM_DEFAULT_HEAD_IMAGE_URL } from '@/utils/constant/index';
 export default {
   components: { ReturnPage, FromComponentSelect, FromSetting, FormPreview, FiledSetting, AddSmartForm },
   data() {

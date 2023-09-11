@@ -46,7 +46,7 @@
   </el-dialog>
 </template>
 <script>
-import { FILE_EXCEL_TYPE } from '@/utils/constant';
+import { FILE_EXCEL_TYPE } from '@/utils/constant/index';
 import { download } from '@/utils/download';
 
 const FIRST_STEP = 1;

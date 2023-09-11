@@ -141,7 +141,7 @@
 </template>
 <script>
 import { remove } from '@/api/drainageCode/actual';
-import { CREATE_TYPE } from '@/utils/constant';
+import { CREATE_TYPE } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 const ONE_DAY_SECOND = 86400;

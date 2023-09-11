@@ -2,7 +2,7 @@
 import { getTree, getList, getMaterialIds } from '@/api/material';
 import uniq from 'lodash/uniq';
 import difference from 'lodash/difference';
-import { MEDIA_TYPE_TEXT, MEDIA_TYPE_AUDIO, MEDIA_TYPE_FILE } from '@/utils/constant';
+import { MEDIA_TYPE_TEXT, MEDIA_TYPE_AUDIO, MEDIA_TYPE_FILE } from '@/utils/constant/index';
 const PAGE_SIZE = 12;
 /**
  * 侧边栏素材列表

@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { CUSTOMER_DETAIL } from '@/utils/constant';
+import { CUSTOMER_DETAIL } from '@/utils/constant/index';
 import { findTrajectory } from '@/api/customer/portrait';
 import RuleContent from '@/components/RuleContent/index.vue';
 import NewsContent from './NewsContent.vue';

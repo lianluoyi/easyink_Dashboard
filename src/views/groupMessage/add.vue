@@ -28,13 +28,14 @@ import {
   GROUP_MESSAGE_PUSH_TIME_SET,
   MAX_APPENDIX_NUM,
   MEDIA_TYPE_SMARTFORM
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import { getFileName, changeButtonLoading, checkChange } from '@/utils/common';
 import NoConfigInfo from '@/components/NoConfigInfo';
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import TagUserShow from '@/components/TagUserShow';
-
+import { cloneDeep } from 'lodash';
+import moment from 'moment';
 export default {
   components: { PhoneDialog, SelectTag, SelectUser, NoConfigInfo, AddAppendixBtn, RequestButton, TagUserShow },
   props: {},
@@ -78,7 +79,6 @@ export default {
       activeName: GROUP_MESSAGE_MSG_TYPE_TEXT,
       dialogVisibleSelectCustomer: false,
       dialogVisibleSelectUser: false,
-      dialogVisibleSelectGroupOwner: false,
       dialogVisibleSelectTag: false,
       dialogVisibleSelectMaterial: false,
       query: {
@@ -108,7 +108,10 @@ export default {
       GROUP_MESSAGE_PUSH_TYPE_GROUP,
       GROUP_MESSAGE_PUSH_RANGE_SOME,
       GROUP_MESSAGE_PUSH_TIME_SET,
-      MEDIA_TYPE_SMARTFORM
+      MEDIA_TYPE_SMARTFORM,
+      filterUsers: [],
+      filterGroupUsers: [],
+      selectUserType: undefined
     };
   },
   computed: {
@@ -131,6 +134,9 @@ export default {
     categoryId() {
       const appendixType = this.$refs['AddAppendixBtn'].appendixType;
       return this.$store.state.materialInfo?.categoryInfo[appendixType]?.id;
+    },
+    selectUserList() {
+      return cloneDeep(this[this.selectUserType]);
     }
   },
   watch: {
@@ -201,7 +207,23 @@ export default {
             };
           })];
         }
+        let newfliterUserArr = [];
+        if (query.filterUserList?.length) {
+          newfliterUserArr = query.filterUserList;
+        }
+        if (query.filterDepartmentList?.length) {
+          newfliterUserArr = [...newfliterUserArr, ...query.filterDepartmentList.map((item) => {
+            return {
+              id: item.departmentId,
+              name: item.departmentName
+            };
+          })];
+        }
+        this[query.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'filterGroupUsers' : 'filterUsers'] = newfliterUserArr;
         this[query.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'groupOwner' : 'userParty'] = newArr;
+        if (query.customerEndTime && query.customerStartTime) {
+          this.form.addTime = [moment(query.customerStartTime).format('YYYY-MM-DD'), moment(query.customerEndTime).format('YYYY-MM-DD')];
+        }
         Object.keys(this.form).forEach((key) => {
           if (query.content) {
             this.form.textMessage.content = query.content;
@@ -241,7 +263,7 @@ export default {
     },
     // 选择添加人确认按钮
     selectedUser(users) {
-      this[this.form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'groupOwner' : 'userParty'] = users;
+      this[this.selectUserType] = users;
     },
     // 选择标签确认按钮
     submitSelectTag(data) {
@@ -414,6 +436,14 @@ export default {
           // debugger
           form.tag = form.tag.map((d) => d.tagId) + '';
           form.filterTags = form.filterTags.map((d) => d.tagId) + '';
+          const filterDepartments = [];
+          const filterUsers = [];
+          this[form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'filterGroupUsers' : 'filterUsers'].forEach((d) => {
+            d.userId && filterUsers.push(d.userId);
+            d.id && filterDepartments.push(d.id);
+          });
+          form.filterDepartments = filterDepartments.join(',');
+          form.filterUsers = filterUsers.join(',');
           form.staffId = [];
           let departmentList = [];
           let staffIdList = [];
@@ -454,7 +484,9 @@ export default {
       const params = {
         ...this.form,
         staffId: [],
-        department: []
+        department: [],
+        filterUsers: [],
+        filterDepartments: []
       };
       const form = { ...this.form };
       if (form.addTime && form.addTime.length > 1) {
@@ -463,15 +495,25 @@ export default {
       }
       params.tag = form.tag.map((d) => d.tagId) + '';
       params.filterTags = form.filterTags.map((d) => d.tagId) + '';
+      this[form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'filterGroupUsers' : 'filterUsers'].forEach((d) => {
+        d.userId && params.filterUsers.push(d.userId);
+        d.id && params.filterDepartments.push(d.id);
+      });
       this[form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'groupOwner' : 'userParty'].map((d) => {
         d.userId && params.staffId.push(d.userId);
         d.id && params.department.push(d.id);
       });
       params.department += '';
       params.staffId += '';
+      params.filterUsers += '';
+      params.filterDepartments += '';
       getSendSize(params).then((res) => {
         this.sendSize = res.data;
       });
+    },
+    selectUser(type) {
+      this.selectUserType = type;
+      this.dialogVisibleSelectUser = true;
     }
   }
 };
@@ -519,7 +561,7 @@ export default {
                     dict.label + (form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? '群' : '')
                   }}</el-radio>
                 </el-radio-group>
-                <div v-if="form.pushRange === GROUP_MESSAGE_PUSH_RANGE_SOME" class="form-range-area">
+                <div v-show="form.pushRange === GROUP_MESSAGE_PUSH_RANGE_SOME" class="form-range-area">
                   <el-alert
                     :style="'width: 408px;margin-top:0;'"
                     title="给同时满足以下条件的对象群发"
@@ -527,7 +569,7 @@ export default {
                     :closable="false"
                   />
                   <el-form-item
-                    v-if="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER"
+                    v-show="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER"
                     label="性别"
                     prop="gender"
                     label-width="68px"
@@ -540,7 +582,7 @@ export default {
                     </el-radio-group>
                   </el-form-item>
                   <el-form-item
-                    v-if="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER"
+                    v-show="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER"
                     label="客户标签"
                     label-width="68px"
                     style="padding: 8px 0"
@@ -554,9 +596,8 @@ export default {
                       @close="deleteOneSelectTag('tag', unit)"
                     >{{ unit.name }}</el-tag>
                   </el-form-item>
-
                   <el-form-item
-                    v-if="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER"
+                    v-show="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER"
                     label="添加时间"
                     label-width="68px"
                     style="padding: 10px 0"
@@ -572,20 +613,38 @@ export default {
                     />
                   </el-form-item>
                   <el-form-item
-                    v-if="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER"
-                    label="所属员工"
+                    :label="form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? '群主' : '所属员工'"
+                    :label-width="form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? '48px' : '68px'"
+                    style="padding: 10px 0 0"
+                  >
+                    <el-button icon="el-icon-plus" @click="selectUser(form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'groupOwner' : 'userParty')">{{
+                      (form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? groupOwner : userParty).length === 0 ? '添加成员' : '修改成员'
+                    }}</el-button>
+                    <el-tag v-for="(unit, unique) in form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? groupOwner : userParty" :key="unique" class="user-tag">
+                      <TagUserShow :name="unit.name" :show-icon="!unit.userId" />
+                    </el-tag>
+                  </el-form-item>
+                  <el-divider />
+                  <el-alert
+                    :style="'width: 408px;margin-top:0;'"
+                    title="在满足上述条件的对象中，过滤符合以下任一条件的对象"
+                    type="warning"
+                    :closable="false"
+                  />
+                  <el-form-item
+                    :label="form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? '过滤群主' : '过滤员工'"
                     label-width="68px"
                     style="padding: 8px 0"
                   >
-                    <el-button icon="el-icon-plus" @click="dialogVisibleSelectUser = true">{{
-                      userParty.length === 0 ? '添加成员' : '修改成员'
+                    <el-button icon="el-icon-plus" @click="selectUser(form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'filterGroupUsers' : 'filterUsers')">{{
+                      (form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? filterGroupUsers : filterUsers).length === 0 ? '添加成员' : '修改成员'
                     }}</el-button>
-                    <el-tag v-for="(unit, unique) in userParty" :key="unique" class="user-tag">
+                    <el-tag v-for="(unit, unique) in form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? filterGroupUsers : filterUsers" :key="unique" class="user-tag">
                       <TagUserShow :name="unit.name" :show-icon="!unit.userId" />
                     </el-tag>
                   </el-form-item>
                   <el-form-item
-                    v-if="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER"
+                    v-show="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER"
                     label="过滤标签"
                     label-width="68px"
                     style="padding: 8px 0"
@@ -599,17 +658,7 @@ export default {
                       @close="deleteOneSelectTag('filterTags', unit)"
                     >{{ unit.name }}</el-tag>
                   </el-form-item>
-                  <el-form-item
-                    v-if="form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP"
-                    label="群主"
-                    label-width="48px"
-                    style="padding: 10px 0 0"
-                  >
-                    <el-button icon="el-icon-plus" @click="dialogVisibleSelectGroupOwner = true">{{
-                      groupOwner.length === 0 ? '添加成员' : '修改成员'
-                    }}</el-button>
-                    <el-tag v-for="(unit, unique) in groupOwner" :key="unique" class="user-tag">{{ unit.name }}</el-tag>
-                  </el-form-item>
+                  <div v-if="form.pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER" class="filter-tips">若客户包含任一过滤标签，则不会收到本次群发消息</div>
                 </div>
               </el-form-item>
               <el-form-item label="发送时间" prop="pushTime" label-width="68px" style="padding: 0">
@@ -630,17 +679,6 @@ export default {
               </el-form-item>
             </div>
           </div>
-
-          <!-- <el-form-item class="send-range" label="发送范围" prop="pushRange">
-            <span v-show="isSelectedText">{{ selectedText }}</span>
-            <el-button type="text" size="medium" @click="showRangeDialog()">{{
-              isSelectedText
-                ? '修改'
-                : form.pushType == 0
-                  ? '选择发送客户'
-                  : '按群主选择客户群'
-            }}</el-button>
-          </el-form-item> -->
           <div class="form-base-wrap">
             <div class="base-title">群发内容</div>
             <div class="base-content group-content-text">
@@ -681,17 +719,9 @@ export default {
       <!-- 选择添加人弹窗 -->
       <SelectUser
         :visible.sync="dialogVisibleSelectUser"
-        title="选择员工"
+        :title="selectUserType === 'groupOwner' ? '选择群主' : '选择员工'"
         :is-only-leaf="false"
-        :selected-user-list="userParty"
-        @success="selectedUser"
-      />
-      <!-- 选择群主弹窗 -->
-      <SelectUser
-        :visible.sync="dialogVisibleSelectGroupOwner"
-        title="选择群主"
-        :is-only-leaf="false"
-        :selected-user-list="groupOwner"
+        :selected-user-list="selectUserList"
         @success="selectedUser"
       />
 
@@ -710,6 +740,10 @@ export default {
 
 <style lang="scss" scoped>
 @import '~@/styles/mixin.scss';
+/deep/ .el-divider--horizontal {
+  margin-top: 12px;
+  margin-bottom: 10px;
+}
 .group-info {
   background: #f4f4f5;
   display: flex;
@@ -924,5 +958,12 @@ export default {
       padding-left: 5px;
     }
   }
+}
+.filter-tips {
+  color: #999;
+  font-size: 12px;
+  height: 14px;
+  line-height: 14px;
+  margin-left: 68px;
 }
 </style>

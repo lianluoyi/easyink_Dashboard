@@ -246,7 +246,7 @@
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
 import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, changeJobStatus } from '@/api/monitor/job';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 
 export default {

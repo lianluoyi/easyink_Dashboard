@@ -4,7 +4,7 @@
  * @LastEditors: broccoli
 -->
 <script>
-import { MEDIA_TYPE_POSTER } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER } from '@/utils/constant/index';
 
 /**
  * 添加海报素材表单

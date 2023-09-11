@@ -1,7 +1,7 @@
 <!--
  * @Description: 兑换码详情
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <template>
   <div>
@@ -227,7 +227,8 @@ import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
 import ImportFile from '@/components/ImportFile.vue';
-import { PAGE_LIMIT, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import RightContainer from '@/components/RightContainer';
 import * as conversionCode from '@/api/redeem';
 import { goRouteWithQuery } from '@/utils';

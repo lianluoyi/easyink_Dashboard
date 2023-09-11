@@ -2,7 +2,7 @@
 import { add, remove, update } from '@/api/drainageCode/actual';
 import { getDetail } from '@/api/drainageCode/group';
 import Customer from './customer';
-import { PAGE_LIMIT, CREATE_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, CREATE_TYPE } from '@/utils/constant/index';
 import GetQrcodeDemo from './demo/getQrcodeDemo.vue';
 import RealCodeTable from './realCodeTable.vue';
 import EnterpriseCodeModal from './enterpriseCodeModal.vue';

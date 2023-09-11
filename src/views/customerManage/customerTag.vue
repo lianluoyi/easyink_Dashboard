@@ -112,7 +112,7 @@
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import AddTag from '@/components/AddTag';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import * as api from '@/api/customer/tag';
 import * as groupTagApi from '@/api/customer/grouptag';
 import { totalTagCnt } from '@/api/customer/group';

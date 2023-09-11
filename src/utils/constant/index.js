@@ -112,6 +112,7 @@ export const ADD_BY_CONFERENCE_PARTICIPATION = '12';
 export const ADD_BY_WX_FRIEND = '13';
 export const ADD_BY_INTELLIGENT_HARDWARE = '14';
 export const ADD_BY_ON_SITE_SERVICE = '15';
+export const ADD_BY_CUSTOMER_ASSISTANT = '16';
 export const ADD_WAY_MAP = {
   [UNKNOW_SOURCE]: '未知来源',
   [ADD_BY_QRCODE]: '扫描二维码',
@@ -129,7 +130,8 @@ export const ADD_WAY_MAP = {
   [ADD_BY_INTELLIGENT_HARDWARE]: '通过智慧硬件专属客服添加',
   [ADD_BY_ON_SITE_SERVICE]: '通过上门服务客服添加',
   [ADD_BY_INTERNAL_SHARE]: '内部成员共享',
-  [ADD_BY_ADMIN]: '管理员/负责人分配'
+  [ADD_BY_ADMIN]: '管理员/负责人分配',
+  [ADD_BY_CUSTOMER_ASSISTANT]: '通过获客链接添加'
 };
 
 // 视频播放速度
@@ -789,6 +791,8 @@ export const STAFF_DIMENSION = 2;
 export const CLIENT_DIMENSION = 3;
 /** 活码维度 */
 export const CODE_DIMENSION = 4;
+/** 渠道维度 */
+export const CHANNEL_DIMENSION = 5;
 /** 数据维度*/
 export const DATA_DIMENSION = {
   'date': DATE_DIMENSION,
@@ -801,11 +805,7 @@ export const CUSTOMER_CONTACT_SESSION_SAVE_KEY = {
   'sendDateRange': 'activeness_sendDateRange',
   'userAndDepartmentList': 'activeness_userAndDepartmentList'
 };
-/** 客户详情页的path*/
-export const CUSTOMER_DEATIL_PATH = '/customerManage/customerCenter/customerDetail';
 
-/** 客户列表页的path*/
-export const CUSTOMER_PATH = '/customerManage/customerCenter/customer';
 // 表单上传展示类型
 /** 拖拽单个上传 */
 export const DRAG_ONE_TYPE = 1;

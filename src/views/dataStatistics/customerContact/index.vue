@@ -19,7 +19,8 @@
   </div>
 </template>
 <script>
-import { CUSTOMER_LABEL_TYPE, CUSTOMER_CONTACT_SESSION_SAVE_KEY, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { CUSTOMER_LABEL_TYPE, CUSTOMER_CONTACT_SESSION_SAVE_KEY } from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import CustomerOverview from './customerOverview.vue';
 import CustomerActiveness from './customerActiveness.vue';
 import NoConfigInfo from '@/components/NoConfigInfo';

@@ -1,5 +1,5 @@
 <script>
-import { SERVER_TYPE_THIRD } from '@/utils/constant';
+import { SERVER_TYPE_THIRD } from '@/utils/constant/index';
 import { replaceUrlProtocol } from '@/utils/common';
 
 export default {

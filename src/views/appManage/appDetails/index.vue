@@ -28,7 +28,7 @@
 <script>
 import AppInfo from '../component/AppInfo';
 import { getApplicationDetail, installApplication } from '@/api/appManage';
-import { SERVER_TYPE_THIRD, SERVER_TYPE_INTERNAL } from '@/utils/constant';
+import { SERVER_TYPE_THIRD, SERVER_TYPE_INTERNAL } from '@/utils/constant/index';
 import WorkSheetAssistantDetail from './workSheetAssistantDetail.vue';
 
 export default {

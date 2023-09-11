@@ -55,7 +55,7 @@
 </template>
 <script>
 import { VueCropper } from 'vue-cropper';
-import { MEDIA_TYPE_POSTER } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER } from '@/utils/constant/index';
 
 const AUTO_CROP_SIZE = 200;
 
