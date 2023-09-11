@@ -131,7 +131,7 @@
   </el-dialog>
 </template>
 <script>
-import { PAGE_LIMIT, SOP_TYPE, PAGE_LIMIT_INFINITE } from '@/utils/constant';
+import { PAGE_LIMIT, SOP_TYPE, PAGE_LIMIT_INFINITE } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getCycleSopRulesDetailList, getSopRulesRecordList } from '@/api/sop';

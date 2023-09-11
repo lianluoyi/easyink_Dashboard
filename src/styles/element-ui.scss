@@ -330,9 +330,16 @@
   }
 }
 
-.tag-dialog {
+// 使用主题色的alert
+.theme-el-alert {
+    border-color: #c4e1dd;
+    color: #7f7f7f !important;
+    background-color: $bgLightBaseColor !important;
+    margin: -15px 0 15px;
+  .el-icon-info, .el-icon-warning {
+    color: $baseColor !important;
+  }
   .el-icon-info {
-    color: #6bb4ab;
     transform: rotateZ(-15deg);
   }
   .el-input__suffix {
@@ -447,4 +454,27 @@
 }
 .el-link.el-link--default:hover {
   @include text_btn_color($color-theme2-1);
+}
+
+// 超链接颜色
+.hyperlink {
+  color: #409eff !important;
+  text-indent: 0em;
+}
+.hyperlink:hover {
+  color: #409eff !important;
+}
+
+.hyperlink.is-underline:hover:after {
+  border-color: #66b1ff !important;
+}
+
+// 日期组件禁止清空的样式
+// 由于el-picker组件的clearable无法控制面板中的清空按钮，所以只能通过设置样式的方法隐藏
+.forbid-clear-picker {
+    .el-picker-panel__footer {
+      .el-picker-panel__link-btn:nth-child(1){
+        display: none;
+      }
+    }
 }

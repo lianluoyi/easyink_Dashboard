@@ -3,7 +3,7 @@ import * as api from '@/api/customer/dimission';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { goRouteWithQuery } from '@/utils';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import AllocateModal from './allocateModal.vue';
 
 export default {

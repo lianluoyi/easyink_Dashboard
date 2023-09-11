@@ -41,7 +41,7 @@ import VerbalTrickImgLink from './Link.vue';
 import ContentVideo from './ContentVideo.vue';
 import {
   MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 const MAXIMGLENGTH = 3;
 export default {
   components: { VerbalTrickImgLink, ContentVideo },

@@ -28,7 +28,7 @@
   </div>
 </template>
 <script>
-import { AUTOLABEL_TYPE } from '@/utils/constant';
+import { AUTOLABEL_TYPE } from '@/utils/constant/index';
 import SceneItem from './sceneItem.vue';
 import { deepClone } from '@/utils/index';
 

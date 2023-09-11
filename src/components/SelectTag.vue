@@ -243,6 +243,7 @@ export default {
   <el-dialog class="tag-dialog" :title="title" :visible.sync="Pvisible" :close-on-click-modal="false" append-to-body @closed="closed">
     <el-alert
       v-show="infoMsg"
+      class="theme-el-alert"
       :title="infoMsg"
       type="info"
       show-icon

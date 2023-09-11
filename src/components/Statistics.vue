@@ -1,7 +1,7 @@
 <!--
-* @Description: 发布统计
+* @Description: 统计
  * @Author: wJiaaa
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 // TODO 重新布局 采用自适应 每行最少显示3个 可进行换行显示
 <template>
@@ -11,7 +11,7 @@
         <el-row type="flex" class="row-bg" justify="space-between" align="middle">
           <el-col :span="24" class="title_name">
             {{ title }}
-            <span v-if="showUptime" class="fontgay">更新于{{ uptime }}</span>
+            <slot name="extraInfo" />
           </el-col>
           <!-- operate 插槽 用来控制标题右侧的内容-->
           <slot name="operate" />
@@ -39,7 +39,7 @@
             <span :style="`color: ${color} `" class="col-item theme-text-color">
               <template v-if="item[item.filed] === DATA_STATISTICS_DEFAULT_SHOW">{{ DATA_STATISTICS_DEFAULT_SHOW }}</template>
               <template v-else>
-                {{ item[item.filed] || 0 }}
+                <span :style="`color:${item.numColor}`">{{ item[item.filed] || 0 }}</span>
                 <!-- 符号 -->
                 <span class="unit">{{ item.unit }}</span>
               </template>
@@ -51,19 +51,9 @@
   </div>
 </template>
 <script>
-import { DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
+import { DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant/index';
 export default {
   props: {
-    /** 是否展示更新时间 */
-    showUptime: {
-      type: Boolean,
-      default: false
-    },
-    /** 更新时间 */
-    uptime: {
-      type: String,
-      default: ''
-    },
     /** 列表详情  title：展示的标题 showPopover：是否显示弹出框 content：弹出框内容  placement:弹出框位置 filed:要显示的字段 unit:单位 */
     colList: {
       type: Array,
@@ -108,13 +98,6 @@ export default {
     font-size: 18px;
     font-weight: 500;
     color: #666;
-  }
-
-  .fontgay {
-    text-indent: 4em;
-    color: #999;
-    font-size: 14px;
-    font-weight: 200;
   }
 
   .tables {

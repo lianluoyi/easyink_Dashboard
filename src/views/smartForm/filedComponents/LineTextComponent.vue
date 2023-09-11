@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import { MANY_LINE_TEXT_COMPONENT, TEXT_LENGTH_TYPE } from '@/utils/constant';
+import { MANY_LINE_TEXT_COMPONENT, TEXT_LENGTH_TYPE } from '@/utils/constant/index';
 import { EventBus } from '@/event-bus.js';
 /** 数值 */
 const NUMS_TYPE = 1;

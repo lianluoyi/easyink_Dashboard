@@ -31,7 +31,7 @@
 
 <script>
 import { initGetCustomerProper } from '@/utils/common';
-import { GROUP_MESSAGE_GENDER_TYPE, ADD_WAY_MAP, ADD_WAY, CUSTOMER_PROPERTY_VALUE, SOP_TYPE } from '@/utils/constant';
+import { GROUP_MESSAGE_GENDER_TYPE, ADD_WAY_MAP, ADD_WAY, CUSTOMER_PROPERTY_VALUE, SOP_TYPE } from '@/utils/constant/index';
 import moment from 'moment';
 import TagUserShow from '@/components/TagUserShow';
 export default {

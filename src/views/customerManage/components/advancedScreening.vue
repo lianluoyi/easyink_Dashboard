@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import { SCREENING_GENDER_TYPE, CUSTOMER_PROPERTY_VALUE, CUSTOMER_STATUS, COMMON_TYPE, LOSS_TYPE, TRANSFER_TYPE, TO_INHERIT_TYPE, ALL_TYPE, GENDER_TYPE_OF_UNKNOWN, GENDER_OF_FEMALE, GENDER_OF_MALE } from '@/utils/constant';
+import { SCREENING_GENDER_TYPE, CUSTOMER_PROPERTY_VALUE, CUSTOMER_STATUS, COMMON_TYPE, LOSS_TYPE, TRANSFER_TYPE, TO_INHERIT_TYPE, ALL_TYPE, GENDER_TYPE_OF_UNKNOWN, GENDER_OF_FEMALE, GENDER_OF_MALE } from '@/utils/constant/index';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import { findIndex } from 'lodash';

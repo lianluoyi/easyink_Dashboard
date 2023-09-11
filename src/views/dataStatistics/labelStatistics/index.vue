@@ -17,7 +17,7 @@
   </div>
 </template>
 <script>
-import { TAG_LABEL_TYPE } from '@/utils/constant';
+import { TAG_LABEL_TYPE } from '@/utils/constant/index';
 import TagView from './tagView.vue';
 export default {
   name: '',

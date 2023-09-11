@@ -9,7 +9,7 @@ import {
 } from '@/api/drainageCode/staff';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { goRouteWithQuery, copyText } from '@/utils';
-import { PAGE_LIMIT, STAFF_CODE_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, STAFF_CODE_TYPE } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import ListUserShow from '@/components/ListUserShow';
 
@@ -67,7 +67,6 @@ export default {
   },
   methods: {
     getList(page) {
-      // console.log(this.dateRange);
       if (this.dateRange) {
         this.query.beginTime = this.dateRange[0];
         this.query.endTime = this.dateRange[1];

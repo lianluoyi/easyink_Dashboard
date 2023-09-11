@@ -18,7 +18,7 @@
 </template>
 <script>
 import SOPList from '../components/SOPList.vue';
-import { SOP_TYPE } from '@/utils/constant';
+import { SOP_TYPE } from '@/utils/constant/index';
 
 export default {
   name: '',

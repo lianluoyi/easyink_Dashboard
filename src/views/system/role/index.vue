@@ -177,10 +177,10 @@ import { roleMenuTreeselect } from '@/api/system/menu';
 import { treeselect as deptTreeselect } from '@/api/system/dept';
 import SelectTree from '@/components/SelectTree';
 import { deepClone } from '@/utils';
-import { ROLE_IN_USE_CODE } from '@/utils/constant';
+import { ROLE_IN_USE_CODE } from '@/utils/constant/index';
 import difference from 'lodash/difference';
 import uniq from 'lodash/uniq';
-import { THIRD_INVISIBLE_MENUS } from '@/utils/constant';
+import { THIRD_INVISIBLE_MENUS } from '@/utils/constant/index';
 const TABLE_HEIGHT = 650;
 // 1： 系统管理员角色（管理员）
 // 2： 系统默认角色（部门管理员和员工）

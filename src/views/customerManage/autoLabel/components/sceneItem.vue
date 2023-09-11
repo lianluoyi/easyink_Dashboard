@@ -142,7 +142,7 @@
   </div>
 </template>
 <script>
-import { AUTOLABEL_TYPE, WEEK_OPTIONS, NEWCUSOMTER_SCENE_TYPE } from '@/utils/constant';
+import { AUTOLABEL_TYPE, WEEK_OPTIONS, NEWCUSOMTER_SCENE_TYPE } from '@/utils/constant/index';
 import MonthDateSelect from '@/components/MonthDateSelect.vue';
 import SelectTag from '@/components/SelectTag';
 import CustomerGroupModal from '@/views/drainageCode/group/customer.vue';

@@ -16,7 +16,7 @@
 
 <script>
 import { scrollTo } from '@/utils/scroll-to';
-import { PAGE_LIMIT, PAGE_LIMIT_TWENTY, PAGE_LIMIT_THIRTY, PAGE_LIMIT_FIFTY, DEFAULT_PAGE_NUM } from '@/utils/constant';
+import { PAGE_LIMIT, PAGE_LIMIT_TWENTY, PAGE_LIMIT_THIRTY, PAGE_LIMIT_FIFTY, DEFAULT_PAGE_NUM } from '@/utils/constant/index';
 const SCROLL_TO_DISTANCE = 800;
 
 /**

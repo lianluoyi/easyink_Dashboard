@@ -6,7 +6,7 @@
 <script>
 import { getFileIcon, filterSize } from '@/utils/common';
 import Upload from '@/components/Upload.vue';
-import { MEDIA_TYPE_FILE } from '@/utils/constant';
+import { MEDIA_TYPE_FILE } from '@/utils/constant/index';
 
 /**
  * 添加文件素材表单

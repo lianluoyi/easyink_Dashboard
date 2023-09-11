@@ -20,7 +20,7 @@
 
 <script>
 import radarList from './radarList.vue';
-import { RADAR_TYPE } from '@/utils/constant';
+import { RADAR_TYPE } from '@/utils/constant/index';
 import { checkPermi } from '@/utils/permission';
 export default {
   name: 'RadarManage',

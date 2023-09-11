@@ -52,7 +52,7 @@
   </el-dialog>
 </template>
 <script>
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import UserItem from '@/components/UserItem.vue';
 import {

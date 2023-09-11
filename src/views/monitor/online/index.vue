@@ -76,7 +76,7 @@
 
 <script>
 import { list, forceLogout } from '@/api/monitor/online';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 
 export default {

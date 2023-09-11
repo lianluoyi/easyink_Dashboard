@@ -195,6 +195,24 @@ const specialRoute = {
       path: '/operationsCenter/material/radarManage'
     }
   ],
+  '/operationsCenter/drainageCode/customerAssistantDetail': [
+    {
+      title: '获客助手',
+      path: '/operationsCenter/drainageCode/customerAssistant'
+    }
+  ],
+  '/operationsCenter/drainageCode/customerAssistantAdd': [
+    {
+      title: '获客助手',
+      path: '/operationsCenter/drainageCode/customerAssistant'
+    }
+  ],
+  '/operationsCenter/drainageCode/customerAssistantEdit': [
+    {
+      title: '获客助手',
+      path: '/operationsCenter/drainageCode/customerAssistant'
+    }
+  ],
   '/operationsCenter/material/editForm': [
     {
       title: '智能表单',

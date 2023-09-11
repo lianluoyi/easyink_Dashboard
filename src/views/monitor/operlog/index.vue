@@ -169,7 +169,7 @@
 
 <script>
 import { list, delOperlog, cleanOperlog, exportOperlog } from '@/api/monitor/operlog';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 
 export default {

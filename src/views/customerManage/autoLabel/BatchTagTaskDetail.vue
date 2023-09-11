@@ -96,7 +96,8 @@ import ReturnPage from '@/components/ReturnPage.vue';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { goRouteWithQuery } from '@/utils';
-import { PAGE_LIMIT, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import { selectBatchTaskDetailList, exportBatchTaskDetailList } from '@/api/batchTagTask';
 // 打标签状态枚举
 const TAG_TODO = 0;

@@ -158,7 +158,7 @@
   </div>
 </template>
 <script>
-import { CUSTOMER_PROPERTY_VALUE, MEDIA_TYPE_FILE } from '@/utils/constant';
+import { CUSTOMER_PROPERTY_VALUE, MEDIA_TYPE_FILE } from '@/utils/constant/index';
 import { download } from '@/utils/download';
 import { deepClone } from '@/utils/index';
 const MAX_UPLOAD_COUNT = 9;

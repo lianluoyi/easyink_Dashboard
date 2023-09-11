@@ -3,7 +3,7 @@ import * as api from '@/api/enterpriseId';
 import HeaderComponent from './header.vue';
 import ConfigItemComponent from './configItem.vue';
 import ConfigComponent from './configDemo/config.vue';
-import { NO_ENTERPRISE_CONFIG_CODE, NORMAL } from '@/utils/constant';
+import { NO_ENTERPRISE_CONFIG_CODE, NORMAL } from '@/utils/constant/index';
 import { getDefaultDomainConfig } from '@/api/admin';
 // 定义一个常量作为获取字符串的位数
 const SUBSTR = 2;

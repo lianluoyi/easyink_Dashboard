@@ -5,7 +5,7 @@ import {
   MS_TO_SECONDS, WX_TYPE, CORP_TYPE, ICON_LIST, MEDIA_TYPE_POSTER, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO,
   MEDIA_TYPE_FILE, FILE_EXCEL_TYPE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK,
   MEDIA_TYPE_MINIAPP, SCOPELIST_TYPE, MEDIA_TYPE_SMARTFORM, MEDIA_TYPE_RADARLINK, ADD_WAY_MAP
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import { getUserInfo } from '@/api/system/staff';
 import { groupBy, isEqual } from 'lodash';
 import moment from 'moment';
@@ -15,6 +15,9 @@ const TIME_LENGTH = 10;
 export const TODAY_TIME = moment().format('YYYY-MM-DD');
 // 昨天
 export const YESTERDAY_TIME = moment().subtract(1, 'days').format('YYYY-MM-DD');
+// 一周之前
+const ONE_WEEK_DAY = 6;
+export const WEEK_TIME = moment().subtract(ONE_WEEK_DAY, 'days').format('YYYY-MM-DD');
 // 180天之前
 export const ONE_HUNDRED_AND_EIGHTY = 180;
 export const FIXED_DAYS_AGO_TIME = moment().subtract(ONE_HUNDRED_AND_EIGHTY, 'days').format('YYYY-MM-DD');
@@ -831,4 +834,13 @@ export const getSourceLabel = (options) => {
     });
   });
   return sourceOptionList;
+};
+
+/**
+ * 移除存在sessionStorage中的查询条件
+ * @param {*} key
+ */
+export const removeSearchKey = (key) => {
+  const allNeedClearSessionKey = Object.values(key);
+  allNeedClearSessionKey.map(item => sessionStorage.removeItem(item));
 };

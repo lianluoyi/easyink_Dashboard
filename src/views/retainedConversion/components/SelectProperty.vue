@@ -28,7 +28,7 @@
   </el-dialog>
 </template>
 <script>
-import { CUSTOMER_PROPERTY_VALUE, ADD_WAY, SOP_TYPE } from '@/utils/constant';
+import { CUSTOMER_PROPERTY_VALUE, ADD_WAY, SOP_TYPE } from '@/utils/constant/index';
 import { getSourceLabel } from '@/utils/common';
 export default {
   name: 'SelectProperty',

@@ -210,7 +210,8 @@
 </template>
 <script>
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT, DATA_DIMENSION, CUSTOMER_CONTACT_SESSION_SAVE_KEY, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { PAGE_LIMIT, DATA_DIMENSION, CUSTOMER_CONTACT_SESSION_SAVE_KEY } from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import ClientDetailsDialog from './clientDetailsDialog.vue';
 import Graphics from './graphics.vue';
 import UserItem from '@/components/UserItem.vue';

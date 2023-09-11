@@ -5,7 +5,7 @@
 -->
 <script>
 import { uploadFile2Cos } from '@/api/common';
-import { MEDIA_TYPE_POSTER } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER } from '@/utils/constant/index';
 import { dealUploadSize, dealFormat } from '@/utils/common';
 import draggable from 'vuedraggable';
 const FILE_NAME_LENGTH = 32;

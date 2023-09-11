@@ -114,7 +114,7 @@ import SelectUser from '@/components/SelectUser/index.vue';
 import CustomPropertyItem from '@/views/customerManage/components/customPropertyItem.vue';
 import BasePropertyItem from '@/views/customerManage/components/basePropertyItem.vue';
 import { groupByScopeType, checkChange } from '@/utils/common';
-import { SOP_TYPE, GENDER_TYPE_OF_ALL, GENDER_OF_MALE, GENDER_OF_FEMALE, GENDER_TYPE_OF_UNKNOWN } from '@/utils/constant';
+import { SOP_TYPE, GENDER_TYPE_OF_ALL, GENDER_OF_MALE, GENDER_OF_FEMALE, GENDER_TYPE_OF_UNKNOWN } from '@/utils/constant/index';
 import TagUserShow from '@/components/TagUserShow';
 import SelectProperty from './SelectProperty.vue';
 import SelectTag from '@/components/SelectTag';

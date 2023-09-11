@@ -126,7 +126,8 @@
 import { goRouteWithQuery } from '@/utils';
 import { dealAtInfo } from '@/utils/common';
 import { PAGE_LIMIT, WX_TYPE, INHERIT_STATUS_INHERITED, INHERIT_STATUS_INHERITING, INHERIT_STATUS_REFUSE,
-  INHERIT_STATUS_FAIL, INHERIT_STATUS_USER_REACHED_UPPER_LIMIT, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+  INHERIT_STATUS_FAIL, INHERIT_STATUS_USER_REACHED_UPPER_LIMIT } from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 
 import { getRecordList } from '@/api/transfer';
 

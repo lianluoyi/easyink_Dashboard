@@ -9,8 +9,8 @@
       <div v-if="item.msgType=='location'" class="msg-type-location">
         [位置] {{ item.location.address }}
       </div>
-      <div v-else-if="item.msgType=='weapp'" class="msg-type-weapp">a
-        [小程序]{{ item.weApp.title || item.weapp.title }}
+      <div v-else-if="item.msgType=='weapp'" class="msg-type-weapp">
+        [小程序]{{ item.weApp && item.weApp.title || item.weapp && item.weapp.title }}
       </div>
       <div v-else-if="item.msgType=='text'" class="msgtype-text">
         {{ item.text.content }}
@@ -107,7 +107,8 @@ export default {
       redpacketType: REDPACKET_TYPE
     };
   },
-  mounted() {},
+  mounted() {
+  },
   methods: {
     /**
      * 文件下载

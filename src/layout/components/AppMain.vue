@@ -2,14 +2,14 @@
   <transition name="fade-transform" mode="out-in">
     <keep-alive v-if="isKeep">
       <router-view v-if="$route.meta.keepAlive" :key="key" class="page app-main" />
-      <router-view v-else :key="key + new Date().getTime()" />
+      <router-view v-else :key="key + new Date().getTime()" class="page app-main" />
     </keep-alive>
     <router-view v-else :key="key" class="page app-main" />
   </transition>
 </template>
 
 <script>
-import { CUSTOMER_PATH, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { CUSTOMER_PATH, CUSTOMER_DEATIL_PATH, CUSTOMER_ASSISTANT_PATH, CUSTOMER_ASSISTANT_DETAIL_PATH, CUSTOMER_ASSISTANT_EDIT_PATH } from '@/utils/constant/routePath';
 
 export default {
   name: 'AppMain',
@@ -22,7 +22,7 @@ export default {
      */
     isKeep() {
       /** 需要缓存的页面 */
-      const keepAliveList = [CUSTOMER_DEATIL_PATH, CUSTOMER_PATH, '/customerManage/customerCenter/BatchTagTaskDetail'];
+      const keepAliveList = [CUSTOMER_DEATIL_PATH, CUSTOMER_PATH, '/customerManage/customerCenter/BatchTagTaskDetail', CUSTOMER_ASSISTANT_PATH, CUSTOMER_ASSISTANT_DETAIL_PATH, CUSTOMER_ASSISTANT_EDIT_PATH];
       return keepAliveList.includes(this.$route.path);
     }
   }

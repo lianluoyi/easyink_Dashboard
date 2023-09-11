@@ -38,7 +38,7 @@
 </template>
 <script>
 import DEFAULT_ICON from '@/assets/image/conversation-unconfig.svg';
-import { SERVER_TYPE_THIRD, SERVER_TYPE_INTERNAL } from '@/utils/constant';
+import { SERVER_TYPE_THIRD, SERVER_TYPE_INTERNAL } from '@/utils/constant/index';
 
 export default {
   components: {},

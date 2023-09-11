@@ -92,7 +92,7 @@
 </template>
 <script>
 import { getWordScategoryList, removeGroup, changeGroupSort } from '@/api/wordscategory';
-import { VERBAL_TRICK_TYPE } from '@/utils/constant';
+import { VERBAL_TRICK_TYPE } from '@/utils/constant/index';
 import GroupModal from './component/groupModal.vue';
 import VerbalTrickList from './verbalTrickList.vue';
 import { dealChildIdList } from '@/utils/common';

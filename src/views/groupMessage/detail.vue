@@ -7,7 +7,7 @@
 import { getDetail } from '@/api/groupMessage';
 import AppendixList from '@/components/AppendixList';
 import TabContent from './TabContent.vue';
-import { MEDIA_TYPE_TEXT, GROUP_MESSAGE_PUSH_TYPE } from '@/utils/constant';
+import { MEDIA_TYPE_TEXT, GROUP_MESSAGE_PUSH_TYPE } from '@/utils/constant/index';
 
 export default {
   components: {

@@ -117,7 +117,7 @@
 <script>
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import { getConversionCodeActiveList } from '@/api/redeem';
 import { checkPermi } from '@/utils/permission';
 import HowToUse from '@/views/marketingActivities/components/HowToUse.vue';

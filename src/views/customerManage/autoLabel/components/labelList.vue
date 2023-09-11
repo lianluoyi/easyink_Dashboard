@@ -181,7 +181,7 @@
 import RightContainer from '@/components/RightContainer';
 import SelectTag from '@/components/SelectTag';
 import { getKeyWordList, getGroupList, getCustomerList, updateStatus, deleteKeyWordRule, deleteGroupRule, deleteCustomerRule } from '@/api/customer/auto';
-import { AUTOLABEL_TYPE, PAGE_LIMIT } from '@/utils/constant';
+import { AUTOLABEL_TYPE, PAGE_LIMIT } from '@/utils/constant/index';
 import { goRouteWithQuery } from '@/utils';
 import { checkPermi } from '@/utils/permission';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';

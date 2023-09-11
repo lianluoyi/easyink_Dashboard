@@ -85,7 +85,8 @@
 <script>
 // 渠道名称最大长度
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT, DEFAULT_PAGE_NUM, SORT, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { PAGE_LIMIT, DEFAULT_PAGE_NUM, SORT } from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getCustomerClickRecord, getCustomerClickRecordDetail } from '@/api/radar';
 import { goRouteWithQuery } from '@/utils';

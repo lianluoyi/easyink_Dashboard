@@ -1,6 +1,6 @@
 <script>
 import { updateCustomerDetail, getDetail, getEmployeesList } from '@/api/customer';
-import { ADD_WAY_MAP, CUSTOMER_PROPERTY_VALUE, GENDER_TYPE, WX_TYPE, ADD_BY_CHANNEL, CUSTOMER_DETAIL } from '@/utils/constant';
+import { ADD_WAY_MAP, CUSTOMER_PROPERTY_VALUE, GENDER_TYPE, WX_TYPE, ADD_BY_CHANNEL, CUSTOMER_DETAIL } from '@/utils/constant/index';
 import ReturnPage from '@/components/ReturnPage.vue';
 import { dealShowText, initGetCustomerProper, dealAtInfo } from '@/utils/common';
 import BasePropertyItem from './components/basePropertyItem.vue';

@@ -151,7 +151,7 @@ import { goRouteWithQuery } from '@/utils';
 import HowToUse from '../components/HowToUse.vue';
 import RightContainer from '@/components/RightContainer';
 import { getConversionCodeActiveList, deleteConversionCodeActive } from '@/api/redeem';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 const DEFAULT_PAGE_NUM = 1;
 export default {
   name: 'List',

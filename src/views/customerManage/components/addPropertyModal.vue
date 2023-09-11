@@ -72,7 +72,7 @@
 <script>
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading } from '@/utils/common';
-import { CUSTOMER_PROPERTY_MAP, CUSTOMER_PROPERTY_VALUE } from '@/utils/constant';
+import { CUSTOMER_PROPERTY_MAP, CUSTOMER_PROPERTY_VALUE } from '@/utils/constant/index';
 import MoveTool from '@/components/MoveTool.vue';
 import { addExtendProperty, editBatchExtendProperty } from '@/api/extendProperty';
 

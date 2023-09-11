@@ -60,7 +60,7 @@
 </template>
 <script>
 import MoveTool from '@/components/MoveTool.vue';
-import { CREATE_TYPE } from '@/utils/constant';
+import { CREATE_TYPE } from '@/utils/constant/index';
 export default {
   name: 'ActuaList',
   components: { MoveTool },

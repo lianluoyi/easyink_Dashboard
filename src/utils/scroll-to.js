@@ -1,4 +1,4 @@
-import { MS_TO_SECONDS } from '@/utils/constant';
+import { MS_TO_SECONDS } from '@/utils/constant/index';
 const TIME_MEASUREMENT = 60;
 Math.easeInOutQuad = function(t, b, c, d) {
   const DOUBLE = 2;

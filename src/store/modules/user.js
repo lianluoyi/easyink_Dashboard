@@ -1,7 +1,7 @@
 import { login, logout, getInfo, qrCodeLogin, qrCodeLogin3rd } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import { getUserProfile } from '@/api/system/user';
-import { GET_INFO_ERROR } from '@/utils/constant';
+import { GET_INFO_ERROR } from '@/utils/constant/index';
 import { RSAECBEncrypt } from '@/utils/jsencrypt';
 const user = {
   state: {

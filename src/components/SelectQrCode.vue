@@ -1,6 +1,6 @@
 <script>
 import { getList } from '@/api/drainageCode/group';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 

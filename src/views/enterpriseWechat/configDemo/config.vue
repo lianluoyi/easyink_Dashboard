@@ -1,6 +1,6 @@
 <script>
 import * as api from '@/api/enterpriseId';
-import { AUTH_ENADLE, NORMAL } from '@/utils/constant';
+import { AUTH_ENADLE, NORMAL } from '@/utils/constant/index';
 // 定义一个TIME常量作为页面加载的时候调用定时器的间隔时间
 const TIME = 3000;
 // 定义一个常量作为截取字符串的长度值

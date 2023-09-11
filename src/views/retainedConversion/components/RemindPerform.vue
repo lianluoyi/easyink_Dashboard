@@ -41,7 +41,7 @@
   </div>
 </template>
 <script>
-import { SOP_TYPE, RULE_PERFORM_TYPE } from '@/utils/constant';
+import { SOP_TYPE, RULE_PERFORM_TYPE } from '@/utils/constant/index';
 export default {
   name: '',
   components: {},

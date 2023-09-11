@@ -1,7 +1,7 @@
 <!--
  * @Description: 员工服务
  * @Author: wJiaaa
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="overview-page">
@@ -56,7 +56,6 @@
 
       <template v-slot:data>
         <Statistics
-          :show-uptime="false"
           :col-list="topLineColList"
           title="数据总览"
         >
@@ -91,7 +90,6 @@
         </Statistics>
         <Statistics
           class="next-statistics"
-          :show-uptime="false"
           :col-list="nextLineColList"
         />
         <div class="table-overview">
@@ -181,7 +179,7 @@ import Statistics from '@/components/Statistics';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
 import UserItem from '@/components/UserItem.vue';
-import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION } from '@/utils/constant';
+import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION } from '@/utils/constant/index';
 import moment from 'moment';
 import { cloneDeep } from 'lodash';
 import { YESTERDAY_TIME, FIXED_DAYS_AGO_TIME, groupByScopeType } from '@/utils/common';

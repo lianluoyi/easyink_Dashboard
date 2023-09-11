@@ -4,7 +4,7 @@ import * as tagApi from '@/api/customer/grouptag';
 import SelectTag from '@/components/SelectTag';
 import RightContainer from '@/components/RightContainer';
 import CustomerOrGroupInfo from './components/CustomerOrGroupInfo.vue';
-import { PAGE_LIMIT, JOIN_SCENE, GROUP_ENTER_WAY_MAP, MEMBER_TYPE, CUSTOMER_DETAIL } from '@/utils/constant';
+import { PAGE_LIMIT, JOIN_SCENE, GROUP_ENTER_WAY_MAP, MEMBER_TYPE, CUSTOMER_DETAIL } from '@/utils/constant/index';
 export default {
   // name: 'GroupDetail',
   components: { SelectTag, RightContainer, CustomerOrGroupInfo },

@@ -31,7 +31,7 @@ import CustomerServicePopover from '../components/CustomerServicePopover';
 
 import ResizeMixin from './mixin/ResizeHandler';
 import { mapState } from 'vuex';
-import { SERVER_TYPE_THIRD } from '@/utils/constant';
+import { SERVER_TYPE_THIRD } from '@/utils/constant/index';
 
 export default {
   name: 'Layout',

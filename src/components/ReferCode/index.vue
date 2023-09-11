@@ -96,7 +96,7 @@ const titleInfo = {
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
 import {
   MAX_APPENDIX_NUM, redeemCodeMsgType
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 export default {
   components: { AddAppendixBtn },
   props: {

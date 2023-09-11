@@ -23,7 +23,7 @@ import ReturnPage from '@/components/ReturnPage.vue';
 import SOPDetailTab from './SOPDetailTab.vue';
 import PerformRecord from './performRecord.vue';
 import { getSopDetail } from '@/api/sop';
-import { SOP_TYPE } from '@/utils/constant';
+import { SOP_TYPE } from '@/utils/constant/index';
 
 export default {
   name: '',

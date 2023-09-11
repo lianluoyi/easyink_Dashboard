@@ -7,7 +7,7 @@ import { sync as groupSync } from '@/api/customer/group';
 import { syncTag } from '@/api/customer/tag';
 import { setDefaultConfig } from '@/utils/enterpriseWechat';
 import { validURL } from '@/utils/validate';
-import { ENTERPRISE_CONFIG_TIP, SERVER_TYPE_THIRD } from '@/utils/constant';
+import { ENTERPRISE_CONFIG_TIP, SERVER_TYPE_THIRD } from '@/utils/constant/index';
 import { getDefaultDomainConfig } from '@/api/admin';
 import CodeValidata from '../codeValidata.vue';
 let qrcodeTimer = null;

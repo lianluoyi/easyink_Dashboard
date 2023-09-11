@@ -9,7 +9,7 @@ import CommonTree from '@/components/CommonTree';
 import UserItem from './UserItem.vue';
 import { groupBy, cloneDeep } from 'lodash';
 import uniqBy from 'lodash/uniqBy';
-import { USER_AND_DEPARTMENT_LIMIT, IS_ACTIVATE } from '@/utils/constant';
+import { USER_AND_DEPARTMENT_LIMIT, IS_ACTIVATE } from '@/utils/constant/index';
 
 // 根部门Id
 const DEFAULT_ROOT_DEPARTMENT_ID = '1';
@@ -54,6 +54,11 @@ export default {
     },
     // 警告提示
     alertText: {
+      type: String,
+      default: ''
+    },
+    // 警告组件类名
+    alertClass: {
       type: String,
       default: ''
     },
@@ -525,7 +530,7 @@ export default {
   <el-dialog :title="title" :visible.sync="Pvisible" :close-on-click-modal="false" class="dialog-div" append-to-body>
     <el-alert
       v-if="alertText"
-      class="alert"
+      :class="`alert ${alertClass}`"
       :title="alertText"
       type="warning"
       close-text=" "

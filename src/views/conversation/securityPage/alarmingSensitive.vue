@@ -58,7 +58,7 @@
 </template>
 <script>
 import * as sensitiveApis from '@/api/conversation/security';
-import { PAGE_LIMIT, DEFAULT_AVATAR, WX_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, DEFAULT_AVATAR, WX_TYPE } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import AlarmingManage from './alarmingManage';
 import { dealAtInfo } from '@/utils/common';

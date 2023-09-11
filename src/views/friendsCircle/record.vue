@@ -5,7 +5,7 @@
 -->
 <script>
 import { goRouteWithQuery } from '@/utils';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import { getFriendsList, deleteMoment } from '@/api/friends';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';

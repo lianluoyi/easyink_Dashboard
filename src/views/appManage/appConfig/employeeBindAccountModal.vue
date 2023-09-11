@@ -153,7 +153,7 @@
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { listOfBindDetail, networkUser, unbindUser, bindUser } from '@/api/order';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import { mapGetters } from 'vuex';
 
 export default {

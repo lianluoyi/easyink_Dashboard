@@ -6,7 +6,7 @@
 <script>
 import TagList from './Taglist.vue';
 import MaskItem from './ToolMaskItem.vue';
-import { MEDIA_TYPE_VIDEO } from '@/utils/constant';
+import { MEDIA_TYPE_VIDEO } from '@/utils/constant/index';
 import { matchDealtagName } from '@/utils/common';
 import VideoModal from '@/views/conversation/component/videoModal.vue';
 import { onSelectMaterial } from './common';

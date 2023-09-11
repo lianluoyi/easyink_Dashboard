@@ -36,8 +36,40 @@ export default {
   computed: {},
   watch: {},
   created() {},
-  mounted() {},
-  methods: {}
+  mounted() {
+    this.dealSearchTool();
+    /**
+     * 部分搜索栏的按钮有自适应换行按钮和固定在右侧的按钮
+     * 该方法用来处理固定右侧的按钮被挤出页面流时样式的更改
+     * (若有类似使用则给对应按钮附上“fix-right-operate-btn”、“last-btn”的类名)
+     */
+    window.addEventListener('resize', this.dealSearchTool);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.dealSearchTool);
+  },
+
+  methods: {
+    dealSearchTool() {
+      const PADDING_WIDTH = 20;
+      const customBtn = document.getElementsByClassName('fix-right-operate-btn')?.[0];
+      const searchBtn = document.getElementsByClassName('last-btn')?.[0];
+      if (!searchBtn || !customBtn) return;
+      const resizeWidth = (searchBtn.offsetParent.clientWidth - (searchBtn.clientWidth + searchBtn.offsetLeft)) || 0;
+      if ((resizeWidth - PADDING_WIDTH) < customBtn.clientWidth) {
+        customBtn.style.position = 'relative';
+        customBtn.style.bottom = 'initial';
+        customBtn.style.right = 'initial';
+        const EXTRA_WIDTH = 32;
+        customBtn.style.left = `${searchBtn.offsetParent.clientWidth - customBtn.clientWidth - EXTRA_WIDTH}px`;
+      } else {
+        customBtn.style.position = 'absolute';
+        customBtn.style.bottom = '15px';
+        customBtn.style.right = '15px';
+        customBtn.style.left = 'initial';
+      }
+    }
+  }
 };
 </script>
 
@@ -111,6 +143,11 @@ export default {
             justify-content: flex-start;
           }
         }
+      }
+      .fix-right-operate-btn {
+        position: absolute;
+        right: 15px;
+        bottom: 15px;
       }
     }
     /deep/ .el-input {

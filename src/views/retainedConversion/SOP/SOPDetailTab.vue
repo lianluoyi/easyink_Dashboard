@@ -143,7 +143,7 @@
 </template>
 <script>
 import SOPRuleList from '../components/SOPRuleList.vue';
-import { RULE_PERFORM_TYPE, SOP_TYPE } from '@/utils/constant';
+import { RULE_PERFORM_TYPE, SOP_TYPE } from '@/utils/constant/index';
 import UseEmployeeModal from '../components/UseEmployeeModal.vue';
 import SopCalendar from './sopCalendar.vue';
 import AddRuleDrawer from '../components/AddRuleDrawer.vue';

@@ -4,7 +4,7 @@
  * @LastEditors: wJiaaa
 -->
 <script>
-import { WX_PAAS_URL } from '@/utils/constant';
+import { WX_PAAS_URL } from '@/utils/constant/index';
 export default {
   name: 'GetAppIDDemo',
   components: {},

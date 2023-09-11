@@ -184,7 +184,7 @@
   </el-dialog>
 </template>
 <script>
-import { PAGE_LIMIT, SOP_TYPE, PAGE_LIMIT_INFINITE, WX_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, SOP_TYPE, PAGE_LIMIT_INFINITE, WX_TYPE } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getCustomerSopRulesDetailList, getSopRulesRecordList, getTimingSopRulesDetailList } from '@/api/sop';

@@ -32,7 +32,7 @@
   </div>
 </template>
 <script>
-import { weekNum } from '@/utils/constant';
+import { weekNum } from '@/utils/constant/index';
 import VerbalTrickDetailPreview from '@/views/verbalTrickLibrary/component/verbalTrickDetailPreview.vue';
 
 export default {

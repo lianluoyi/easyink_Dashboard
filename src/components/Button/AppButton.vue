@@ -26,7 +26,10 @@ export default {
       default: 'white'
     },
     /** @deprecated Use color instead */
-    oldColor: String
+    oldColor: {
+      type: String,
+      default: ''
+    }
   },
   computed: {
     styles() {

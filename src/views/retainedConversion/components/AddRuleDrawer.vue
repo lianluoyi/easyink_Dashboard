@@ -80,7 +80,7 @@
 <script>
 import {
   MEDIA_TYPE_TEXT, RULE_PERFORM_TYPE, SOP_TYPE, DEFAULT_ALERTINFO
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import VerbalTrickItem from '@/views/verbalTrickLibrary/component/verbalTrickItem.vue';
 import AddVerbalTrickButton from '@/components/AddVerbalTrickButton.vue';
 import { checkContent } from '@/utils/common';

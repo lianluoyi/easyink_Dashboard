@@ -200,7 +200,7 @@ import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import SpreadDialog from './spreadDialog.vue';
 import BatchUpdateGroup from './batchUpdateGroup.vue';
 import { getFormPageList, changeEnableState, removeFormList } from '@/api/form';
-import { INTELLIGENT_FORM_TYPE, PAGE_LIMIT, TREE_ALL_GROUP_ID } from '@/utils/constant';
+import { INTELLIGENT_FORM_TYPE, PAGE_LIMIT, TREE_ALL_GROUP_ID } from '@/utils/constant/index';
 export default {
   name: 'VerbalTrickList',
   components: {

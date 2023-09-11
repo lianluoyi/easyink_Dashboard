@@ -120,7 +120,8 @@
 
 <script>
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT, DEFAULT_PAGE_NUM, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { PAGE_LIMIT, DEFAULT_PAGE_NUM } from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { goRouteWithQuery } from '@/utils';
 import { getChannelClickRecord, getChannelClickRecordDetail } from '@/api/radar';

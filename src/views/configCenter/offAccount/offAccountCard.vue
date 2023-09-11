@@ -48,7 +48,7 @@ import {
   SERVICE_OFF_ACCOUNT,
   WX_PAAS_URL,
   CONFIG_INTRODUCE_URL
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 export default {
   props: {
     // 公众号卡片数据

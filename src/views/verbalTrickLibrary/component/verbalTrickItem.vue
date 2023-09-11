@@ -280,7 +280,7 @@ import {
   LINK_TITLE_MAXLENGTH,
   LINK_CONTENT_MAXLENGTH,
   MEDIA_TYPE_SMARTFORM
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import MoveTool from '@/components/MoveTool.vue';
 import UploadDrag from '@/components/uploadDrag.vue';
 import VerbalTrickImgLink from './verbalTrickPreview/verbalTrickImgLink.vue';

@@ -23,7 +23,7 @@
 <script>
 import MoreDetailModal from './MoreDetailModal.vue';
 import FileInfo from '@/components/FileInfo.vue';
-import { MEDIA_TYPE_TEXT, RULE_PERFORM_TYPE, SOP_TYPE } from '@/utils/constant';
+import { MEDIA_TYPE_TEXT, RULE_PERFORM_TYPE, SOP_TYPE } from '@/utils/constant/index';
 const MAX_SHOW_RULE_LENGTH = 2;
 export default {
   name: '',

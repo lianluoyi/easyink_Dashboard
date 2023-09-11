@@ -21,7 +21,7 @@
 <script>
 import 'video.js/dist/video-js.css';
 import 'vue-video-player/src/custom-theme.css';
-import { PLAYBACK_RATES, VIDEO_TYPE_MP4 } from '@/utils/constant';
+import { PLAYBACK_RATES, VIDEO_TYPE_MP4 } from '@/utils/constant/index';
 
 export default {
   props: {},

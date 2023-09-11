@@ -273,7 +273,7 @@ import {
   downloadAMR
 } from '@/utils/common.js';
 import { listDistinct } from '@/api/customer/index';
-import { MSG_TYPE, MSG_TYPE_VIDEO, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_ALL } from '@/utils/constant';
+import { MSG_TYPE, MSG_TYPE_VIDEO, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_ALL } from '@/utils/constant/index';
 export default {
   components: {
     list,

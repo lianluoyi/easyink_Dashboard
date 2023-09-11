@@ -6,7 +6,8 @@ import {
   exportTimeRangeAnalyseCount
 } from '@/api/drainageCode/staff';
 import echarts from 'echarts';
-import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE, SCOPELIST_TYPE, MEDIA_TYPE_SMARTFORM, MEDIA_TO_WELCOME_TYPE } from '@/utils/constant';
+import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE, SCOPELIST_TYPE, MEDIA_TYPE_SMARTFORM, MEDIA_TO_WELCOME_TYPE } from '@/utils/constant/index';
+import { getFirstMsg } from '@/utils/drainageCode';
 import PhoneDialog from '@/components/PhoneDialog';
 import TagUserShow from '@/components/TagUserShow';
 
@@ -72,8 +73,8 @@ export default {
       getDetail(id).then(({ data }) => {
         this.userByEmplyCodeList = data.weEmpleCodeUseScops;
         this.form = data;
-        this.form.welcomeMsg = this.getFirstMsg(this.form).welcomeMsg;
-        this.form.materialList = this.getFirstMsg(this.form).materialList;
+        this.form.welcomeMsg = getFirstMsg(this.form).welcomeMsg;
+        this.form.materialList = getFirstMsg(this.form).materialList;
         this.loading = false;
         this.query.addWay = 1;
         this.query.state = data.state;
@@ -81,35 +82,7 @@ export default {
         // this.getList()
       });
     },
-    /**
-     * 获取第一个欢迎语
-     */
-    getFirstMsg(item) {
-      // 按照活动欢迎语顺序进行匹配 当匹配到即return 没有匹配到进入下一个if语句中
-      if (item.codeSuccessMsg || item.codeSuccessMaterialList?.length) {
-        return {
-          welcomeMsg: item.codeSuccessMsg || '',
-          materialList: item?.codeSuccessMaterialList || []
-        };
-      }
-      if (item.codeFailMsg || item.codeFailMaterialList?.length) {
-        return {
-          welcomeMsg: item.codeFailMsg || '',
-          materialList: item?.codeFailMaterialList || []
-        };
-      }
-      if (item.codeRepeatMsg || item.codeRepeatMaterialList?.length) {
-        return {
-          welcomeMsg: item.codeRepeatMsg || '',
-          materialList: item?.codeRepeatMaterialList || []
-        };
-      }
-      // 为普通欢迎语时返回下列字段值
-      return {
-        welcomeMsg: item.welcomeMsg || '',
-        materialList: item?.materialList || []
-      };
-    },
+
     /**  */
     getList() {
       getTimeRangeAnalyseCount(this.getPayload()).then(({ data }) => {

@@ -1,7 +1,7 @@
 <!--
  * @Description: 如何使用兑换活动
  * @Author: wJiaaa
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <el-drawer
@@ -96,6 +96,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/deep/ .el-drawer__header {
+  margin-bottom: 26px
+}
 .draw-body {
     height: 100%;
     display: flex;

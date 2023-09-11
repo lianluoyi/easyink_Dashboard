@@ -1,7 +1,7 @@
 <!--
  * @Description: 自定义渠道
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
 -->
 <template>
   <div>
@@ -127,7 +127,7 @@
 // 渠道名称最大长度
 const MAX_INPUT_LENGTH = 32;
 import RightContainer from '@/components/RightContainer';
-import { PAGE_LIMIT, DEFAULT_PAGE_NUM } from '@/utils/constant';
+import { PAGE_LIMIT, DEFAULT_PAGE_NUM } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getRadarChannelList, addCustomChannel, deleteCustomChannel, updateChannel } from '@/api/radar';
 import RequestButton from '@/components/Button/RequestButton.vue';
@@ -295,6 +295,7 @@ export default {
   padding-left: 20px;
   margin-bottom: 10px;
   font-size: 12px;
+  line-height: 12px;
   i {
     font-size: 14px;
     transform: rotate(-15deg);

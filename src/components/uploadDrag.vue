@@ -67,7 +67,7 @@ import { uploadFile2Cos } from '@/api/common';
 import { dealImgName, dealFormat, dealUploadSize, filterSize, getFileIcon } from '@/utils/common';
 import {
   MEDIA_TYPE_POSTER, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 const FILE_NAME_LENGTH = 100;
 const VIDEO_BYTE = 10;
 

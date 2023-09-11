@@ -183,7 +183,7 @@
 <script>
 import {
   SOP_TYPE, RULE_PERFORM_TYPE, ONE_DAY_MSECOND, WEEK_OPTIONS
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import moment from 'moment';
 const MONTH = 31; // 一个月的天数为31
 const MINUTE = 30; // 定义一个MINUTE作为延时30分钟

@@ -22,7 +22,7 @@
   </div>
 </template>
 <script>
-import { SOP_TYPE } from '@/utils/constant';
+import { SOP_TYPE } from '@/utils/constant/index';
 import SOPList from '../components/SOPList.vue';
 import { removeUrlParams } from '@/utils/common';
 

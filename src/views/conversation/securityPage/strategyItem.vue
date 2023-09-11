@@ -68,7 +68,7 @@ const DEPART_TYPE = 1;
 const ALL_TYPE = 3;
 // 审计范围显示人数最大值
 const MAX_SHOW_LENGTH = 10;
-import { SCOPELIST_TYPE } from '@/utils/constant';
+import { SCOPELIST_TYPE } from '@/utils/constant/index';
 import ByLengthUserShow from '@/components/ByLengthUserShow';
 export default {
   components: { ByLengthUserShow },

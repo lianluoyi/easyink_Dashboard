@@ -2,17 +2,19 @@
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { getCodeList } from '@/api/drainageCode/staff';
 import remove from 'lodash/remove';
-import { PAGE_LIMIT_TWENTY } from '@/utils/constant';
+import { PAGE_LIMIT_TWENTY } from '@/utils/constant/index';
+import NumPagination from '@/components/Pagination/NumPagination.vue';
+import { differenceWith } from 'lodash';
 export default {
   name: 'SelectCode',
-  components: { EmptyDefaultIcon },
+  components: { EmptyDefaultIcon, NumPagination },
   props: {
-    /** 是否显示选择活码  */
+    /** 是否显示选择渠道  */
     visible: {
       type: Boolean,
       default: false
     },
-    /** 编辑的时候显示的已选择的活码列表 */
+    /** 编辑的时候显示的已选择的渠道列表 */
     confirmSelectedCodeList: {
       type: Array,
       default: () => []
@@ -20,7 +22,7 @@ export default {
   },
   data() {
     return {
-      allCodeList: [],
+      codeList: [],
       selectCodeList: [],
       query: {
         pageNum: 1,
@@ -28,9 +30,9 @@ export default {
         scenario: ''
       },
       total: 0,
-      noMore: false,
-      loading: false,
-      searchLoading: false
+      searchLoading: false,
+      checkAll: false,
+      isIndeterminate: false
     };
   },
   computed: {
@@ -41,9 +43,6 @@ export default {
       set(val) {
         this.$emit('update:visible', val);
       }
-    },
-    disabled() {
-      return this.loading || this.noMore;
     }
   },
   watch: {
@@ -57,7 +56,7 @@ export default {
       if (val) {
         const resList = [...this.confirmSelectedCodeList];
         this.selectCodeList = resList;
-        this.allCodeList = this.initCheckFlag(this.allCodeList, resList);
+        this.searchList();
       }
     }
   },
@@ -66,19 +65,35 @@ export default {
   },
   methods: {
     getList() {
+      this.searchLoading = true;
       getCodeList(this.query).then((res) => {
         this.total = res.total;
-        this.allCodeList = [...this.allCodeList, ...this.initCheckFlag(res.rows)];
-        this.noMore = (this.allCodeList.length === this.total);
+        this.codeList = this.initCheckFlag(res.rows);
       }).catch(() => {
-        this.noMore = true;
       }).finally(() => {
-        this.loading = false;
         this.searchLoading = false;
+        this.dealCheckAllStatus();
+        // 处理滚动条位置
+        if (this.Pvisible) {
+          this.$nextTick(() => {
+            this.$refs['codeListRef'].$el.scrollTop = 0;
+          });
+        }
       });
     },
     /**
-     * @description 通过已勾选的列表处理当前活码列表是否为被勾选状态
+     * @description 处理全选/半选状态
+     */
+    dealCheckAllStatus() {
+      this.checkAll = this.codeList.every(codeItem =>
+        this.selectCodeList.some(item => item.id === codeItem.id)
+      ) && this.selectCodeList.length > 0;
+      this.isIndeterminate = this.selectCodeList.some(selectItem =>
+        this.codeList.some(codeItem => codeItem.id === selectItem.id)
+      ) && !this.checkAll;
+    },
+    /**
+     * @description 通过已勾选的列表处理当前渠道列表是否为被勾选状态
      * @param list 需判断是否为勾选状态的列表
      * @param selectCodeList 已勾选的列表
      */
@@ -90,55 +105,48 @@ export default {
       });
     },
     /**
-     * @description 选择活码变化
+     * @description 选择渠道变化
      */
     selectChange(item) {
       const index = this.selectCodeList.findIndex((o) => o.id === item.id);
       if (index === -1) {
         this.selectCodeList.push(item);
+        this.dealCheckAllStatus();
       } else {
         this.handleRemove(item);
       }
     },
     /**
-     * @description 移除选中的活码
+     * @description 移除选中的渠道
      * @param item
      */
     handleRemove(item) {
-    // 这个checked是自己维护的一个选择框状态 再移除选中的活码的时候要设为false
-      this.allCodeList = this.allCodeList.map((o) => {
+    // 这个checked是自己维护的一个选择框状态 再移除选中的渠道的时候要设为false
+      this.codeList = this.codeList.map((o) => {
         return {
           ...o,
           ...(o.id === item.id && { checked: false })
         };
       });
       remove(this.selectCodeList, (o) => o.id === item.id);
+      this.dealCheckAllStatus();
     },
     searchList() {
       this.query.pageNum = 1;
-      this.noMore = true;
-      this.searchLoading = true;
-      // 清空是因为getList里使用拼接 若不清空会继续进行拼接
-      this.allCodeList = [];
-      // 使用定时器 避免一闪的效果
-      setTimeout(() => {
-        this.getList();
-      // eslint-disable-next-line no-magic-numbers
-      }, 300);
+      this.getList();
     },
-
     handleEnterSearch() {
       this.query.scenario && this.searchList();
     },
-
     submit() {
       this.$emit('success', [...this.selectCodeList]);
       this.Pvisible = false;
     },
-
     resetChecked() {
       this.selectCodeList = [];
-      this.allCodeList = this.allCodeList.map((item) => {
+      this.checkAll = false;
+      this.isIndeterminate = false;
+      this.codeList = this.codeList.map((item) => {
         return {
           ...item,
           checked: false
@@ -146,23 +154,27 @@ export default {
       });
     },
     /**
-     * 滚动加载更多
-     * @description 定时500再去调用 是为了让loading状态能够展现出来
+     * @description 处理全选/取消状态
+     * @param val 当前状态
      */
-    load() {
-      this.query.pageNum++;
-      this.loading = true;
-      setTimeout(() => {
-        this.getList();
-      // eslint-disable-next-line no-magic-numbers
-      }, 500);
+    handleCheckAllChange(val) {
+      this.codeList = this.codeList.map((item) => {
+        item.checked = val;
+        return item;
+      });
+      if (val) {
+        this.isIndeterminate = false;
+        this.selectCodeList = [...this.selectCodeList, ...this.codeList];
+      } else {
+        this.selectCodeList = differenceWith(this.selectCodeList, this.codeList, (a, b) => a.id === b.id);
+      }
     }
   }
 };
 </script>
 <template>
   <el-dialog
-    title="选择活码"
+    title="选择渠道"
     :visible.sync="Pvisible"
     :close-on-click-modal="false"
     class="dialog-div"
@@ -176,37 +188,39 @@ export default {
             v-model="query.scenario"
             clearable
             prefix-icon="el-icon-search"
-            placeholder="请输入活码名称，回车搜索"
+            placeholder="请输入渠道名称，回车搜索"
             @keyup.enter.native="handleEnterSearch"
           />
         </div>
         <div v-loading="searchLoading" class="customer">
-          <empty-default-icon :length="allCodeList.length" style="max-height: 450px; overflow: auto;">
-            <div v-infinite-scroll="load" :infinite-scroll-immediate="false" :infinite-scroll-disabled="disabled">
-              <div
-                v-for="item in allCodeList"
-                :key="item.id"
-                class="customer-choose inoneline"
-              >
-                <el-checkbox v-model="item.checked" @change="selectChange(item)">
-                  <span class="customer-name inoneline">
-                    {{ item.scenario }}
-                  </span>
-                </el-checkbox>
-              </div>
-            </div>
-            <div v-if="loading" v-loading="loading" element-loading-spinner="el-icon-loading" class="customClass" />
-            <div v-if="noMore && query.pageNum > 1" class="no-more">
-              没有更多数据
+          <empty-default-icon ref="codeListRef" :length="codeList.length" style="height: 450px; overflow: auto;">
+            <el-checkbox v-model="checkAll" class="mb10" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选当前页</el-checkbox>
+            <div
+              v-for="item in codeList"
+              :key="item.id"
+              class="customer-choose inoneline"
+            >
+              <el-checkbox v-model="item.checked" @change="selectChange(item)">
+                <div class="customer-name inoneline">
+                  {{ item.scenario }}
+                </div>
+              </el-checkbox>
             </div>
           </empty-default-icon>
         </div>
+        <NumPagination
+          class="mt10"
+          :total="total"
+          :page.sync="query.pageNum"
+          :limit.sync="query.pageSize"
+          @pagination="getList"
+        />
       </el-col>
       <!--用户数据-->
       <el-col :span="12" :xs="24" class="user-list">
         <el-row :gutter="10">
           <div class="user-list-top mb5">
-            <span style="line-height: 32px">选择活码列表 </span>
+            <span style="line-height: 32px">选择渠道列表 </span>
             <el-button @click="resetChecked">一键清空</el-button>
           </div>
         </el-row>
@@ -233,6 +247,9 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+/deep/ .pagination-container {
+  text-align: center;
+}
 .head-container {
   > .el-input {
     width: 100%;
@@ -243,6 +260,7 @@ export default {
   margin-top: 5px;
   .customer-choose {
     height: 26px;
+    margin-left: 16px;
     .el-checkbox {
       display: flex;
       align-items: center;
@@ -250,7 +268,6 @@ export default {
     .customer-name {
       font-size: 14px;
       max-width: 292px;
-      display: inline-block;
     }
   }
   .load-status {

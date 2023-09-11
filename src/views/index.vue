@@ -2,7 +2,6 @@
   <div class="index">
     <NoConfigInfo style="margin-bottom: 15px;" :config-keys="['contactSecret', 'customSecret']" page-title="统计数据" />
     <Statistics
-      :show-uptime="false"
       :col-list="colList"
       title="数据总览"
       color="#333333"
@@ -135,7 +134,7 @@ import echarts from 'echarts';
 import NoConfigInfo from '@/components/NoConfigInfo';
 import DiffItem from './dataStatistics/diffItem.vue';
 import CntItem from './dataStatistics/cntItem.vue';
-import { DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
+import { DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant/index';
 
 const DEFAULT_TIMEOUT = 100;
 export default {

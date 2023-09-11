@@ -127,7 +127,7 @@
 <script>
 import * as sensitiveApis from '@/api/conversation/security';
 import SelectUser from '@/components/SelectUser/index.vue';
-import { PAGE_LIMIT, SCOPE_TYPE, WX_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, SCOPE_TYPE, WX_TYPE } from '@/utils/constant/index';
 import setSensitiveWord from './setSensitiveWord';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';

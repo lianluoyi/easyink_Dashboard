@@ -7,16 +7,13 @@ import PhoneDialog from '@/components/PhoneDialog';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import SelectQrCode from '@/components/SelectQrCode';
-import { SCOPELIST_TYPE, NORMAL_WORD, ACTIVE_WORD } from '@/utils/constant';
+import { SCOPELIST_TYPE, NORMAL_WORD, ACTIVE_WORD } from '@/utils/constant/index';
+import { SELECT_TIME_TYPE, MAX_WELCOME_MSG_LENGTH, DEPARTMENT_ID_KEY, UN_CHOOSE_SKIPVERIFY, REMARK_TYPE } from '@/utils/constant/drainageCode';
 import TagUserShow from '@/components/TagUserShow';
 import ReferCode from '@/components/ReferCode';
 import ActivityPopup from '@/components/ReferCode/ActivityPopup';
 const businessIdTypeOfUser = 2;
-const SELECT_TIME_TYPE = 2;
 const CODE_TYPE_MANY = 2;
-const MAX_WELCOME_MSG_LENGTH = 2000;
-const DEPARTMENT_ID_KEY = 'businessId';
-const UN_CHOOSE_SKIPVERIFY = 0;
 export default {
   components: { PhoneDialog, SelectTag, SelectUser, SelectQrCode, ActivityPopup, RequestButton, TagUserShow, ReferCode },
   data() {
@@ -35,7 +32,7 @@ export default {
         welcomeMsg: '', // 加群引导语
         groupCodeId: undefined, // 群活码ID
         tagList: [], // 客户标签
-        remarkType: 1,
+        remarkType: REMARK_TYPE['previous'],
         skipVerify: 1, // 无需确认自动加好友
         // 表单的欢迎语类型
         welcomeMsgType: NORMAL_WORD
@@ -83,6 +80,7 @@ export default {
       // 使用员工类型
       SCOPELIST_TYPE,
       DEPARTMENT_ID_KEY,
+      REMARK_TYPE,
       // 活动列表
       activeList: [],
       // 控制兑换活动弹窗
@@ -394,14 +392,14 @@ export default {
               />
               <el-form-item label="备注位置" label-width="68px">
                 <el-radio-group v-model="form.remarkType">
-                  <el-radio :label="1">在昵称前</el-radio>
-                  <el-radio :label="2">在昵称后</el-radio>
+                  <el-radio :label="REMARK_TYPE['previous']">在昵称前</el-radio>
+                  <el-radio :label="REMARK_TYPE['after']">在昵称后</el-radio>
                 </el-radio-group>
                 <br>
                 <el-form-item prop="remarkName">
                   <el-input v-model="form.remarkName" placeholder="请输入备注" :maxlength="12" show-word-limit>
-                    <template v-if="form.remarkType === 2" slot="prepend">客户昵称-</template>
-                    <template v-if="form.remarkType === 1" slot="append">-客户昵称</template>
+                    <template v-if="form.remarkType === REMARK_TYPE['after']" slot="prepend">客户昵称-</template>
+                    <template v-if="form.remarkType === REMARK_TYPE['previous']" slot="append">-客户昵称</template>
                   </el-input>
                 </el-form-item>
               </el-form-item>

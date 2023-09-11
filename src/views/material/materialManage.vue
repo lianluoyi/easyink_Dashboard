@@ -9,7 +9,7 @@ import ImgLink from '@/views/material/graphicList.vue';
 import MiniAppPage from './miniAppList.vue';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import { getList, getMaterialConfig, updateMaterialConfig } from '@/api/material';
-import { MEDIA_TYPE_POSTER, PAGE_LIMIT, MEDIA_TYPE_IMGLINK, RADAR_TYPE, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, PAGE_LIMIT_TWENTY } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER, PAGE_LIMIT, MEDIA_TYPE_IMGLINK, RADAR_TYPE, MEDIA_TYPE_VIDEO, MEDIA_TYPE_FILE, MEDIA_TYPE_MINIAPP, PAGE_LIMIT_TWENTY } from '@/utils/constant/index';
 import SelectTagModal from './components/SelectTagModal.vue';
 import { getMaterialTagList } from '@/utils/material';
 const DEFAULT_EXPIRE_DAYS = 7;

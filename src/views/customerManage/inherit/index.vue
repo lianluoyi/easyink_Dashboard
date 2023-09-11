@@ -217,7 +217,8 @@
 <script>
 import { goRouteWithQuery } from '@/utils';
 import { dealAtInfo } from '@/utils/common';
-import { PAGE_LIMIT, INHERIT_STATUS_INHERITING, WX_TYPE, CUSTOMER_DEATIL_PATH } from '@/utils/constant';
+import { PAGE_LIMIT, INHERIT_STATUS_INHERITING, WX_TYPE } from '@/utils/constant/index';
+import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import { getCustomerList, transfer, getTransferConfig, editConfig } from '@/api/transfer';
 
 import RightContainer from '@/components/RightContainer';

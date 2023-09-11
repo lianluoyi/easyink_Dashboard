@@ -173,7 +173,7 @@
 
 <script>
 import RightContainer from '@/components/RightContainer';
-import { RADAR_TYPE, PAGE_LIMIT, DEFAULT_PAGE_NUM, SORT } from '@/utils/constant';
+import { RADAR_TYPE, PAGE_LIMIT, DEFAULT_PAGE_NUM, SORT } from '@/utils/constant/index';
 import { getConfig } from '@/api/wechatopen';
 import { checkPermi } from '@/utils/permission';
 import { getRadarConfig } from '@/api/radar';

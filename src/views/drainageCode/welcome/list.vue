@@ -135,7 +135,7 @@
 </template>
 
 <script>
-import { EMPLOYEES_WELCOME, INTO_GROUP, PAGE_LIMIT, WELCOME_TO_MEDIA_TYPE, WELCOME_APPENDIX_TYPE } from '@/utils/constant';
+import { EMPLOYEES_WELCOME, INTO_GROUP, PAGE_LIMIT, WELCOME_TO_MEDIA_TYPE, WELCOME_APPENDIX_TYPE } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { goRouteWithQuery } from '@/utils';

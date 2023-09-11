@@ -10,7 +10,7 @@
   </el-col>
 </template>
 <script>
-import { DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
+import { DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant/index';
 
 export default {
   name: 'CntItem',

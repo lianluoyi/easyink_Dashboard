@@ -1,14 +1,17 @@
 <!--
  * @Description: 返回组件
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: broccoli
 -->
 <template>
   <div class="return-page-div" v-bind="$attrs">
     <el-button type="text" size="medium" @click="handlleReturn">
-      <svg class="icon-restore" :width="18" :height="18">
-        <use href="#icon-restore" />
-      </svg>返回
+      <div class="btn-show-content">
+        <svg class="icon-restore" :width="18" :height="18">
+          <use href="#icon-restore" />
+        </svg>
+        <span>{{ showText }}</span>
+      </div>
     </el-button>
     <el-button v-if="showNextStep" type="primary" @click="$emit('nextStep')">下一步</el-button>
   </div>
@@ -19,6 +22,7 @@ export default {
   components: {},
   props: {
     // 组件若接受path，则路由跳转到该path
+    // 只有传入path的返回组件，返回时才会显示页面数据保存提示
     path: {
       type: String,
       default: ''
@@ -37,6 +41,10 @@ export default {
     customBackMethod: {
       type: Boolean,
       default: false
+    },
+    showText: {
+      type: String,
+      default: '返回'
     }
   },
   data() {
@@ -85,6 +93,10 @@ export default {
     .icon-restore{
       vertical-align: middle;
       margin-right: 10px;
+    }
+    .btn-show-content {
+      display: flex;
+      align-items: center;
     }
   }
 </style>

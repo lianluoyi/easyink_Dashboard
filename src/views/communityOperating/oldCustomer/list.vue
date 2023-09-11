@@ -1,7 +1,7 @@
 <script>
 import { getList, remove, getStat } from '@/api/communityOperating/oldCustomer';
 import { goRouteWithQuery } from '@/utils';
-import { PAGE_LIMIT, CREATE_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, CREATE_TYPE } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
 

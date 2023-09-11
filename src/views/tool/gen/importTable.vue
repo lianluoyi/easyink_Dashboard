@@ -50,7 +50,7 @@
 
 <script>
 import { listDbTable, importTable } from '@/api/tool/gen';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 
 export default {
   data() {

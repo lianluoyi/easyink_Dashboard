@@ -96,7 +96,7 @@ import SelectUser from '@/components/SelectUser/index.vue';
 import { groupByScopeType } from '@/utils/common';
 import TableShow from './components/TableShow.vue';
 import ChartShow from './components/ChartShow.vue';
-import { TAG_LABEL_TYPE } from '@/utils/constant';
+import { TAG_LABEL_TYPE } from '@/utils/constant/index';
 import { exportGroupTagsView, exportCustomerTagsView } from '@/api/statistics';
 import { groupTagList } from '@/api/customer/grouptag';
 import { tagGroupList } from '@/api/customer/tag';

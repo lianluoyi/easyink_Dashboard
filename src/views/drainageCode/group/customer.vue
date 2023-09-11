@@ -1,6 +1,6 @@
 <script>
 import { getList } from '@/api/customer/group';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 
 export default {

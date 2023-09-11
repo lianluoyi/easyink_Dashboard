@@ -4,7 +4,7 @@ import PhoneDialog from '@/components/PhoneDialog';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import SelectQrCode from '@/components/SelectQrCode';
-import { GENDER_TYPE } from '@/utils/constant';
+import { GENDER_TYPE } from '@/utils/constant/index';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading, checkChange } from '@/utils/common';
 const SEND_PART_CUSTOMER_TYPE = 1;

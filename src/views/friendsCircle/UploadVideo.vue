@@ -5,7 +5,7 @@
 -->
 <script>
 import { uploadFile2Cos } from '@/api/common';
-import { MEDIA_TYPE_VIDEO } from '@/utils/constant';
+import { MEDIA_TYPE_VIDEO } from '@/utils/constant/index';
 import { dealUploadSize, dealFormat, filterSize } from '@/utils/common';
 const FILE_NAME_LENGTH = 32;
 const VIDEOTIME = 30;

@@ -2,7 +2,7 @@
 import { getAdminLoginQrcode, checkAdminLoginQrcode, autoConfig } from '@/api/admin';
 import * as api from '@/api/enterpriseId';
 import { setDefaultConfig } from '@/utils/enterpriseWechat';
-import { SERVER_TYPE_THIRD } from '@/utils/constant';
+import { SERVER_TYPE_THIRD } from '@/utils/constant/index';
 import { getDefaultDomainConfig } from '@/api/admin';
 import CodeValidata from '../codeValidata.vue';
 let qrcodeTimer = null;

@@ -32,7 +32,7 @@ import {
   TEXT_COMPONENT,
   IMAGE_COMPONENT,
   CAROUSEL_COMPONENT
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import { EventBus } from '@/event-bus.js';
 import RadioComponent from '../filedComponents/RadioComponent.vue';
 import CheckBoxComponent from '../filedComponents/CheckBoxComponent.vue';

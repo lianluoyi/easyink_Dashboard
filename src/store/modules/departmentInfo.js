@@ -5,7 +5,7 @@
  */
 import { getDeparmentAndOtherList } from '@/api/organization';
 import uniqBy from 'lodash/uniqBy';
-import { USER_AND_DEPARTMENT_LIMIT, IS_ACTIVATE } from '@/utils/constant';
+import { USER_AND_DEPARTMENT_LIMIT, IS_ACTIVATE } from '@/utils/constant/index';
 const departmentInfo = {
 
   state: {

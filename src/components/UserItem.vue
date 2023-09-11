@@ -21,7 +21,7 @@
 </template>
 <script>
 export default {
-  name: '',
+  name: 'UserItem',
   components: { },
   props: {
     // 用户展示所需数据

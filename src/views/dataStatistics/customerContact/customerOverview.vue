@@ -169,7 +169,7 @@
 <script>
 import RightContainer from '@/components/RightContainer';
 import Statistics from '@/components/Statistics.vue';
-import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION, DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant';
+import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION, DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import UserItem from '@/components/UserItem.vue';
 import TagUserShow from '@/components/TagUserShow';

@@ -24,7 +24,7 @@
 import alarmingSensitive from './securityPage/alarmingSensitive.vue';
 import sensitiveList from './securityPage/sensitiveList.vue';
 import UnconfigConversation from './unconfigConversation.vue';
-import { CHAT_SECRET } from '@/utils/constant';
+import { CHAT_SECRET } from '@/utils/constant/index';
 import UNCONFIG_ICON from '@/assets/image/security-unconfig.svg';
 
 export default {

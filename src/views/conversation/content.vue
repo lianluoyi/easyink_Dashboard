@@ -25,7 +25,7 @@ import employee from './page/employeeTest.vue';
 import user from './page/userTest.vue';
 import role from './page/roleTest.vue';
 import UnconfigConversation from './unconfigConversation.vue';
-import { CHAT_SECRET } from '@/utils/constant';
+import { CHAT_SECRET } from '@/utils/constant/index';
 export default {
   components: { employee, user, role, UnconfigConversation },
   data() {

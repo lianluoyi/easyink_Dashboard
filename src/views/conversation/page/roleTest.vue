@@ -120,10 +120,10 @@ import {
   content
 } from '@/api/content.js';
 import RightContainer from '@/components/RightContainer';
-import { DEFAULT_AVATAR, WX_TYPE } from '@/utils/constant';
+import { DEFAULT_AVATAR, WX_TYPE } from '@/utils/constant/index';
 import chat from '../component/chatItem.vue';
 import { dealAtInfo } from '@/utils/common';
-import { PAGE_LIMIT, CORP_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, CORP_TYPE } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 export default {
   components: { RightContainer, chat, EmptyDefaultIcon },

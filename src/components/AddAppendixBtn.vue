@@ -121,7 +121,7 @@ import {
   RADAR_TYPE,
   MEDIA_TYPE_SMARTFORM,
   INTELLIGENT_FORM_TYPE
-} from '@/utils/constant';
+} from '@/utils/constant/index';
 import { getList as getMaterialListApi } from '@/api/material';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import { getCategoryList, getMaterialTagList } from '@/utils/material';

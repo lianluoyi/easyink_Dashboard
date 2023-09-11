@@ -9,7 +9,7 @@ import {
   getApplink
 } from '@/api/drainageCode/staff';
 import { goRouteWithQuery, copyText } from '@/utils';
-import { PAGE_LIMIT } from '@/utils/constant';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
 import ListUserShow from '@/components/ListUserShow';

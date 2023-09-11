@@ -1,5 +1,5 @@
 import { parseTime } from './common';
-import { MEDIA_TO_WELCOME_TYPE, WELCOME_APPENDIX_TYPE, WELCOME_TO_MEDIA_TYPE } from '@/utils/constant';
+import { MEDIA_TO_WELCOME_TYPE, WELCOME_APPENDIX_TYPE, WELCOME_TO_MEDIA_TYPE } from '@/utils/constant/index';
 import moment from 'moment';
 import { Notification } from 'element-ui';
 const MS_TO_SECONDS = 1000;

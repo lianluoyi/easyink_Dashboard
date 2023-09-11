@@ -159,7 +159,7 @@ import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import SelectUser from '@/components/SelectUser/index.vue';
 import { goRouteWithQuery } from '@/utils';
-import { SOP_TYPE, PAGE_LIMIT, SCOPELIST_TYPE } from '@/utils/constant';
+import { SOP_TYPE, PAGE_LIMIT, SCOPELIST_TYPE } from '@/utils/constant/index';
 import { checkPermi } from '@/utils/permission';
 import { getSopList, batchSwitchSop, deleteSop, editUser } from '@/api/sop';
 import ListUserShow from '@/components/ListUserShow';

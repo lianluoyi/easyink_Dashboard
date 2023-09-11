@@ -33,7 +33,7 @@
 <script>
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { getCustomerTagTableView, getGroupTagTableView } from '@/api/statistics';
-import { PAGE_LIMIT, TAG_LABEL_TYPE } from '@/utils/constant';
+import { PAGE_LIMIT, TAG_LABEL_TYPE } from '@/utils/constant/index';
 const SORT_TYPE = {
   'ascending': 'ASC',
   'descending': 'DESC',

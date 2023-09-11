@@ -171,7 +171,7 @@ import RightContainer from '@/components/RightContainer';
 import { deleteExtendProperty } from '@/api/extendProperty';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import AddPropertyModal from './components/addPropertyModal.vue';
-import { CUSTOMER_PROPERTY_MAP, CUSTOMER_PROPERTY_VALUE } from '@/utils/constant';
+import { CUSTOMER_PROPERTY_MAP, CUSTOMER_PROPERTY_VALUE } from '@/utils/constant/index';
 import Sortable from 'sortablejs';
 import { editBatchExtendProperty } from '@/api/extendProperty';
 import { checkPermi } from '@/utils/permission';

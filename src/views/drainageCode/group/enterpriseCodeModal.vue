@@ -161,7 +161,7 @@
   </el-dialog>
 </template>
 <script>
-import { MEDIA_TYPE_POSTER } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER } from '@/utils/constant/index';
 import Customer from './customer';
 import GetEnterpriseQrcodeDemo from './demo/getEnterpriseQrcodeDemo.vue';
 import GetCreateGroupDemo from './demo/getCreateGroupDemo.vue';

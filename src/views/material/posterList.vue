@@ -6,7 +6,7 @@
 <script>
 import MaPage from '@/views/material/components/MaPage';
 import Poster from '@/components/MaterialItem/PosterItem.vue';
-import { MEDIA_TYPE_POSTER } from '@/utils/constant';
+import { MEDIA_TYPE_POSTER } from '@/utils/constant/index';
 
 export default {
   name: 'PosterList',

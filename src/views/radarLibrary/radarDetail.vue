@@ -37,7 +37,6 @@
       </div>
     </div>
     <Statistics
-      :show-uptime="false"
       :col-list="colList"
       title="数据总览"
     />
