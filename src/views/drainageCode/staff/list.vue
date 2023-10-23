@@ -2,14 +2,13 @@
 import {
   getList,
   remove,
-  batchAdd,
   downloadBatch,
   download,
   getApplink
 } from '@/api/drainageCode/staff';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { goRouteWithQuery, copyText } from '@/utils';
-import { PAGE_LIMIT, STAFF_CODE_TYPE } from '@/utils/constant/index';
+import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import ListUserShow from '@/components/ListUserShow';
 
@@ -23,7 +22,6 @@ export default {
         pageNum: 1,
         pageSize: PAGE_LIMIT,
         useUserName: undefined,
-        mobile: undefined,
         scenario: undefined,
         createBy: undefined,
         beginTime: undefined,
@@ -38,24 +36,16 @@ export default {
       // 总条数
       total: 0,
       // 表格数据
-      list: [],
-      // 表单参数
-      form: {
-        codeType: STAFF_CODE_TYPE,
-        qrcode: '',
-        isJoinConfirmFriends: 0,
-        weEmpleCodeTags: [],
-        weEmpleCodeUseScops: []
-      }
+      list: []
     };
   },
   created() {
-    if (this.$route.query) {
-      Object.keys(this.query).forEach(key => {
-        if (this.$route.query[key]) {
-          this.query[key] = this.$route.query[key];
-        }
-      });
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      const { beginTime, endTime } = this.$store.getters.searchQuery[this.$route.name];
+      if (beginTime && endTime) {
+        this.dateRange = [beginTime, endTime];
+      }
+      this.query = this.$store.getters.searchQuery[this.$route.name];
     }
     this.getList();
     this.$store.dispatch(
@@ -90,11 +80,15 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = [];
-      this.$refs['queryForm'].resetFields();
+      this.query = this.$options.data().query;
       this.getList(1);
     },
     goRoute(path, id) {
-      goRouteWithQuery(this.$router, path, this.query, { id });
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
+      goRouteWithQuery(this.$router, path, {}, { id });
     },
     goToStaffAdd() {
       this.goRoute('staffAdd');
@@ -118,21 +112,6 @@ export default {
             this.getList();
             this.msgSuccess('删除成功');
           });
-      });
-    },
-    // 选择人员变化事件
-    selectedUser(users) {
-      this.form.weEmpleCodeUseScops = users.map((d) => {
-        return {
-          businessId: d.id || d.userId,
-          businessName: d.name,
-          // eslint-disable-next-line no-magic-numbers
-          businessIdType: d.userId ? 2 : 1
-        };
-      });
-      batchAdd(this.form).then(({ data }) => {
-        this.msgSuccess('操作成功');
-        this.getList(1);
       });
     },
     download(id, userName, scenario) {
@@ -176,7 +155,6 @@ export default {
     getQueryObj() {
       const {
         useUserName,
-        mobile,
         scenario,
         createBy,
         beginTime,
@@ -184,7 +162,6 @@ export default {
       } = this.query;
       return {
         useUserName,
-        mobile,
         scenario,
         createBy,
         beginTime,

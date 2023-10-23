@@ -57,12 +57,12 @@ export default {
     }
   },
   created() {
-    if (this.$route.query) {
-      Object.keys(this.query).forEach(key => {
-        if (this.$route.query[key]) {
-          this.query[key] = this.$route.query[key];
-        }
-      });
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      const { beginTime, endTime } = this.$store.getters.searchQuery[this.$route.name];
+      if (beginTime && endTime) {
+        this.dateRange = [beginTime, endTime];
+      }
+      this.query = this.$store.getters.searchQuery[this.$route.name];
     }
     this.getList();
     this.$store.dispatch(
@@ -102,7 +102,11 @@ export default {
     },
     // 新建/编辑新客数据
     goRoute(id) {
-      goRouteWithQuery(this.$router, 'newCustomerAev', this.query, { id });
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
+      goRouteWithQuery(this.$router, 'newCustomerAev', {}, { id });
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -166,7 +170,7 @@ export default {
     // 重置查询参数
     resetQuery() {
       this.dateRange = [];
-      this.$refs['queryForm'].resetFields();
+      this.query = this.$options.data().query;
 
       this.$nextTick(() => {
         this.getList(1);

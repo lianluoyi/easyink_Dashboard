@@ -53,12 +53,12 @@ export default {
     }
   },
   created() {
-    if (this.$route.query) {
-      Object.keys(this.query).forEach(key => {
-        if (this.$route.query[key]) {
-          this.query[key] = this.$route.query[key];
-        }
-      });
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      const { beginTime, endTime } = this.$store.getters.searchQuery[this.$route.name];
+      if (beginTime && endTime) {
+        this.searchDate = [beginTime, endTime];
+      }
+      this.query = this.$store.getters.searchQuery[this.$route.name];
     }
 
     this.getGroupCodes();
@@ -97,7 +97,7 @@ export default {
     // 搜索栏清空
     resetQuery() {
       this.searchDate = '';
-      this.$refs['queryForm'].resetFields();
+      this.query = this.$options.data().query;
 
       this.$nextTick(() => {
         this.getGroupCodes();
@@ -181,7 +181,11 @@ export default {
       this.realCodeDialog = true;
     },
     goRoute(path, params) {
-      goRouteWithQuery(this.$router, path, this.query, params);
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
+      goRouteWithQuery(this.$router, path, {}, params);
     },
     goToGroupAdd() {
       this.goRoute('customerGroupDetail');

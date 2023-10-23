@@ -866,5 +866,12 @@ export const TAG_LABEL_TYPE = {
 
 /** 来源 */
 export const ADD_WAY = 'addWay';
-// 数据统计默认占位符
+/** 数据统计默认占位符 */
 export const DATA_STATISTICS_DEFAULT_SHOW = '-';
+
+/** 任务状态 */
+export const TASK_STATUS = {
+  'error': 0,
+  'success': 1,
+  'process': 2
+};

@@ -47,9 +47,8 @@
         </div>
       </li>
     </ul>
-    <el-dialog :visible.sync="dia" :show-close="false">
+    <el-dialog :visible.sync="dia" :show-close="false" append-to-body>
       <p>播放</p>
-
     </el-dialog>
   </div>
 </template>

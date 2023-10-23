@@ -263,6 +263,7 @@ export default {
     },
     submit() {
       this.$refs['form'].validate((valid) => {
+        // TODO 使用策略模式完成不同情况警告提示
         if (valid) {
           if (!this.form.weEmpleCodeUseScops.length) {
             this.msgError('请至少选择一名使用员工');
@@ -308,17 +309,16 @@ export default {
           }
           this.loading = true;
           (this.form.id ? update : add)(this.form)
-            .then(({ data }) => {
-              changeButtonLoading(this.$store, 'save');
+            .then(() => {
+              this.$store.commit('SET_ADD_FLAG', !this.form.id);
               if (this.qrCode !== this.form.qrCode && this.form.id) {
                 this.msgSuccess('活码已更新，请重新下载');
               } else {
                 this.msgSuccess('操作成功');
               }
-              this.loading = false;
               this.$router.back();
             })
-            .catch(() => {
+            .finally(() => {
               changeButtonLoading(this.$store, 'save');
               this.loading = false;
             });
@@ -352,6 +352,9 @@ export default {
     deleteTag(tag) {
       const index = this.form.weEmpleCodeTags.findIndex(tag_ => tag_.tagId === tag.tagId);
       this.form.weEmpleCodeTags.splice(index, 1);
+    },
+    handleClose(index) {
+      this.form.weEmpleCodeUseScops.splice(index, 1);
     }
   }
 };
@@ -399,7 +402,7 @@ export default {
                 size="mini"
                 @click="dialogVisibleSelectUser = true"
               >{{ form.weEmpleCodeUseScops.length ? '修改' : '添加' }}成员</el-button>
-              <el-tag v-for="(item, index) in form.weEmpleCodeUseScops" :key="index" class="user-tag aic mb5" size="medium">
+              <el-tag v-for="(item, index) in form.weEmpleCodeUseScops" :key="index" class="user-tag mb5" closable size="medium" @close="handleClose(index)">
                 <TagUserShow :name="item.businessName" :show-icon="item.businessIdType === SCOPELIST_TYPE.DEPARTMENT" />
               </el-tag>
             </div>

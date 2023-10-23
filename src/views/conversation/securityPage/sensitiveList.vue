@@ -1,128 +1,135 @@
 <!-- 敏感词触发页面 -->
 <template>
-  <el-tabs v-model="activeName" class="white-tabs">
-    <el-tab-pane label="敏感消息记录" name="record">
-      <RightContainer>
-        <template v-slot:search>
-          <el-form :inline="true" :model="form" class="demo-form-inline">
-            <el-form-item>
-              <div class="tag-input" @click="dialogVisibleSelectUser = true">
-                <span v-if="!queryUser.length" class="tag-place">请选择员工</span>
-                <template v-else>
-                  <el-tag
-                    v-for="(unit, unique) in queryUser"
-                    :key="unique"
-                    type="info"
-                  >{{ unit.name }}</el-tag>
-                </template>
-              </div>
-            </el-form-item>
-            <el-form-item>
-              <el-input
-                v-model="form.keyword"
-                placeholder="请输入关键词"
-              />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="() => getSensitiveList(1)">查询</el-button>
-              <el-button
-                class="btn-reset"
-                @click="resetQuery()"
-              >重置</el-button>
-            </el-form-item>
-          </el-form>
-        </template>
-        <template v-slot:data>
-          <el-table
-            :data="tableData"
-            size="medium"
-            style="width: 100%"
-          >
-            <template slot="empty">
-              <empty-default-icon
-                :length="tableData.length"
-              />
-            </template>
-            <el-table-column label="发送者">
-              <template slot-scope="scope">
-                <div v-if="scope.row.fromInfo" class="user-item">
-                  <img :src="scope.row.fromInfo.avatarMediaid || scope.row.fromInfo.avatar || require('@/assets/image/default-avatar.svg')" @error="defImg">
-                  <div class="name">
-                    <span>{{ scope.row.fromInfo && (scope.row.fromInfo.name || scope.row.fromInfo.groupName) }}</span>
-                    <div class="cus-dept">{{ (scope.row.fromInfo && departmentList[scope.row.fromInfo.mainDepartment]) ? departmentList[scope.row.fromInfo.mainDepartment].name : '' }}</div>
-                  </div>
+  <div>
+    <el-tabs v-model="activeName" class="white-tabs">
+      <el-tab-pane label="敏感消息记录" name="record">
+        <RightContainer>
+          <template v-slot:search>
+            <el-form :inline="true" :model="form" class="demo-form-inline">
+              <el-form-item>
+                <div class="tag-input" @click="dialogVisibleSelectUser = true">
+                  <span v-if="!queryUser.length" class="tag-place">请选择员工</span>
+                  <template v-else>
+                    <el-tag
+                      v-for="(unit, unique) in queryUser"
+                      :key="unique"
+                      type="info"
+                    >{{ unit.name }}</el-tag>
+                  </template>
                 </div>
-              </template>
-            </el-table-column>
-            <el-table-column label="接收者">
-              <template slot-scope="scope">
-                <div v-if="scope.row.toListInfo" :class="`${(scope.row.toListInfo && scope.row.toListInfo.type) ? 'user-item-center' : ''} user-item`">
-                  <img :src="scope.row.toListInfo.avatar || scope.row.toListInfo.avatarMediaid || require('@/assets/image/default-avatar.svg')" @error="defImg">
-                  <div class="name">
-                    <span>{{ scope.row.toListInfo && (scope.row.toListInfo.name || scope.row.toListInfo.groupName) }}</span>
-                    <span :class="scope.row.toListInfo.type === wxType ? 'wx-type-flag' : 'customer-type'">{{ renderUserInfo(scope.row.toListInfo) }}</span>
-                    <div class="cus-dept">{{ (scope.row.toListInfo && departmentList[scope.row.toListInfo.mainDepartment]) ? departmentList[scope.row.toListInfo.mainDepartment].name : '' }}</div>
-                  </div>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column label="敏感词">
-              <template slot-scope="scope">
-                <span>{{ scope.row.pattern_words || scope.row.patternWords }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="content" label="消息内容" />
-            <!-- <el-table-column prop="status" label="消息状态">
-        <template slot="header">
-          {{ floorRange }}
-          <el-select
-            size="mini"
-            v-model="floorRange"
-            class="noborder"
-            @change="chechName(floorRange)"
-          >
-            <el-option
-              v-for="item in displayOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              </el-form-item>
+              <el-form-item>
+                <el-input
+                  v-model="form.keyword"
+                  placeholder="请输入关键词"
+                />
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="() => getSensitiveList(1)">查询</el-button>
+                <el-button
+                  class="btn-reset"
+                  @click="resetQuery()"
+                >重置</el-button>
+              </el-form-item>
+            </el-form>
+          </template>
+          <template v-slot:data>
+            <el-table
+              :data="tableData"
+              size="medium"
+              style="width: 100%"
             >
-            </el-option>
-          </el-select>
-        </template>
-        <template slot-scope="scope">
-          {{ STATUS_MAP[scope.row.status] }}
-        </template>
-      </el-table-column> -->
-            <el-table-column prop="msgtime" label="发送时间">
-              <template slot-scope="scope">
-                <span>{{ parseTime(scope.row.msgtime) }}</span>
+              <template slot="empty">
+                <empty-default-icon
+                  :length="tableData.length"
+                />
               </template>
-            </el-table-column>
-          </el-table>
-          <pagination
-            v-show="total > 0"
-            :total="total"
-            :page.sync="form.pageNum"
-            :limit.sync="form.pageSize"
-            @pagination="getSensitiveList()"
-          />
-          <!-- 选择添加人弹窗 -->
-          <SelectUser
-            :visible.sync="dialogVisibleSelectUser"
-            title="选择添加人"
-            :is-sigle-select="true"
-            :selected-user-list="queryUser"
-            @success="selectedUser"
-          />
-        </template>
-      </RightContainer>
-    </el-tab-pane>
-    <el-tab-pane label="敏感词设置" name="settings">
-      <set-sensitive-word />
-    </el-tab-pane>
-  </el-tabs>
-
+              <el-table-column label="发送者">
+                <template slot-scope="scope">
+                  <div v-if="scope.row.fromInfo" class="user-item">
+                    <img :src="scope.row.fromInfo.avatarMediaid || scope.row.fromInfo.avatar || require('@/assets/image/default-avatar.svg')" @error="defImg">
+                    <div class="name">
+                      <span>{{ scope.row.fromInfo && (scope.row.fromInfo.name || scope.row.fromInfo.groupName) }}</span>
+                      <div class="cus-dept">{{ (scope.row.fromInfo && departmentList[scope.row.fromInfo.mainDepartment]) ? departmentList[scope.row.fromInfo.mainDepartment].name : '' }}</div>
+                    </div>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column label="接收者">
+                <template slot-scope="scope">
+                  <div v-if="scope.row.toListInfo" :class="`${(scope.row.toListInfo && scope.row.toListInfo.type) ? 'user-item-center' : ''} user-item`">
+                    <img :src="scope.row.toListInfo.avatar || scope.row.toListInfo.avatarMediaid || require('@/assets/image/default-avatar.svg')" @error="defImg">
+                    <div class="name">
+                      <span>{{ scope.row.toListInfo && (scope.row.toListInfo.name || scope.row.toListInfo.groupName) }}</span>
+                      <span :class="scope.row.toListInfo.type === wxType ? 'wx-type-flag' : 'customer-type'">{{ renderUserInfo(scope.row.toListInfo) }}</span>
+                      <div class="cus-dept">{{ (scope.row.toListInfo && departmentList[scope.row.toListInfo.mainDepartment]) ? departmentList[scope.row.toListInfo.mainDepartment].name : '' }}</div>
+                    </div>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column label="敏感词">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.pattern_words || scope.row.patternWords }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="content" label="消息内容" />
+              <!-- <el-table-column prop="status" label="消息状态">
+              <template slot="header">
+                {{ floorRange }}
+                <el-select
+                  size="mini"
+                  v-model="floorRange"
+                  class="noborder"
+                  @change="chechName(floorRange)"
+                >
+                  <el-option
+                    v-for="item in displayOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </template>
+              <template slot-scope="scope">
+                {{ STATUS_MAP[scope.row.status] }}
+              </template>
+            </el-table-column> -->
+              <el-table-column prop="msgtime" label="发送时间">
+                <template slot-scope="scope">
+                  <span>{{ parseTime(scope.row.msgtime) }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="100">
+                <template slot-scope="{ row }">
+                  <el-button size="mini" type="text" @click="viewContext(row)">查看上下文</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination
+              v-show="total > 0"
+              :total="total"
+              :page.sync="form.pageNum"
+              :limit.sync="form.pageSize"
+              @pagination="getSensitiveList()"
+            />
+            <!-- 选择添加人弹窗 -->
+            <SelectUser
+              :visible.sync="dialogVisibleSelectUser"
+              title="选择添加人"
+              :is-sigle-select="true"
+              :selected-user-list="queryUser"
+              @success="selectedUser"
+            />
+          </template>
+        </RightContainer>
+      </el-tab-pane>
+      <el-tab-pane label="敏感词设置" name="settings">
+        <set-sensitive-word />
+      </el-tab-pane>
+    </el-tabs>
+    <CheckContext :visible.sync="checkContextVisible" :check-context-query="checkContextQuery" />
+  </div>
 </template>
 <script>
 import * as sensitiveApis from '@/api/conversation/security';
@@ -132,12 +139,14 @@ import setSensitiveWord from './setSensitiveWord';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { dealAtInfo } from '@/utils/common';
+import CheckContext from '../component/CheckContext.vue';
 export default {
   components: {
     SelectUser,
     setSensitiveWord,
     RightContainer,
-    EmptyDefaultIcon
+    EmptyDefaultIcon,
+    CheckContext
   },
   data() {
     return {
@@ -181,7 +190,9 @@ export default {
         '3': '已删除'
       },
       wxType: WX_TYPE,
-      departmentList: []
+      departmentList: [],
+      checkContextVisible: false,
+      checkContextQuery: null
     };
   },
   mounted() {
@@ -191,6 +202,18 @@ export default {
     this.getDepartmentList();
   },
   methods: {
+    viewContext(row) {
+      this.checkContextQuery = {
+        msgId: row.msgId,
+        fromId: row?.fromInfo.userId || row?.fromInfo.externalUserid
+      };
+      if (row.roomId) {
+        this.checkContextQuery.roomId = row.roomId;
+      } else {
+        this.checkContextQuery.receiveId = row?.toListInfo.userId || row?.toListInfo.externalUserid;
+      }
+      this.checkContextVisible = true;
+    },
     async getDepartmentList() {
       const data = await this.$store.dispatch('GetDepartmentList');
       const departmentList = {};

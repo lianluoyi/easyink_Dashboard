@@ -443,6 +443,13 @@ export default {
     }
   },
   created() {
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      const { beginTime, endTime } = this.$store.getters.searchQuery[this.$route.name];
+      if (beginTime && endTime) {
+        this.searchForm.dateRange = [beginTime, endTime];
+      }
+      this.searchForm = this.$store.getters.searchQuery[this.$route.name];
+    }
     const routerQuery = this.$route.query;
     this.formId = routerQuery.id;
     this.getFormSet();
@@ -505,8 +512,12 @@ export default {
      * 查看客户资料
      */
     checkCustomerInfo(row) {
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.searchForm
+      });
       goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH,
-        this.searchForm, {
+        {}, {
           id: row.externalUserId,
           prePageType: 'staffClickRecord'
         });

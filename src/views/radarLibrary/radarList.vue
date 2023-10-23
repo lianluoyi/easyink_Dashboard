@@ -42,9 +42,10 @@
       </template>
       <template v-slot:data>
         <el-table
+          ref="tableRef"
           v-loading="loading"
           :data="list"
-          :default-sort="{prop: 'clickNum', order: null}"
+          :default-sort="defaultSort"
           @selection-change="handleSelectionChange"
           @sort-change="changeTableSort"
         >
@@ -207,7 +208,6 @@ export default {
   data() {
     return {
       RADAR_TYPE,
-      SORT,
       query: {
         searchTitle: '',
         pageNum: DEFAULT_PAGE_NUM,
@@ -232,7 +232,8 @@ export default {
       // 配置公众号弹窗显隐
       configDialogVisible: false,
       // 弹出操作须知弹窗去配置按钮loading
-      handleHintBtnLoading: false
+      handleHintBtnLoading: false,
+      defaultSort: { prop: 'clickNum', order: null }
     };
   },
   computed: {
@@ -279,11 +280,16 @@ export default {
      * 表格排序
      */
     changeTableSort(obj) {
-      this.query.enableSort = null;
+      this.query.pageNum = DEFAULT_PAGE_NUM;
       this.query.enableSort = SORT[obj.order];
-      this.getRadaList(1);
+      this.getRadaList();
     },
     async init() {
+      if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+        this.query = this.$store.getters.searchQuery[this.$route.name];
+        // TODO 排序不传 true false 传ASC or desc
+        this.defaultSort.order = this.query.enableSort === undefined ? null : this.query.enableSort ? 'ascending' : 'descending';
+      }
       await this.getRadaList();
       this.getAllOffAccountConfig();
       this.getOffAccountConfig();
@@ -309,9 +315,13 @@ export default {
     },
     /**
      * 获取雷达列表
+     * @param addFlag 是否时新增的标识
      */
-    async getRadaList(pageNum) {
-      pageNum && (this.query.pageNum = pageNum);
+    async getRadaList(addFlag) {
+      if (addFlag) {
+        this.query = this.$options.data().query;
+        this.$refs?.tableRef?.clearSort();
+      }
       const query = {
         ...this.query,
         type: this.activeRadar
@@ -332,14 +342,16 @@ export default {
      * 回车搜索
      */
     onSearch() {
-      this.getRadaList(1);
+      this.query.pageNum = DEFAULT_PAGE_NUM;
+      this.getRadaList();
     },
     /**
      * 清空客户昵称输入框触发的条件
      */
     clear(val) {
       if (!val) {
-        this.getRadaList(1);
+        this.query.pageNum = DEFAULT_PAGE_NUM;
+        this.getRadaList();
       }
     },
     /**
@@ -389,9 +401,7 @@ export default {
      */
     openVisible(type, radarId) {
       this.radarId = radarId;
-      type === 'edit'
-        ? (this.addRadarDrawerVisible = true)
-        : (this.customChannelVisible = true);
+      this[type === 'edit' ? 'addRadarDrawerVisible' : 'customChannelVisible'] = true;
     },
     /**
      * 删除单个雷达
@@ -427,16 +437,20 @@ export default {
         },
         async() => {
           deleteRadar(params).then(() => {
-            // TODO 后面需要考虑在第二页删除 页码不会跳到第一页的问题 兑换码也有该问题
             this.getRadaList();
           });
         }
       );
     },
     goRoute(row) {
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
+      // TODO  radarActive 也存到vuex
       // 点击详情时记录当前所在tab页
       window.sessionStorage.setItem('radarActive', this.activeRadar);
-      goRouteWithQuery(this.$router, 'radarDetail', this.query, {
+      goRouteWithQuery(this.$router, 'radarDetail', {}, {
         id: row.radarId
       });
     }

@@ -20,6 +20,8 @@ const getters = {
   tagList: state => state.listInfo.tagList,
   groupTagList: state => state.listInfo.groupTagList,
   customerProperList: state => state.customerProperty.customerProperList,
-  departmentList: state => state.departmentInfo.departmentList
+  departmentList: state => state.departmentInfo.departmentList,
+  searchQuery: state => state.searchConditions.searchQuery,
+  saveCondition: state => state.searchConditions.saveCondition
 };
 export default getters;

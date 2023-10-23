@@ -44,7 +44,7 @@
       <el-button icon="el-icon-plus" @click="dialogVisibleSelectUser = true">{{
         customerInfo.useStaff.length === 0 ? '添加成员' : '修改成员'
       }}</el-button>
-      <el-tag v-for="(item, index) in customerInfo.useStaff" :key="index" class="user-tag iaic">
+      <el-tag v-for="(item, index) in customerInfo.useStaff" :key="index" closable class="user-tag iaic" @close="handleClose(index)">
         <TagUserShow :show-icon="!item.userId" :name="item.name" />
       </el-tag>
     </el-form-item>
@@ -231,6 +231,9 @@ export default {
     submitSelectTag(data) {
       this.customerInfo[this.tagType === 'filter' ? 'filterTagList' : 'tagList'] = data;
       this.dialogVisibleSelectTag = false;
+    },
+    handleClose(index) {
+      this.customerInfo.useStaff.splice(index, 1);
     }
   }
 };

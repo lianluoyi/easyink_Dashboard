@@ -1,14 +1,14 @@
 <!--
  * @Description: 展示使用员工和部门，部门前面带图标
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 
 <template>
-  <div v-if="name">
+  <span v-if="name">
     <i v-if="!!showIcon" :class="`iconfont icon-folder mr${marginRight}`" :style="`font-size: ${iconSize}px; color: inherit;}`" />
     <span style="line-height:100%">{{ name }}</span>
-  </div>
+  </span>
 
 </template>
 
@@ -17,7 +17,7 @@ export default {
   name: 'TagUserShow',
   props: {
     showIcon: {
-      type: Boolean,
+      type: [Boolean, String],
       default: false
     },
     name: {

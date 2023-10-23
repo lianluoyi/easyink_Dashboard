@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { CUSTOMER_PATH, CUSTOMER_DEATIL_PATH, CUSTOMER_ASSISTANT_PATH, CUSTOMER_ASSISTANT_DETAIL_PATH, CUSTOMER_ASSISTANT_EDIT_PATH } from '@/utils/constant/routePath';
+import { CUSTOMER_PATH, CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 
 export default {
   name: 'AppMain',
@@ -22,7 +22,7 @@ export default {
      */
     isKeep() {
       /** 需要缓存的页面 */
-      const keepAliveList = [CUSTOMER_DEATIL_PATH, CUSTOMER_PATH, '/customerManage/customerCenter/BatchTagTaskDetail', CUSTOMER_ASSISTANT_PATH, CUSTOMER_ASSISTANT_DETAIL_PATH, CUSTOMER_ASSISTANT_EDIT_PATH];
+      const keepAliveList = [CUSTOMER_DEATIL_PATH, CUSTOMER_PATH, '/customerManage/customerCenter/BatchTagTaskDetail'];
       return keepAliveList.includes(this.$route.path);
     }
   }

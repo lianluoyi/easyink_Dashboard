@@ -1,6 +1,5 @@
 <template>
-
-  <div class="takecontent">
+  <div ref="takeContent" class="takecontent">
     <empty-default-icon
       text="暂无聊天记录"
       :length="allChat.length"
@@ -12,131 +11,142 @@
           :key="index"
           :class="dealSender(item, chatData, chatType)"
         >
-          <!-- <span v-if="item.fromInfo.name">{{item.fromInfo.name}}</span> -->
-          <div class="info-line"><span
-            v-if="item.fromInfo"
-          >{{ item.fromInfo.name }}</span> <span
-            :style="'color: #999'"
-          >{{ parseTime(item.msgTime) }}</span></div>
-          <!-- :style="{'color':item.action=='send'?'#199ed8':'#999'}">{{parseTime(item.msgTime)}}</span></div> -->
-          <div v-show="item.msgType=='card'" style="height: 95px" />
-          <div v-show="item.msgType=='location'" style="height: 140px" />
-          <div v-show="item.msgType=='weapp'" style="height: 140px" />
-          <Message v-if="item.msgType=='text'" :is-revoke="item.isRevoke" class="msgtypetext">
-            {{ item.text.content }}
-          </Message>
-          <Message v-else-if="item.msgType=='image'" :is-revoke="item.isRevoke" class="msgtypeimg">
-            <ImgChatItem :img-url="item.image.attachment" />
-          </Message>
-          <Message v-else-if="item.msgType=='mixed'" :is-revoke="item.isRevoke">
-            <MixedList :mixed="item.mixed.item" />
-          </Message>
-          <Message v-else-if="item.msgType=='file'" :is-revoke="item.isRevoke" class="msgtypefile">
-            <div class="toe" :title="item.file.filename || item.file.fileName" @click="down(item.file)">
-              {{ item.file.filename || item.file.fileName }}
+          <el-avatar
+            v-if="!SYSTEM_MSG_TYPE_LIST.includes(item.msgType) && showAvatar"
+            :style="(chatType === 'employee' && item.from === chatData.fromId || chatType !== 'employee' && item.from !== chatData.fromId) ? 'margin-left:5px':'margin-right:5px'"
+            shape="square"
+            size="medium"
+            :src="item.fromInfo && (item.fromInfo.avatar || item.fromInfo.avatarMediaid || require('@/assets/image/card-avatar.svg'))"
+            class="avatar"
+          />
+          <div>
+            <div class="info-line">
+              <template v-if="chatType === 'employee'">
+                <span v-if="item.from !== chatData.fromId" class="name">{{ item.fromInfo && item.fromInfo.name }}</span>
+                <span class="time" :style="item.from !== chatData.fromId ? 'margin-left:5px;':'margin-right:5px;'">{{ parseTime(item.msgTime) }}</span>
+                <span v-if="item.from === chatData.fromId" class="name">{{ item.fromInfo && item.fromInfo.name }}</span>
+              </template>
+              <template v-else>
+                <span v-if="item.from === chatData.fromId" class="name">{{ item.fromInfo && item.fromInfo.name }}</span>
+                <span class="time" :style="item.from === chatData.fromId ? 'margin-left:5px;':'margin-right:5px;'">{{ parseTime(item.msgTime) }}</span>
+                <span v-if="item.from !== chatData.fromId" class="name">{{ item.fromInfo && item.fromInfo.name }}</span>
+              </template>
             </div>
-          </Message>
-          <Message v-else-if="item.msgType=='voice'" :is-revoke="item.isRevoke" class="msgtypevoice">
-            <img v-if="voicePlayObj[item.msgId] && voicePlayObj[item.msgId].isPlaying" :src="dealVoiceImg(true, item)" @click="pauseVideo(item)">
-            <img v-else :src="dealVoiceImg(false, item)" @click="playVideo(item)">
-          </Message>
-          <Message v-else-if="item.msgType=='emotion'" :is-revoke="item.isRevoke" class="msgtypeimg">
-            <ImgChatItem :img-url="item.emotion.attachment" />
-          </Message>
-          <Message v-else-if="item.msgType=='video'" :is-revoke="item.isRevoke" class="msgtypevideo">
-            <VideoChatItem :url="item.video.attachment" />
-          </Message>
-          <Message v-else-if="item.msgType=='location'" :is-revoke="item.isRevoke" class="msgtypecard msg-type-location">
-            <div>
-              <div class="card_name">
-                <el-amap
-                  ref="map"
-                  vid="amapDemo"
-                  :center="[item.location.longitude, item.location.latitude]"
-                  :zoom="zoom"
-                  class="amap-demo"
-                  style="pointer-events: none;"
-                >
-                  <el-amap-marker :position="[item.location.longitude, item.location.latitude]" />
-                </el-amap>
+            <Message v-if="item.msgType=='text'" :is-revoke="item.isRevoke" class="msgtypetext">
+              {{ item.text.content }}
+            </Message>
+            <Message v-else-if="item.msgType=='image'" :is-revoke="item.isRevoke" class="msgtypeimg">
+              <ImgChatItem :img-url="item.image.attachment" />
+            </Message>
+            <Message v-else-if="item.msgType=='mixed'" :is-revoke="item.isRevoke">
+              <MixedList :mixed="item.mixed.item" />
+            </Message>
+            <Message v-else-if="item.msgType=='file'" :is-revoke="item.isRevoke" class="msgtypefile">
+              <div class="toe" :title="item.file.filename || item.file.fileName" @click="down(item.file)">
+                {{ item.file.filename || item.file.fileName }}
               </div>
-              <div class="card_foot">{{ item.location.address }}</div>
-            </div>
-          </Message>
-          <Message v-else-if="item.msgType=='weapp'" :is-revoke="item.isRevoke" class="msgtypecard msg-type-weapp">
-            <div v-if="item.weApp">
-              <div class="card_name">{{ item.weApp.title }}</div>
-              <div class="card_foot">小程序</div>
-            </div>
-          </Message>
-          <Message v-else-if="item.msgType=='sphfeed'" :is-revoke="item.isRevoke" class="msgtypesph">
-            <div class="toe" :title="item.sphFeed.feedDesc">
-              [视频号] {{ item.sphFeed.feedDesc }}
-            </div>
-          </Message>
-          <Message v-else-if="item.msgType=='external_redpacket'" :is-revoke="item.isRevoke" class="msgtypetext">
-            [这是一条红包消息]
-          </Message>
-          <Message v-else-if="item.msgType=='chatrecord'" :is-revoke="item.isRevoke" class="msg-type-link">
-            <div>
-              <div class="msg-type-title">{{ chatReCordShowTitle(item.chatReCord.title) }}</div>
-              <div class="chatrecord-content">
-                <p v-for="(chatrecordItem,cIndex) in item.chatReCord.item.slice(0,4)" :key="cIndex" class="toe">
-                  {{ chatReCordShowText(chatrecordItem, 'unParsed') }}
-                </p>
-              </div>
-              <el-button type="text" class="chatrecord-button" @click="$emit('openChatrecord', item.chatReCord)">查看详情</el-button>
-            </div>
-          </Message>
-
-          <!-- 系统提示消息 -->
-          <div v-else-if="item.msgType=='agree'" class="msgtypetext">
-            {{ item.fromInfo.name }}同意存档会话内容
-          </div>
-          <div v-else-if="item.msgType=='disagree'" class="msgtypetext">
-            {{ item.fromInfo.name }}不同意存档会话内容，无法获取聊天记录
-          </div>
-          <div v-else-if="item.msgType=='revoke'" class="msgtypetext">
-            {{ item.fromInfo.name }}撤回了一条消息
-          </div>
-
-          <Message v-else-if="item.msgType=='card'" :is-revoke="item.isRevoke" class="msg-type-card">
-            <div>
-              <div class="card_name">
-                <div class="card-left">
-                  <div class="card-corp-name">
-                    <img v-show="['微信', '微信联系人'].includes(item.card.corpName)" class="wx-logo" :src="require('@/assets/image/wx-logo.svg')">
-                    {{ ['微信', '微信联系人'].includes(item.card.corpName) ? '微信' : item.card.corpName }}
-                  </div>
-                  <div class="card-user-name inoneline">{{ item.card.userName || item.card.userId }}</div>
+            </Message>
+            <Message v-else-if="item.msgType=='voice'" :is-revoke="item.isRevoke" class="msgtypevoice">
+              <img v-if="voicePlayObj[item.msgId] && voicePlayObj[item.msgId].isPlaying" :src="dealVoiceImg(true, item)" @click="pauseVideo(item)">
+              <img v-else :src="dealVoiceImg(false, item)" @click="playVideo(item)">
+            </Message>
+            <Message v-else-if="item.msgType=='emotion'" :is-revoke="item.isRevoke" class="msgtypeimg">
+              <ImgChatItem :img-url="item.emotion.attachment" />
+            </Message>
+            <Message v-else-if="item.msgType=='video'" :is-revoke="item.isRevoke" class="msgtypevideo">
+              <VideoChatItem :url="item.video.attachment" />
+            </Message>
+            <Message v-else-if="item.msgType=='location'" :is-revoke="item.isRevoke" class="msg-type-location">
+              <div class="msgtypecard">
+                <div class="title">
+                  {{ item.location.address }}
                 </div>
-                <img :src="item.card.imageUrl || require('@/assets/image/card-avatar.svg')">
+                <div class="info">
+                  {{ item.location.title }}
+                </div>
+                <div class="name">位置</div>
               </div>
-              <div class="card-foot">个人名片</div>
+            </Message>
+            <Message v-else-if="item.msgType=='weapp'" :is-revoke="item.isRevoke" class="msg-type-weapp">
+              <div class="msgtypecard">
+                <div class="title">
+                  {{ item.weApp.title }}
+                </div>
+                <div class="info">
+                  {{ item.weApp.displayname }}
+                </div>
+                <div class="name">小程序</div>
+              </div>
+            </Message>
+            <Message v-else-if="item.msgType=='sphfeed'" :is-revoke="item.isRevoke" class="msgtypesph">
+              <div class="toe" :title="item.sphFeed.feedDesc">
+                [视频号] {{ item.sphFeed.feedDesc }}
+              </div>
+            </Message>
+            <Message v-else-if="item.msgType=='external_redpacket'" :is-revoke="item.isRevoke" class="msgtypetext">
+              [这是一条红包消息]
+            </Message>
+            <Message v-else-if="item.msgType=='chatrecord'" :is-revoke="item.isRevoke" class="msg-type-link">
+              <div>
+                <div class="msg-type-title">{{ chatReCordShowTitle(item.chatReCord.title) }}</div>
+                <div class="chatrecord-content">
+                  <p v-for="(chatrecordItem,cIndex) in item.chatReCord.item.slice(0,4)" :key="cIndex" class="toe">
+                    {{ chatReCordShowText(chatrecordItem, 'unParsed') }}
+                  </p>
+                </div>
+                <el-button type="text" class="chatrecord-button" @click="$emit('openChatrecord', item.chatReCord)">查看详情</el-button>
+              </div>
+            </Message>
+
+            <!-- 系统提示消息 -->
+            <div v-else-if="item.msgType=='agree'" class="msgtypetext system-msg">
+              {{ item.fromInfo.name }}同意存档会话内容
             </div>
-          </Message>
-          <Message v-else-if="item.msgType=='link'" :is-revoke="item.isRevoke" class="msgtypelink">
-            <template v-if="item.link">
-              <a class="msg-type-link" :href="item.link.linkUrl" target="_blank">
-                <div class="msg-type-title">{{ item.link.title }}</div>
+            <div v-else-if="item.msgType=='disagree'" class="msgtypetext">
+              {{ item.fromInfo.name }}不同意存档会话内容，无法获取聊天记录
+            </div>
+            <div v-else-if="item.msgType=='revoke'" class="msgtypetext">
+              {{ item.fromInfo.name }}撤回了一条消息
+            </div>
+
+            <Message v-else-if="item.msgType=='card'" :is-revoke="item.isRevoke" class="msg-type-card">
+              <div>
+                <div class="card_name">
+                  <div class="card-left">
+                    <div class="card-corp-name">
+                      <img v-show="['微信', '微信联系人'].includes(item.card.corpName)" class="wx-logo" :src="require('@/assets/image/wx-logo.svg')">
+                      {{ ['微信', '微信联系人'].includes(item.card.corpName) ? '微信' : item.card.corpName }}
+                    </div>
+                    <div class="card-user-name inoneline">{{ item.card.userName || item.card.userId }}</div>
+                  </div>
+                  <img :src="item.card.imageUrl || require('@/assets/image/card-avatar.svg')">
+                </div>
+                <div class="card-foot">个人名片</div>
+              </div>
+            </Message>
+            <Message v-else-if="item.msgType=='link'" :is-revoke="item.isRevoke" class="msgtypelink">
+              <template v-if="item.link">
+                <a class="msg-type-link" :href="item.link.linkUrl" target="_blank">
+                  <div class="msg-type-title">{{ item.link.title }}</div>
+                  <div class="msg-type-desc">
+                    <div>{{ item.link.description }}</div>
+                    <img :src="item.link.imageUrl || item.link.image_url">
+                  </div>
+                </a>
+              </template>
+            </Message>
+            <Message v-else-if="item.msgType=='docmsg'" :is-revoke="item.isRevoke" class="msg-doc">
+              <a class="msg-type-doc" :href="item.doc.linkUrl" target="_blank">
+                <div class="msg-type-title">{{ item.doc.title }}</div>
                 <div class="msg-type-desc">
-                  <div>{{ item.link.description }}</div>
-                  <img :src="item.link.imageUrl || item.link.image_url">
+                  <div>点击查看文档</div>
+                  <svg className="icon-docx" :width="45" :height="45">
+                    <use href="#icon-docx" />
+                  </svg>
                 </div>
               </a>
-            </template>
-          </Message>
-          <Message v-else-if="item.msgType=='docmsg'" :is-revoke="item.isRevoke" class="msg-doc">
-            <a class="msg-type-doc" :href="item.doc.linkUrl" target="_blank">
-              <div class="msg-type-title">{{ item.doc.title }}</div>
-              <div class="msg-type-desc">
-                <div>点击查看文档</div>
-                <svg className="icon-docx" :width="45" :height="45">
-                  <use href="#icon-docx" />
-                </svg>
-              </div>
-            </a>
-          </Message>
+            </Message>
+          </div>
         </li>
       </ul>
     </empty-default-icon>
@@ -180,18 +190,29 @@ export default {
     chatType: {
       type: String,
       default: 'employee'
+    },
+    showAvatar: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
       zoom,
-      voicePlayObj: {}
+      voicePlayObj: {},
+      SYSTEM_MSG_TYPE_LIST
     };
   },
   mounted() {},
   methods: {
     playVideo(msg) {
       this.urlToBlob(msg.voice.attachment, msg);
+    },
+    /**
+     * @description 初始化滚动条
+     */
+    initScollTop() {
+      this.$refs['takeContent'] && (this.$refs['takeContent'].scrollTop = 0);
     },
     down(e) {
       downloadFile(e.attachment, e.filename || e.fileName || e.file.filename);
@@ -387,10 +408,15 @@ export default {
 
     ul li {
       padding: 8px;
+      display: flex;
+      .avatar {
+        flex-shrink: 0;
+        background: none;
+      }
     }
 
     .msgtypetext {
-      padding: 10px 0;
+      padding: 5px 0;
       color: #333;
     }
 
@@ -418,18 +444,17 @@ export default {
     }
 
     .msgtypesph {
-      width: calc(100% - 10px);
       div {
+        max-width: 290px;
         height: 40px;
         line-height: 40px;
         cursor: pointer;
         color: #199ed8;
-        text-indent: 10px;
         box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2), 0 1px 4px 0 rgba(0, 0, 0, 0.19);
-        margin: 10px;
+        margin: 10px 0;
         display: inline-block;
         text-align: left;
-        padding-right: .6em;
+        padding: 0 10px;
       }
     }
 
@@ -442,9 +467,7 @@ export default {
 
     .msgtypevideo {
       margin: 10px;
-
       cursor: pointer;
-
       border-radius: 8px;
     }
     .msgtypeimg {
@@ -456,18 +479,11 @@ export default {
         height: 80px;
       }
     }
-    .msg-type-location, .msg-type-weapp {
-      position: absolute!important;
-      left: 10px;
-      top: 20px;
-    }
     .msg-type-card {
-      position: absolute;
-      left: 10px;
       top: 20px;
       width: 240px;
       height: 91px;
-      margin: 10px 10px 10px 0px;
+      margin: 5px 0px;
       border-radius: 8px;
       -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
@@ -506,7 +522,6 @@ export default {
         margin-right: 5px;
       }
       .card-foot {
-        position: absolute;
         border-top: 1px solid #efefef;
         text-align: left;
         padding-left: 8px;
@@ -516,51 +531,55 @@ export default {
         width: 100%;
       }
     }
+    .msg-type-location,.msg-type-weapp {
+      margin: 5px 0px;
+    }
     .msgtypecard {
-      width: 320px;
-      height: 140px;
-      margin: 10px 10px 10px 0px;
+      width: 290px;
+      text-align: left;
       border-radius: 8px;
       -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
-      position: relative;
-
-      .card_foot {
-        position: absolute;
-        height: 20px;
+      .title {
+        font-size: 14px;
+        color: #262626;
+        padding: 10px 10px 5px 10px;
+      }
+      .info {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+        padding: 0 10px;
+      }
+      .name {
+        font-size: 12px;
+        color: #666;
         border-top: 1px solid #efefef;
-        text-align: left;
-        bottom: 15px;
-        padding: 10px;
-        color: #333;
-        font-weight: bold;
-        width: 100%;
+        padding: 5px 10px;
       }
     }
     .sender, .receiver {
       position: relative;
       .info-line {
         color: #199ed8;
+        .time {
+          color: #999;
+        }
       }
     }
     .sender {
       text-align: right;
-      .msg-type-card, .msg-type-location, .msg-type-weapp {
-        left: unset;
-        right: 0;
-        top: 20px;
-      }
+      flex-direction: row-reverse;
     }
 
   }
 
   .system-msg{
     text-align: center;
-
-    .info-line > span:first-child {
+    justify-content: center;
+    .name {
       display: none;
     }
-
     .msgtypetext{
       font-size: 14px;
       color: #999;

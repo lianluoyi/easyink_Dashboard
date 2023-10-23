@@ -13,7 +13,7 @@
         <img class="thumb" :src="list.content.attachment" @click="showImg(list.content.attachment)">
       </div>
     </div>
-    <el-dialog :visible.sync="dialogVisible" width="40%">
+    <el-dialog :visible.sync="dialogVisible" width="40%" append-to-body>
       <img :src="imgSrc" style="width:100%;max-height:600px">
       <span slot="footer" class="dialog-footer" />
     </el-dialog>

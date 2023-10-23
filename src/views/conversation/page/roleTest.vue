@@ -1,119 +1,126 @@
 <template>
-  <RightContainer>
-    <template v-slot:search>
-      <el-form id="roleTestSearch" :inline="true" :model="form" class="demo-form-inline" label-width="100px">
-        <el-row>
-          <el-form-item>
-            <el-input v-model="form.Ename" placeholder="请填写发送者的姓名/昵称" style="width:240px" />
-          </el-form-item>
-          <el-form-item>
-            <el-input v-model="form.Cname" placeholder="请填写接收者的姓名/昵称" style="width:240px" />
-          </el-form-item>
-          <el-form-item>
-            <el-input v-model="form.Scontent" placeholder="请输入聊天内容" style="width:240px" />
-          </el-form-item>
-          <el-form-item>
-            <el-date-picker
-              v-model="form.Stime"
-              style="width:240px"
-              type="datetimerange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              align="right"
-              :default-time="['00:00:00', '23:59:59']"
-            />
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="searchList">查询</el-button>
-            <el-button
-              class="btn-reset"
-              @click="resetQuery()"
-            >重置</el-button>
-          </el-form-item>
-        </el-row>
-      </el-form>
-    </template>
-    <template v-slot:data>
-      <div id="roleTestContent" class="content">
-        <el-table size="medium" :data="fileData" :height="tableHeight" style="width: 100%">
-          <template slot="empty">
-            <empty-default-icon
-              :length="fileData.length"
-            />
-          </template>
-          <el-table-column prop="date" label="发送者" width="200">
-            <template slot-scope="scope">
-              <div :class="`${(scope.row.fromInfo && scope.row.fromInfo.type) ? 'user-item-center' : ''} user-item`">
-                <img class="avatar" :src="(scope.row.fromInfo && (scope.row.fromInfo.avatar || scope.row.fromInfo.avatarMediaid)) || defaultAvatar">
-                <div>
-                  <span v-if="scope.row.fromInfo" class="user-name">{{ scope.row.fromInfo.name }}</span>
-                  <span v-if="scope.row.fromInfo" :class="scope.row.fromInfo.type === wxType ? 'wx-type-flag' : 'corp-type-name'">{{ renderUserInfo(scope.row.fromInfo) }}</span>
-                  <div class="cus-dept">{{ (scope.row.fromInfo && scope.row.fromInfo.mainDepartment && departmentList[scope.row.fromInfo.mainDepartment]) ? departmentList[scope.row.fromInfo.mainDepartment].name : '' }}</div>
-                </div>
-              </div>
+  <div class="h100">
+    <RightContainer>
+      <template v-slot:search>
+        <el-form id="roleTestSearch" :inline="true" :model="form" class="demo-form-inline" label-width="100px">
+          <el-row>
+            <el-form-item>
+              <el-input v-model="form.Ename" placeholder="请填写发送者的姓名/昵称" style="width:240px" />
+            </el-form-item>
+            <el-form-item>
+              <el-input v-model="form.Cname" placeholder="请填写接收者的姓名/昵称" style="width:240px" />
+            </el-form-item>
+            <el-form-item>
+              <el-input v-model="form.Scontent" placeholder="请输入聊天内容" style="width:240px" />
+            </el-form-item>
+            <el-form-item>
+              <el-date-picker
+                v-model="form.Stime"
+                style="width:240px"
+                type="datetimerange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                align="right"
+                :default-time="['00:00:00', '23:59:59']"
+              />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="searchList">查询</el-button>
+              <el-button
+                class="btn-reset"
+                @click="resetQuery()"
+              >重置</el-button>
+            </el-form-item>
+          </el-row>
+        </el-form>
+      </template>
+      <template v-slot:data>
+        <div id="roleTestContent" class="content">
+          <el-table size="medium" :data="fileData" :height="tableHeight" style="width: 100%">
+            <template slot="empty">
+              <empty-default-icon
+                :length="fileData.length"
+              />
             </template>
-          </el-table-column>
-          <el-table-column prop="date" label="接收者" width="200">
-            <template slot-scope="scope">
-              <div :class="`${(scope.row.toListInfo && scope.row.toListInfo.type) ? 'user-item-center' : ''} user-item`">
-                <img class="avatar" :src="(scope.row.toListInfo && (scope.row.toListInfo.avatar || scope.row.toListInfo.avatarMediaid)) || defaultAvatar" @error="defImg">
-                <div>
-                  <span v-if="scope.row.toListInfo" class="user-name">{{ scope.row.toListInfo.name || scope.row.toListInfo.groupName }}</span>
-                  <span v-if="scope.row.toListInfo" :class="scope.row.toListInfo.type === wxType ? 'wx-type-flag' : 'corp-type-name'">{{ renderUserInfo(scope.row.toListInfo) }}</span>
-                  <div class="cus-dept">{{ (scope.row.toListInfo && scope.row.toListInfo.mainDepartment && departmentList[scope.row.toListInfo.mainDepartment]) ? departmentList[scope.row.toListInfo.mainDepartment].name : '' }}</div>
+            <el-table-column prop="date" label="发送者" width="200">
+              <template slot-scope="scope">
+                <div :class="`${(scope.row.fromInfo && scope.row.fromInfo.type) ? 'user-item-center' : ''} user-item`">
+                  <img class="avatar" :src="(scope.row.fromInfo && (scope.row.fromInfo.avatar || scope.row.fromInfo.avatarMediaid)) || defaultAvatar">
+                  <div>
+                    <span v-if="scope.row.fromInfo" class="user-name">{{ scope.row.fromInfo.name }}</span>
+                    <span v-if="scope.row.fromInfo" :class="scope.row.fromInfo.type === wxType ? 'wx-type-flag' : 'corp-type-name'">{{ renderUserInfo(scope.row.fromInfo) }}</span>
+                    <div class="cus-dept">{{ (scope.row.fromInfo && scope.row.fromInfo.mainDepartment && departmentList[scope.row.fromInfo.mainDepartment]) ? departmentList[scope.row.fromInfo.mainDepartment].name : '' }}</div>
+                  </div>
                 </div>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="name" label="消息内容">
-            <template slot-scope="scope">
-              <!-- <p v-if="!!scope.row.content" class="emcode" v-html="scope.row.content" />
+              </template>
+            </el-table-column>
+            <el-table-column prop="date" label="接收者" width="200">
+              <template slot-scope="scope">
+                <div :class="`${(scope.row.toListInfo && scope.row.toListInfo.type) ? 'user-item-center' : ''} user-item`">
+                  <img class="avatar" :src="(scope.row.toListInfo && (scope.row.toListInfo.avatar || scope.row.toListInfo.avatarMediaid)) || defaultAvatar" @error="defImg">
+                  <div>
+                    <span v-if="scope.row.toListInfo" class="user-name">{{ scope.row.toListInfo.name || scope.row.toListInfo.groupName }}</span>
+                    <span v-if="scope.row.toListInfo" :class="scope.row.toListInfo.type === wxType ? 'wx-type-flag' : 'corp-type-name'">{{ renderUserInfo(scope.row.toListInfo) }}</span>
+                    <div class="cus-dept">{{ (scope.row.toListInfo && scope.row.toListInfo.mainDepartment && departmentList[scope.row.toListInfo.mainDepartment]) ? departmentList[scope.row.toListInfo.mainDepartment].name : '' }}</div>
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="name" label="消息内容">
+              <template slot-scope="scope">
+                <!-- <p v-if="!!scope.row.content" class="emcode" v-html="scope.row.content" />
               <p v-else-if="!!!scope.row.content&&scope.row.text">{{ scope.row.text.content }}</p> -->
-              <chat :item="scope.row" />
-            </template>
-          </el-table-column>
-          <el-table-column label="发送状态" width="160" label-class-name="send-label-cell" class-name="send-cell">
-            <template #header>
-              <el-select v-model="floorRange" size="mini" class="noborder send-type-select" @change="chechName(floorRange)">
-                <el-option v-for="item in displayOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </template>
-            <template slot-scope="scope">
-              <div class="pers">
-                <span v-if="scope.row.action==''" />
-                <span v-else-if="scope.row.action=='send'">
-                  <span class="green" />
-                  已发送
-                </span>
-                <span v-else-if="scope.row.action=='recall'">
-                  <span class="red" />
-                  已撤回
-                </span>
-                <span v-else-if="scope.row.action=='switch'">
-                  <span class="gay" />
-                  企业日志
-                </span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="address" label="发送时间" width="200">
-            <template slot-scope="scope">
-              {{ parseTime(scope.row.msgTime) }}
-            </template>
-          </el-table-column>
-        </el-table>
-        <pagination
-          v-show="total > 0"
-          :total="total"
-          :page.sync="currentPage"
-          :limit.sync="pageSize"
-          @pagination="currentChange"
-        />
-      </div>
-    </template>
-  </RightContainer>
-
+                <chat :item="scope.row" />
+              </template>
+            </el-table-column>
+            <el-table-column label="发送状态" width="160" label-class-name="send-label-cell" class-name="send-cell">
+              <template #header>
+                <el-select v-model="floorRange" size="mini" class="noborder send-type-select" @change="chechName(floorRange)">
+                  <el-option v-for="item in displayOptions" :key="item.value" :label="item.label" :value="item.value" />
+                </el-select>
+              </template>
+              <template slot-scope="scope">
+                <div class="pers">
+                  <span v-if="scope.row.action==''" />
+                  <span v-else-if="scope.row.action=='send'">
+                    <span class="green" />
+                    已发送
+                  </span>
+                  <span v-else-if="scope.row.action=='recall'">
+                    <span class="red" />
+                    已撤回
+                  </span>
+                  <span v-else-if="scope.row.action=='switch'">
+                    <span class="gay" />
+                    企业日志
+                  </span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="address" label="发送时间" width="200">
+              <template slot-scope="scope">
+                {{ parseTime(scope.row.msgTime) }}
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="200">
+              <template slot-scope="{ row }">
+                <el-button size="mini" type="text" @click="viewContext(row)">查看上下文</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <pagination
+            v-show="total > 0"
+            :total="total"
+            :page.sync="currentPage"
+            :limit.sync="pageSize"
+            @pagination="currentChange"
+          />
+        </div>
+      </template>
+    </RightContainer>
+    <CheckContext :visible.sync="checkContextVisible" :check-context-query="checkContextQuery" :chat-type="chatType" />
+  </div>
 </template>
 <script>
 import {
@@ -125,8 +132,9 @@ import chat from '../component/chatItem.vue';
 import { dealAtInfo } from '@/utils/common';
 import { PAGE_LIMIT, CORP_TYPE } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
+import CheckContext from '../component/CheckContext.vue';
 export default {
-  components: { RightContainer, chat, EmptyDefaultIcon },
+  components: { RightContainer, chat, EmptyDefaultIcon, CheckContext },
   data() {
     return {
       wxType: WX_TYPE,
@@ -165,7 +173,10 @@ export default {
       // eslint-disable-next-line no-magic-numbers
       tableHeight: 100,
       defaultAvatar: DEFAULT_AVATAR,
-      departmentList: []
+      departmentList: [],
+      checkContextVisible: false,
+      checkContextQuery: null,
+      chatType: 'employee'
     };
   },
   mounted() {
@@ -180,6 +191,19 @@ export default {
     this.getDepartmentList();
   },
   methods: {
+    viewContext(row) {
+      this.chatType = row.fromInfo?.userId ? 'employee' : 'user';
+      this.checkContextQuery = {
+        msgId: row.msgId,
+        fromId: row?.fromInfo.userId || row?.fromInfo.externalUserid
+      };
+      if (row.roomId) {
+        this.checkContextQuery.roomId = row.roomId;
+      } else {
+        this.checkContextQuery.receiveId = row?.toListInfo.userId || row?.toListInfo.externalUserid;
+      }
+      this.checkContextVisible = true;
+    },
     async getDepartmentList() {
       const data = await this.$store.dispatch('GetDepartmentList');
       const departmentList = {};

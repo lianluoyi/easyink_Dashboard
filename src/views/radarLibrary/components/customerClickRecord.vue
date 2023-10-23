@@ -117,6 +117,9 @@ export default {
     };
   },
   created() {
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      this.query = this.$store.getters.searchQuery[this.$route.name];
+    }
     this.getCustomerClickRecord();
   },
   methods: {
@@ -136,8 +139,12 @@ export default {
      * 查看客户资料
      */
     checkCustomerInfo(row) {
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
       goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH,
-        this.query, {
+        {}, {
           id: row.externalId,
           prePageType: 'customerClickRecord'
         });

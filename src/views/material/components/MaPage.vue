@@ -198,10 +198,9 @@ export default {
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
-          this.loading = false;
           this.$emit('listChange', this.list);
         })
-        .catch(() => {
+        .finally(() => {
           this.loading = false;
         });
       this.getMaterialCount();

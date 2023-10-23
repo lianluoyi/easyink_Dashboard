@@ -39,7 +39,9 @@
                 v-for="(item, index) in useStaff"
                 :key="index"
                 size="medium"
+                closable
                 class="user-tag aic"
+                @close="handleClose(index)"
               >
                 <TagUserShow :name="item.name" :show-icon="item.id" />
               </el-tag>
@@ -198,18 +200,16 @@
 </template>
 <script>
 import RequestButton from '@/components/Button/RequestButton.vue';
-import { changeButtonLoading, checkChange } from '@/utils/common';
+import { changeButtonLoading, checkChange, groupByScopeType } from '@/utils/common';
 import ReturnPage from '@/components/ReturnPage.vue';
 import { AUTOLABEL_TYPE } from '@/utils/constant/index';
 import SceneList from './components/sceneList.vue';
 import SelectUser from '@/components/SelectUser';
 import SelectTag from '@/components/SelectTag';
 import { addNewCustomerRule, addIntoGroupRule, addKeywordRule, getKeywordRuleInfo, getIntoGroupRuleInfo, getNewCustomerRuleInfo, updateKeywordRule, updateIntoGroupRule, updateNewCustomerRule } from '@/api/customer/auto';
-import { ONE_DAY, ONE_HOUR, MS_TO_SECONDS, NEWCUSOMTER_SCENE_TYPE, SCOPELIST_TYPE } from '@/utils/constant/index';
+import { ONE_DAY, ONE_HOUR, MS_TO_SECONDS, NEWCUSOMTER_SCENE_TYPE } from '@/utils/constant/index';
 import differenceBy from 'lodash/differenceBy';
-import { groupBy } from 'lodash';
 import TagUserShow from '@/components/TagUserShow';
-
 export default {
   name: '',
   components: { ReturnPage, SceneList, SelectUser, SelectTag, RequestButton, TagUserShow },
@@ -417,6 +417,7 @@ export default {
       const newParams = { ...params };
       const tagIdList = this.customerTags?.map(item => item.tagId);
       const removeTagList = this.removeTagList;
+      const allListObj = groupByScopeType(this.useStaff);
       this.loading = true;
       switch (this.labelType) {
         case AUTOLABEL_TYPE['keyWords']: {
@@ -435,9 +436,9 @@ export default {
             // 客户标签列表
             tagIdList: tagIdList,
             // 使用员工列表
-            userIdList: this.useEmployeesList?.map(item => item.userId),
+            userIdList: allListObj.useEmployeesList?.map(item => item.userId),
             // 使用部门列表
-            departmentIdList: this.useDepartmentList?.map(item => item.id)
+            departmentIdList: allListObj.useDepartmentList?.map(item => item.id)
           });
           break;
         }
@@ -480,8 +481,8 @@ export default {
                 tagIdList: item.tagList?.map(item => item.tagId)
               };
             }),
-            userIdList: this.useEmployeesList?.map(item => item.userId),
-            departmentIdList: this.useDepartmentList?.map(item => item.id)
+            userIdList: allListObj.useEmployeesList?.map(item => item.userId),
+            departmentIdList: allListObj.useDepartmentList?.map(item => item.id)
           });
           break;
         }
@@ -530,6 +531,7 @@ export default {
     async addAutoRule(params) {
       let newParams = params;
       const tagList = this.customerTags?.map(item => item.tagId);
+      const allListObj = groupByScopeType(this.useStaff);
       this.loading = true;
       switch (this.labelType) {
         case AUTOLABEL_TYPE['keyWords']: {
@@ -538,8 +540,8 @@ export default {
             exactMatchKeywordList: this.accurateKeywords,
             fuzzyMatchKeywordList: this.fuzzyKeywords,
             tagIdList: tagList,
-            userIdList: this.useEmployeesList?.map(item => item.userId),
-            departmentIdList: this.useDepartmentList?.map(item => item.id)
+            userIdList: allListObj.useEmployeesList?.map(item => item.userId),
+            departmentIdList: allListObj.useDepartmentList?.map(item => item.id)
           };
           await addKeywordRule(newParams);
           break;
@@ -571,8 +573,8 @@ export default {
                 tagIdList: item.tagList?.map(tagItem => tagItem.tagId)
               };
             }),
-            userIdList: this.useEmployeesList?.map(item => item.userId),
-            departmentIdList: this.useDepartmentList?.map(item => item.id)
+            userIdList: allListObj.useEmployeesList?.map(item => item.userId),
+            departmentIdList: allListObj.useDepartmentList?.map(item => item.id)
           };
           await addNewCustomerRule(newParams);
           break;
@@ -605,12 +607,6 @@ export default {
     // 选择添加人确认按钮
     selectedUser(users) {
       this.useStaff = users;
-      const groupObj = groupBy(users, (item) => {
-        if (item.userId) return SCOPELIST_TYPE.USER;
-        if (item.id) return SCOPELIST_TYPE.DEPARTMENT;
-      });
-      this.useEmployeesList = groupObj[SCOPELIST_TYPE.USER] || [];
-      this.useDepartmentList = groupObj[SCOPELIST_TYPE.DEPARTMENT] || [];
     },
     /**
      * 打开客户标签弹窗
@@ -641,8 +637,6 @@ export default {
      */
     getInfoAndDealUserList(userList, departmentList) {
       this.useStaff = [...userList, ...departmentList]?.map(item => { return { ...item, name: item.userName || item.departmentName, id: item.departmentId }; });
-      this.useEmployeesList = userList?.map(item => { return { ...item, name: item.userName }; });
-      this.useDepartmentList = departmentList?.map(item => { return { ...item, name: item.departmentName, id: item.departmentId }; });
     },
     /**
      * 编辑模式下，获取对应规则的详情
@@ -687,6 +681,9 @@ export default {
         }
       }
       this.ruleForm = ruleForm;
+    },
+    handleClose(index) {
+      this.useStaff.splice(index, 1);
     }
   }
 

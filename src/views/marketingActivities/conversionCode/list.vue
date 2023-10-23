@@ -178,6 +178,13 @@ export default {
     };
   },
   created() {
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      const { effectStartTime, effectEndTime } = this.$store.getters.searchQuery[this.$route.name];
+      if (effectStartTime && effectEndTime) {
+        this.dateRange = [effectStartTime, effectEndTime];
+      }
+      this.query = this.$store.getters.searchQuery[this.$route.name];
+    }
     this.$store.dispatch(
       'app/setBusininessDesc',
       `
@@ -204,6 +211,10 @@ export default {
       });
     },
     goRoute(path, id) {
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
       goRouteWithQuery(this.$router, path, {}, { id });
     },
     /**
@@ -217,7 +228,7 @@ export default {
      */
     resetQuery() {
       this.dateRange = [];
-      this.$refs['queryForm'].resetFields();
+      this.query = this.$options.data().query;
       this.getList(1);
     },
 

@@ -19,7 +19,7 @@ import { EventBus } from '@/event-bus.js';
 import { goRouteWithQuery } from '@/utils';
 import differenceBy from 'lodash/differenceBy';
 import { dealAtInfo, changeButtonLoading } from '@/utils/common';
-import { PAGE_LIMIT, WX_TYPE } from '@/utils/constant/index';
+import { PAGE_LIMIT, WX_TYPE, TASK_STATUS } from '@/utils/constant/index';
 import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 const IS_OPEN = '1'; // 切换开关
 
@@ -151,14 +151,25 @@ export default {
     exportCustomer(perms) {
       const queryParams = {
         ...this.query,
-        perms
+        perms,
+        selectedProperties: ['客户', '添加时间', '所属员工', '标签']
       };
       this.confirmModal({
         msg: '即将导出当前查询结果，是否继续？'
       }, () => {
         return exportCustomer(queryParams)
           .then((response) => {
-            this.download(response.msg);
+            if (response.data.hasFinished) {
+              this.download(response.data.fileName);
+            } else {
+              this.msgInfo('数据准备中，请稍后前往窗口右下角下载');
+              this.$store.commit('ADD_TASK', {
+                fileName: response.data.fileName,
+                status: TASK_STATUS['process'],
+                percentage: 0,
+                oprId: response.data.oprId
+              });
+            }
           });
       });
     },

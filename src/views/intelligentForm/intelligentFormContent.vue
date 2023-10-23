@@ -226,12 +226,18 @@ export default {
     async getAllList(params, needFormListSearch = true) {
       // 重置选中分组为"全部"
       this.selectGroupDataId = undefined;
+      if (this.$store.getters.saveCondition && this.$store.getters.searchQuery[this.$route.name].selectedGroup) {
+        const selectedGroup = this.$store.getters.searchQuery[this.$route.name].selectedGroup;
+        this.selectGroupParentId = selectedGroup[1] ? selectedGroup[0] : TREE_ALL_GROUP_ID;
+        // 选"全部" 则传undefined
+        this.selectGroupDataId = selectedGroup[1] || selectedGroup[0];
+      }
       // 获取分组列表
       this.getFormGroupListByType(this?.type, { ...params });
       if (needFormListSearch) {
         // 获取表单列表 (使用子暴露出来的onSearch)
         await this.$nextTick();
-        this.$refs?.intelligentFormListRef?.onSearch(true);
+        this.$refs?.intelligentFormListRef?.onSearch();
       }
     },
     /**
@@ -255,6 +261,10 @@ export default {
     async getFormGroupListByType(type, params) {
       getGroupTree({ sourceType: type, ...params }).then(res => {
         this.groupData = res.data;
+        this.$nextTick(() => {
+        // 设置节点的选中状态
+          this.$refs.tree && this.$refs.tree.$refs.commonTree.setCurrentKey(this.selectGroupDataId);
+        });
       }).catch(() => {
         this.groupData = [];
       });

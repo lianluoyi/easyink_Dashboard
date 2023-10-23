@@ -205,8 +205,12 @@ export default {
           };
           conversionCodeActive[this.$route.query.id ? 'updateConversionCodeActive' : 'addConversionCodeActive'](params).then((res) => {
             this.msgSuccess('操作成功');
+            this.$store.commit('SET_ADD_FLAG', !this.$route.query.id);
+            !this.$route.query.id
+              ? this.$router.push({ path: '/operationsCenter/conversionCode/conversionCodeDetail', query: { id: res.data || this.$route.query.id, addFlag: true }})
+              : this.$router.go(-1);
+          }).finally(() => {
             changeButtonLoading(this.$store, 'save');
-            !this.$route.query.id ? this.$router.push({ path: '/operationsCenter/conversionCode/conversionCodeDetail', query: { id: res.data || this.$route.query.id }}) : this.$router.go(-1);
           });
         } else {
           changeButtonLoading(this.$store, 'save');

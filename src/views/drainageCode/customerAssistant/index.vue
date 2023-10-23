@@ -1,7 +1,7 @@
 <!--
  * @Description: 获客助手
  * @Author: wJiaaa
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="container">
@@ -9,10 +9,7 @@
       <span class="title"> 获客助手 </span>
       <span class="explain">
         线上获客时，可将获客链接配置在微信内/外，如网页、App、公众号、短信等，客户点击即可跳到成员详情页一键添加，有效提升获客转化。
-        <span
-          class="use-tips theme-text-color"
-          @click="useTipDrawer = true"
-        >使用指引</span>
+        <span class="use-tips theme-text-color" @click="useTipDrawer = true">使用指引</span>
       </span>
       <div class="image">
         <el-image
@@ -72,7 +69,7 @@
               <el-button class="btn-reset" @click="onReset">重置</el-button>
             </el-form-item>
             <el-form-item class="fix-right-operate-btn">
-              <el-button v-hasPermi="['customer:assistant:add']" type="primary" @click="addLink">新增链接</el-button>
+              <el-button v-hasPermi="['customer:assistant:add']" type="primary" @click="goRoute('customerAssistantAdd', {})">新增链接</el-button>
               <el-button v-hasPermi="['customer:assistant:delete']" class="btn-reset" @click="batchDelete">批量删除</el-button>
             </el-form-item>
           </el-form>
@@ -126,12 +123,12 @@
             <el-table-column label="操作" align="center" min-width="185" fixed="right">
               <template slot-scope="{ row }">
                 <div>
-                  <el-button size="mini" type="text" @click="goRoute(row)">详情</el-button>
+                  <el-button size="mini" type="text" @click="goRoute('customerAssistantDetail', {id: row.id})">详情</el-button>
                   <el-button size="mini" type="text" @click="openVisible(row.id)">自定义渠道</el-button>
                   <el-button v-copy="row.qrCode" size="mini" type="text">复制链接</el-button>
                 </div>
                 <div>
-                  <el-button v-hasPermi="['customer:assistant:edit']" size="mini" type="text" @click="editLink(row.id)">编辑</el-button>
+                  <el-button v-hasPermi="['customer:assistant:edit']" size="mini" type="text" @click="goRoute('customerAssistantEdit', { id:row.id })">编辑</el-button>
                   <el-button v-hasPermi="['customer:assistant:delete']" size="mini" type="text" @click="handleDelete(row)">删除</el-button>
                 </div>
               </template>
@@ -163,7 +160,6 @@ import CustomerAssistantSituation from './components/CustomerAssistantSituation.
 import CustomChannel from './components/CustomChannel.vue';
 import ListUserShow from '@/components/ListUserShow';
 import { checkPermi } from '@/utils/permission';
-import { CUSTOMER_ASSISTANT_PATH, CUSTOMER_ASSISTANT_DETAIL_PATH, CUSTOMER_ASSISTANT_EDIT_PATH } from '@/utils/constant/routePath';
 
 export default {
   components: { CustomChannel, RightContainer, EmptyDefaultIcon, UseTip, ListUserShow, CustomerAssistantSituation },
@@ -180,12 +176,10 @@ export default {
         useUserName: undefined,
         qrCode: undefined,
         createBy: undefined
-
       },
       // 日期范围
       dateRange: [],
       useTipDrawer: false,
-
       customChannelVisible: false,
       // 已勾选的项id
       ids: [],
@@ -193,23 +187,17 @@ export default {
       selectEmpleCodeId: undefined
     };
   },
-  beforeRouteEnter(to, from, next) {
-    to.meta.keepAlive = true;
-    next();
-  },
-  /**
-   * 页面离开时保存查询条件
-   */
-  beforeRouteLeave(to, from, next) {
-    const needKeepAlive = from.path === CUSTOMER_ASSISTANT_PATH && [CUSTOMER_ASSISTANT_DETAIL_PATH, CUSTOMER_ASSISTANT_EDIT_PATH].includes(to.path);
-    from.meta.keepAlive = needKeepAlive;
-    next();
-  },
-  activated() {
+  created() {
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      const { beginTime, endTime } = this.$store.getters.searchQuery[this.$route.name];
+      if (beginTime && endTime) {
+        this.dateRange = [beginTime, endTime];
+      }
+      this.query = this.$store.getters.searchQuery[this.$route.name];
+    }
     this.getList();
   },
   methods: {
-
     handleSelectionChange(list) {
       this.ids = list.map((item) => item.id);
     },
@@ -222,16 +210,12 @@ export default {
         [row.id]
       );
     },
-    goRoute(row) {
-      goRouteWithQuery(this.$router, 'customerAssistantDetail', this.query, {
-        id: row.id
+    goRoute(path, param) {
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
       });
-    },
-    addLink() {
-      goRouteWithQuery(this.$router, 'customerAssistantAdd', this.query, { });
-    },
-    editLink(id) {
-      goRouteWithQuery(this.$router, 'customerAssistantEdit', this.query, { id });
+      goRouteWithQuery(this.$router, path, {}, param);
     },
     /**
      * @description 批量删除
@@ -268,10 +252,9 @@ export default {
     },
     onReset() {
       this.dateRange = [];
-      this.$refs['queryForm'].resetFields();
+      this.query = this.$options.data().query;
       this.getList(1);
     },
-
     getList(page) {
       if (this.dateRange) {
         this.query.beginTime = this.dateRange[0];
@@ -286,12 +269,12 @@ export default {
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
-          this.loading = false;
           this.ids = [];
         })
         .catch(() => {
           this.list = [];
           this.total = 0;
+        }).finally(() => {
           this.loading = false;
         });
     },
