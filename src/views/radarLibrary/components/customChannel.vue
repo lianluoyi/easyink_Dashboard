@@ -1,7 +1,7 @@
 <!--
  * @Description: 自定义渠道
  * @Author: wJiaaa
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div>
@@ -175,10 +175,7 @@ export default {
   },
   computed: {
     Pvisible: {
-      get(val) {
-        if (val.visible) {
-          this.getList(1);
-        }
+      get() {
         return this.visible;
       },
       set(val) {
@@ -192,6 +189,11 @@ export default {
     },
     roleKey(val) {
       this.hasRole = val;
+    },
+    visible(val) {
+      if (val) {
+        this.getList(1);
+      }
     }
   },
   created() {
@@ -226,8 +228,9 @@ export default {
         }
         (this.id ? updateChannel : addCustomChannel)(params).then(() => {
           this.addChannelVisible = false;
+          this.getList(!this.id ? 1 : null);
+        }).finally(() => {
           changeButtonLoading(this.$store, 'submit');
-          this.getList(1);
         });
       });
     },

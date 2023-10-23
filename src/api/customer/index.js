@@ -157,3 +157,12 @@ export function listDistinct(params) {
     params
   });
 }
+
+// 导出客户结果
+export function exportCustomerResult(params) {
+  return request({
+    url: service + '/export/result',
+    method: 'GET',
+    params
+  });
+}

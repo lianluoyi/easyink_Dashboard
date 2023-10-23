@@ -1,6 +1,7 @@
 ﻿/**
  * 通用js方法封装处理
  */
+import { successCode } from '@/utils/httpCode';
 import {
   MS_TO_SECONDS, WX_TYPE, CORP_TYPE, ICON_LIST, MEDIA_TYPE_POSTER, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO,
   MEDIA_TYPE_FILE, FILE_EXCEL_TYPE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK,
@@ -130,14 +131,29 @@ export function selectDictLabels(datas, value, separator) {
   return actions.join('').substring(0, actions.join('').length - 1);
 }
 
-// 通用下载方法
-export function download(fileName, noStamp = false) {
-  const base = baseURL + '/common/download?fileName=' + encodeURI(fileName) + '&delete=' + true;
-  if (!noStamp) {
-    window.location.href = base;
-  } else {
-    window.location.href = base + '&needTimeStamp=' + false;
+/**
+ * @description 通用下载方法
+ * @param fileName 文件名
+ * @param noStamp 是否需要时间戳
+ * @param _this vue实例
+ * @param callback 下载回调
+ */
+export function download(fileName, noStamp = false, _this, callback) {
+  let base = baseURL + '/common/download?fileName=' + encodeURI(fileName);
+  if (noStamp) {
+    base = base + '&needTimeStamp=' + false;
   }
+  fetch(base, { method: 'GET' })
+    .then(response => {
+      // eslint-disable-next-line no-magic-numbers
+      if (response.status === successCode) {
+        callback && callback();
+        window.location.href = base + '&delete=' + true;
+      } else {
+        _this && _this.msgWarn('当前文件异常，请重新导出');
+      }
+    })
+    .catch();
 }
 
 // 字符串格式化(%s )

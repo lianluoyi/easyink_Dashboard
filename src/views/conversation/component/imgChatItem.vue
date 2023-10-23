@@ -6,7 +6,7 @@
 <template>
   <div class="img-chat-item">
     <img class="thumb" :src="imgUrl" @click="showImg(imgUrl)">
-    <el-dialog :visible.sync="dialogVisible" width="30%">
+    <el-dialog append-to-body :visible.sync="dialogVisible" width="30%">
       <img :src="imgSrc" style="width:100%;max-height:600px">
       <span slot="footer" class="dialog-footer" />
     </el-dialog>

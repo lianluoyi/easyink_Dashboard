@@ -1,7 +1,7 @@
 <!--
  * @Description: 话术管理页面（分组+列表）
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="verbal-trick-content-page">
@@ -190,7 +190,7 @@ export default {
         // 获取全部话术列表
         this.$refs.verbalTrickList.getAllWordsList({
           categoryIds: list
-        });
+        }, true);
       }
     },
     /**

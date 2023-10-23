@@ -414,18 +414,20 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            updateRadar(params).then((res) => {
-              changeButtonLoading(this.$store, 'submit');
+            updateRadar(params).then(() => {
               this.$emit('getRadaList');
               this.$emit('update:visible', false);
             });
-          }).catch(() => { changeButtonLoading(this.$store, 'submit'); });
+          }).finally(() => {
+            changeButtonLoading(this.$store, 'submit');
+          });
           return;
         }
         addRadar(params).then(() => {
-          changeButtonLoading(this.$store, 'submit');
-          this.$emit('getRadaList');
+          this.$emit('getRadaList', true);
           this.$emit('update:visible', false);
+        }).finally(() => {
+          changeButtonLoading(this.$store, 'submit');
         });
       });
     }

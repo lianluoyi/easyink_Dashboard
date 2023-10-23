@@ -1,7 +1,7 @@
 <!--
  * @Description: 新增sop
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="add-sop-page wrap">
@@ -50,7 +50,7 @@
               size="mini"
               @click="dialogVisibleSelectUser = true"
             >{{ customerScopeInfo.useStaff.length ? '修改' : '添加' }}成员</el-button>
-            <el-tag v-for="(item, index) in customerScopeInfo.useStaff" :key="index" class="user-tag iaic">
+            <el-tag v-for="(item, index) in customerScopeInfo.useStaff" :key="index" closable class="user-tag iaic" @close="handleClose(customerScopeInfo.useStaff,index)">
               <TagUserShow :name="item.name" :show-icon="!item.userId" />
             </el-tag>
           </el-form-item>
@@ -77,7 +77,7 @@
             </el-radio-group>
             <div v-if="sopForm.filterType === SPECIFIED_GROUP" class="form-range-area">
               <el-button icon="el-icon-plus" @click="customerGroupVisible = true">添加群聊</el-button>
-              <el-tag v-for="(unit, unique) in groupList" :key="unique" type="info" class="user-tag">{{
+              <el-tag v-for="(unit, unique) in groupList" :key="unique" closable type="info" class="user-tag" @close="handleClose(groupList,unique)">{{
                 unit.groupName
               }}</el-tag>
             </div>
@@ -92,7 +92,7 @@
                 <el-button icon="el-icon-plus" @click="() => openUserModal('选择群主')">{{
                   groupOwner.length === 0 ? '添加成员' : '修改成员'
                 }}</el-button>
-                <el-tag v-for="(unit, unique) in groupOwner" :key="unique" type="info" class="user-tag">{{
+                <el-tag v-for="(unit, unique) in groupOwner" :key="unique" closable type="info" class="user-tag" @close="handleClose(groupOwner,unique)">{{
                   unit.name
                 }}</el-tag>
               </el-form-item>
@@ -122,7 +122,7 @@
           </el-form-item>
           <el-form-item v-if="sopType === SOP_TYPE['groupCalendar']" label="使用群聊" prop="useGroup">
             <el-button icon="el-icon-plus" class="mr10" @click="customerGroupVisible = true">添加群聊</el-button>
-            <el-tag v-for="(unit, unique) in groupList" :key="unique" type="info" class="user-tag">{{
+            <el-tag v-for="(unit, unique) in groupList" :key="unique" closable type="info" class="user-tag" @close="handleClose(groupList,unique)">{{
               unit.groupName
             }}</el-tag>
           </el-form-item>
@@ -488,14 +488,15 @@ export default {
         case SOP_TYPE['newCustomer']:
         case SOP_TYPE['birthday']:
         {
-          const { gender, tagList, filterTagList, addTime, useEmployeesList, useDepartmentList, customPropertyList } = this.customerScopeInfo;
+          const { gender, tagList, filterTagList, addTime, useStaff, customPropertyList } = this.customerScopeInfo;
+          const groupByList = groupByScopeType(useStaff);
           newSopForm.sopCustomerFilter = {
             tagId: this.dealIds(tagList, 'tagId'),
             filterTagId: this.dealIds(filterTagList, 'tagId'),
             startTime: addTime && addTime[0],
             endTime: addTime && addTime[1],
-            users: this.dealIds(useEmployeesList, 'userId'),
-            departments: this.dealIds(useDepartmentList, 'id'),
+            users: this.dealIds(groupByList.useEmployeesList, 'userId'),
+            departments: this.dealIds(groupByList.useDepartmentList, 'id'),
             gender,
             columnList: customPropertyList.map((item) => {
               if (item.id === ADD_WAY) {
@@ -571,10 +572,7 @@ export default {
     selectedUser(users) {
       const groupOwnerStatus = [SOP_TYPE['timing'], SOP_TYPE['cycle']].includes(this.sopType);
       if (!groupOwnerStatus) {
-        const groupByList = groupByScopeType(users);
         this.customerScopeInfo.useStaff = users;
-        this.customerScopeInfo.useEmployeesList = groupByList.useEmployeesList;
-        this.customerScopeInfo.useDepartmentList = groupByList.useDepartmentList;
       } else {
         this.groupOwner = users;
       }
@@ -695,10 +693,7 @@ export default {
       this.customerScopeInfo.useStaff = userAndDepartmentList.map((item) => {
         return { ...item, name: item.userName || item.departmentName, id: item.departmentId };
       });
-      const groupByList = groupByScopeType(this.customerScopeInfo.useStaff);
       this.customerScopeInfo.gender = resData.sopCustomerFilter.gender;
-      this.customerScopeInfo.useEmployeesList = groupByList.useEmployeesList;
-      this.customerScopeInfo.useDepartmentList = groupByList.useDepartmentList;
       this.customerScopeInfo.tagList = resData.sopCustomerFilter.tagList ? [...resData.sopCustomerFilter.tagList] : [];
       this.customerScopeInfo.filterTagList = resData.sopCustomerFilter.filterTagList
         ? [...resData.sopCustomerFilter.filterTagList]
@@ -870,6 +865,9 @@ export default {
      */
     updateCustomerScopeInfo(data) {
       this.customerScopeInfo = data;
+    },
+    handleClose(target, index) {
+      target.splice(index, 1);
     }
   }
 };

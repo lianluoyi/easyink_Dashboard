@@ -74,12 +74,13 @@
               >
                 <div class="popover-content">
                   <div class="info">
-                    <p>客户总数：截止到查询时间，未将员工删除、拉黑的客户总数</p>
+                    <p>客户总数：截止到查询时间，员工没有删除的客户数，未去重</p>
+                    <p>留存客户总数：截止到查询时间，未将员工删除、拉黑的客户总数，未去重</p>
                     <p>新增客户数：查询时间内员工添加的客户数量</p>
                     <p>流失客户数：查询时间内，把员工删除或拉黑的客户数量</p>
-                    <p>新客留存率：查询时间内，未将员工删除、拉黑的新增客户/新增客户</p>
+                    <p>新客留存率：查询时间内，未将员工删除或拉黑的新增客户/新增客户</p>
                     <p>新客开口率：查询时间内，在添加当天给员工发消息的新增客户/新增客户</p>
-                    <p>服务响应率：查询时间内，员工首次向客户发送消息后，客户在30分钟内回复/员工主动发起的会话</p>
+                    <p>服务响应率：查询时间内，员工首次向客户发送消息后，客户在30分钟内回复/会话客户</p>
                   </div>
                   <div class="line" />
                   <div class="notice">
@@ -110,7 +111,7 @@
             ref="showTable"
             v-loading="loading"
             :data="list"
-            :default-sort="{prop: 'totalContactCnt', order: 'descending'}"
+            :default-sort="{prop: 'totalAllContactCnt', order: 'descending'}"
             @sort-change="changeTableSort"
           >
             <template slot="empty">
@@ -136,7 +137,8 @@
                 {{ row.xtime }}
               </template>
             </el-table-column>
-            <el-table-column sortable="custom" prop="totalContactCnt" label="客户总数" min-width="180" />
+            <el-table-column sortable="custom" prop="totalAllContactCnt" label="客户总数" min-width="180" />
+            <el-table-column sortable="custom" prop="totalContactCnt" label="留存客户总数" min-width="180" />
             <el-table-column sortable="custom" prop="contactLossCnt" label="流失客户数" min-width="180" />
             <el-table-column sortable="custom" prop="newContactCnt" label="新增客户数" min-width="180" />
             <el-table-column sortable="custom" prop="newContactRetentionRate" label="新客留存率" min-width="180">
@@ -232,10 +234,10 @@ export default {
       sortParams: {
         // 员工默认排序
         staffSort: {
-          totalContactCnt: 'descending'
+          totalAllContactCnt: 'descending'
         },
         dateSort: {
-          sortName: 'totalContactCnt', // 默认降序
+          sortName: 'totalAllContactCnt', // 默认降序
           sortType: null
         }
       },
@@ -275,8 +277,13 @@ export default {
       getCustomerOverView(this.getSearchPayload()).then(res => {
         this.colList = [
           {
-            totalContactCnt: res?.data?.totalContactCnt,
+            totalAllContactCnt: res?.data?.totalAllContactCnt,
             title: '客户总数',
+            filed: 'totalAllContactCnt'
+          },
+          {
+            totalContactCnt: res?.data?.totalContactCnt,
+            title: '留存客户总数',
             filed: 'totalContactCnt'
           },
           {
@@ -348,10 +355,10 @@ export default {
       this.dateRange = [YESTERDAY_TIME, YESTERDAY_TIME];
       if (this.dimensionType === STAFF_DIMENSION) {
         this.sortParams.staffSort = this.$options.data().sortParams.staffSort;
-        this.$refs?.showTable?.sort('totalContactCnt', 'descending'); // 重置为默认排序(此处自行进行请求表单数据)
+        this.$refs?.showTable?.sort('totalAllContactCnt', 'descending'); // 重置为默认排序(此处自行进行请求表单数据)
       } else {
         this.sortParams.dateSort = this.$options.data().sortParams.dateSort;
-        this.$refs?.showTable?.sort('totalContactCnt', null);
+        this.$refs?.showTable?.sort('totalAllContactCnt', null);
       }
       this.getDataOverview();
     },

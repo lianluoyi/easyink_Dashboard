@@ -17,6 +17,7 @@
           <app-main />
         </div>
         <customer-service-popover v-if="$store.state.serverInfo.serverType === SERVER_TYPE_THIRD" />
+        <ExportTask v-if="$store.state.exportTaskList.taskList.length" />
       </div>
     </div>
   </div>
@@ -28,7 +29,7 @@ import { AppMain, Navbar, Sidebar } from './components';
 import Breadcrumb from './components/Breadcrumb';
 import Hamburger from './components/Hamburger';
 import CustomerServicePopover from '../components/CustomerServicePopover';
-
+import ExportTask from '@/components/ExportTask.vue';
 import ResizeMixin from './mixin/ResizeHandler';
 import { mapState } from 'vuex';
 import { SERVER_TYPE_THIRD } from '@/utils/constant/index';
@@ -41,7 +42,8 @@ export default {
     AppMain,
     Navbar,
     Sidebar,
-    CustomerServicePopover
+    CustomerServicePopover,
+    ExportTask
   },
   mixins: [ResizeMixin],
   data() {
@@ -50,6 +52,9 @@ export default {
     };
   },
   computed: {
+    exportTaskList() {
+      return this.$store.state.exportTaskList.taskList;
+    },
     //  ...mapGetters(['sidebar', 'avatar', 'device']),
     ...mapState({
       sidebar: (state) => state.app.sidebar,
@@ -62,6 +67,14 @@ export default {
         withoutAnimation: this.sidebar.withoutAnimation,
         mobile: this.device === 'mobile'
       };
+    }
+  },
+  created() {
+    const list = window.localStorage.getItem('exportTaskList');
+    if (list) {
+      JSON.parse(list).reverse().forEach((item) => {
+        this.$store.commit('ADD_TASK', item);
+      });
     }
   },
   methods: {

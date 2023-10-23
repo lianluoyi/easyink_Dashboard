@@ -355,21 +355,12 @@ import {
   DATA_STATISTICS_DEFAULT_SHOW, SKIP_VERIFY
 } from '@/utils/constant/index';
 import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
-import { groupByScopeType, WEEK_TIME, TODAY_TIME, removeSearchKey } from '@/utils/common';
+import { groupByScopeType, WEEK_TIME, TODAY_TIME } from '@/utils/common';
 import { getDetail, getDetailDataStatistics, getChannelList, statisticByCustomer, statisticByChannel, statisticByDate, exportStatisticByCustomer, exportStatisticByChannel, exportStatisticByDate } from '@/api/drainageCode/customerAssistant';
 import { getFirstMsg } from '@/utils/drainageCode';
 import DetailCustomerCnt from './components/DetailCustomerCnt.vue';
 import UserItem from '@/components/UserItem.vue';
 import { goRouteWithQuery } from '@/utils/index';
-
-/** 在sessionStorage保存查询条件的key */
-const CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY = {
-  'customerName': 'assistant_activeness_customerName',
-  'userList': 'assistant_activeness_userList',
-  'channelId': 'assistant_activeness_channelId',
-  'statisticTime': 'assistant_activeness_statisticTime',
-  'pageNum': 'assistant_activeness_pageNum'
-};
 
 export default {
   components: {
@@ -390,7 +381,9 @@ export default {
       statisticTime: [WEEK_TIME + ' 00:00', TODAY_TIME + ' 23:59'],
       pageQuery: {
         pageNum: 1,
-        pageSize: PAGE_LIMIT
+        pageSize: PAGE_LIMIT,
+        name: '',
+        channelId: ''
       },
       userList: [],
       SCOPELIST_TYPE,
@@ -451,20 +444,6 @@ export default {
       this.getStatisticByCustomer();
     }
   },
-  beforeRouteLeave(to, from, next) {
-    // 组件销毁前，如果不是跳转到客户详情，则删除sessionStorage数据
-    if (to.path !== CUSTOMER_DEATIL_PATH) {
-      removeSearchKey(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY);
-    }
-    next();
-  },
-  beforeRouteEnter(to, from, next) {
-    // 若不是来自客户详情页的返回，则需要删除
-    if (from.path !== CUSTOMER_DEATIL_PATH) {
-      removeSearchKey(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY);
-    }
-    next();
-  },
   methods: {
     getOverview(empleCodeId) {
       getDetailDataStatistics(empleCodeId).then(res => {
@@ -520,24 +499,10 @@ export default {
       if (this.dimensionType !== CLIENT_DIMENSION) {
         delete params.name;
       }
-      this.setSessionStorage();
       return {
         ...params,
         empleCodeId: this.empleCodeId
       };
-    },
-    /**
-     * 将查询条件保存到sessionStorage中
-     */
-    setSessionStorage() {
-      if (this.pageQuery.name) sessionStorage.setItem(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY['customerName'], this.pageQuery.name);
-      if (this.userList?.length) {
-        const setUserList = this.userList.map(item => { return { userId: item.userId, name: item.name }; });
-        sessionStorage.setItem(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY['userList'], JSON.stringify(setUserList));
-      }
-      if (this.pageQuery.channelId) sessionStorage.setItem(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY['channelId'], this.pageQuery.channelId);
-      if (this.statisticTime?.length > 0) sessionStorage.setItem(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY['statisticTime'], JSON.stringify(this.statisticTime));
-      sessionStorage.setItem(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY['pageNum'], this.pageQuery.pageNum);
     },
     getStatisticSearchDetailsDataFun() {
       switch (this.dimensionType) {
@@ -559,9 +524,6 @@ export default {
       this.pageQuery = {
         pageNum: 1,
         pageSize: PAGE_LIMIT,
-        beginTime: '',
-        endTime: '',
-        userIds: '',
         channelId: '',
         name: ''
       };
@@ -599,6 +561,14 @@ export default {
     },
     // 跳转到客户资料详情页
     skipToUserDetails(row) {
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: {
+          ...this.pageQuery,
+          userList: this.userList.map(item => { return { userId: item.userId, name: item.name }; }),
+          statisticTime: this.statisticTime
+        }
+      });
       goRouteWithQuery(
         this.$router,
         CUSTOMER_DEATIL_PATH,
@@ -627,23 +597,21 @@ export default {
       });
     },
     /**
-     * @TODO 后续返回保留查询条件的方法需抽离
+     * TODO 后续返回保留查询条件的方法需抽离
      * @description 读取sessionStorage中保存的搜索数据并设置
      */
     setQueryParams() {
-      const customerName = sessionStorage.getItem(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY['customerName']);
-      const userList = sessionStorage.getItem(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY['userList']);
-      const channelId = sessionStorage.getItem(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY['channelId']);
-      const statisticTime = sessionStorage.getItem(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY['statisticTime']);
-      const pageNum = sessionStorage.getItem(CUSTOMER_ASSISTANT_DETAIL_SAVE_KEY['pageNum']) || 1;
-      this.userList = userList ? JSON.parse(userList) : [];
-      this.statisticTime = JSON.parse(statisticTime);
-      this.pageQuery = {
-        ...this.pageQuery,
-        name: customerName,
-        channelId,
-        pageNum: pageNum * 1
-      };
+      if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+        const { userList, statisticTime, name, channelId, pageNum, pageSize } = this.$store.getters.searchQuery[this.$route.name];
+        this.userList = userList || [];
+        this.statisticTime = statisticTime || [];
+        this.pageQuery = {
+          name,
+          channelId,
+          pageNum,
+          pageSize
+        };
+      }
     }
   }
 };

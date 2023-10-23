@@ -7,7 +7,26 @@
       color="#333333"
       border-radius="5px"
       class="data-overview"
-    />
+    >
+      <template slot="operate">
+        <el-popover
+          placement="left-start"
+          trigger="hover"
+          :offset="10"
+        >
+          <div class="popover-content">
+            <div class="info">
+              <p>企业成员总数：截至当前，企业下已激活且未离职的员工总数</p>
+              <p>客户总数：截至当前，企业下在职员工没有删除的客户数以及离职员工未分配的客户数，未去重</p>
+              <p>留存客户总数：截至当前，企业下员工未删除且未将员工删除/拉黑的客户数，已去重</p>
+              <p>客户群总数：截至当前，企业下未离职员工的客户群数量</p>
+              <p>昨日群成员总数：截至昨天，企业下未离职员工的客户群群成员总数，未去重</p>
+            </div>
+          </div>
+          <div slot="reference" class="statistic theme-text-color">统计说明</div>
+        </el-popover>
+      </template>
+    </Statistics>
     <div class="index_l whitebg">
       <!-- <div class="box titlebox">
         <p>{{ parseTime(nowTime) }}</p>
@@ -165,7 +184,8 @@ export default {
           filed: 'userCount',
           showPopover: false
         },
-        { title: '客户总数', filed: 'customerCount', showPopover: false },
+        { title: '客户总数', filed: 'totalAllContactCnt', showPopover: false },
+        { title: '留存客户总数', filed: 'customerCount', showPopover: false },
         {
           title: '客户群总数',
           filed: 'groupCount',
@@ -258,7 +278,7 @@ export default {
     },
     serErchat() {
       // this.canvansData('main', ['发起申请数'], 'arr1', 'btm1', '#088AEE')
-      this.canvansData('main2', ['客户总数', '新增客户数', '流失客户数'], ['totalContactCnt', 'newContactCnt', 'negativeFeedbackCnt'], 'btm1', ['#5088EC', '#12BF49', '#EA656F']);
+      this.canvansData('main2', ['留存客户总数', '新增客户数', '流失客户数'], ['totalContactCnt', 'newContactCnt', 'negativeFeedbackCnt'], 'btm1', ['#5088EC', '#12BF49', '#EA656F']);
       this.canvansData('main3', ['新客留存率'], ['newContactRetentionRate'], 'btm1', ['#5088EC'], '%');
       this.canvansData('main4', ['客户群总数', '新增客户群'], ['chatTotal', 'newChatCnt'], 'btm1', ['#5088EC', '#12BF49']);
       this.canvansData('main5', ['客户群总人数', '客户群新增人数'], ['memberTotal', 'newMemberCnt'], 'btm1', ['#5088EC', '#12BF49'], '', '客户群总人数不包含今日的数据');
@@ -343,6 +363,15 @@ export default {
   .el-icon-refresh{
     font-size: 16px;
     margin-left: 5px;
+  }
+  .statistic {
+    font-size: 14px;
+    cursor: default;
+  }
+  .popover-content {
+    width: 370px;
+    font-size: 12px;
+    line-height: 20px;
   }
   .index {
     margin: 0;
@@ -590,7 +619,6 @@ export default {
         background: #fff;
       }
     }
-
     // .car {
     //   height: 200px;
     //   margin-top: 40px;

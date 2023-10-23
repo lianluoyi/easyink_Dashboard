@@ -98,6 +98,7 @@
         v-model="activeRecord"
         class="radio-group-div mb10"
         size="medium"
+        @input="changeActiveRecord"
       >
         <el-radio-button :label="CLICK_RECORD['customer']">客户点击记录</el-radio-button>
         <el-radio-button :label="CLICK_RECORD['channel']">渠道点击记录</el-radio-button>
@@ -193,10 +194,10 @@ export default {
     this.getOverview();
     this.getChannelSort();
   },
-  mounted() {
-
-  },
   methods: {
+    changeActiveRecord() {
+      this.$store.commit('SET_SAVE_CONDITION', false);
+    },
     /**
      * 排行榜样式
      * @params index 排行

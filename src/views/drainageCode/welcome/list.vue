@@ -1,7 +1,7 @@
 <!--
  * @Description: 欢迎语列表
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="welcome-list-page">
@@ -193,6 +193,9 @@ export default {
     }
   },
   created() {
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      this.query = this.$store.getters.searchQuery[this.$route.name];
+    }
     this.getList();
     // 入群欢迎语tab需调用统计接口
     if (this.activeName && Number(this.activeName) === INTO_GROUP) {
@@ -210,11 +213,6 @@ export default {
       `
     );
   },
-  // beforeRouteLeave(to, from, next) {
-  //   // this.$store.dispatch(('app/setBusininessDesc', ''))
-  //   this.$store.state.app.busininessDesc = ''
-  //   next()
-  // },
   methods: {
     /**
      * 新增欢迎语
@@ -243,6 +241,10 @@ export default {
     onEdit(item) {
       const query = { id: item.id };
       query.welcomeMsgTplType = this.activeName;
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
       goRouteWithQuery(this.$router, query.welcomeMsgTplType === EMPLOYEES_WELCOME ? 'welcomeAdd' : 'groupWelcomeAdd', {}, query);
     },
     /**

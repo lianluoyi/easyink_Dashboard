@@ -160,12 +160,12 @@ export default {
             };
           }
           (this.form.id ? editGroupWelMsg : addGroupWelMsg)(params)
-            .then(({ data }) => {
+            .then(() => {
+              this.$store.commit('SET_ADD_FLAG', !this.form.id);
               this.msgSuccess('操作成功');
-              changeButtonLoading(this.$store, 'submit');
               this.goBack();
             })
-            .catch(() => {
+            .finally(() => {
               changeButtonLoading(this.$store, 'submit');
             });
         } else {

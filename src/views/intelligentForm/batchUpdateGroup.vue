@@ -1,7 +1,7 @@
 <!--
  * @Description: 批量修改表单所属分组
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <el-dialog
@@ -92,16 +92,16 @@ export default {
         if (!valid) return changeButtonLoading(this.$store, 'save');
         let ids = [];
         ids = this.multiSelect.map(item => item.id);
-        const updateRes = await batchChangeGroup({
+        batchChangeGroup({
           formIdList: ids,
           groupId: this.formData.groupId
-        });
-        if (updateRes) {
-          changeButtonLoading(this.$store, 'save');
+        }).then(() => {
           this.getList();
           this.$emit('update:visible', false);
           this.formData.groupId = undefined;
-        }
+        }).finally(() => {
+          changeButtonLoading(this.$store, 'save');
+        });
       });
     },
     handleChangeCategoryId(value) {

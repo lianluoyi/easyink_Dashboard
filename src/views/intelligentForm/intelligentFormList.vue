@@ -1,7 +1,7 @@
 <!--
  * @Description: 智能表单管理列表区域
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="intelligent-form-list-wrap">
@@ -184,7 +184,7 @@
       :visible.sync="batchVisible"
       :group-tree-data="selectGroupTreeData"
       :multi-select="multiSelect"
-      :get-list="() => onSearch(true)"
+      :get-list="() => onSearch()"
     />
     <SpreadDialog
       ref="SpreadDialog"
@@ -254,7 +254,9 @@ export default {
         formName: '', // 表单名称
         enableFlag: undefined, // 启用状态
         pageSize: PAGE_LIMIT,
-        pageNum: 1
+        pageNum: 1,
+        beginTime: undefined,
+        endTime: undefined
       },
       // 表单总数
       total: 0,
@@ -290,22 +292,24 @@ export default {
     }
   },
   watch: {
-    selectedGroupId(val, oldVal) {
+    selectedGroupId() {
       this.onSearch(true);
     }
   },
   created() {
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name].query || {}).length) {
+      const { beginTime, endTime } = this.$store.getters.searchQuery[this.$route.name].query;
+      if (beginTime && endTime) {
+        this.timeSection = [beginTime, endTime];
+      }
+      this.query = this.$store.getters.searchQuery[this.$route.name].query;
+    }
   },
   mounted() {},
   methods: {
     // 重置查询条件
     resetQuery() {
-      this.query = {
-        ...this.query,
-        pageNum: 1,
-        formName: '',
-        enableFlag: undefined
-      };
+      this.query = this.$options.data().query;
       // 置空日期范围
       this.timeSection = undefined;
       this.getFormList();
@@ -355,8 +359,15 @@ export default {
      * @param payload 携带的参数
      */
     goRouterToForm(paegPath, payload) {
+      const hasParentId = this.selectGroupParentId && this.selectGroupParentId !== TREE_ALL_GROUP_ID;
       window.sessionStorage.setItem('intelligent_form_active', this.type);
       window.sessionStorage.setItem('intelligent_form_department_id', this.departmentId);
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: {
+          query: this.query,
+          selectedGroup: this.selectedGroupId ? (hasParentId ? [this.selectGroupParentId, this.selectedGroupId] : [this.selectedGroupId]) : undefined }
+      });
       goRouteWithQuery(this.$router, paegPath, {}, payload);
     },
     /**
@@ -365,18 +376,18 @@ export default {
      * @return {*}
      */
     getPayload() {
+      if (this.timeSection) {
+        this.query.beginTime = this.timeSection[0];
+        this.query.endTime = this.timeSection[1];
+      } else {
+        this.query.beginTime = undefined;
+        this.query.endTime = undefined;
+      }
       let payload = {
         ...this.query,
         groupId: this.selectedGroupId,
         sourceType: this.type
       };
-      if (this.timeSection) {
-        payload = {
-          ...payload,
-          beginTime: this.timeSection[0],
-          endTime: this.timeSection[1]
-        };
-      }
       if (this.type === INTELLIGENT_FORM_TYPE['department']) {
         payload = {
           ...payload,
@@ -410,12 +421,6 @@ export default {
       });
     },
     /**
-     * 点击详情
-     */
-    handleCheckMore(detail) {
-      //
-    },
-    /**
      * @description: 查询表单数据
      * @param {*} initPage  是否重置为第一页
      * @return {*}
@@ -439,7 +444,7 @@ export default {
       const delRes = await removeFormList(params);
       if (delRes) {
         this.msgSuccess('删除成功');
-        this.onSearch(true);
+        this.onSearch();
       }
     },
     /**

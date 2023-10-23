@@ -1,8 +1,9 @@
 <!--
  * @Description: 兑换码详情
  * @Author: wJiaaa
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
+// TODO 滚动条样式修改
 <template>
   <div>
     <ReturnPage path="/operationsCenter/conversionCode/list" />
@@ -246,8 +247,7 @@ export default {
         // 领取状态
         status: undefined,
         pageNum: DEFAULT_PAGE_NUM,
-        pageSize: PAGE_LIMIT,
-        activityId: this.$route.query.id
+        pageSize: PAGE_LIMIT
       },
       addForm: {
         code: '', // 兑换码
@@ -295,6 +295,13 @@ export default {
     }
   },
   created() {
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      const { receiveStartTime, receiveEndTime } = this.$store.getters.searchQuery[this.$route.name];
+      if (receiveStartTime && receiveEndTime) {
+        this.dateRange = [receiveStartTime, receiveEndTime];
+      }
+      this.query = this.$store.getters.searchQuery[this.$route.name];
+    }
     this.$store.dispatch(
       'app/setBusininessDesc',
       `
@@ -334,8 +341,12 @@ export default {
      * 跳转到客户详情
      */
     goRoute(row) {
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
       goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH,
-        this.query, {
+        {}, {
           id: row.receiveUserId,
           prePageType: 'conversionCodeDetail'
         });
@@ -389,7 +400,7 @@ export default {
      */
     resetQuery() {
       this.dateRange = [];
-      this.$refs['queryForm'].resetFields();
+      this.query = this.$options.data().query;
       this.getList(1);
     },
     /**
@@ -405,15 +416,14 @@ export default {
       this.importLoading = true;
       conversionCode['importRedeemCode'](this.$route.query.id, formData).then(res => {
         const resData = res.data;
-        this.importLoading = false;
         this.importInfo = {
           successNum: resData.successNum,
           failNum: resData.failNum,
           url: resData.url
         };
-        this.getList();
+        this.resetQuery();
       })
-        .catch(() => {
+        .finally(() => {
           this.importLoading = false;
         });
     },
@@ -423,15 +433,15 @@ export default {
     getList(pageNum) {
       this.query.receiveStartTime = this.dateRange && this.dateRange[0];
       this.query.receiveEndTime = this.dateRange && this.dateRange[1];
+      this.query.activityId = this.$route.query.id;
       pageNum && (this.query.pageNum = pageNum);
       this.loading = true;
       conversionCode['getConversionCodeList'](this.query)
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = total;
-          this.loading = false;
         })
-        .catch(() => {
+        .finally(() => {
           this.loading = false;
         });
     },
@@ -451,10 +461,9 @@ export default {
           this.isSingleAdd ? 'addConversionCode' : 'updateConversionCode'
         ](params).then(() => {
           this.msgSuccess('操作成功');
-          changeButtonLoading(this.$store, 'save');
           this.singleAddDialogVisible = false;
-          this.getList();
-        }).catch(() => {
+          this.resetQuery();
+        }).finally(() => {
           changeButtonLoading(this.$store, 'save');
         });
       });

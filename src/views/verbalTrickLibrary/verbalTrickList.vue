@@ -1,6 +1,6 @@
 <!--
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="verbal-trick-list-page">
@@ -105,7 +105,7 @@
       :type="type"
       :group-tree-data="selectGroupTreeData"
       :selected-group="selectedGroup"
-      @getList="() => getAllWordsList({})"
+      @getList="(addFlag) => getAllWordsList({},addFlag)"
     />
     <VerbalTrickDetailDrawer
       title="话术详情"
@@ -131,7 +131,7 @@
       width="443px"
       :group-tree-data="selectGroupTreeData"
       :multi-select="multiSelect"
-      @getList="() => query.pageNum = 1 && getAllWordsList({})"
+      @getList="() => getAllWordsList({})"
     />
   </div>
 </template>
@@ -249,7 +249,14 @@ export default {
         this.$refs.addVerbalTrickDrawer.$refs?.verbalForm?.resetFields();
       }
     },
-    getAllWordsList(params) {
+    /**
+     * @description 获取话术列表
+     * @param addFlag 是否新增话术
+     */
+    getAllWordsList(params, addFlag) {
+      if (addFlag) {
+        this.query = this.$options.data().query;
+      }
       const newParams = {
         pageSize: this.query.pageSize,
         pageNum: this.query.pageNum,
@@ -328,7 +335,6 @@ export default {
       const delRes = await deleteWords(params);
       if (delRes) {
         this.msgSuccess('操作成功');
-        this.query.pageNum = 1;
         this.getAllWordsList({});
       }
     },
@@ -372,14 +378,13 @@ export default {
       importWords(formData).then(res => {
         this.handleGetGroup();
         const resData = res.data;
-        this.importLoading = false;
         this.importInfo = {
           successNum: resData.successNum,
           failNum: resData.failNum,
           url: resData.url
         };
       })
-        .catch(() => {
+        .finally(() => {
           this.importLoading = false;
         });
     }

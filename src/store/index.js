@@ -10,8 +10,10 @@ import materialInfo from './modules/materialInfo';
 import customerProperty from './modules/customerPropertyList';
 import listInfo from './modules/listInfo';
 import requestButton from './modules/requestButton';
+import searchConditions from './modules/searchConditions';
 import secretKey from './modules/secretKey';
 import departmentInfo from './modules/departmentInfo';
+import exportTaskList from './modules/exportTaskList';
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
@@ -25,8 +27,10 @@ const store = new Vuex.Store({
     customerProperty,
     listInfo,
     requestButton,
+    searchConditions,
     secretKey,
-    departmentInfo
+    departmentInfo,
+    exportTaskList
   },
   getters
 });

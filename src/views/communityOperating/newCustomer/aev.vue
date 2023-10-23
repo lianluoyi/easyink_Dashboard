@@ -275,28 +275,23 @@ export default {
           if (this.newGroupId) {
             update(this.newGroupId, this.form)
               .then(() => {
-                changeButtonLoading(this.$store, 'save');
-                if (this.qrCode !== this.form.qrCode) {
-                  this.msgSuccess('活码已更新，请重新下载');
-                } else {
-                  this.msgSuccess('更新成功');
-                }
-                this.loading = false;
+                this.$store.commit('SET_ADD_FLAG', false);
+                this.msgSuccess(this.qrCode !== this.form.qrCode ? '活码已更新，请重新下载' : '更新成功');
                 this.$router.back();
               })
-              .catch(() => {
+              .finally(() => {
                 changeButtonLoading(this.$store, 'save');
                 this.loading = false;
               });
           } else {
             add(this.form)
               .then(() => {
-                changeButtonLoading(this.$store, 'save');
+                this.$store.commit('SET_ADD_FLAG', true);
                 this.msgSuccess('添加成功');
-                this.loading = false;
                 this.$router.back();
               })
-              .catch(() => {
+              .finally(() => {
+                changeButtonLoading(this.$store, 'save');
                 this.loading = false;
               });
           }
@@ -324,6 +319,9 @@ export default {
       this.form.welcomeMsg = '';
       Object.keys(this.codeMsg).forEach(key => { this.codeMsg[key] = ''; });
       Object.keys(this.codeMaterialList).forEach(key => { this.codeMaterialList[key] = []; });
+    },
+    handleClose(index) {
+      this.users.splice(index, 1);
     }
   }
 };
@@ -361,7 +359,7 @@ export default {
                 size="mini"
                 @click="dialogVisibleSelectUser = true"
               >{{ users.length ? '修改' : '添加' }}成员</el-button>
-              <el-tag v-for="(user, index) in users" :key="index" class="user-tag aic mb5" size="medium">
+              <el-tag v-for="(user, index) in users" :key="index" closable class="user-tag aic mb5" size="medium" @close="handleClose(index)">
                 <TagUserShow :name="user.businessName" :show-icon="user.businessIdType === SCOPELIST_TYPE.DEPARTMENT" />
               </el-tag>
             </div>

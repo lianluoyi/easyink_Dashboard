@@ -255,16 +255,17 @@ export default {
       const addRes = await addWords(params);
       changeButtonLoading(this.$store, 'submit');
       if (addRes) {
-        this.closeDrawerAndGet();
+        this.closeDrawerAndGet(true);
       }
     },
     /**
      * 关闭并重新获取话术列表
+     * @param addFlag 是否新增
      */
-    closeDrawerAndGet() {
+    closeDrawerAndGet(addFlag) {
       this.handleClose();
       this.msgSuccess('操作成功');
-      this.$emit('getList');
+      this.$emit('getList', addFlag);
     },
     /**
      * 更新话术

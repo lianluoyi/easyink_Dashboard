@@ -472,8 +472,10 @@ export default {
         const flag = this.dealSubmitResult(payload);
         if (flag) {
           (this.formId ? editForm : addForm)(payload).then(() => {
+            this.$store.commit('SET_ADD_FLAG', !this.formId);
             this.$router.push('intelligentForm');
             this.msgSuccess('操作成功');
+          }).finally(() => {
             changeButtonLoading(this.$store, 'submitForm');
           });
         } else {

@@ -1,7 +1,7 @@
 <!--
  * @Description: 渠道点击记录
  * @Author: wJiaaa
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <!-- 中间表格 -->
@@ -166,16 +166,30 @@ export default {
       channelVisible: false
     };
   },
-  created() {
-    this.getChannelClickRecord();
-    // 当sessionStorage中有clickRecord时，修改默认的activeRecord
-    if (window.sessionStorage.getItem('clickRecord')) {
-      this.channelDetailQuery = JSON.parse(window.sessionStorage.getItem('channelName'));
-      window.sessionStorage.removeItem('clickRecord');
-      this.getChannelClickRecordDetail();
-      this.channelVisible = true;
-      return;
+  watch: {
+    channelVisible(val) {
+      if (!val) {
+        // 弹窗关闭的时候清空 点击详情 中的客户昵称 同时将 vuex 中的channelDetailQuery置为空
+        this.channelDetailQuery.customerName = '';
+        this.$store.commit('SET_SEARCH_QUERY', {
+          pageName: this.$route.name,
+          query: { channelQuery: this.query, channelDetailQuery: null }
+        });
+      }
     }
+  },
+  created() {
+    window.sessionStorage.removeItem('clickRecord');
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      const { channelDetailQuery, channelQuery } = this.$store.getters.searchQuery[this.$route.name];
+      this.query = channelQuery;
+      if (channelDetailQuery) {
+        this.channelDetailQuery = channelDetailQuery;
+        this.getChannelClickRecordDetail();
+        this.channelVisible = true;
+      }
+    }
+    this.getChannelClickRecord();
   },
   methods: {
     /**
@@ -191,12 +205,14 @@ export default {
      * 查看客户资料
      */
     checkCustomerInfo(row) {
-      // 存储点击记录，防止返回时默认为客户点击记录
+      // TODO 改为vuex 存储点击记录，防止返回时默认为客户点击记录
       window.sessionStorage.setItem('clickRecord', CLICK_RECORD['channel']);
-      // 存储链接详情信息 防止返回时空白
-      window.sessionStorage.setItem('channelName', JSON.stringify(this.channelDetailQuery));
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: { channelQuery: this.query, channelDetailQuery: this.channelDetailQuery }
+      });
       goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH,
-        this.query, {
+        {}, {
           id: row.externalId,
           prePageType: 'channelClickRecord'
         });

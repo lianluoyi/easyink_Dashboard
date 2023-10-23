@@ -110,7 +110,8 @@ export default {
       // 判断在详情页点击的是编辑还是复制
       from: 'copy',
       momentTaskId: '',
-      chooseMaterial: false
+      chooseMaterial: false,
+      userAndDepartmentList: []
     };
   },
   computed: {
@@ -120,9 +121,6 @@ export default {
     },
     categoryId() {
       return this.$store.state.materialInfo?.categoryInfo[this.appendixType]?.id;
-    },
-    userAndDepartmentList() {
-      return [...this.form.departments || [], ...this.form.users || []];
     }
   },
   watch: {
@@ -194,6 +192,7 @@ export default {
           item.name = item.userName;
           return item;
         });
+        this.userAndDepartmentList = [...departmentList || [], ...userList || []];
         if (data.tagList) {
           this.form.tags = data.tagList;
         }
@@ -204,9 +203,7 @@ export default {
           pushRange: pushRange,
           type: type,
           taskType: taskType,
-          sendTime: sendTime,
-          users: userList && userList.length !== 0 ? userList : [],
-          departments: departmentList && departmentList.length !== 0 ? departmentList : []
+          sendTime: sendTime
         };
         // 处理附件
         this.momentsContent = String(mediaType);
@@ -296,9 +293,7 @@ export default {
     },
     // 选择添加人确认按钮
     selectedUser(users) {
-      const groupByList = groupByScopeType(users);
-      this.form.users = groupByList.useEmployeesList;
-      this.form.departments = groupByList.useDepartmentList;
+      this.userAndDepartmentList = users;
     },
     // 选择标签确认按钮
     submitSelectTag(data) {
@@ -312,7 +307,7 @@ export default {
     submit() {
       this.loading = true;
       // 在自定义链接从本地上传封面的处理
-      const form = JSON.parse(JSON.stringify(this.form));
+      let form = JSON.parse(JSON.stringify(this.form));
       if (this.from === 'edit') {
         form.momentTaskId = this.momentTaskId;
       }
@@ -320,7 +315,7 @@ export default {
       Promise.resolve()
         .then(() => {
           if (form.pushRange === 1) {
-            if ((Number(!!form.users?.length) + Number(!!form.departments?.length)) === 0 && Number(!!form.tags?.length) === 0) {
+            if (!this.userAndDepartmentList.length && Number(!!form.tags?.length) === 0) {
               this.msgInfo('请设置可见范围');
               changeButtonLoading(this.$store, 'submit');
               return Promise.reject();
@@ -367,36 +362,20 @@ export default {
             // 在提交时将链接类型设置到附件里
             this.form.attachments[0].isDefined = this.isDefined;
           }
-          // 处理表单朋友圈附件
-          Object.keys(form).forEach(key => {
-            if (key === 'attachments') {
-              form[key].forEach(function(item) {
-                // 当为图片附件时删除无用的属性
-                delete item.status;
-                delete item.uid;
-                delete item.percentage;
-                delete item.raw;
-                if (item.mediaType === Number(MEDIA_TYPE_POSTER)) {
-                  delete item.size;
-                  delete item.name;
-                } if (item.mediaType === Number(MEDIA_TYPE_IMGLINK)) {
-                  item.url = item.addressUrl;
-                }
-              });
-            }
-            // 处理标签
-            if (['tags', 'users', 'departments'].includes(key)) {
-              const keyField = {
-                tags: 'tagId',
-                users: 'userId',
-                departments: 'id'
-              };
-              const newItem = form[key].map((obj) => {
-                return obj[keyField[key]];
-              });
-              form[key] = newItem;
+          form.attachments.forEach(function(item) {
+            // 当为图片附件时删除无用的属性
+            delete item.status;
+            delete item.uid;
+            delete item.percentage;
+            delete item.raw;
+            if (item.mediaType === Number(MEDIA_TYPE_POSTER)) {
+              delete item.size;
+              delete item.name;
+            } if (item.mediaType === Number(MEDIA_TYPE_IMGLINK)) {
+              item.url = item.addressUrl;
             }
           });
+          form = this.dealUserDepAndTag(form);
           return form.momentTaskId ? updateMoment(form) : createFriendsCircle(form);
         }).then(() => {
           changeButtonLoading(this.$store, 'submit');
@@ -409,6 +388,18 @@ export default {
           changeButtonLoading(this.$store, 'submit');
           this.loading = false;
         });
+    },
+    dealUserDepAndTag(form) {
+      if (this.userAndDepartmentList && this.userAndDepartmentList.length > 0) {
+        const allListObj = groupByScopeType(this.userAndDepartmentList);
+        form.departments = allListObj.useDepartmentList.map(item => item.id);
+        form.users = allListObj.useEmployeesList.map(item => item.userId);
+      } else {
+        form.departments = [];
+        form.users = [];
+      }
+      form.tags = form.tags && form.tags.map((k) => k.tagId);
+      return form;
     },
     // 获取素材列表
     getMaterialList(params) {
@@ -523,6 +514,9 @@ export default {
       const index = tags.findIndex(tag_ => tag_.tagId === tag.tagId);
       tags.splice(index, 1);
       this.form[type] = tags;
+    },
+    handleClose(index) {
+      this.userAndDepartmentList.splice(index, 1);
     }
   }
 };
@@ -584,7 +578,9 @@ export default {
                     <el-tag
                       v-for="(unit, unique) in userAndDepartmentList"
                       :key="unique"
+                      closable
                       class="theme-text-color user-tag iaic"
+                      @close="handleClose(unique)"
                     >
                       <TagUserShow :name="unit.name" :show-icon="!unit.userId" />
                     </el-tag>
@@ -937,7 +933,10 @@ export default {
     border: 1px solid #e1f0ee;
     /deep/ .el-tag__close {
       @include text_btn_color($color-theme2-1);
-      background-color: transparent;
+    }
+    /deep/ .el-icon-close:hover {
+      @include bg_primary_color($color-theme2-1);
+      color: #fff;
     }
   }
 }
@@ -961,6 +960,9 @@ export default {
   }
   .el-form-item {
     align-items: center;
+  }
+  /deep/ .el-form-item__label {
+    flex-shrink: 0;
   }
 }
 .step {

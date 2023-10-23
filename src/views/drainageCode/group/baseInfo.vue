@@ -94,10 +94,12 @@ export default {
             }
             return { ...actualListItem, sortNo: index + 1 };
           })
-        }).then((res) => {
+        }).then(() => {
+          this.$store.commit('SET_ADD_FLAG', true);
+          this.$router.back();
+        }).finally(() => {
           changeButtonLoading(this.$store, 'save');
           this.loading = false;
-          this.$router.back();
         });
       });
     },
@@ -129,10 +131,12 @@ export default {
           delActualIdList: this.removeList.map((item) => {
             return item.id;
           })
-        }).then((res) => {
+        }).then(() => {
+          this.$store.commit('SET_ADD_FLAG', false);
+          this.$router.back();
+        }).finally(() => {
           changeButtonLoading(this.$store, 'save');
           this.loading = false;
-          this.$router.back();
         });
       });
     },

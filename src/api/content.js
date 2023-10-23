@@ -73,6 +73,13 @@ const reloadredis = () => {
     method: 'get'
   });
 };
+const viewContext = (params) => {
+  return request({
+    url: '/wecom/finance/view/context',
+    method: 'get',
+    params
+  });
+};
 export const content = {
   indexEchart,
   indexTable,
@@ -81,5 +88,6 @@ export const content = {
   listByCustomer,
   getChatAllList,
   chatGrounpList,
-  reloadredis
+  reloadredis,
+  viewContext
 };

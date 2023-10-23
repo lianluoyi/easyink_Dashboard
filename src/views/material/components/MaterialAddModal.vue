@@ -358,13 +358,16 @@ export default {
         if (this.isOperatingMaterial) {
           (form.id ? update : add)(params)
             .then(() => {
-              changeButtonLoading(this.$store, 'submit');
               this.msgSuccess('操作成功');
-              this.Pvisible = false;
-              this.getList({ mediaType: params.mediaType });
+              if (form.id) {
+                this.getList();
+              } else {
+                this.$parent.resetQuery();
+              }
               this.$refs['form'].resetFields();
             })
-            .catch(() => {
+            .finally(() => {
+              changeButtonLoading(this.$store, 'submit');
               this.Pvisible = false;
             });
         } else {
@@ -373,8 +376,9 @@ export default {
           this.Pvisible = false;
           if (params.saveToMaterial) {
             add(params).then(() => {
-              changeButtonLoading(this.$store, 'submit');
               this.$emit('submit', params);
+            }).finally(() => {
+              changeButtonLoading(this.$store, 'submit');
             });
           } else {
             changeButtonLoading(this.$store, 'submit');

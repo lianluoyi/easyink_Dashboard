@@ -252,13 +252,12 @@ export default {
           }
           this.loading = true;
           (this.form.id ? update : add)(this.form)
-            .then(({ data }) => {
-              changeButtonLoading(this.$store, 'save');
+            .then(() => {
+              this.$store.commit('SET_ADD_FLAG', !this.form.id);
               this.msgSuccess('操作成功');
-              this.loading = false;
               this.$router.back();
             })
-            .catch(() => {
+            .finally(() => {
               changeButtonLoading(this.$store, 'save');
               this.loading = false;
             });

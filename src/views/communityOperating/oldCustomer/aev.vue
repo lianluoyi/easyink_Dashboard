@@ -116,12 +116,11 @@ export default {
           };
           add(payload)
             .then(() => {
-              changeButtonLoading(this.$store, 'submit');
+              this.$store.commit('SET_ADD_FLAG', true);
               this.msgSuccess('添加成功');
-              this.loading = false;
               this.$router.back();
             })
-            .catch(() => {
+            .finally(() => {
               changeButtonLoading(this.$store, 'submit');
               this.loading = false;
             });
@@ -129,6 +128,12 @@ export default {
           changeButtonLoading(this.$store, 'submit');
         }
       });
+    },
+    handleClose(index) {
+      this.users.splice(index, 1);
+    },
+    closeTag(index) {
+      this.tags.splice(index, 1);
     }
   }
 };
@@ -199,7 +204,7 @@ export default {
                   :disabled="form.sendScope == 0"
                   @click="dialogVisibleSelectTag = true"
                 >添加标签</el-button>
-                <el-tag v-for="(tag, index) in tags" :key="index" size="medium">{{ tag.name }}</el-tag>
+                <el-tag v-for="(tag, index) in tags" :key="index" closable size="medium" @close="closeTag(index)">{{ tag.name }}</el-tag>
               </el-form-item>
               <el-form-item label="添加时间" label-width="77px">
                 <el-date-picker
@@ -222,7 +227,7 @@ export default {
                   size="mini"
                   @click="dialogVisibleSelectUser = true"
                 >{{ users.length ? '修改' : '添加' }}成员</el-button>
-                <el-tag v-for="(user, index) in users" :key="index" class="user-tag" size="medium">{{
+                <el-tag v-for="(user, index) in users" :key="index" closable class="user-tag" size="medium" @close="handleClose(index)">{{
                   user.name
                 }}</el-tag>
               </el-form-item>

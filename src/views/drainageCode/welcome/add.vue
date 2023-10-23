@@ -195,13 +195,12 @@ export default {
             };
           }
           (this.form.id ? editEmployWel : addEmployWelMsg)(newParams)
-            .then(({ data }) => {
-              changeButtonLoading(this.$store, 'submit');
+            .then(() => {
+              this.$store.commit('SET_ADD_FLAG', !this.form.id);
               this.msgSuccess('操作成功');
-              this.loading = false;
               this.goBack();
             })
-            .catch(() => {
+            .finally(() => {
               changeButtonLoading(this.$store, 'submit');
               this.loading = false;
             });
@@ -311,6 +310,9 @@ export default {
       const removeList = [...this.removeSpecialRuleList];
       removeList.push(item);
       this.removeSpecialRuleList = removeList;
+    },
+    handleClose(index) {
+      this.form.weEmpleCodeUseScops.splice(index, 1);
     }
   }
 };
@@ -344,7 +346,7 @@ export default {
                 size="mini"
                 @click="dialogVisibleSelectUser = true"
               >{{ form.weEmpleCodeUseScops.length ? '修改' : '添加' }}成员</el-button>
-              <el-tag v-for="(item, index) in form.weEmpleCodeUseScops" :key="index" class="user-tag" size="medium">{{
+              <el-tag v-for="(item, index) in form.weEmpleCodeUseScops" :key="index" class="user-tag" size="medium" closable="" @close="handleClose(index)">{{
                 item && item.userName
               }}</el-tag>
             </el-form-item>

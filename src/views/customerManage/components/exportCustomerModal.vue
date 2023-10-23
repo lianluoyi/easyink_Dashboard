@@ -25,6 +25,7 @@
 <script>
 import * as api from '@/api/customer';
 import store from '@/store';
+import { TASK_STATUS } from '@/utils/constant/index';
 export default {
   name: '',
   components: {},
@@ -101,10 +102,21 @@ export default {
       this.loading = true;
       api.exportCustomer(queryParams)
         .then((response) => {
+          if (response.data.hasFinished) {
+            this.download(response.data.fileName);
+          } else {
+            this.msgInfo('数据准备中，请稍后前往窗口右下角下载');
+            this.$store.commit('ADD_TASK', {
+              fileName: response.data.fileName,
+              status: TASK_STATUS['process'],
+              percentage: 0,
+              oprId: response.data.oprId
+            });
+          }
+        }).finally(e => {
           this.loading = false;
-          this.download(response.msg);
           this.onClose();
-        }).catch(e => { this.loading = false; });
+        });
     },
     checked(item) {
       return this.selected && this.selected.findIndex(selectItem => selectItem.id === item.id) > -1;

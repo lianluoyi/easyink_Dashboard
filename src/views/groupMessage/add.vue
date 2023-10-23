@@ -514,6 +514,9 @@ export default {
     selectUser(type) {
       this.selectUserType = type;
       this.dialogVisibleSelectUser = true;
+    },
+    handleClose(type, index) {
+      this[type].splice(index, 1);
     }
   }
 };
@@ -620,7 +623,13 @@ export default {
                     <el-button icon="el-icon-plus" @click="selectUser(form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'groupOwner' : 'userParty')">{{
                       (form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? groupOwner : userParty).length === 0 ? '添加成员' : '修改成员'
                     }}</el-button>
-                    <el-tag v-for="(unit, unique) in form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? groupOwner : userParty" :key="unique" class="user-tag">
+                    <el-tag
+                      v-for="(unit, unique) in form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? groupOwner : userParty"
+                      :key="unique"
+                      closable
+                      class="user-tag"
+                      @close="handleClose(form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'groupOwner' : 'userParty', unique)"
+                    >
                       <TagUserShow :name="unit.name" :show-icon="!unit.userId" />
                     </el-tag>
                   </el-form-item>
@@ -639,7 +648,13 @@ export default {
                     <el-button icon="el-icon-plus" @click="selectUser(form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'filterGroupUsers' : 'filterUsers')">{{
                       (form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? filterGroupUsers : filterUsers).length === 0 ? '添加成员' : '修改成员'
                     }}</el-button>
-                    <el-tag v-for="(unit, unique) in form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? filterGroupUsers : filterUsers" :key="unique" class="user-tag">
+                    <el-tag
+                      v-for="(unit, unique) in form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? filterGroupUsers : filterUsers"
+                      :key="unique"
+                      closable
+                      class="user-tag"
+                      @close="handleClose(form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? 'filterGroupUsers' : 'filterUsers', unique)"
+                    >
                       <TagUserShow :name="unit.name" :show-icon="!unit.userId" />
                     </el-tag>
                   </el-form-item>
@@ -820,6 +835,10 @@ export default {
     /deep/ .el-tag__close {
       @include text_btn_color($color-theme2-1);
       background-color: transparent;
+    }
+    /deep/ .el-icon-close:hover {
+      @include bg_primary_color($color-theme2-1);
+      color: #fff;
     }
   }
 }
