@@ -2,7 +2,7 @@
   <div>
     <div class="avatar-container">
       <img :src="avatarUrl" class="img-circle img-lg" @error="loadAvatarError">
-      <el-button v-if="!$store.state.serverInfo.dkCorp" @click="editCropper()"><i class="iconfont icon-export" />更换头像</el-button>
+      <el-button v-if="!$store.state.serverInfo.dkCorp && $store.state.user.isSuperAdmin" @click="editCropper()"><i class="iconfont icon-export" />更换头像</el-button>
     </div>
     <TailoringImg
       ref="tailoringImg"

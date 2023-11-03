@@ -86,6 +86,16 @@ export default {
     }
   },
   created() {
+    const searchQuery = this.$store.getters.searchQuery[this.$route.name];
+    if (this.$store.getters.saveCondition && Object.keys(searchQuery || {}).length) {
+      const { beginTime, endTime } = searchQuery;
+      if (beginTime && endTime) {
+        this.dateRange = [beginTime, endTime];
+      }
+      this.selectUserList = searchQuery.selectUserList;
+      delete searchQuery.selectUserList;
+      this.query = searchQuery;
+    }
     this.getRecordList();
     this.getRecordCount();
   },
@@ -138,8 +148,12 @@ export default {
      */
     goRoute(row) {
       window.sessionStorage.setItem('DetailActive', ACTIVENAME);
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: { ...this.query, selectUserList: this.selectUserList }
+      });
       goRouteWithQuery(this.$router, 'customerDetail',
-        this.query, {
+        {}, {
           id: row.customerId,
           userId: row.userId,
           prePageType: 'labelDetail'

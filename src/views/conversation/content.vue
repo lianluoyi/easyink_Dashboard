@@ -1,3 +1,8 @@
+<!--
+ * @Description: 会话存档
+ * @Author: wJiaaa
+ * @LastEditors: wJiaaa
+-->
 <template>
   <div v-if="enterPriseWechatConfig[chatSecret]" class="content">
     <el-tabs v-model="activeName" class="content-tabs white-tabs" @tab-click="handleClick">

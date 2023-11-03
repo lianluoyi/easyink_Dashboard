@@ -124,7 +124,7 @@
       :visible.sync="dialogVisibleSelectUser"
       title="选择审计范围"
       :ignore-permission="true"
-      :select-user-list="auditUserRange.filter(item => item.department !== SCOPELIST_TYPE.ALL_USER)"
+      :selected-user-list="auditUserRange.filter(item => item.department !== SCOPELIST_TYPE.ALL_USER)"
       @success="selectedUser"
     />
     <!-- 选择审计人弹窗 -->

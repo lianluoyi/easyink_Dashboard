@@ -9,7 +9,6 @@
       ref="showTable"
       v-loading="loading"
       :data="list"
-      :default-sort="{prop: 'createTime', order: 'ascending'}"
       @sort-change="changeTableSort"
     >
       <template slot="empty">
@@ -17,8 +16,8 @@
       </template>
       <el-table-column prop="tagName" label="标签" min-width="200" />
       <el-table-column prop="groupTagName" label="所属标签组" min-width="180" />
-      <el-table-column sortable="custom" prop="customerCnt" :label="tagType() === TAG_LABEL_TYPE['customer'] ? '标签下客户数' :'标签下客户群'" min-width="180" />
-      <el-table-column sortable="custom" prop="createTime" label="标签创建时间" min-width="180" />
+      <el-table-column :sortable="tagType() === TAG_LABEL_TYPE['customer'] ? false : 'custom'" prop="customerCnt" :label="tagType() === TAG_LABEL_TYPE['customer'] ? '标签下客户数' :'标签下客户群'" min-width="180" />
+      <el-table-column :sortable="tagType() === TAG_LABEL_TYPE['customer'] ? false : 'custom'" prop="createTime" label="标签创建时间" min-width="180" />
     </el-table>
     <pagination
       :total="total"
@@ -94,10 +93,13 @@ export default {
       const searchValue = this.getSearchPayload();
       const payload = { ...this.query, ...searchValue };
       const { sortName, sortType } = this.sortParams;
-      const sortPayload = {
+      let sortPayload = {
         sortName: sortName + 'Sort',
         sortType: SORT_TYPE[sortType]
       };
+      if (this.tagType() === TAG_LABEL_TYPE['customer']) {
+        sortPayload = {};
+      }
       return {
         ...payload, ...sortPayload
       };
@@ -107,7 +109,7 @@ export default {
      */
     reset() {
       this.query = this.$options.data().query;
-      this.$refs?.showTable?.sort('createTime', 'ascending');
+      this.$refs?.showTable?.sort('createTime', this.tagType() !== TAG_LABEL_TYPE['customer'] ? 'ascending' : null);
     },
     changeTableSort({ prop, order }) {
       this.sortParams = {

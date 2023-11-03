@@ -49,15 +49,12 @@ export default {
     };
   },
   created() {
-    if (this.$route.query) {
-      Object.keys(this.query).forEach(key => {
-        if (this.$route.query[key]) {
-          this.query[key] = this.$route.query[key];
-        }
-      });
-      if (this.query.beginTime && this.query.endTime) {
-        this.dateRange = [this.query.beginTime, this.query.endTime];
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      const { beginTime, endTime } = this.$store.getters.searchQuery[this.$route.name];
+      if (beginTime && endTime) {
+        this.dateRange = [beginTime, endTime];
       }
+      this.query = this.$store.getters.searchQuery[this.$route.name];
     }
     this.getList();
   },
@@ -90,9 +87,7 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = [];
-      this.$set(this.query, 'sender', undefined);
-      this.$set(this.query, 'content', undefined);
-      this.$set(this.query, 'pushType', undefined);
+      this.query = this.$options.data().query;
       this.getList(1);
     },
     // 多选框选中数据
@@ -100,23 +95,21 @@ export default {
       this.ids = selection.map((item) => item.id);
     },
     goRoute(id, path) {
-      goRouteWithQuery(this.$router, path, this.query, { id });
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
+      goRouteWithQuery(this.$router, path, {}, { id });
     },
     syncMsg(data) {
       const { msgid, messageId } = data;
       const magArr = msgid.split(',');
       syncMsg({ msgids: magArr, messageId })
-        .then(({ data: resData }) => {
+        .then(() => {
           this.msgSuccess('同步成功');
           this.getList();
-          // this.list = rows
-          // this.total = +total
-          // this.loading = false
-          // this.ids = []
         })
-        .catch(() => {
-          // this.loading = false
-        });
+        .catch(() => {});
     },
     dealAttachments(attachments) {
       return JSON.stringify(attachments.map(attachment => {

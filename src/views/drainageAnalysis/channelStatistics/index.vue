@@ -10,6 +10,7 @@
       :visible.sync="dialogVisibleSelectUser"
       title="选择员工/部门"
       :is-only-leaf="false"
+      is-dep-linkage
       :selected-user-list="userAndDepartmentList"
       @success="selectedUserOrDepartment"
     />

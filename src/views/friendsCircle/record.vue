@@ -1,10 +1,11 @@
 <!--
  * @Description: 发布记录
  * @Author: wJiaaa
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <script>
 import { goRouteWithQuery } from '@/utils';
+import { MOMENT_RECORD } from '@/utils/constant/routePath';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import { getFriendsList, deleteMoment } from '@/api/friends';
@@ -60,12 +61,12 @@ export default {
     };
   },
   created() {
-    if (this.$route.query) {
-      Object.keys(this.query).forEach(key => {
-        if (this.$route.query[key]) {
-          this.query[key] = this.$route.query[key];
-        }
-      });
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[MOMENT_RECORD] || {}).length) {
+      const { beginTime, endTime } = this.$store.getters.searchQuery[MOMENT_RECORD];
+      if (beginTime && endTime) {
+        this.dateRange = [beginTime, endTime];
+      }
+      this.query = this.$store.getters.searchQuery[MOMENT_RECORD];
     }
     this.getFriendsCircleList();
   },
@@ -94,13 +95,16 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = [];
-      this.query.content = undefined;
-      this.query.type = undefined;
+      this.query = this.$options.data().query;
       this.getFriendsCircleList(1);
     },
     // 前往详情
     goRoute(id, path) {
-      goRouteWithQuery(this.$router, path, this.query, { id });
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: MOMENT_RECORD,
+        query: this.query
+      });
+      goRouteWithQuery(this.$router, path, {}, { id });
     },
     // 删除朋友圈 status  任务状态，整型，0表示定时任务未发送 3表示创建任务（已发送）
     deleteTask(task) {

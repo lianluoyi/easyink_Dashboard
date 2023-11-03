@@ -22,7 +22,7 @@ export default {
      */
     isKeep() {
       /** 需要缓存的页面 */
-      const keepAliveList = [CUSTOMER_DEATIL_PATH, CUSTOMER_PATH, '/customerManage/customerCenter/BatchTagTaskDetail'];
+      const keepAliveList = [CUSTOMER_DEATIL_PATH, CUSTOMER_PATH];
       return keepAliveList.includes(this.$route.path);
     }
   }

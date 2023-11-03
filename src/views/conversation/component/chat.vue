@@ -418,17 +418,17 @@ export default {
     .msgtypetext {
       padding: 5px 0;
       color: #333;
+      text-align: left;
     }
 
     .msgtypevoice {
-      margin: 10px;
+      margin-top: 10px;
       img {
         cursor: pointer;
       }
     }
 
     .msgtypefile {
-      width: calc(100% - 10px);
       div {
         height: 40px;
         line-height: 40px;
@@ -436,7 +436,7 @@ export default {
         color: #199ed8;
         text-indent: 10px;
         box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2), 0 1px 4px 0 rgba(0, 0, 0, 0.19);
-        margin: 10px;
+        margin-top: 10px;
         width: 200px;
         display: inline-block;
         text-align: left;
@@ -451,7 +451,7 @@ export default {
         cursor: pointer;
         color: #199ed8;
         box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2), 0 1px 4px 0 rgba(0, 0, 0, 0.19);
-        margin: 10px 0;
+        margin-top: 10px;
         display: inline-block;
         text-align: left;
         padding: 0 10px;
@@ -466,14 +466,13 @@ export default {
     }
 
     .msgtypevideo {
-      margin: 10px;
+      margin-top: 10px;
       cursor: pointer;
       border-radius: 8px;
     }
     .msgtypeimg {
       height: 80px;
-      margin: 10px;
-      width: calc(100% - 10px);
+      margin-top: 10px;
       /deep/ .thumb {
         width: 100px;
         height: 80px;
@@ -570,8 +569,10 @@ export default {
     .sender {
       text-align: right;
       flex-direction: row-reverse;
+      .msgtypetext {
+        margin-left: 7px;
+      }
     }
-
   }
 
   .system-msg{

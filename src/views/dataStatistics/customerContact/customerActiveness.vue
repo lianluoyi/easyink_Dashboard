@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户活跃度
  * @Author: xulinbin
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="activeness-page">
@@ -9,6 +9,7 @@
     <SelectUser
       :visible.sync="dialogVisibleSelectUser"
       title="选择员工/部门"
+      is-dep-linkage
       :is-only-leaf="false"
       :selected-user-list="userAndDepartmentList"
       @success="selectedUserOrDepartment"
@@ -62,11 +63,15 @@
           </el-form-item>
           <el-form-item>
             <el-button
+              v-preventReClick="200"
               type="primary"
+              :loading="searchButtonLoading"
               @click="onSearch"
             >查询</el-button>
             <el-button
+              v-preventReClick="200"
               class="btn-reset"
+              :loading="resetButtonLoading"
               @click="resetForm"
             >重置</el-button>
           </el-form-item>
@@ -192,6 +197,7 @@
             </el-table-column>
           </el-table>
           <pagination
+            :disabled="loading"
             :total="total * 1"
             :page.sync="query.pageNum"
             :limit.sync="query.pageSize"
@@ -294,7 +300,9 @@ export default {
         userSendMessageList: []
       },
       // 是否跳转到客户详情页
-      isSkipToCustomerDetail: false
+      isSkipToCustomerDetail: false,
+      searchButtonLoading: false,
+      resetButtonLoading: false
     };
   },
   watch: {
@@ -395,6 +403,8 @@ export default {
         this.total = res.total || 0;
       }).finally(() => {
         this.loading = false;
+        this.searchButtonLoading = false;
+        this.resetButtonLoading = false;
       });
     },
     // 得到不同的获取维度数据详情的函数
@@ -432,11 +442,13 @@ export default {
     },
     // 查询
     onSearch() {
+      this.searchButtonLoading = true;
       this.getList(true);
       this.getChartData();
     },
     // 重置
     resetForm() {
+      this.resetButtonLoading = true;
       this.userAndDepartmentList = [];
       this.query = this.$options.data().query;
       this.pickerMinDate = '';

@@ -1,29 +1,46 @@
 <template>
   <div class="employ">
-    <el-row class="user-test-div">
+    <el-row>
       <el-col :span="6" class="borderR">
         <div class="hd_box" style="height: 92px">
           <div class="hd_name">客户列表（{{ employAmount }}）</div>
           <div class="paddingT10">
-            <el-input v-model="employName" placeholder="输入客户昵称，回车搜索" prefix-icon="el-icon-search" @keyup.enter.native="customerList" />
+            <el-input
+              v-model="employName"
+              placeholder="输入客户昵称，回车搜索"
+              prefix-icon="el-icon-search"
+              @keyup.enter.native="() => {
+                customerQuery.pageNum = 1;
+                customerList()
+              }"
+            />
           </div>
         </div>
         <div v-loading="userListLoading" class="ct_box ct_boxFirst">
           <empty-default-icon
+            class="h100"
             text="暂无客户"
             desc="若首次加载，请耐心等待后台数据同步，稍后回来"
             :desc-show-condition="{ employName }"
             :length="CList.length"
           >
-            <ul>
+            <ul class="customer-list">
               <li v-for="(i,t) in CList" :key="t" :class="{'liActive':t==personIndex}" @click="personCheck(i,t)">
                 <div class="customer-item">
-
                   <img :src="i.avatar || require('@/assets/image/card-avatar.svg')" alt="头像">
                   <div class="toe">{{ i.name }}</div>
                 </div>
               </li>
             </ul>
+            <div class="footer-button">
+              <el-button size="mini" class="mr10" :disabled="customerQuery.pageNum === DEFAULT_PAGE_NUM" type="primary" plain icon="el-icon-arrow-left" @click="customerPageChange(false)">
+                上一页
+              </el-button>
+              <el-button size="mini" class="ml10" :disabled="CList.length < customerQuery.pageSize" type="primary" plain @click="customerPageChange(true)">
+                <span>下一页</span>
+                <i class="el-icon-arrow-right" />
+              </el-button>
+            </div>
           </empty-default-icon>
         </div>
       </el-col>
@@ -33,26 +50,53 @@
         </div>
         <div class="hd_tabs">
           <el-tabs v-model="activeName" class="group-tabs" @tab-click="handleChatTabClick">
-            <el-tab-pane class="chat-list single-chat" label="单聊" name="0">
-              <div class="hd_tabs_content">
-                <list v-if="activeName==0" :person-list="showPersonList" :loading="loading" @chatFn="chatFn" />
-              </div>
+            <div v-if="activeName === PRIVATE_CHAT" class="search">
+              <el-input
+                v-model="query.chatName"
+                placeholder="请输入聊天对象昵称"
+                clearable
+                prefix-icon="el-icon-search"
+                @clear="handleChatTabClick"
+                @keyup.enter.native="() => {
+                  query.pageNum = DEFAULT_PAGE_NUM;
+                  handleChatTabClick()
+                }"
+              />
+            </div>
+            <el-tab-pane class="hd-tab-pane" label="单聊" :name="PRIVATE_CHAT">
+              <list v-if="activeName === PRIVATE_CHAT" :person-list="showPersonList" :loading="loading" @chatFn="chatFn" />
             </el-tab-pane>
-            <el-tab-pane class="chat-list group-chat" label="群聊" name="2">
-              <grouplist v-if="activeName==2" :person-list="showPersonList" :loading="loading" @groupFn="groupFn" />
+            <el-tab-pane class="hd-tab-pane" label="群聊" :name="GROUP_CHAT">
+              <grouplist v-if="activeName === GROUP_CHAT" :person-list="showPersonList" :loading="loading" @groupFn="groupFn" />
             </el-tab-pane>
           </el-tabs>
+          <div v-if="showPersonList.length" class="footer-button">
+            <el-button
+              :disabled="query.pageNum === DEFAULT_PAGE_NUM"
+              type="primary"
+              size="mini"
+              plain
+              icon="el-icon-arrow-left"
+              class="mr10"
+              @click="pageChange(false)"
+            >
+              上一页
+            </el-button>
+            <el-button
+              :disabled="showPersonList.length < query.pageSize"
+              type="primary"
+              size="mini"
+              plain
+              class="ml10"
+              @click="pageChange(true)"
+            >
+              <span>下一页</span>
+              <i class="el-icon-arrow-right" />
+            </el-button>
+          </div>
         </div>
       </el-col>
       <el-col :span="12" class="chat-content-div">
-        <!-- <div class="hd_box">
-          <div class="hd_name">
-              <span
-              v-if="chatData&&chatData.finalChatContext">与{{chatData.finalChatContext.fromInfo.name}} 的聊天</span>
-              判断 activeName
-            <span class="fr hd_nameRi">下载会话</span>
-          </div>
-        </div> -->
         <div class=" hd_tabthree">
           <el-tabs v-model="activeNameThree" class="tabthree-tabs" @tab-click="activeNameThreeClick()">
             <el-tab-pane class="tabthree-tab-pane" label="全部" :name="MSG_TYPE_ALL">
@@ -272,8 +316,10 @@ import {
   filterSize,
   downloadAMR
 } from '@/utils/common.js';
-import { listDistinct } from '@/api/customer/index';
-import { MSG_TYPE, MSG_TYPE_VIDEO, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_ALL } from '@/utils/constant/index';
+import { listDistinct, listDistinctCount } from '@/api/customer/index';
+import { DEFAULT_PAGE_NUM, PAGE_LIMIT_TWENTY, MSG_TYPE, MSG_TYPE_VIDEO, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_ALL } from '@/utils/constant/index';
+const GROUP_CHAT = '2';
+const PRIVATE_CHAT = '0'; // 单聊
 export default {
   components: {
     list,
@@ -288,7 +334,7 @@ export default {
       talkName: '',
       chatContent: '',
       personIndex: '-1',
-      activeName: '0',
+      activeName: PRIVATE_CHAT,
       activeNameThree: '0',
       takeTime: '',
       fileData: [],
@@ -315,7 +361,19 @@ export default {
       MSG_TYPE_VOICE,
       MSG_TYPE_ALL,
       contentLoading: false,
-      userListLoading: true
+      userListLoading: true,
+      DEFAULT_PAGE_NUM,
+      query: {
+        pageNum: DEFAULT_PAGE_NUM,
+        pageSize: PAGE_LIMIT_TWENTY,
+        chatName: ''
+      },
+      customerQuery: {
+        pageNum: DEFAULT_PAGE_NUM,
+        pageSize: PAGE_LIMIT_TWENTY
+      },
+      PRIVATE_CHAT,
+      GROUP_CHAT
     };
   },
   mounted() {
@@ -328,13 +386,37 @@ export default {
       this.chatData = data;
       this.activeNameThreeClick();
     },
+    /**
+     * @description 聊天列表切换页码
+     * @param flag 为true时上一页 false时下一页
+     */
+    pageChange(flag) {
+      if (flag) {
+        this.query.pageNum++;
+      } else {
+        this.query.pageNum--;
+      }
+      this.getChatList();
+    },
+    /**
+     * @description 客户列表切换页码
+     * @param flag 为true时上一页 false时下一页
+     */
+    customerPageChange(flag) {
+      if (flag) {
+        this.customerQuery.pageNum++;
+      } else {
+        this.customerQuery.pageNum--;
+      }
+      this.customerList();
+    },
     groupFn(data) {
       this.chatData = data;
       this.activeNameThreeClick('', true);
     },
     currentChange(e) {
       this.currentPage = e;
-      if (this.activeName === '2') {
+      if (this.activeName === GROUP_CHAT) {
         return this.activeNameThreeClick(true, true);
       }
       this.activeNameThreeClick(true);
@@ -343,6 +425,8 @@ export default {
       this.personIndex = e;
       this.talkName = data.name;
       this.employId = data.externalUserid;
+      this.query.pageNum = DEFAULT_PAGE_NUM;
+      this.query.chatName = '';
       this.getChatList();
     },
     getChatList() {
@@ -353,14 +437,14 @@ export default {
       this.personList = [];
       content.getTree({
         fromId: this.employId,
-        searchType: this.activeName
+        searchType: this.activeName,
+        ...this.query
       }).then((
         { rows }
       ) => {
-        this.loading = false;
         this.personList = rows;
         this.matchChatObject(this.chatContent);
-      }).catch(() => {
+      }).finally(() => {
         this.loading = false;
       });
     },
@@ -437,9 +521,6 @@ export default {
     },
     customerList() {
       const querys = {
-        pageNum: 1,
-        // eslint-disable-next-line no-magic-numbers
-        pageSize: 999,
         name: this.employName,
         userId: '',
         tagIds: '',
@@ -447,12 +528,20 @@ export default {
         endTime: '',
         status: '',
         isOpenChat: '1',
-        queryType: 1
+        queryType: 1,
+        ...this.customerQuery
       };
       this.userListLoading = true;
+      if (this.activeName === GROUP_CHAT) {
+        querys.chatName = '';
+      }
+      if (!this.employAmount) {
+        listDistinctCount(querys).then((res) => {
+          this.employAmount = res.data.ignoreDuplicateCount;
+        }).catch(() => {});
+      }
       listDistinct(querys).then(res => {
         this.CList = res.rows;
-        this.employAmount = res.total;
       }).finally(() => {
         this.userListLoading = false;
       });
@@ -463,9 +552,10 @@ export default {
     voiceLook(e) {
       downloadAMR(e.attachment);
     },
-    handleChatTabClick(tab, event) {
-      if (tab.name === '2') {
+    handleChatTabClick() {
+      if (this.activeName === GROUP_CHAT) {
         this.chatType = 'groupChat';
+        this.query.chatName = '';
       } else {
         this.chatType = 'singleChat';
       }
@@ -509,27 +599,40 @@ export default {
   .employ {
     background: #f6f6f9;
     height: 100%;
-    .user-test-div {
+    /deep/ .el-row {
       height: 100%;
     }
-
+    .footer-button {
+       box-shadow: 0px -5px 10px 0px rgba(0, 0, 0, 0.11);
+       display: flex;
+       height: 52px;
+       align-items: center;
+       justify-content: center;
+       border-top: 1px solid #efefef;
+       button {
+         width: 90px;
+       }
+       .el-icon-arrow-right:before {
+         margin-left: 10px;
+       }
+     }
     .hd_tabs {
       background: #fff;
-      height: calc(100% - 92px);
-      /deep/ .el-tabs__content {
-        height: calc(100% - 40px);
-      }
-      .chat-list {
-        height: 100%;
-        .hd_tabs_content {
-          height: 100%;
-          .list {
+      height: calc(100% - 52px);
+      .group-tabs {
+        height: calc(100% - 52px);
+         /deep/ .el-tabs__content {
+          height: calc(100% - 40px);
+          .hd-tab-pane {
             height: 100%;
+            .el-tab-pane {
+              height: 100%;
+            }
           }
         }
       }
-      .group-tabs {
-        height: 100%;
+      /deep/ .el-tabs__header {
+        margin: 0;
       }
     }
 
@@ -547,46 +650,24 @@ export default {
       min-height: 20px;
     }
 
-    .hd_tabs_content {
-      width: 100%;
-      border-bottom: 1px solid #efefef;
-    }
-
-    .hd_nameRi {
-      color: #199ed8;
-      text-align: right;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
     .ct_box {
       background: white;
-      border-bottom: 1px solid #efefef;
-      // min-height: 709px;
       padding: 10px;
+      height: 100%;
       overflow-y: auto;
       color: #999;
       text-align: center;
-
-      ::-webkit-scrollbar {
-        display: none;
-      }
-
       ul {
         margin: 0;
         padding: 0;
       }
-
       ul li {
-
         text-align: left;
         cursor: pointer;
         border-bottom: 1px solid #efefef;
-
         :hover {
           background: #efefef;
         }
-
         img {
           width: 40px;
           height: 40px;
@@ -603,9 +684,12 @@ export default {
     }
 
     .ct_boxFirst {
-      // height: 700px;
       height: calc(100% - 92px);
-      padding: 10px 0;
+      padding: 0;
+      .customer-list {
+        height: calc(100% - 54px);
+        overflow: auto;
+      }
       .customer-item {
         padding: 10px;
         margin: 0px;
@@ -627,7 +711,12 @@ export default {
     height: 30px;
     float: left;
   }
-
+  .search {
+    padding: 6px 11px;
+    z-index :999;
+    background-color: #F6F6F6;
+    width: 100%;
+  }
   .hd_tabthree {
     height: 100%;
     /deep/ .tabthree-tabs {

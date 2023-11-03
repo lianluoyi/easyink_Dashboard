@@ -39,6 +39,7 @@
               v-else
               v-loading="item.loading"
               height="250"
+              :default-sort="{prop:'customerCnt',order: 'descending'}"
               :data="item.list"
             >
               <el-table-column

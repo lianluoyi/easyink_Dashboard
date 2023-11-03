@@ -4,39 +4,19 @@
       <el-col :span="6" class="borderR">
         <div class="hd_box" style="height: 92px">
           <div class="hd_name">成员</div>
-          <!-- <div class="hd_name">成员（{{employAmount}}）</div> -->
           <div class="paddingT10">
             <el-input v-model="employName" placeholder="请输入内容" prefix-icon="el-icon-search" />
           </div>
         </div>
-        <div ref="userTree" class="ct_box ct_boxFirst">
-          <common-tree
-            ref="tree"
-            v-loading="loadingEmployee"
+        <div ref="employTree" class="ct_box ct_boxFirst">
+          <UserTree
+            ref="userTree"
             class="filter-tree conversation-user-tree"
-            node-key="id"
-            :data="treeData"
-            :props="defaultProps"
-            :default-expanded-keys="treeData[0] ? [treeData[0].id] : []"
-            :filter-node-method="filterNode"
-            :node-click="handleNodeClick"
-          >
-            <template slot="empty">
-              <empty-default-icon
-                text="暂无员工"
-                desc="若首次加载，请耐心等待后台数据同步，稍后回来"
-                :desc-show-condition="{ employName }"
-                :desc-config="['contactSecret']"
-              />
-            </template>
-            <div slot-scope="{ node, data }" class="custom-tree-node">
-              <div v-if="data.userId" :data-userId="dealUserId(data.userId)" :class="['user-info', employId === data.userId ? 'selected' : '']">
-                <img class="user-avatar" :src="data.avatarMediaid || require('@/assets/image/card-avatar.svg')">
-                <span>{{ node.label }}</span>
-              </div>
-              <span v-else>{{ node.label }}（{{ data.totalUserCount || 0 }}）</span>
-            </div>
-          </common-tree>
+            v-bind="$attrs"
+            :filter-text="employName"
+            is-only-click
+            @updateUserList="handleNodeClick"
+          />
         </div>
       </el-col>
       <el-col :span="6" class="borderR">
@@ -45,14 +25,49 @@
         </div>
         <div class="hd_tabs">
           <el-tabs v-model="contactTabType" class="tabs-div" @tab-click="loadContactList">
+            <div v-if="contactTabType !== CONTACT_TYPE_GROUP" class="search">
+              <el-input
+                v-model="query.chatName"
+                placeholder="请输入聊天对象昵称"
+                clearable
+                prefix-icon="el-icon-search"
+                @clear="loadContactList"
+                @keyup.enter.native="() => {
+                  query.pageNum = 1;
+                  loadContactList()
+                }"
+              />
+            </div>
             <el-tab-pane v-for="tab in contactTypeTabs" :key="tab.value" class="hd-tab-pane" :label="tab.label" :name="tab.value">
-              <div v-if="contactTabType===CONTACT_TYPE_INNER" class="ct_box" style="padding: 0">
-                <insideList :person-list="personList" :loading="loading" @chatFn="chatFn" />
-              </div>
+              <insideList v-if="contactTabType===CONTACT_TYPE_INNER" :person-list="personList" :loading="loading" @chatFn="chatFn" />
               <list v-else-if="contactTabType===CONTACT_TYPE_EXTERNAL" :person-list="personList" :loading="loading" @chatFn="chatFn" />
               <grouplist v-else :person-list="personList" :loading="loading" @groupFn="groupFn" />
             </el-tab-pane>
           </el-tabs>
+          <div v-if="personList.length" class="footer-button">
+            <el-button
+              size="mini"
+              class="mr10"
+              :disabled="query.pageNum === DEFAULT_PAGE_NUM"
+              type="primary"
+              plain
+              icon="el-icon-arrow-left"
+              @click="pageChange(false)"
+            >
+              上一页
+            </el-button>
+            <el-button
+              size="mini"
+              class="ml10"
+              :disabled="personList.length < query.pageSize"
+              type="primary"
+              plain
+              @click="pageChange(true)"
+            >
+              <span>下一页</span>
+              <i class="el-icon-arrow-right" />
+            </el-button>
+          </div>
         </div>
       </el-col>
       <el-col :span="12" class="chat-content-col">
@@ -308,18 +323,15 @@ import list from '../component/list.vue';
 import chat from '../component/chat.vue';
 import insideList from '../component/insideList.vue';
 import grouplist from '../component/groupList.vue';
-import * as api from '@/api/organization';
+import UserTree from '@/components/SelectUser/UserTree.vue';
 import {
   content
 } from '@/api/content.js';
 import {
-  yearMouthDay, downloadFile, filterSize, downloadAMR, changeDeptTreeData
+  yearMouthDay, downloadFile, filterSize, downloadAMR
 } from '@/utils/common.js';
-import { PAGE_LIMIT, MSG_TYPE, MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO, USER_AND_DEPARTMENT_LIMIT, IS_ACTIVATE } from '@/utils/constant/index';
-import { groupBy } from 'lodash';
+import { PAGE_LIMIT_TWENTY, DEFAULT_PAGE_NUM, PAGE_LIMIT, MSG_TYPE, MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
-import CommonTree from '@/components/CommonTree';
-
 const CONTACT_TYPE_INNER = '0';
 const CONTACT_TYPE_EXTERNAL = '1';
 const CONTACT_TYPE_GROUP = '2';
@@ -328,7 +340,6 @@ const CONTACT_TAB_TYPE = {
   [CONTACT_TYPE_EXTERNAL]: '外部联系人',
   [CONTACT_TYPE_GROUP]: '群聊'
 };
-const USER_PAGE_LIMIT = 999;
 
 const buildTextChat = (msgTime, content) => ({
   msgType: 'text',
@@ -351,36 +362,32 @@ export default {
     grouplist,
     insideList,
     chat,
-    CommonTree,
+    UserTree,
     EmptyDefaultIcon
   },
   data() {
     return {
-      employAmount: 1,
       employId: '',
       employName: '',
       talkName: '',
-      treeData: [],
-      defaultProps: {
-        label: 'name',
-        children: 'children'
-      },
       contactTypeTabs: Object.entries(CONTACT_TAB_TYPE).map(arr => ({ value: arr[0], label: arr[1] })),
       contactTabType: CONTACT_TYPE_EXTERNAL,
       msgTabType: MSG_TYPE_ALL,
       takeTime: '',
-      fileData: [],
       chat: {},
       personList: [],
       loading: false,
       // 显示消息栈
       allChatStack: [],
-      // 员工列表加载时的loading
-      loadingEmployee: false,
       // template中要用到的常量
       CONTACT_TYPE_INNER, CONTACT_TYPE_EXTERNAL,
-      MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO,
-      contentLoading: false
+      MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO, DEFAULT_PAGE_NUM, CONTACT_TYPE_GROUP,
+      contentLoading: false,
+      query: {
+        pageNum: DEFAULT_PAGE_NUM,
+        pageSize: PAGE_LIMIT_TWENTY,
+        chatName: ''
+      }
     };
   },
   computed: {
@@ -407,59 +414,30 @@ export default {
       }
     }
   },
-  watch: {
-    employName(val) {
-      const tree = this.$refs.tree;
-      if (tree) tree.filter(val);
-    }
-  },
   // 组件销毁前，清除内部联系人和外部联系人存的session值
   beforeDestroy() {
     sessionStorage.removeItem('list');
     sessionStorage.removeItem('insideList');
   },
-  mounted() {
-    this.getTree();
-    // this.getAmount()
-  },
   methods: {
-    renderContent(h, { node, data, store }) {
-      return (
-        <div class='custom-tree-node'>
-          {
-            data.userId
-              ? <div
-
-                data-userId={this.dealUserId(data.userId)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontSize: '14px',
-                  color: '#606266'
-                }}
-                class={['user-info', this.employId === data.userId ? 'selected' : '']}>
-                <img
-                  class='user-avatar'
-                  width={30}
-                  height={30}
-                  style={{
-                    marginRight: '5px',
-                    borderRadius: '4px'
-                  }}
-                  src={data.avatarMediaid || require('@/assets/image/card-avatar.svg')}/>
-                <span>{ node.label }</span>
-              </div>
-              : <span>{ node.label }（{ data.totalUserCount || 0 }）</span>
-          }
-        </div>
-      );
-    },
     filterSize,
     voiceLook(e) {
       downloadAMR(e.attachment);
     },
     download(e) {
       downloadFile(e.file.attachment, e.file.fileName || e.file.filename);
+    },
+    /**
+     * @description 切换页码
+     * @param flag 为true时上一页 false时下一页
+     */
+    pageChange(flag) {
+      if (flag) {
+        this.query.pageNum++;
+      } else {
+        this.query.pageNum--;
+      }
+      this.loadContactList();
     },
     /**
      * @description: 翻页操作
@@ -540,35 +518,6 @@ export default {
       if (data.roomId) this.chat.receiveName = data.roomInfo.groupName;
       this.loadMessageList('');
     },
-    async getTree() {
-      const data = await this.$store.dispatch('GetDepartmentList');
-      await this.recursionGetTreeList();
-      this.loadingEmployee = false;
-      this.treeData = [...this.handleTree(data), ...this.$store.state.departmentInfo.otherUserList];
-      let departmentIds = '';
-      data.map((item, index) => {
-        if (index !== 0) {
-          departmentIds = departmentIds + ',';
-        }
-        departmentIds = departmentIds + item.id;
-      });
-      // 根据部门id获取员工列表
-      this.getUserList(departmentIds);
-    },
-    /**
-     * @description 递归获取其他员工
-     */
-    async recursionGetTreeList() {
-      if (this.departmentInfo.otherUserList.length < this.departmentInfo.otherUserListTotal) {
-        this.loadingEmployee = true;
-        await this.$store.dispatch('GetOtherUserList', {
-          isActivate: IS_ACTIVATE,
-          lastId: this.departmentInfo.otherUserList[this.departmentInfo.otherUserList.length - 1]?.userId,
-          pageSize: USER_AND_DEPARTMENT_LIMIT
-        });
-        await this.recursionGetTreeList();
-      }
-    },
     // 加载内/外联系人或群聊列表
     loadContactList() {
       if (!this.employId) {
@@ -576,38 +525,18 @@ export default {
       }
       this.loading = true;
       this.personList = [];
-      content.getTree({
+      const query = {
         fromId: this.employId,
-        searchType: this.contactTabType
-      }).then(({ rows }) => {
-        this.loading = false;
-        this.personList = rows;
-      }).catch(() => {
-        this.loading = false;
-      });
-    },
-    filterNode(value, data) {
-      if (!value) return true;
-      return data.name.indexOf(value) !== -1;
-    },
-    // 获取部门下的员工列表，处理数据
-    getUserList(departmentIds) {
-      const querys = {
-        pageNum: '1',
-        pageSize: USER_PAGE_LIMIT,
-        // department: data.id,
-        departmentStr: departmentIds
+        searchType: this.contactTabType,
+        ...this.query
       };
-      api.getList(querys).then(({ rows }) => {
-        // 将员工按照部门分组
-        const deptUserListMap = groupBy(rows, 'mainDepartment');
-        Object.keys(deptUserListMap).forEach(deptId => {
-          const userList = deptUserListMap[deptId];
-          // 将员工列表塞到treeData中对应的部门
-          changeDeptTreeData(this.treeData, deptId, userList);
-          // 重新赋值，否则子部门员工无法正常渲染
-          this.treeData = [...this.treeData];
-        });
+      if (this.contactTabType === CONTACT_TYPE_GROUP) {
+        query.chatName = '';
+      }
+      content.getTree(query).then(({ rows }) => {
+        this.personList = rows;
+      }).finally(() => {
+        this.loading = false;
       });
     },
     /**
@@ -616,15 +545,17 @@ export default {
     handleNodeClick(data) {
       // 点击部门不做处理
       if (!data.userId) {
-        this.$refs['userTree'].classList.remove('ct_box_color');
+        this.$refs['employTree'].classList.remove('ct_box_color');
         return;
       }
       const nowClickDom = document.querySelector(`[data-userid="${this.dealUserId(data.userId)}"]`);
       if (nowClickDom) {
-        this.$refs['userTree'].classList.add('ct_box_color');
+        this.$refs['employTree'].classList.add('ct_box_color');
       }
       this.talkName = data.name;
       this.employId = data.userId;
+      this.query.pageNum = DEFAULT_PAGE_NUM;
+      this.query.chatName = '';
       this.loadContactList();
     },
     // 处理data-userId数据，因为querySelector接口查询属性时不支持数字开头
@@ -776,16 +707,10 @@ export default {
       this.allChatStack.push(chatrecordChatData);
     }
   }
-
 };
 
 </script>
 <style lang="scss" scoped>
-  * {
-    margin: 0;
-    padding: 0;
-  }
-
   /deep/.el-tabs__nav-scroll {
     padding-left: 15px;
   }
@@ -812,11 +737,25 @@ export default {
     /deep/ .el-row {
       height: 100%;
     }
+    .footer-button {
+       box-shadow: 0px -5px 10px 0px rgba(0, 0, 0, 0.11);
+       display: flex;
+       height: 52px;
+       align-items: center;
+       justify-content: center;
+       border-top: 1px solid #efefef;
+       button {
+         width: 90px;
+       }
+       .el-icon-arrow-right:before {
+         margin-left: 10px;
+       }
+    }
     .hd_tabs {
       background: #fff;
       height: calc(100% - 52px);
       .tabs-div {
-        height: 100%;
+        height: calc(100% - 52px);
         /deep/ .el-tabs__content {
           height: calc(100% - 40px);
           .hd-tab-pane {
@@ -831,7 +770,6 @@ export default {
         margin: 0;
       }
     }
-
     .hd_tabthree {
       height: calc(100% - 52px);
       /deep/ .el-tabs__header {
@@ -879,7 +817,6 @@ export default {
     }
 
     .ct_boxFirst {
-      // height: 800px !important;
       height: calc(100% - 92px) !important;
       .conversation-user-tree {
         height: 100%;
@@ -892,9 +829,7 @@ export default {
     .ct_box {
       background: white;
       height: 100%;
-      // padding: 10px;
       overflow-y: auto;
-      border-bottom: 1px solid #efefef;
       color: #999;
       text-align: center;
       /deep/.el-tree-node__content:hover {
@@ -910,7 +845,12 @@ export default {
       }
     }
   }
-
+  .search {
+    padding: 6px 11px;
+    z-index :999;
+    background-color: #F6F6F6;
+    width: 100%;
+  }
   .pagination {
     padding: 10px;
     height: 50px;
@@ -937,10 +877,8 @@ export default {
     border-bottom-width: 1px;
     padding-left: 1em;
     text-align: left;
-
     display: flex;
     align-items: center;
-
     .icon-restore{
       margin-right: 10px;
     }

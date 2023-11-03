@@ -1,7 +1,7 @@
 <!--
  * @Description: 公共树组件（统一判断空值情况）
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
  * @remrk 空值调用时slot命名为empty
 -->
 
@@ -110,6 +110,7 @@ export default {
         :default-expanded-keys="defaultExpandedKeys"
         :filter-node-method="filterNode"
         v-bind="$attrs"
+        empty-text=""
         v-on="$listeners"
         @node-click="nodeClick"
       >

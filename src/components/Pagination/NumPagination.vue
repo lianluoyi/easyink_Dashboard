@@ -6,7 +6,7 @@
 <template>
   <el-pagination
     v-bind="$attrs"
-    layout="sizes,slot"
+    :layout="layout"
     :page-sizes="pageSizes"
     :page-size.sync="pageSize"
     :total="total"
@@ -15,6 +15,7 @@
     <span class="el-pagination__jump ml5">
       <i :class="[ currentPage > 1 ? 'pointer' : 'not-allowed', 'mr10 el-icon-arrow-left']" @click="previousPage" />
       <el-input
+        v-if="!disabledInput"
         :value="currentPage !== null ? currentPage : 1"
         class="el-pagination__editor is-in-pagination"
         type="number"
@@ -23,9 +24,10 @@
         @input="handleInput"
         @change="handleChange"
       />
+      <div v-else class="current-page">{{ currentPage }}</div>
       <span class="no-select">
-        <span class="ml20">/</span>
-        <span>
+        <span class="division">/</span>
+        <span class="page-count">
           {{ pageCount }}
         </span>
       </span>
@@ -37,6 +39,7 @@
 <script>
 import { PAGE_LIMIT, PAGE_LIMIT_TWENTY, PAGE_LIMIT_THIRTY, PAGE_LIMIT_FIFTY, DEFAULT_PAGE_NUM } from '@/utils/constant/index';
 export default {
+  name: 'NumPagination',
   props: {
     total: {
       required: true,
@@ -55,6 +58,18 @@ export default {
       default() {
         return [PAGE_LIMIT, PAGE_LIMIT_TWENTY, PAGE_LIMIT_THIRTY, PAGE_LIMIT_FIFTY];
       }
+    },
+    /**
+     * 分页布局
+     */
+    layout: {
+      type: String,
+      default: 'sizes,slot'
+    },
+    /** 是否禁用输入框 */
+    disabledInput: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -145,17 +160,34 @@ export default {
 }
 .not-allowed {
   cursor: not-allowed;
+  color: #ccc;
+}
+.current-page {
+  font-weight: 100;
+  font-size: 15px;
+  display: inline;
+  margin-right: 5px;
+  margin-left: 5px;
 }
 .no-select {
   user-select:none;
-  margin-top: 1px;
+  text-align: center;
   span {
     font-weight: 100;
     font-size: 15px;
-    margin-right: -10px;
+    display: inline;
   }
-  span:first-child {
+  .page-count {
+    text-align: center;
+    margin-right: 12px;
+  }
+  .division {
     font-size: 19px;
+    display: inline;
+    margin-left: 15px;
+    margin-right: 12px;
+    text-align: center;
+    line-height: 30px;
   }
 }
 /deep/ .el-input--small .el-input__inner {

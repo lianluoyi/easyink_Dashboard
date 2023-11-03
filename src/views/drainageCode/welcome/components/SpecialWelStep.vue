@@ -1,7 +1,7 @@
 <!--
  * @Description: 特殊时段欢迎语
  * @Author: broccoli
- * @LastEditors: Xzz
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="special-step-page">
@@ -229,7 +229,7 @@ export default {
         margin-right: 10px;
       }
       .welcome-input-div {
-        width: 430px;
+        width: 455px;
         margin-right: 10px;
       }
       .tool-div {

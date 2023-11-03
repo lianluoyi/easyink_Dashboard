@@ -73,12 +73,17 @@ export default {
   computed: {},
   watch: {},
   created() {
-    if (this.$route.query) {
-      Object.keys(this.query).forEach(key => {
-        if (this.$route.query[key]) {
-          this.query[key] = this.$route.query[key];
-        }
-      });
+    const searchQuery = this.$store.getters.searchQuery[this.$route.name];
+    if (this.$store.getters.saveCondition && Object.keys(searchQuery || {}).length) {
+      const { beginTime, endTime } = searchQuery;
+      if (beginTime && endTime) {
+        this.dateRange = [beginTime, endTime];
+      }
+      this.queryTag = searchQuery.queryTag;
+      this.queryUser = searchQuery.queryUser;
+      delete searchQuery.queryTag;
+      delete searchQuery.queryUser;
+      this.query = searchQuery;
     }
     this.getList();
     this.getListTag();
@@ -180,19 +185,16 @@ export default {
     submitSelectTag(selected) {
       if (this.tagDialogType.type === 'query') {
         this.query.tagIds = selected.map((d) => d.tagId) + '';
-        // debugger;
         this.queryTag = selected;
         this.dialogVisible = false;
       }
     },
-    resetForm(formName) {
+    resetForm() {
       this.dateRange = [];
       this.queryTag = [];
       this.queryUser = [];
       this.selectedTag = [];
-      this.$refs['queryForm'].resetFields();
-      this.query.userIds = '';
-      this.query.tagIds = '';
+      this.query = this.$options.data().query;
       EventBus.$emit('resetTag');
       EventBus.$emit('resetUser');
       this.$nextTick(() => {
@@ -245,7 +247,11 @@ export default {
       this.removeTagList.push(item);
     },
     goRoute(item) {
-      goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH, this.query, { id: item.externalUserid, userId: item.userId, userName: item.userName, prePageType: 'lossRemind' });
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: { ...this.query, queryTag: this.queryTag, queryUser: this.queryUser }
+      });
+      goRouteWithQuery(this.$router, CUSTOMER_DEATIL_PATH, {}, { id: item.externalUserid, userId: item.userId, userName: item.userName, prePageType: 'lossRemind' });
     },
     /**
      * 处理 @微信 的字样
