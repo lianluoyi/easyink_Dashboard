@@ -732,17 +732,17 @@ export default {
               :disabled="disabled"
             >
               <el-form-item label="姓名" prop="userName">
-                <el-input v-model="form.userName" :disabled="isDKCorp" :maxlength="64" show-word-limit />
+                <el-input v-model="form.userName" disabled :maxlength="64" show-word-limit />
               </el-form-item>
               <el-form-item label="账号" prop="userId">
                 <el-input
                   v-model="form.userId"
-                  :disabled="!form._new"
+                  disabled
                   placeholder="成员唯一标识，不支持更改，不支持中文"
                 />
               </el-form-item>
               <el-form-item label="性别">
-                <el-radio-group v-model="form.gender" :disabled="isDKCorp">
+                <el-radio-group v-model="form.gender" disabled>
                   <el-radio :label="1">男</el-radio>
                   <el-radio :label="2">女</el-radio>
                 </el-radio-group>
@@ -764,14 +764,14 @@ export default {
               <el-form-item label="昵称">
                 <el-input
                   v-model="form.alias"
-                  :disabled="isDKCorp"
+                  disabled
                   :maxlength="64"
                   :placeholder="`${showPlaceHolder ? '可在新闻公告应用的生日祝福等场景使用' : ''}`"
                   show-word-limit
                 />
               </el-form-item>
               <el-form-item label="手机号" prop="mobile">
-                <el-input v-model="form.mobile" :disabled="isDKCorp" />
+                <el-input v-model="form.mobile" disabled />
               </el-form-item>
               <el-form-item label="生日">
                 <el-date-picker v-model="form.birthday" value-format="yyyy-MM-dd" type="date" placeholder />
@@ -780,7 +780,7 @@ export default {
                 <el-input v-model="form.idCard" />
               </el-form-item>
               <el-form-item label="邮箱" prop="email">
-                <el-input v-model="form.email" :disabled="isDKCorp" />
+                <el-input v-model="form.email" disabled />
               </el-form-item>
               <el-form-item label="QQ" prop="qqAccount">
                 <el-input v-model="form.qqAccount" />
@@ -788,7 +788,7 @@ export default {
               <el-form-item label="地址">
                 <el-input
                   v-model="form.address"
-                  :disabled="isDKCorp"
+                  disabled
                   type="textarea"
                   row="2"
                   :maxlength="128"
@@ -821,7 +821,7 @@ export default {
               <el-form-item label="所在部门" prop="mainDepartment">
                 <el-cascader
                   v-model="form.mainDepartment"
-                  :disabled="isDKCorp"
+                  disabled
                   :options="treeData"
                   :show-all-levels="false"
                   :props="{
@@ -834,7 +834,7 @@ export default {
                 />
               </el-form-item>
               <el-form-item label="职务">
-                <el-input v-model="form.position" :disabled="isDKCorp" :maxlength="64" show-word-limit />
+                <el-input v-model="form.position" disabled :maxlength="64" show-word-limit />
               </el-form-item>
               <!-- <el-form-item label="角色">
               <el-radio-group v-model="form.isLeaderInDept">

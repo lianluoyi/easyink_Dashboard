@@ -97,7 +97,6 @@ import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant/index';
-import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import { selectBatchTaskDetailList, exportBatchTaskDetailList } from '@/api/batchTagTask';
 // 打标签状态枚举
 const TAG_TODO = 0;
@@ -127,15 +126,10 @@ export default {
       TAG_TODO
     };
   },
-  beforeRouteEnter(to, from, next) {
-    to.meta.keepAlive = true;
-    next();
-  },
-  beforeRouteLeave(to, from, next) {
-    from.meta.keepAlive = to.path === CUSTOMER_DEATIL_PATH;
-    next();
-  },
   created() {
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      this.query = this.$store.getters.searchQuery[this.$route.name];
+    }
     const routerQuery = this.$route.query;
     this.taskId = routerQuery.taskId;
     this.taskName = routerQuery.taskName;
@@ -168,10 +162,14 @@ export default {
         this.msgWarn('Ta不是企业客户');
         return;
       }
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
       goRouteWithQuery(
         this.$router,
         'customerDetail',
-        this.query,
+        {},
         {
           id: row.tagExternalUserid,
           userId: row.tagUserId,

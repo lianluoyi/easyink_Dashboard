@@ -55,17 +55,45 @@ export const CUSTOMER_ASSISTANT_EDIT = 'CustomerAssistantEdit';
 export const CUSTOMER_ASSISTANT_ADD = 'CustomerAssistantAdd';
 /** 客户详情页的name*/
 export const CUSTOMER_DEATIL = 'CustomerCenter/customerDetail';
+/** 群发记录页的name*/
+export const GROUP_RECORD = 'Record';
+/** 群发详情页的name*/
+export const GROUP_SEND_DETAIL = 'Detail';
+/** 朋友圈记录页的name*/
+export const MOMENT_RECORD = 'momentRecord';
+/** 朋友圈详情页的name*/
+export const MOMENT_DETAIL = 'Detail';
+/** 客户SOP任务列表页的name*/
+export const CUSTOMER_SOP = 'CustomerSOP';
+/** 群SOP任务列表页的name*/
+export const GROUP_SOP = 'GroupSOP';
+/** 群日历SOP任务列表页的name*/
+export const GROUP_CALENDAR_SOP = 'GroupCalendarSOP';
+/** SOP任务详情页的name*/
+export const SOP_DETAIL = 'SOPDetail';
+/** 新增SOP任务页的name*/
+export const ADD_SOP = 'AddSOP';
+/** 客户群列表的name*/
+export const GROUP_LIST = 'Group';
+/** 客户群详情的name*/
+export const CUSTOMER_GROUP_DEATIL = 'CustomerCenter/groupDetail';
+/** 流失提醒列表的name*/
+export const LOSS_REMIND_LIST = 'LossRemind';
+/** 自动标签详情的name*/
+export const AUTO_LABEL_DETAIL = 'LabelDetail';
+/** 自动标签列表的name*/
+export const AUTO_LABEL_LIST = 'AutoLabel';
+/** 新增自动标签的name*/
+export const ADD_LABEL_RULE = 'AddRule';
+/** 批量打标签详情的name*/
+export const BATCHTAG_TASK_DETAIL = 'CustomerCenter/BatchTagTaskDetail';
+/** 批量打标签列表的name*/
+export const BATCHTAG_TASK_LIST = 'batchTagTask';
 
 /** 客户详情页的path*/
 export const CUSTOMER_DEATIL_PATH = '/customerManage/customerCenter/customerDetail';
 /** 客户列表页的path*/
 export const CUSTOMER_PATH = '/customerManage/customerCenter/customer';
-/** 获客链接列表页 */
-export const CUSTOMER_ASSISTANT_PATH = '/operationsCenter/drainageCode/customerAssistant';
-/** 获客链接详情页 */
-export const CUSTOMER_ASSISTANT_DETAIL_PATH = '/operationsCenter/drainageCode/customerAssistantDetail';
-/** 获客链接编辑页 */
-export const CUSTOMER_ASSISTANT_EDIT_PATH = '/operationsCenter/drainageCode/customerAssistantEdit';
 
 /** 是否为需要显示之前查询条件的路由名 */
 export const PAGE_FROM_PATH = {
@@ -94,5 +122,25 @@ export const PAGE_FROM_PATH = {
   // 智能表单列表
   [INTELLIGENT_FORM_LIST]: [EDIT_INTELLIGENT_FORM, INTELLIGENT_FORM_DETAIL],
   // 智能表单详情
-  [INTELLIGENT_FORM_DETAIL]: [CUSTOMER_DEATIL]
+  [INTELLIGENT_FORM_DETAIL]: [CUSTOMER_DEATIL],
+  // 群发记录
+  [GROUP_RECORD]: [GROUP_SEND_DETAIL],
+  // 朋友圈发布记录
+  [MOMENT_RECORD]: [MOMENT_DETAIL],
+  // 客户SOP
+  [CUSTOMER_SOP]: [SOP_DETAIL, ADD_SOP],
+  // 群SOP
+  [GROUP_SOP]: [SOP_DETAIL, ADD_SOP],
+  // 群日历SOP
+  [GROUP_CALENDAR_SOP]: [SOP_DETAIL, ADD_SOP],
+  // 客户群
+  [GROUP_LIST]: [CUSTOMER_GROUP_DEATIL],
+  // 流失提醒
+  [LOSS_REMIND_LIST]: [CUSTOMER_DEATIL],
+  // 自动标签 批量打标签
+  [AUTO_LABEL_LIST]: [AUTO_LABEL_DETAIL, ADD_LABEL_RULE, BATCHTAG_TASK_DETAIL],
+  // 批量打标签任务详情
+  [BATCHTAG_TASK_DETAIL]: [CUSTOMER_DEATIL],
+  // 规则详情
+  [AUTO_LABEL_DETAIL]: [CUSTOMER_DEATIL]
 };

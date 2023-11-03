@@ -840,7 +840,7 @@ export const CUSTOMER_STATUS = {
   [ALL_TYPE]: '全部'
 };
 
-/** 高级筛选性别下拉框 */
+/** 性别下拉框 */
 export const SCREENING_GENDER_TYPE = {
   [GENDER_TYPE_OF_UNKNOWN]: '未知',
   [GENDER_OF_MALE]: '男性',
@@ -875,3 +875,15 @@ export const TASK_STATUS = {
   'success': 1,
   'process': 2
 };
+/** 来源 */
+export const SOURCE = 0;
+/** 性别 */
+export const GENDER = 1;
+/** 且 */
+export const AND = 1;
+/** 或 */
+export const OR = 0;
+/** 所有性别 */
+export const ALL_GENGER = 3;
+/** 所有来源 */
+export const ALL_SOURCE = '17';

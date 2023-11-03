@@ -6,14 +6,14 @@
 <template>
   <div class="user-item-div">
     <!-- todo 待优化 -->
-    <div v-if="!(node.key && (node.key.startsWith(moreFlag) || node.key.startsWith(loadingFlag)))" class="checkbox-div">
+    <div v-if="!isOnlyClick && !(node.key && (node.key.startsWith(moreFlag) || node.key.startsWith(loadingFlag)))" class="checkbox-div">
       <el-checkbox :value="checked" :disabled="(isSigleSelect || isOnlyLeaf) && !data.userId" @change="onSelect" @click.stop.native="clickFun" />
     </div>
     <div v-if="node.key && node.key.startsWith(loadingFlag)" class="ml5"><i class="el-icon-loading" style="font-size: 18px;" /></div>
     <div v-else-if="node.key && node.key.startsWith(moreFlag)" :class="`show-more theme-text-color cp ml20 ${loading ? 'disabled-btn' : ''}`" @click="showMore">
       <i v-if="loading" class="el-icon-loading mr5" />查看更多
     </div>
-    <div v-else-if="data.userId" class="user-info">
+    <div v-else-if="data.userId" class="user-info" :data-userId="dealUserId(data.userId)">
       <img class="user-avatar" :src="data.avatarMediaid || require('@/assets/image/card-avatar.svg')">
       <span>{{ node.label }}</span>
     </div>
@@ -84,6 +84,20 @@ export default {
     isShowMainDep: {
       type: Boolean,
       default: false
+    },
+    /**
+     * 是否只能点击
+     */
+    isOnlyClick: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * 是否自动选择父部门下的所有子部门
+     */
+    depLinkage: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -91,8 +105,6 @@ export default {
       checked: false,
       loading: false
     };
-  },
-  computed: {
   },
   watch: {
     userList(val) {
@@ -105,6 +117,16 @@ export default {
     this.dealCheckStatus(this.userList);
   },
   methods: {
+    // 处理data-userId数据，因为querySelector接口查询属性时不支持数字开头
+    dealUserId(userId) {
+      if (!userId) return userId;
+      const reg = (/[a-zA-Z]/);
+      const match = userId.match(reg);
+      if (match) {
+        return userId.slice(match.index);
+      }
+      return userId;
+    },
     /**
      * 处理复选框选中状态
      */
@@ -140,6 +162,9 @@ export default {
           const list = [...this.userList];
           list.push(this.data);
           this.$emit('update:userList', list);
+        }
+        if (this.depLinkage) {
+          this.$emit('dealDepLinkage', this.data, !checkStatus);
         }
       }
     },
@@ -191,6 +216,11 @@ export default {
   }
   .disabled-btn {
     cursor: not-allowed;
+  }
+}
+.popover-info {
+  div {
+    cursor: pointer;
   }
 }
 </style>

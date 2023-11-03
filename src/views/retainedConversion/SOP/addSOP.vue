@@ -179,6 +179,7 @@
       v-if="[SOP_TYPE['newCustomer'], SOP_TYPE['birthday']].includes(sopType)"
       :visible.sync="dialogVisibleSelectUser"
       title="选择使用员工"
+      is-dep-linkage
       :is-only-leaf="false"
       :selected-user-list="customerScopeInfo.useStaff"
       @success="selectedUser"
@@ -441,17 +442,22 @@ export default {
           if (this.sopForm.id) {
             if (this.removeList.length) newSopForm.delRuleList = this.removeList.map((item) => item.id);
             delete newSopForm.customerSopVOList;
-            updateSop(newSopForm).then((res) => {
-              changeButtonLoading(this.$store, 'submit');
+            updateSop(newSopForm).then(() => {
+              this.$store.commit('SET_ADD_FLAG', false);
               this.msgSuccess('修改成功');
               this.$router.go(-1);
+            }).finally(() => {
+              changeButtonLoading(this.$store, 'submit');
             });
           } else {
-            addSop(newSopForm).then((res) => {
+            addSop(newSopForm).then(() => {
               changeButtonLoading(this.$store, 'submit');
+              this.$store.commit('SET_ADD_FLAG', true);
               this.msgSuccess('新增成功');
               window.history.go(-1);// 反馈可能部分浏览器无法跳转，先采用这种方式测试
               // this.$router.go(-1);
+            }).finally(() => {
+              changeButtonLoading(this.$store, 'submit');
             });
           }
         } else {

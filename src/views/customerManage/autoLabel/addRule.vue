@@ -275,9 +275,7 @@ export default {
         disabledDate(time) {
           return time.getTime() < Date.now() - ONE_DAY * ONE_HOUR * MS_TO_SECONDS;
         }
-      },
-      // 保存按钮的加载状态
-      loading: false
+      }
     };
   },
   created() {
@@ -418,7 +416,6 @@ export default {
       const tagIdList = this.customerTags?.map(item => item.tagId);
       const removeTagList = this.removeTagList;
       const allListObj = groupByScopeType(this.useStaff);
-      this.loading = true;
       switch (this.labelType) {
         case AUTOLABEL_TYPE['keyWords']: {
           await updateKeywordRule({
@@ -488,7 +485,6 @@ export default {
         }
       }
       changeButtonLoading(this.$store, 'submit');
-      this.loading = false;
       this.$router.go(-1);
       return newParams;
     },
@@ -509,7 +505,6 @@ export default {
       return this.sceneList.some((item, index) => {
         const { sceneType, loopBeginTime, loopEndTime, tagList, loopPoint, chatRoomList } = item;
         const timeVerify = !sceneType || !loopBeginTime || !loopEndTime || (sceneType !== NEWCUSOMTER_SCENE_TYPE['day'] && !loopPoint);
-        changeButtonLoading(this.$store, 'submit');
         if ([AUTOLABEL_TYPE['newCustomer'], AUTOLABEL_TYPE['intoGroup']].includes(this.labelType) && (!tagList || !tagList.length)) {
           this.msgWarn(`请设置场景${index + 1}的客户标签`);
           return true;
@@ -532,7 +527,6 @@ export default {
       let newParams = params;
       const tagList = this.customerTags?.map(item => item.tagId);
       const allListObj = groupByScopeType(this.useStaff);
-      this.loading = true;
       switch (this.labelType) {
         case AUTOLABEL_TYPE['keyWords']: {
           newParams = {
@@ -581,7 +575,6 @@ export default {
         }
       }
       changeButtonLoading(this.$store, 'submit');
-      this.loading = false;
       this.$router.go(-1);
     },
     /**
@@ -593,7 +586,8 @@ export default {
           const ruleForm = this.ruleForm;
           // 校验必填项
           const verify = this.verifyNewCustomerSceneList();
-          if (verify) return;
+          if (verify) return changeButtonLoading(this.$store, 'submit');
+          this.$store.commit('SET_ADD_FLAG', !ruleForm.id);
           if (ruleForm.id) {
             this.updateRule({ id: ruleForm.id, ruleName: ruleForm.ruleName });
           } else {

@@ -174,6 +174,7 @@ import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { selectBatchTaskList, deleteTask } from '@/api/batchTagTask';
 import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant/index';
+import { BATCHTAG_TASK_LIST } from '@/utils/constant/routePath';
 export default {
   name: 'BatchTag',
   components: { RightContainer, EmptyDefaultIcon, SelectTag, ImportTask },
@@ -198,18 +199,18 @@ export default {
     };
   },
   computed: {},
-  beforeRouterEnter() {
-  },
   created() {
-    // 判断上一个页面是否来自详情在进行赋值操作
-    const searchQuery = JSON.parse(sessionStorage.getItem('BatchTag'));
-    if (searchQuery) {
-      this.query = searchQuery.query;
-      this.selectedTags = searchQuery.selectedTags;
-      this.dateRange = searchQuery.dateRange;
+    const searchQuery = this.$store.getters.searchQuery[BATCHTAG_TASK_LIST];
+    if (this.$store.getters.saveCondition && Object.keys(searchQuery || {}).length) {
+      const { beginTime, endTime } = searchQuery;
+      if (beginTime && endTime) {
+        this.dateRange = [beginTime, endTime];
+      }
+      this.selectedTags = searchQuery.selectedTags || [];
+      delete searchQuery.selectedTags;
+      this.query = searchQuery;
     }
-    sessionStorage.removeItem('BatchTag');
-    this.getTaskList(1);
+    this.getTaskList();
   },
   methods: {
     dealTagList(tagName) {
@@ -233,7 +234,6 @@ export default {
      * @description 搜索
      */
     onSearch() {
-      this.saveQuery();
       this.getTaskList(1);
     },
     onReset() {
@@ -261,22 +261,14 @@ export default {
       });
     },
     goToDetail(row) {
-      goRouteWithQuery(this.$router, 'BatchTagTaskDetail', {
-        ...this.query,
-        dateRange: this.dateRange
-      }, {
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: BATCHTAG_TASK_LIST,
+        query: { ...this.query, selectedTags: this.selectedTags }
+      });
+      goRouteWithQuery(this.$router, 'BatchTagTaskDetail', {}, {
         taskId: row.id,
         taskName: row.name
       });
-    },
-    // TODO 保存查询参数 从详情返回时 使用原先的查询参数 待处理
-    saveQuery() {
-      const payload = {
-        query: this.query,
-        dateRange: this.dateRange,
-        selectedTags: this.selectedTags
-      };
-      sessionStorage.setItem('BatchTag', JSON.stringify(payload));
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -316,7 +308,7 @@ export default {
         async() => {
           deleteTask({ taskIds: params.join(',') }).then((res) => {
             this.msgSuccess('删除成功');
-            this.onSearch();
+            this.getTaskList();
           });
         }
       );

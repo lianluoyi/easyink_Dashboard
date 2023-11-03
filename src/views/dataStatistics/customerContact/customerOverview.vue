@@ -9,6 +9,7 @@
     <SelectUser
       :visible.sync="dialogVisibleSelectUser"
       title="选择员工/部门"
+      is-dep-linkage
       :is-only-leaf="false"
       :selected-user-list="userAndDepartmentList"
       @success="selectedUserOrDepartment"
@@ -51,11 +52,18 @@
           </el-form-item>
           <el-form-item>
             <el-button
+              v-preventReClick="200"
               type="primary"
-              @click="onSearch"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                onSearch()
+              }"
             >查询</el-button>
             <el-button
+              v-preventReClick="200"
               class="btn-reset"
+              :loading="resetButtonLoading"
               @click="resetForm"
             >重置</el-button>
           </el-form-item>
@@ -158,6 +166,7 @@
             </el-table-column>
           </el-table>
           <pagination
+            :disabled="loading"
             :total="total * 1"
             :page.sync="query.pageNum"
             :limit.sync="query.pageSize"
@@ -249,7 +258,9 @@ export default {
       loading: false,
       // 数据总览
       colList: [],
-      dimensionType: STAFF_DIMENSION
+      dimensionType: STAFF_DIMENSION,
+      searchButtonLoading: false,
+      resetButtonLoading: false
     };
   },
   created() {
@@ -333,12 +344,18 @@ export default {
         this.total = res.total || 0;
       }).finally(() => {
         this.loading = false;
+        this.searchButtonLoading = false;
+        this.resetButtonLoading = false;
       });
     },
     /**
      * @description 处理日期维度表格数据分页
      */
     dealPaging(list) {
+      const { sortType } = this.sortParams.dateSort;
+      if (!sortType) {
+        return list;
+      }
       const { pageNum, pageSize } = this.query;
       return list.slice((pageNum - 1) * pageSize, pageNum * pageSize);
     },
@@ -349,6 +366,7 @@ export default {
     },
     // 重置
     resetForm() {
+      this.resetButtonLoading = true;
       this.userAndDepartmentList = [];
       this.query = this.$options.data().query;
       this.pickerMinDate = '';

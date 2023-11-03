@@ -149,6 +149,7 @@
       title="选择使用员工"
       :selected-user-list="selectUserList || []"
       :is-only-leaf="false"
+      is-dep-linkage
       :is-null="false"
       @success="submitSelectUser"
     />
@@ -245,6 +246,9 @@ export default {
     }
   },
   created() {
+    if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
+      this.query = this.$store.getters.searchQuery[this.$route.name];
+    }
     this.getSopList();
   },
   mounted() {},
@@ -301,6 +305,10 @@ export default {
           break;
         }
       }
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: this.query
+      });
       goRouteWithQuery(this.$router, path, {}, { ...newParams, sopType: this.sopType });
     },
     // 多选框选中数据

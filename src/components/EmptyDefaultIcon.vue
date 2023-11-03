@@ -1,7 +1,7 @@
 <!--
  * @Description: 空值缺省图
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 
 <script>
@@ -166,10 +166,8 @@ export default {
         <slot name="customBtn" />
       </div>
     </div>
-    <div v-show="length !== 0">
-      <!-- @slot 传入的length不为0时展示传入的slot节点 -->
-      <slot />
-    </div>
+    <!-- @slot 传入的length不为0时展示传入的slot节点 -->
+    <slot v-show="length !== 0" />
   </div>
 </template>
 

@@ -68,7 +68,7 @@ export default {
   methods: {
     /**
      * @description 切换页码
-     * @param flag 为true时上一页 false时下一页
+     * @param flag 为true时下一页 false时上一页
      */
     pageChange(flag) {
       const params = {

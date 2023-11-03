@@ -1,19 +1,19 @@
 <template>
   <el-form ref="form" class="user-profile-form" :model="user" :rules="rules" label-width="80px" :disabled="isDkType">
     <el-form-item label="姓名" prop="nickName">
-      <el-input v-model="user.nickName" maxlength="32" show-word-limit />
+      <el-input v-model="user.nickName" maxlength="32" :disabled="!isSuperAdmin" show-word-limit />
     </el-form-item>
     <el-form-item label="性别">
-      <el-radio-group v-model="user.sex">
+      <el-radio-group v-model="user.sex" :disabled="!isSuperAdmin">
         <el-radio label="1">男</el-radio>
         <el-radio label="2">女</el-radio>
       </el-radio-group>
     </el-form-item>
     <el-form-item label="手机号码" prop="phonenumber">
-      <el-input v-model="user.phonenumber" maxlength="20" />
+      <el-input v-model="user.phonenumber" maxlength="20" :disabled="!isSuperAdmin" />
     </el-form-item>
     <el-form-item label="邮箱" prop="email">
-      <el-input v-model="user.email" maxlength="32" />
+      <el-input v-model="user.email" maxlength="32" :disabled="!isSuperAdmin" />
     </el-form-item>
     <el-form-item label="所在企业">
       <el-input :value="$store.getters.enterPriseWechatConfig.companyName || ''" disabled />
@@ -28,7 +28,7 @@
       <el-input :value="formatTime(user.createTime)" disabled />
     </el-form-item>
     <el-form-item>
-      <el-button v-if="!isDkType" type="primary" size="mini" @click="submit">更新信息</el-button>
+      <el-button v-if="!isDkType && isSuperAdmin" type="primary" size="mini" @click="submit">更新信息</el-button>
       <!-- <el-button type="danger" size="mini" @click="close">关闭</el-button> -->
     </el-form-item>
   </el-form>

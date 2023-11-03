@@ -37,6 +37,9 @@ export default {
   },
   watch: {
     activeName(val) {
+      if (val === AUTOLABEL_TYPE['batch']) {
+        this.$store.commit('SET_SAVE_CONDITION', false);
+      }
       var url = window.location.href;
       url = removeUrlParams(url);
       window.history.pushState({}, 0, `${url}?labelType=${val}`);
@@ -52,13 +55,6 @@ export default {
     const routerQuery = this.$route.query;
     const labelType = routerQuery.labelType;
     this.activeName = labelType ? Number(labelType) : AUTOLABEL_TYPE['keyWords'];
-  },
-  beforeRouteEnter(to, from, next) {
-    // TODO 是否能够在mixin中处理
-    if (from.path !== '/customerManage/customerCenter/BatchTagTaskDetail') {
-      sessionStorage.removeItem('BatchTag');
-    }
-    next();
   },
   methods: {
     // 处理不同类型表格上方的提示

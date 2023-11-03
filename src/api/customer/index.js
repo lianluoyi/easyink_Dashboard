@@ -158,6 +158,19 @@ export function listDistinct(params) {
   });
 }
 
+/**
+ * 会话存档客户检索获取客户列表总数
+ * @param {*} params
+ * @returns
+ */
+export function listDistinctCount(params) {
+  return request({
+    url: service + '/listDistinct/count',
+    method: 'get',
+    params
+  });
+}
+
 // 导出客户结果
 export function exportCustomerResult(params) {
   return request({

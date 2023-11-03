@@ -118,10 +118,6 @@ export default {
     .list {
         overflow-y: auto;
         height: 100%;
-        ::-webkit-scrollbar {
-          display: none;
-        }
-
         /deep/ .el-loading-spinner{margin-top: 20px;}
        .fr{float:right;}
        .gray{color: #999;}

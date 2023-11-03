@@ -242,7 +242,7 @@ export default {
     }
   },
   watch: {
-    labelType(val) {
+    labelType() {
       this.$nextTick(() => {
         this.query.pageNum = 1;
         this.multipleSelection = [];
@@ -251,6 +251,12 @@ export default {
     }
   },
   created() {
+    const searchQuery = this.$store.getters.searchQuery[this.$route.name];
+    if (this.$store.getters.saveCondition && Object.keys(searchQuery || {}).length) {
+      this.selectedTags = searchQuery.selectedTags;
+      delete searchQuery.selectedTags;
+      this.query = searchQuery;
+    }
     this.getLabelList();
   },
   mounted() {},
@@ -414,6 +420,10 @@ export default {
 
     // 路由跳转
     goRoute(path, params = {}) {
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: { ...this.query, selectedTags: this.selectedTags }
+      });
       goRouteWithQuery(this.$router, path, {}, { ...params, labelType: this.labelType });
     },
     // 选择的标签

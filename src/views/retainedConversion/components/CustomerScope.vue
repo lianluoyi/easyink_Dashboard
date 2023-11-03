@@ -101,6 +101,7 @@
     <SelectUser
       :visible.sync="dialogVisibleSelectUser"
       title="选择使用员工"
+      is-dep-linkage
       :is-only-leaf="false"
       :selected-user-list="customerInfo.useStaff"
       @success="selectedUser"

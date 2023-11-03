@@ -90,12 +90,15 @@ export default {
     };
   },
   created() {
-    if (this.$route.query) {
-      Object.keys(this.query).forEach(key => {
-        if (this.$route.query[key]) {
-          this.query[key] = this.$route.query[key];
-        }
-      });
+    const searchQuery = this.$store.getters.searchQuery[this.$route.name];
+    if (this.$store.getters.saveCondition && Object.keys(searchQuery || {}).length) {
+      const { beginTime, endTime } = searchQuery;
+      if (beginTime && endTime) {
+        this.dateRange = [beginTime, endTime];
+      }
+      this.queryTag = searchQuery.queryTag;
+      delete searchQuery.queryTag;
+      this.query = searchQuery;
     }
     this.getList();
     this.getListTag();
@@ -158,7 +161,7 @@ export default {
       this.queryTag = [];
       this.query.tagIds = '';
       this.dateRange = [];
-      this.$refs['queryForm'].resetFields();
+      this.query = this.$options.data().query;
       this.$nextTick(() => {
         this.getList(1);
       });
@@ -170,7 +173,7 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
-      api.sync().then((r) => {
+      api.sync().then(() => {
         loading.close();
         this.msgSuccess('后台开始同步数据，请稍后关注进度');
       });
@@ -182,7 +185,11 @@ export default {
       this.multiple = !selection.length;
     },
     goRoute(item) {
-      goRouteWithQuery(this.$router, 'groupDetail', this.query, item);
+      this.$store.commit('SET_SEARCH_QUERY', {
+        pageName: this.$route.name,
+        query: { ...this.query, queryTag: this.queryTag }
+      });
+      goRouteWithQuery(this.$router, 'groupDetail', {}, item);
     },
     makeTag(type) {
       if (!this.multipleSelection.length) {

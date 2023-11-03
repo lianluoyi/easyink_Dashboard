@@ -24,7 +24,6 @@
           {{ item.value }}
         </div>
       </div>
-
     </div>
   </el-dialog>
 </template>

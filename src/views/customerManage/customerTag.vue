@@ -100,10 +100,7 @@
         :visible.sync="dialogVisible"
         :form="form"
         :tag-type="type"
-        @success="()=>{
-          getTagTotal()
-          getList(!form.groupId && 1)
-        }"
+        @success="addTagSuccess"
       />
     </template>
   </RightContainer>
@@ -163,6 +160,14 @@ export default {
   },
   mounted() {},
   methods: {
+    addTagSuccess() {
+      this.getTagTotal();
+      if (!this.form.groupId) {
+        this.resetQuery();
+      } else {
+        this.getList();
+      }
+    },
     onSearch() {
       // 点击查询将页码设置到第一页
       this.getList(1);

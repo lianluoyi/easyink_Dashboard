@@ -1,6 +1,15 @@
 <script>
 import { addEmployWelMsg, getWelcomeDetaiById, editEmployWel } from '@/api/tlp';
-import { EMPLOYEES_WELCOME, MAX_APPENDIX_NUM, MEDIA_TO_WELCOME_TYPE, WELCOME_APPENDIX_TYPE } from '@/utils/constant/index';
+import {
+  EMPLOYEES_WELCOME,
+  MAX_APPENDIX_NUM,
+  MEDIA_TO_WELCOME_TYPE,
+  WELCOME_APPENDIX_TYPE,
+  SCREENING_GENDER_TYPE,
+  GENDER_TYPE_OF_UNKNOWN,
+  GENDER_OF_FEMALE,
+  GENDER_OF_MALE, SOURCE, GENDER, AND, OR, ALL_GENGER, ALL_SOURCE
+} from '@/utils/constant/index';
 import ReturnPage from '@/components/ReturnPage.vue';
 import SelectUser from '@/components/SelectUser/index.vue';
 import AddAppendixBtn from '@/components/AddAppendixBtn.vue';
@@ -10,8 +19,35 @@ import PhoneDialog from '@/components/PhoneDialog';
 import uniqBy from 'lodash/uniqBy';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import { changeButtonLoading, checkChange } from '@/utils/common';
+import { getSourceLabel } from '@/utils/common';
 const MAX_WELCOME_MSG_LENGTH = 1000;
-
+const KEY_OPTIONS = [
+  { value: SOURCE, label: '来源' },
+  { value: GENDER, label: '性别' }
+];
+const IS_OPTIONS = [
+  { value: false, label: '不是' },
+  { value: true, label: '是' }
+];
+const CONDITION_OPTIONS = [
+  { value: AND, label: '且' },
+  { value: OR, label: '或' }
+];
+const GENDER_OPTIONS = [{
+  label: '所有性别',
+  value: ALL_GENGER
+}, {
+  label: SCREENING_GENDER_TYPE[GENDER_TYPE_OF_UNKNOWN],
+  value: GENDER_TYPE_OF_UNKNOWN
+}, {
+  label: SCREENING_GENDER_TYPE[GENDER_OF_MALE],
+  value: GENDER_OF_MALE
+}, {
+  label: SCREENING_GENDER_TYPE[GENDER_OF_FEMALE],
+  value: GENDER_OF_FEMALE
+}];
+const SOURCE_OPTIONS = [{ label: '所有来源',
+  value: ALL_SOURCE }, ...getSourceLabel({ key: 'value', value: 'label' })];
 export default {
   components: { ReturnPage, SelectUser, AddAppendixBtn, SpecialWelStep, PhoneDialog, RequestButton },
   props: {},
@@ -27,6 +63,11 @@ export default {
       MAX_APPENDIX_NUM,
       MEDIA_TO_WELCOME_TYPE,
       WELCOME_APPENDIX_TYPE,
+      KEY_OPTIONS,
+      IS_OPTIONS,
+      GENDER_OPTIONS,
+      SOURCE_OPTIONS,
+      SOURCE, CONDITION_OPTIONS, AND, OR, ALL_SOURCE, ALL_GENGER,
       dialogVisible: false,
       dialogVisibleSelectMaterial: false,
       rules: {
@@ -50,7 +91,14 @@ export default {
       welMsgMaxlength: MAX_WELCOME_MSG_LENGTH,
       removeAppendixList: [],
       // 要删除的时段欢迎语列表
-      removeSpecialRuleList: []
+      removeSpecialRuleList: [],
+      weMsgTlpFilterRules: [{
+        filterType: SOURCE, // 选项
+        filterCondition: true, // 判断
+        filterValue: ALL_SOURCE // 结果
+      }],
+      // 当前的条件结果是或还是且
+      multiFilterAssociation: OR
     };
   },
   computed: {},
@@ -146,6 +194,23 @@ export default {
       return this.checkRepeatTime(allWeekList);
     },
     /**
+     * 处理客户范围信息
+     */
+    dealWeMsgTlpFilterRules(list) {
+      const newArr = [];
+      list.forEach((item, index) => {
+        if (item.filterType === GENDER) {
+          item.filterValue = Number(item.filterValue);
+        }
+        if (index !== 0) {
+          newArr.push({ isMultiFilterAssociation: true, filterValue: this.multiFilterAssociation ? AND : OR }, item);
+        } else {
+          newArr.push(item);
+        }
+      });
+      return newArr;
+    },
+    /**
      * 点击保存
      */
     submit() {
@@ -160,9 +225,11 @@ export default {
             useUserIds: form.weEmpleCodeUseScops.map((item) => item.userId),
             weMsgTlp: {
               defaultWelcomeMsg: form.defaultWelcomeMsg,
-              defaultMaterialList
+              defaultMaterialList,
+              multiFilterAssociation: this.multiFilterAssociation
             }
           };
+          params.weMsgTlpFilterRules = this.weMsgTlpFilterRules.filter((item) => !item.isMultiFilterAssociation);
           // 若开启特殊时段欢迎语，进行处理时段欢迎语的传参
           if (form.welcomeSwitch) {
             const weMsgTlpSpecialRules = this.weMsgTlpSpecialRules.map((item) => {
@@ -276,7 +343,6 @@ export default {
     getDetail(id) {
       getWelcomeDetaiById(id).then((res) => {
         const resData = { ...res.data };
-
         this.form = {
           ...this.form,
           weEmpleCodeUseScops: resData.useUsers?.map(item => { return { ...item, name: item.userName }; }),
@@ -296,6 +362,13 @@ export default {
           };
         });
         this.weMsgTlpSpecialRules = weMsgTlpSpecialRules;
+        this.multiFilterAssociation = resData.multiFilterAssociation;
+        this.weMsgTlpFilterRules = this.dealWeMsgTlpFilterRules(resData.weMsgTlpFilterRules.length ? resData.weMsgTlpFilterRules
+          : [{
+            filterType: SOURCE, // 选项
+            filterCondition: true, // 判断
+            filterValue: ALL_SOURCE // 结果
+          }]);
         const appendixList = dealAppendixTypeToMaterial(resData.defaultMaterialList);
         appendixList.sort(function(a, b) {
           return a.sortNo - b.sortNo;
@@ -313,6 +386,26 @@ export default {
     },
     handleClose(index) {
       this.form.weEmpleCodeUseScops.splice(index, 1);
+    },
+    addScopeItem() {
+      this.weMsgTlpFilterRules.push({ isMultiFilterAssociation: true, filterValue: this.multiFilterAssociation }, {
+        filterType: SOURCE,
+        filterCondition: true,
+        filterValue: ALL_SOURCE
+      });
+    },
+    removeScopeItem(index) {
+      // eslint-disable-next-line no-magic-numbers
+      this.weMsgTlpFilterRules.splice(index - 1, 2);
+    },
+    changeCondition(val) {
+      this.multiFilterAssociation = val;
+      this.weMsgTlpFilterRules = this.weMsgTlpFilterRules.map((item) => {
+        if (item.isMultiFilterAssociation) {
+          item.filterValue = val;
+        }
+        return item;
+      });
     }
   }
 };
@@ -350,7 +443,54 @@ export default {
                 item && item.userName
               }}</el-tag>
             </el-form-item>
-            <el-form-item label="默认欢迎语" style="width: 550px">
+            <el-form-item label="客户范围" style="width: 560px">
+              <div class="customer-scope">
+                <div class="title">满足条件</div>
+                <div v-for="(item,index) in weMsgTlpFilterRules" :key="index" class="scope-item">
+                  <template v-if="item.isMultiFilterAssociation">
+                    <el-select v-model="item.filterValue" :disabled="index !== 1" class="mr10" style="width:56px" @change="changeCondition">
+                      <el-option
+                        v-for="key in CONDITION_OPTIONS"
+                        :key="key.value"
+                        :label="key.label"
+                        :value="key.value"
+                      />
+                    </el-select>
+                  </template>
+                  <template v-else>
+                    <el-select v-model="item.filterType" class="mr10" style="width:88px" @change="(val) => item.filterValue = val === SOURCE ? ALL_SOURCE : ALL_GENGER">
+                      <el-option
+                        v-for="key in KEY_OPTIONS"
+                        :key="key.value"
+                        :label="key.label"
+                        :value="key.value"
+                      />
+                    </el-select>
+                    <el-select v-model="item.filterCondition" class="mr10" style="width:70px">
+                      <el-option
+                        v-for="key in IS_OPTIONS"
+                        :key="key.value"
+                        :label="key.label"
+                        :value="key.value"
+                      />
+                    </el-select>
+                    <el-select v-model="item.filterValue" class="mr10" placeholder="未选择则默认所有" style="width:158px">
+                      <el-option
+                        v-for="key in item.filterType === SOURCE ? SOURCE_OPTIONS : GENDER_OPTIONS"
+                        :key="key.value"
+                        :label="key.label"
+                        :value="key.value"
+                      />
+                    </el-select>
+                    <i v-if="index" class="el-icon-remove-outline delete" @click="removeScopeItem(index)" />
+                  </template>
+                </div>
+                <div class="add-scope-item" @click="addScopeItem">
+                  <i class="el-icon-plus" />
+                </div>
+              </div>
+            </el-form-item>
+            <el-form-item label="默认欢迎语" style="width: 570px">
               <el-input
                 v-model="form.defaultWelcomeMsg"
                 type="textarea"
@@ -433,6 +573,9 @@ export default {
 </template>
 <style lang="scss" src="@/styles/communicate.scss" scoped></style>
 <style lang="scss" scoped>
+/deep/ .el-form-item:hover  {
+  background: none;
+}
 .add-welcome-page {
   background-color: #fff;
   .wrap-body {
@@ -443,7 +586,7 @@ export default {
     .alert-tip {
       margin-left: 18px;
       margin-top: 15px;
-      width: 532px;
+      width: 542px;
       /deep/ .el-alert__description {
         line-height: 20px;
       }
@@ -460,10 +603,51 @@ export default {
             display: none;
           }
           .el-step__description {
+            padding-right: 0;
             color: #606266;
           }
         }
       }
+    }
+    .customer-scope {
+      width: 450px;
+      border: 1px solid #dcdfe6;
+      padding: 10px;
+      padding-bottom: 0;
+      display: flex;
+      flex-wrap: wrap;
+      .title {
+        flex-shrink: 0;
+        margin-right: 10px;
+      }
+      .scope-item {
+        display: flex;
+        flex-wrap: wrap;
+        .el-select {
+          margin-bottom: 10px;
+          /deep/ .el-input__inner{
+            padding-left: 10px
+          }
+        }
+        .delete {
+          color: #888;
+          font-size: 16px;
+          cursor: pointer;
+          line-height: 32px;
+        }
+      }
+      .add-scope-item {
+          margin-bottom: 10px;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px dashed #D9D9D9;
+          color: #606266;
+          font-size: 12px;
+          cursor: pointer;
+        }
     }
   }
   .wrap-body-form {
