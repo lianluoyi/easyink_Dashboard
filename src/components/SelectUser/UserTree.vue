@@ -50,7 +50,6 @@
 import * as api from '@/api/organization';
 import { createUniqueString } from '@/utils';
 import { changeDeptTreeData } from '@/utils/common';
-import { EventBus } from '@/event-bus.js';
 import store from '@/store';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { groupBy, cloneDeep } from 'lodash';
@@ -191,7 +190,6 @@ export default {
   },
   mounted() {
     this.initGetData();
-    EventBus.$on('resetUser', this.resetChecked);
   },
   methods: {
     /**

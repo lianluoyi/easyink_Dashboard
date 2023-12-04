@@ -445,17 +445,15 @@ export default {
             updateSop(newSopForm).then(() => {
               this.$store.commit('SET_ADD_FLAG', false);
               this.msgSuccess('修改成功');
-              this.$router.go(-1);
+              this.$router.push(this.returnPath + '?sopType=' + this.sopType);
             }).finally(() => {
               changeButtonLoading(this.$store, 'submit');
             });
           } else {
             addSop(newSopForm).then(() => {
-              changeButtonLoading(this.$store, 'submit');
               this.$store.commit('SET_ADD_FLAG', true);
               this.msgSuccess('新增成功');
-              window.history.go(-1);// 反馈可能部分浏览器无法跳转，先采用这种方式测试
-              // this.$router.go(-1);
+              this.$router.push(this.returnPath + '?sopType=' + this.sopType);
             }).finally(() => {
               changeButtonLoading(this.$store, 'submit');
             });

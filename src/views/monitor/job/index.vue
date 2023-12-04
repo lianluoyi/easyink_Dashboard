@@ -33,8 +33,24 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="small" @click="handleQuery">查询</el-button>
-            <el-button size="small" class="btn-reset" @click="resetQuery">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                handleQuery()
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -105,6 +121,7 @@
           :page.sync="queryParams.pageNum"
           :limit.sync="queryParams.pageSize"
           :select-data-len="ids.length"
+          :disabled="loading"
           @pagination="getList"
         />
       </template>
@@ -248,10 +265,11 @@ import { changeButtonLoading } from '@/utils/common';
 import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, changeJobStatus } from '@/api/monitor/job';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'Job',
   components: { RightContainer, RequestButton },
+  mixins: [loadingMixin],
   data() {
     return {
       // 遮罩层
@@ -324,7 +342,9 @@ export default {
       listJob(this.queryParams).then((response) => {
         this.jobList = response.rows;
         this.total = response.total;
+      }).finally(() => {
         this.loading = false;
+        this.modifyButtonStatus();
       });
     },
     // 任务组名字典翻译

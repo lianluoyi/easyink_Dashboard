@@ -1,10 +1,11 @@
 <script>
 import AllocatedStaffDetailList from './allocatedStaffDetailList';
 import RightContainer from '@/components/RightContainer';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'AllocatedStaffDetail',
   components: { AllocatedStaffDetailList, RightContainer },
+  mixins: [loadingMixin],
   props: {},
   data() {
     return {
@@ -24,6 +25,7 @@ export default {
     },
     resetForm() {
       this.dateRange = [];
+      this.getList();
     },
     /**
      * 点击重置按钮
@@ -68,12 +70,22 @@ export default {
         </el-form-item>
         <el-form-item label>
           <el-button
+            v-preventReClick="200"
             type="primary"
-            @click="getList(1)"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              getList(1)
+            }"
           >查询</el-button>
           <el-button
+            v-preventReClick="200"
             class="btn-reset"
-            @click="resetQuery"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetQuery()
+            }"
           >重置</el-button>
         </el-form-item>
       </el-form>
@@ -85,6 +97,7 @@ export default {
             v-if="active === 'customer'"
             ref="customer"
             :date-range="dateRange"
+            :modify-button-status="modifyButtonStatus"
           />
         </el-tab-pane>
         <el-tab-pane label="已分配客户群" name="group">
@@ -93,6 +106,7 @@ export default {
             ref="group"
             :date-range="dateRange"
             type="group"
+            :modify-button-status="modifyButtonStatus"
           />
         </el-tab-pane>
       </el-tabs>

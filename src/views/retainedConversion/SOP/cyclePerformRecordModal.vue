@@ -46,8 +46,24 @@
                 </el-select>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="onSearch">查询</el-button>
-                <el-button class="btn-reset" @click="resetForm">重置</el-button>
+                <el-button
+                  v-preventReClick="200"
+                  type="primary"
+                  :loading="searchButtonLoading"
+                  @click="()=>{
+                    searchButtonLoading = true;
+                    onSearch()
+                  }"
+                >查询</el-button>
+                <el-button
+                  v-preventReClick="200"
+                  class="btn-reset"
+                  :loading="resetButtonLoading"
+                  @click="()=>{
+                    resetButtonLoading = true;
+                    resetForm()
+                  }"
+                >重置</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -122,6 +138,7 @@
             v-show="total > 0"
             :total="total"
             :page.sync="query.pageNum"
+            :disabled="loading"
             :limit.sync="query.pageSize"
             @pagination="() => getDetailList()"
           />
@@ -135,11 +152,13 @@ import { PAGE_LIMIT, SOP_TYPE, PAGE_LIMIT_INFINITE } from '@/utils/constant/inde
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getCycleSopRulesDetailList, getSopRulesRecordList } from '@/api/sop';
+import loadingMixin from '@/mixin/loadingMixin';
 // 保留两位小数
 const FIX = 2;
 export default {
   name: '',
   components: { RightContainer, EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {
     ruleId: {
       type: Number,
@@ -241,9 +260,13 @@ export default {
         }
       }
       params = { ...params, ...newParams };
+      this.loading = true;
       getCycleSopRulesDetailList(params).then(res => {
         this.recordList = res.rows;
         this.total = res.total;
+      }).finally(() => {
+        this.loading = false;
+        this.modifyButtonStatus();
       });
     },
     /**

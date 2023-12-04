@@ -4,10 +4,11 @@ import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'AllocatedStaffList',
   components: { RightContainer, EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {},
   data() {
     return {
@@ -55,9 +56,9 @@ export default {
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
-          this.loading = false;
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
@@ -109,12 +110,22 @@ export default {
         </el-form-item>
         <el-form-item label>
           <el-button
+            v-preventReClick="200"
             type="primary"
-            @click="getList(1)"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              getList(1)
+            }"
           >查询</el-button>
           <el-button
+            v-preventReClick="200"
             class="btn-reset"
-            @click="resetQuery"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetQuery()
+            }"
           >重置</el-button>
         </el-form-item>
       </el-form>
@@ -122,6 +133,7 @@ export default {
     <template v-slot:data>
       <el-table
         ref="multipleTable"
+        v-loading="loading"
         :data="list"
         tooltip-effect="dark"
         style="width: 100%"
@@ -165,6 +177,7 @@ export default {
 
       <pagination
         v-show="total > 0"
+        :disabled="loading"
         :total="total"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"

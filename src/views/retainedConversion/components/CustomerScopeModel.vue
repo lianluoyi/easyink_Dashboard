@@ -15,10 +15,10 @@
       <div class="customer-scope-list">
         <div class="item-label">{{ item.label }}：</div>
         <div v-if="item.key === 'userInfoList'" class="user-item-value">
-          <div v-for="(user, userIndex) in item.value" :key="userIndex" class="user-info">
+          <span v-for="(user, userIndex) in item.value" :key="userIndex">
             <TagUserShow :name="user.departmentName || user.userName" :show-icon="!user.userId" />
             <span v-show="userIndex !== item.value.length-1">、</span>
-          </div>
+          </span>
         </div>
         <div v-else class="item-value">
           {{ item.value }}
@@ -136,14 +136,9 @@ export default {
     word-break: break-all;
     margin-left: 5px;
     flex: 1;
-    .user-info {
-      display: flex;
-      flex-direction: row;
-    }
   }
   .user-item-value {
     @extend .item-value;
-    display: flex;
   }
 }
 </style>

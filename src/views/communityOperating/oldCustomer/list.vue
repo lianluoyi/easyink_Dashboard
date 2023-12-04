@@ -4,7 +4,7 @@ import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT, CREATE_TYPE } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
-
+import loadingMixin from '@/mixin/loadingMixin';
 const UN_SEND_STATUS = '0';
 const SEND_STATUS_SUCCESS = '1';
 const SEND_STATUS_ERROR_NOT_FRIEND = '2';
@@ -30,6 +30,7 @@ const REMARK_MAP = {
 };
 export default {
   components: { EmptyDefaultIcon, RightContainer },
+  mixins: [loadingMixin],
   props: {},
   data() {
     return {
@@ -76,7 +77,9 @@ export default {
       SEND_STATUS_TEXT,
       CREATE_TYPE,
       // 当前任务所选群活码的进群方式
-      createType: null
+      createType: null,
+      detailSearchLoading: false,
+      detailResetLoading: false
     };
   },
   computed: {
@@ -128,9 +131,9 @@ export default {
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
-          this.loading = false;
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
@@ -143,10 +146,11 @@ export default {
         .then(({ rows, total }) => {
           this.customerList = rows;
           this.customerTotal = +total;
-          this.customerLoading = false;
         })
-        .catch(() => {
+        .finally(() => {
           this.customerLoading = false;
+          this.detailResetLoading = false;
+          this.detailSearchLoading = false;
         });
     },
     // 新增/编辑老客数据
@@ -216,7 +220,6 @@ export default {
     // 客户统计重置
     resetCustomerQuery() {
       this.$refs['customerForm'].resetFields();
-
       this.getStat(1);
     },
     changePage() {
@@ -277,8 +280,24 @@ export default {
             />
           </el-form-item>
           <el-form-item label=" ">
-            <el-button type="primary" @click="getList(1)">查询</el-button>
-            <el-button class="btn-reset" @click="resetQuery">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                getList(1)
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -386,6 +405,7 @@ export default {
         <pagination
           v-show="total > 0"
           :total="total"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           :select-data-len="multiSelect.length"
@@ -442,8 +462,22 @@ export default {
                   </el-select>
                 </el-form-item>
                 <el-form-item label>
-                  <el-button type="primary" @click="customerSearch">查询</el-button>
-                  <el-button class="btn-reset" @click="resetCustomerQuery">重置</el-button>
+                  <el-button
+                    type="primary"
+                    :loading="detailSearchLoading"
+                    @click="()=>{
+                      detailSearchLoading = true;
+                      customerSearch()
+                    }"
+                  >查询</el-button>
+                  <el-button
+                    class="btn-reset"
+                    :loading="detailResetLoading"
+                    @click="()=>{
+                      detailResetLoading = true;
+                      resetCustomerQuery()
+                    }"
+                  >重置</el-button>
                 </el-form-item>
               </el-form>
             </div>
@@ -538,6 +572,7 @@ export default {
             <pagination
               v-show="customerTotal > 0"
               :total="customerTotal"
+              :disabled="customerLoading"
               :page.sync="customerQuery.pageNum"
               :limit.sync="customerQuery.pageSize"
               @pagination="changePage"

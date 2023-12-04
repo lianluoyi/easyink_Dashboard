@@ -4,10 +4,12 @@ import * as tagApi from '@/api/customer/grouptag';
 import SelectTag from '@/components/SelectTag';
 import RightContainer from '@/components/RightContainer';
 import CustomerOrGroupInfo from './components/CustomerOrGroupInfo.vue';
+import loadingMixin from '@/mixin/loadingMixin';
 import { PAGE_LIMIT, JOIN_SCENE, GROUP_ENTER_WAY_MAP, MEMBER_TYPE, CUSTOMER_DETAIL } from '@/utils/constant/index';
 export default {
   // name: 'GroupDetail',
   components: { SelectTag, RightContainer, CustomerOrGroupInfo },
+  mixins: [loadingMixin],
   data() {
     return {
       // 遮罩层
@@ -69,10 +71,12 @@ export default {
         params.endTime = this.dateRange[1];
       }
       page && (this.query.pageNum = page);
-      this.loading = false;
+      this.loading = true;
       api.getMembers(params).then((response) => {
         this.list = response.rows;
         this.total = +response.total;
+      }).finally(() => {
+        this.modifyButtonStatus();
         this.loading = false;
       });
       api.getMemberCount(params).then(({ data }) => {
@@ -210,12 +214,22 @@ export default {
                 </el-form-item>
                 <el-form-item>
                   <el-button
+                    v-preventReClick="200"
                     type="primary"
-                    @click="getList(1)"
+                    :loading="searchButtonLoading"
+                    @click="()=>{
+                      searchButtonLoading = true;
+                      getList(1)
+                    }"
                   >查询</el-button>
                   <el-button
+                    v-preventReClick="200"
                     class="btn-reset"
-                    @click="resetQuery"
+                    :loading="resetButtonLoading"
+                    @click="()=>{
+                      resetButtonLoading = true;
+                      resetQuery()
+                    }"
                   >重置</el-button>
                 </el-form-item>
               </el-form>
@@ -263,6 +277,7 @@ export default {
               <pagination
                 v-show="total > 0"
                 :total="total"
+                :disabled="loading"
                 :page.sync="query.pageNum"
                 :limit.sync="query.pageSize"
                 @pagination="getList()"

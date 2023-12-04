@@ -49,8 +49,24 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="getList(1)">查询</el-button>
-            <el-button class="btn-reset" @click="resetQuery">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                getList(1)
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -74,6 +90,7 @@
       </template>
       <template v-slot:data>
         <el-table
+          v-loading="tableLoading"
           :data="list"
           max-height="600"
           @selection-change="handleSelectionChange"
@@ -143,6 +160,7 @@
           :total="total"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
+          :disabled="tableLoading"
           @pagination="getList()"
         />
         <div class="new-add">
@@ -233,10 +251,12 @@ import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import RightContainer from '@/components/RightContainer';
 import * as conversionCode from '@/api/redeem';
 import { goRouteWithQuery } from '@/utils';
+import loadingMixin from '@/mixin/loadingMixin';
 const DEFAULT_PAGE_NUM = 1;
 export default {
   name: 'List',
   components: { RightContainer, EmptyDefaultIcon, ImportFile, RequestButton },
+  mixins: [loadingMixin],
   data() {
     return {
       query: {
@@ -284,7 +304,8 @@ export default {
       // 选中数组
       codeList: [],
       // 用户未按下回车键提示语
-      matchText: '回车搜索'
+      matchText: '回车搜索',
+      tableLoading: false
     };
   },
   watch: {
@@ -435,14 +456,15 @@ export default {
       this.query.receiveEndTime = this.dateRange && this.dateRange[1];
       this.query.activityId = this.$route.query.id;
       pageNum && (this.query.pageNum = pageNum);
-      this.loading = true;
+      this.tableLoading = true;
       conversionCode['getConversionCodeList'](this.query)
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = total;
         })
         .finally(() => {
-          this.loading = false;
+          this.modifyButtonStatus();
+          this.tableLoading = false;
         });
     },
     /**

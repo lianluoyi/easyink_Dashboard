@@ -68,8 +68,24 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSearch()">查询</el-button>
-            <el-button class="btn-reset" @click="onReset">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                onSearch()
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                onReset()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -148,6 +164,7 @@
         <pagination
           :total="total * 1"
           :page.sync="query.pageNum"
+          :disabled="loading"
           :limit.sync="query.pageSize"
           :select-data-len="multipleSelection.length"
           @pagination="getTaskList()"
@@ -175,9 +192,11 @@ import { selectBatchTaskList, deleteTask } from '@/api/batchTagTask';
 import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import { BATCHTAG_TASK_LIST } from '@/utils/constant/routePath';
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'BatchTag',
   components: { RightContainer, EmptyDefaultIcon, SelectTag, ImportTask },
+  mixins: [loadingMixin],
   data() {
     return {
       query: {
@@ -257,6 +276,7 @@ export default {
         this.taskList = res.rows;
         this.total = res.total;
       }).finally(() => {
+        this.modifyButtonStatus();
         this.loading = false;
       });
     },

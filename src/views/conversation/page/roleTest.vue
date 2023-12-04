@@ -26,10 +26,23 @@
               />
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="searchList">查询</el-button>
               <el-button
+                v-preventReClick="200"
+                type="primary"
+                :loading="searchButtonLoading"
+                @click="()=>{
+                  searchButtonLoading = true;
+                  searchList()
+                }"
+              >查询</el-button>
+              <el-button
+                v-preventReClick="200"
                 class="btn-reset"
-                @click="resetQuery()"
+                :loading="resetButtonLoading"
+                @click="()=>{
+                  resetButtonLoading = true;
+                  resetQuery()
+                }"
               >重置</el-button>
             </el-form-item>
           </el-row>
@@ -37,7 +50,7 @@
       </template>
       <template v-slot:data>
         <div id="roleTestContent" class="content">
-          <el-table size="medium" :data="fileData" :height="tableHeight" style="width: 100%">
+          <el-table v-loading="loading" size="medium" :data="fileData" :height="tableHeight" style="width: 100%">
             <template slot="empty">
               <empty-default-icon
                 :length="fileData.length"
@@ -114,6 +127,7 @@
             :total="total"
             :page.sync="currentPage"
             :limit.sync="pageSize"
+            :disabled="loading"
             @pagination="currentChange"
           />
         </div>
@@ -133,8 +147,10 @@ import { dealAtInfo } from '@/utils/common';
 import { PAGE_LIMIT, CORP_TYPE } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import CheckContext from '../component/CheckContext.vue';
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   components: { RightContainer, chat, EmptyDefaultIcon, CheckContext },
+  mixins: [loadingMixin],
   data() {
     return {
       wxType: WX_TYPE,
@@ -176,7 +192,8 @@ export default {
       departmentList: [],
       checkContextVisible: false,
       checkContextQuery: null,
-      chatType: 'employee'
+      chatType: 'employee',
+      loading: false
     };
   },
   mounted() {
@@ -259,6 +276,7 @@ export default {
         pageSize: this.pageSize
       };
       // 处理消息内容
+      this.loading = true;
       content.getChatAllList(query).then(res => {
         const revokeDate = res.data.list.map(chatDate => {
           if (chatDate.msgType === 'revoke') {
@@ -274,6 +292,9 @@ export default {
         });
         this.fileData = revokeDate;
         this.total = Number(res.data.total);
+      }).finally(() => {
+        this.modifyButtonStatus();
+        this.loading = false;
       });
     },
     chechName(e) {

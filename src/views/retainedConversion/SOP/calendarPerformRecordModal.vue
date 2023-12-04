@@ -72,8 +72,24 @@
                 </el-select>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="onSearch">查询</el-button>
-                <el-button class="btn-reset" @click="resetForm">重置</el-button>
+                <el-button
+                  v-preventReClick="200"
+                  type="primary"
+                  :loading="searchButtonLoading"
+                  @click="()=>{
+                    searchButtonLoading = true;
+                    onSearch()
+                  }"
+                >查询</el-button>
+                <el-button
+                  v-preventReClick="200"
+                  class="btn-reset"
+                  :loading="resetButtonLoading"
+                  @click="()=>{
+                    resetButtonLoading = true;
+                    resetForm()
+                  }"
+                >重置</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -134,6 +150,7 @@
           </el-table>
           <pagination
             v-show="total > 0"
+            :disabled="loading"
             :total="total"
             :page.sync="query.pageNum"
             :limit.sync="query.pageSize"
@@ -149,10 +166,11 @@ import RightContainer from '@/components/RightContainer';
 import { PAGE_LIMIT, SOP_TYPE, PAGE_LIMIT_INFINITE } from '@/utils/constant/index';
 import { getSopRulesRecordList, getTimingSopRulesDetailList } from '@/api/sop';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: '',
   components: { RightContainer, EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {
     isGroupRule: {
       type: Boolean,
@@ -249,9 +267,13 @@ export default {
         }
       }
       params = { ...params, ...newParams };
+      this.loading = true;
       getTimingSopRulesDetailList(params).then(res => {
         this.recordList = res.rows;
         this.total = res.total;
+      }).finally(() => {
+        this.loading = false;
+        this.modifyButtonStatus();
       });
     },
     getRulesRecordList() {

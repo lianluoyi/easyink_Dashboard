@@ -43,6 +43,7 @@
           <pagination
             v-show="channelList.length > 0"
             :total="total"
+            :disabled="loading"
             :limit.sync="query.pageSize"
             :page.sync="query.pageNum"
             @pagination="getChannelClickRecord()"
@@ -71,7 +72,7 @@
         <div class="content-container">
           <RightContainer>
             <template v-slot:data>
-              <el-table v-loading="DetailLoading" :data="channelDetailList">
+              <el-table v-loading="detailLoading" :data="channelDetailList">
                 <template slot="empty">
                   <empty-default-icon :length="channelDetailList.length" />
                 </template>
@@ -99,6 +100,7 @@
               <pagination
                 v-show="channelDetailList.length > 0"
                 :total="detailListTotal"
+                :disabled="detailLoading"
                 :limit.sync="channelDetailQuery.pageSize"
                 :page.sync="channelDetailQuery.pageNum"
                 @pagination="getChannelClickRecordDetail()"
@@ -159,7 +161,7 @@ export default {
         pageSize: PAGE_LIMIT
       },
       total: 0,
-      DetailLoading: false,
+      detailLoading: false,
       // 渠道点击记录详情列表
       channelDetailList: [],
       detailListTotal: 0,
@@ -262,9 +264,9 @@ export default {
      */
     getChannelClickRecordDetail(pageNum) {
       pageNum && (this.channelDetailQuery.pageNum = pageNum);
-      this.DetailLoading = true;
+      this.detailLoading = true;
       getChannelClickRecordDetail(this.channelDetailQuery).then(({ rows, total }) => {
-        this.DetailLoading = false;
+        this.detailLoading = false;
         this.channelDetailList = rows;
         this.detailListTotal = total;
       });

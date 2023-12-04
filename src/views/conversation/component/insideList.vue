@@ -14,13 +14,10 @@
           :class="{ liActive: index == personIndex }"
           @click="liClick(item, index)"
         >
-          <el-row style="padding: 10px">
-            <span class="fl">
-              <img
-                :src="getHeadImgUrl(item.receiveWeUser.avatarMediaid)"
-              ></span>
+          <el-row class="row-div">
+            <span class="fl"> <img :src="getHeadImgUrl(item.receiveWeUser.avatarMediaid)"></span>
             <span class="fl" style="margin-left: 10px">
-              <p>{{ item.receiveWeUser.name }}</p>
+              <p class="intwoline">{{ item.receiveWeUser.name }}</p>
             </span>
             <span v-if="item.finalChatContext" class="time">{{ dealTime(item.finalChatContext.msgtime) }}</span>
           </el-row>
@@ -77,12 +74,11 @@ export default {
   margin: 0;
 }
 .time {
-  float: right;
+  margin-left: auto;
   font-size: 14px;
-  height: 19px;
-  width: 39px;
-  margin-top: 10px;
+  width: 40px;
   color: #B8BCC5;
+  flex-shrink: 0;
 }
 .fl {
   float: left;
@@ -105,22 +101,22 @@ export default {
     height: calc(100% - 40px);
     overflow: auto;
     li {
+      padding: 10px;
+      overflow: hidden;
       border-bottom: 1px solid #efefef;
       cursor: pointer;
-      p {
-        white-space: nowrap;
-        overflow: hidden;
-        line-height: 40px;
-        text-overflow: ellipsis;
-      }
-      :hover {
-        background: #efefef;
+      .row-div {
+        display: flex;
+        align-items: center;
       }
       img {
         width: 40px;
         height: 40px;
         float: left;
       }
+    }
+    li:hover {
+      background: #efefef;
     }
   }
   .liActive {

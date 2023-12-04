@@ -51,12 +51,22 @@
         </el-form-item>
         <el-form-item>
           <el-button
+            v-preventReClick="200"
             type="primary"
-            @click="onSearch"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              onSearch()
+            }"
           >查询</el-button>
           <el-button
+            v-preventReClick="200"
             class="btn-reset"
-            @click="resetForm"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetForm()
+            }"
           >重置</el-button>
         </el-form-item>
       </el-form>
@@ -76,8 +86,8 @@
       </div>
     </template>
     <template v-slot:data>
-      <TableShow v-if="viewType === VIEW_TYPE['table']" ref="tableShow" :get-search-payload="getSearchPayload" />
-      <ChartShow v-else ref="chartShow" :get-search-payload="getSearchPayload" />
+      <TableShow v-if="viewType === VIEW_TYPE['table']" ref="tableShow" :modify-button-status="modifyButtonStatus" :get-search-payload="getSearchPayload" />
+      <ChartShow v-else ref="chartShow" :modify-button-status="modifyButtonStatus" :get-search-payload="getSearchPayload" />
       <!-- 选择员工/部门弹窗 -->
       <SelectUser
         :visible.sync="dialogVisibleSelectUser"
@@ -100,6 +110,7 @@ import { TAG_LABEL_TYPE } from '@/utils/constant/index';
 import { exportGroupTagsView, exportCustomerTagsView } from '@/api/statistics';
 import { groupTagList } from '@/api/customer/grouptag';
 import { tagGroupList } from '@/api/customer/tag';
+import loadingMixin from '@/mixin/loadingMixin';
 const VIEW_TYPE = {
   'table': 1,
   // eslint-disable-next-line no-magic-numbers
@@ -112,6 +123,7 @@ const LABEL_STAT = {
 export default {
   name: '',
   components: { RightContainer, TagUserShow, SelectUser, TableShow, ChartShow },
+  mixins: [loadingMixin],
   data() {
     return {
       // 选择添加人弹窗显隐

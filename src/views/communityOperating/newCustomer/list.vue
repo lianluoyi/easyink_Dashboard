@@ -13,9 +13,10 @@ import { PAGE_LIMIT } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
 import ListUserShow from '@/components/ListUserShow';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   components: { EmptyDefaultIcon, RightContainer, ListUserShow },
+  mixins: [loadingMixin],
   props: {},
   data() {
     return {
@@ -77,7 +78,6 @@ export default {
     getList(page) {
       page && (this.query.pageNum = page);
       this.loading = true;
-
       getList(this.query)
         .then(({ rows, total }) => {
           this.list = rows;
@@ -88,15 +88,14 @@ export default {
             getList(this.query).then(({ rows: resRows, total: resTotal }) => {
               this.list = resRows;
               this.total = resTotal;
-              this.loading = false;
-            }).catch(() => {
+            }).finally(() => {
+              this.modifyButtonStatus();
               this.loading = false;
             });
-          } else {
-            this.loading = false;
           }
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
@@ -255,12 +254,22 @@ export default {
           </el-form-item>
           <el-form-item label=" ">
             <el-button
+              v-preventReClick="200"
               type="primary"
-              @click="getList(1)"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                getList(1)
+              }"
             >查询</el-button>
             <el-button
+              v-preventReClick="200"
               class="btn-reset"
-              @click="resetQuery()"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
             >重置</el-button>
           </el-form-item>
         </el-form>
@@ -427,6 +436,7 @@ export default {
         <pagination
           v-show="total > 0"
           :total="total * 1"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           :select-data-len="ids.length"

@@ -3,9 +3,10 @@ import { getList } from '@/api/drainageCode/group';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   components: { RightContainer, EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {
     // 添加标签显隐
     visible: {
@@ -48,17 +49,16 @@ export default {
     }
   },
   watch: {
-    selected(val) {
+    selected() {
       this.setSelected();
     },
-    list(val) {
+    list() {
       this.setSelected();
     }
   },
   created() {
     this.getList();
   },
-  mounted() {},
   methods: {
     resetQuery() {
       this.query.activityName = '';
@@ -74,9 +74,9 @@ export default {
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
-          this.loading = false;
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
@@ -117,14 +117,22 @@ export default {
                 @keydown.enter="getList(1)"
               />
               <el-button
+                v-preventReClick="200"
                 type="primary"
-                @click="getList(1)"
-              >
-                查询
-              </el-button>
+                :loading="searchButtonLoading"
+                @click="()=>{
+                  searchButtonLoading = true;
+                  getList(1)
+                }"
+              >查询</el-button>
               <el-button
+                v-preventReClick="200"
                 class="btn-reset"
-                @click="resetQuery()"
+                :loading="resetButtonLoading"
+                @click="()=>{
+                  resetButtonLoading = true;
+                  resetQuery()
+                }"
               >重置</el-button>
             </el-form-item>
           </el-form>
@@ -213,6 +221,7 @@ export default {
         v-show="total > 0"
         layout="prev, pager, next"
         :total="total"
+        :disabled="loading"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"
         :pager-count="5"

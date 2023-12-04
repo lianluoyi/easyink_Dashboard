@@ -200,7 +200,7 @@
       </template>
       <template v-if="mediaType === MEDIA_TYPE_MINIAPP">
         <div class="item-div">
-          <el-form-item label-width="0" prop="content">
+          <el-form-item label-width="0" prop="accountOriginalId">
             <el-input
               v-model="item.accountOriginalId"
               placeholder="必填，请填写与企业关联小程序的账号原始ID"
@@ -209,7 +209,7 @@
               clearable
             />
           </el-form-item>
-          <el-form-item label-width="0" prop="content">
+          <el-form-item label-width="0" prop="appid">
             <el-input
               v-model="item.appid"
               placeholder="必填，请填写与企业关联小程序的appid"
@@ -238,7 +238,6 @@
               clearable
             />
           </el-form-item>
-          <!-- <UploadDrag text="将封面拖到此处，或" tip="只能上传jpg/png文件，且不超过2M" /> -->
           <UploadDrag
             text="将封面拖到此处，或"
             tip="只能上传jpg/png文件，且不超过2M"

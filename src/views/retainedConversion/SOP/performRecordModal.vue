@@ -86,8 +86,24 @@
                 </el-select>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="onSearch">查询</el-button>
-                <el-button class="btn-reset" @click="resetForm">重置</el-button>
+                <el-button
+                  v-preventReClick="200"
+                  type="primary"
+                  :loading="searchButtonLoading"
+                  @click="()=>{
+                    searchButtonLoading = true;
+                    onSearch()
+                  }"
+                >查询</el-button>
+                <el-button
+                  v-preventReClick="200"
+                  class="btn-reset"
+                  :loading="resetButtonLoading"
+                  @click="()=>{
+                    resetButtonLoading = true;
+                    resetForm()
+                  }"
+                >重置</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -175,6 +191,7 @@
             v-show="total > 0"
             :total="total"
             :page.sync="query.pageNum"
+            :disabled="loading"
             :limit.sync="query.pageSize"
             @pagination="() => getDetailList()"
           />
@@ -189,10 +206,11 @@ import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getCustomerSopRulesDetailList, getSopRulesRecordList, getTimingSopRulesDetailList } from '@/api/sop';
 import { dealAtInfo } from '@/utils/common';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: '',
   components: { RightContainer, EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {
     ruleId: {
       type: Number,
@@ -289,6 +307,7 @@ export default {
     },
     getDetailList(newParams) {
       const finishFlag = this.query.finishFlag;
+      this.loading = true;
       switch (this.sopType) {
         case SOP_TYPE['newCustomer']:
         case SOP_TYPE['activity']:
@@ -324,6 +343,9 @@ export default {
       getTimingSopRulesDetailList(params).then(res => {
         this.recordList = res.rows;
         this.total = res.total;
+      }).finally(() => {
+        this.loading = false;
+        this.modifyButtonStatus();
       });
     },
     getCustomerSopRulesDetailList(finishFlag, newParams = {}) {
@@ -348,6 +370,9 @@ export default {
       getCustomerSopRulesDetailList(params).then(res => {
         this.recordList = res.rows;
         this.total = res.total;
+      }).finally(() => {
+        this.loading = false;
+        this.modifyButtonStatus();
       });
     },
     getRulesRecordList() {

@@ -4,7 +4,7 @@ import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT, GROUP_MESSAGE_PUSH_TYPE_GROUP, MESSAGE_MEDIA_TYPE, MEDIA_TYPE_TEXT, GROUP_MESSAG_STATUS_SENDED } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'Operlog',
   components: { EmptyDefaultIcon, RightContainer },
@@ -14,6 +14,7 @@ export default {
       return `预计发送 ${data.expectSend} ${unit}\n已发送 ${data.actualSend} ${unit}`;
     }
   },
+  mixins: [loadingMixin],
   data() {
     return {
       // 遮罩层
@@ -77,10 +78,10 @@ export default {
           });
           this.list = newRows;
           this.total = +total;
-          this.loading = false;
           this.ids = [];
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
@@ -231,8 +232,24 @@ export default {
             />
           </el-form-item>
           <el-form-item label=" ">
-            <el-button type="primary" @click="getList(1)">查询</el-button>
-            <el-button class="btn-reset" @click="resetQuery">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                getList(1)
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -318,6 +335,7 @@ export default {
         </el-table>
         <pagination
           v-show="total > 0"
+          :disabled="loading"
           :total="total"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"

@@ -14,10 +14,11 @@ import MaterialAddModal from './MaterialAddModal.vue';
 import SelectTagModal from './SelectTagModal.vue';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { getCategoryList } from '@/utils/material';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'MaPage',
   components: { MaterialAddModal, SelectTagModal, EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {
     // "0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报 6 海报字体",
     type: {
@@ -201,6 +202,7 @@ export default {
           this.$emit('listChange', this.list);
         })
         .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
       this.getMaterialCount();
@@ -420,12 +422,22 @@ export default {
         </el-select>
       </div>
       <el-button
+        v-preventReClick="200"
         type="primary"
-        @click="onSearch"
+        :loading="searchButtonLoading"
+        @click="()=>{
+          searchButtonLoading = true;
+          onSearch()
+        }"
       >查询</el-button>
       <el-button
+        v-preventReClick="200"
         class="btn-reset"
-        @click="resetQuery()"
+        :loading="resetButtonLoading"
+        @click="()=>{
+          resetButtonLoading = true;
+          resetQuery()
+        }"
       >重置</el-button>
     </div>
     <div class="content-container mt10">
@@ -503,6 +515,7 @@ export default {
       <pagination
         v-show="total > 0"
         :total="total"
+        :disabled="loading"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"
         @pagination="getList()"
@@ -515,7 +528,7 @@ export default {
       :show-material-setting="true"
       :modal-title="(form.id ? '编辑' : '添加') + MEDIA_TYPE[type]"
       :visible.sync="dialogVisible"
-      :get-list="getList"
+      :get-list="form.id ? getList : resetQuery"
     />
     <SelectTagModal
       :visible.sync="batchVisible"

@@ -3,6 +3,7 @@ import Poster from '@/components/MaterialItem/PosterItem.vue';
 import MiniAppItem from '@/components/MaterialItem/MiniAppItem.vue';
 import VideoItem from '@/components/MaterialItem/VideoItem.vue';
 import FileItem from '@/components/MaterialItem/FileItem.vue';
+import loadingMixin from '@/mixin/loadingMixin';
 import {
   MEDIA_TYPE_POSTER,
   MEDIA_TYPE_IMGLINK,
@@ -26,6 +27,7 @@ import { getGroupTree, getAllFormGroup } from '@/api/form';
 export default {
   name: 'MaterialListDrawer',
   components: { Poster, MiniAppItem, VideoItem, FileItem, EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {
     drawerTitle: {
       type: String,
@@ -262,13 +264,17 @@ export default {
       this.tagIdList = [];
       this.query.search = '';
       this.query.pageNum = 1;
-      this.radarQuery.type = '';
-      this.radarQuery.pageNum = 1;
-      this.radarQuery.searchTitle = '';
       // TODO 考虑如何合并雷达和智能表单 后续添加其他类型不需要在重复定义搜索参数对象
-      this.otherQuery.pageNum = 1;
-      this.otherQuery.formName = '';
-      this.otherQuery.belongGroup = ['corpFormGroup'];
+      if (this.radarQuery) {
+        this.radarQuery.type = '';
+        this.radarQuery.pageNum = 1;
+        this.radarQuery.searchTitle = '';
+      }
+      if (this.otherQuery) {
+        this.otherQuery.pageNum = 1;
+        this.otherQuery.formName = '';
+        this.otherQuery.belongGroup = ['corpFormGroup'];
+      }
       this.onSearch();
     },
     /**
@@ -285,13 +291,13 @@ export default {
     },
     onSearch() {
       // 该处直接修改 父组件传递过来的radarQuery vue不会报错不能修改props是由于 没有直接修改radarQuery 而是修改了radarQuery的属性 其在内存中的地址并没有发生变化
-      this.radarQuery.pageNum = 1;
-      this.otherQuery.pageNum = 1;
+      this.radarQuery && (this.radarQuery.pageNum = 1);
+      this.otherQuery && (this.otherQuery.pageNum = 1);
       this.getList({
         pageNum: 1,
         tagIds: this.tagIdList && this.tagIdList.join(','),
         mediaType: this.materialType
-      });
+      }, this.modifyButtonStatus);
       this.$emit('changeTagIdList', this.tagIdList);
     },
     /**
@@ -476,8 +482,24 @@ export default {
             />
           </div>
         </div>
-        <el-button type="primary" @click="onSearch()">查询</el-button>
-        <el-button class="btn-reset" @click="resetQuery()">重置</el-button>
+        <el-button
+          v-preventReClick="200"
+          type="primary"
+          :loading="searchButtonLoading"
+          @click="()=>{
+            searchButtonLoading = true;
+            onSearch()
+          }"
+        >查询</el-button>
+        <el-button
+          v-preventReClick="200"
+          class="btn-reset"
+          :loading="resetButtonLoading"
+          @click="()=>{
+            resetButtonLoading = true;
+            resetQuery()
+          }"
+        >重置</el-button>
       </div>
       <div class="content-container">
         <div class="material-content">
@@ -594,6 +616,7 @@ export default {
         >
           <pagination
             v-if="total > 0"
+            :disabled="isLoading"
             :total="total"
             :page.sync="getPaginationQuery(activeName).pageNum"
             :limit.sync="getPaginationQuery(activeName).pageSize"

@@ -11,10 +11,12 @@ import {
 } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
+import loadingMixin from '@/mixin/loadingMixin';
 import { getHeadImgUrl } from '@/utils/common';
 const MAX_SEND_TARGET_NUM = 5;
 export default {
   components: { RightContainer, EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {
     type: {
       // eslint-disable-next-line vue/require-prop-type-constructor
@@ -80,10 +82,10 @@ export default {
       getPushResult(query)
         .then(({ rows, total }) => {
           this.list = rows;
-          this.loading = false;
           this.$emit('update:total', +total);
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
@@ -122,8 +124,24 @@ export default {
       <template v-slot:data>
         <div v-if="type === GROUP_MESSAGE_SEND_STATUS_UNEXEC" class="search-form">
           <el-input v-model="query.userName" placeholder="请输入员工姓名" size="small" />
-          <el-button type="primary" @click="getList(1)">查询</el-button>
-          <el-button class="btn-reset" @click="resetQuery">重置</el-button>
+          <el-button
+            v-preventReClick="200"
+            type="primary"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              getList(1)
+            }"
+          >查询</el-button>
+          <el-button
+            v-preventReClick="200"
+            class="btn-reset"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetQuery()
+            }"
+          >重置</el-button>
         </div>
         <div v-if="type === GROUP_MESSAGE_SEND_STATUS_EXECED" class="search-form">
           <el-input v-if="pushType === GROUP_MESSAGE_PUSH_TYPE_CUSTOMER" v-model="query.customerName" placeholder="请输入客户昵称" size="small" />
@@ -137,8 +155,24 @@ export default {
               :value="item.value"
             />
           </el-select>
-          <el-button type="primary" @click="getList(1)">查询</el-button>
-          <el-button class="btn-reset" @click="resetQuery">重置</el-button>
+          <el-button
+            v-preventReClick="200"
+            type="primary"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              getList(1)
+            }"
+          >查询</el-button>
+          <el-button
+            v-preventReClick="200"
+            class="btn-reset"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetQuery()
+            }"
+          >重置</el-button>
         </div>
         <el-table v-loading="loading" :data="list">
           <template slot="empty">
@@ -186,6 +220,7 @@ export default {
         <pagination
           v-show="total > 0"
           :total="total"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           @pagination="getList()"

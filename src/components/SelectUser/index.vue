@@ -1,5 +1,4 @@
 <script>
-import { EventBus } from '@/event-bus.js';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import UserTree from './UserTree.vue';
 /**
@@ -78,9 +77,7 @@ export default {
       this.showTip = hasSelectDepart;
     }
   },
-  mounted() {
-    EventBus.$on('resetUser', this.resetChecked);
-  },
+
   methods: {
     resetChecked() {
       this.userList = [];

@@ -11,10 +11,23 @@
           <el-input v-model="query.searchName" placeholder="请输入标签组或标签" clearable />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSearch()">查询</el-button>
           <el-button
+            v-preventReClick="200"
+            type="primary"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              onSearch()
+            }"
+          >查询</el-button>
+          <el-button
+            v-preventReClick="200"
             class="btn-reset"
-            @click="resetQuery"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetQuery()
+            }"
           >重置</el-button>
         </el-form-item>
       </el-form>
@@ -92,6 +105,7 @@
         :total="total"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"
+        :disabled="loading"
         :select-data-len="ids.length"
         @pagination="getList()"
       />
@@ -113,9 +127,11 @@ import { PAGE_LIMIT } from '@/utils/constant/index';
 import * as api from '@/api/customer/tag';
 import * as groupTagApi from '@/api/customer/grouptag';
 import { totalTagCnt } from '@/api/customer/group';
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: '',
   components: { AddTag, RightContainer, EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {
     type: {
       type: String,
@@ -183,30 +199,27 @@ export default {
       this.loading = true;
       switch (this.type) {
         case 'customer': {
-          this.$store.dispatch('listInfo/getTagList');
           api
             .getList(this.query)
             .then(({ rows, total }) => {
               this.list = rows;
               this.total = +total;
-              this.loading = false;
             })
-            .catch(() => {
+            .finally(() => {
+              this.modifyButtonStatus();
               this.loading = false;
             });
           break;
         }
         case 'group': {
-          // TODO 为什么要调用2次？？？ 若不需要在全局存储 则删除该处调用并将vuex中的模块删除
-          this.$store.dispatch('listInfo/getGroupTagList');
           groupTagApi
             .getGroupTagListByPage({ ...this.query })
             .then(({ rows, total }) => {
               this.list = rows;
               this.total = +total;
-              this.loading = false;
             })
-            .catch(() => {
+            .finally(() => {
+              this.modifyButtonStatus();
               this.loading = false;
             });
           break;
@@ -236,6 +249,7 @@ export default {
           case 'customer': {
             return api.remove(operIds)
               .then(() => {
+                this.$store.dispatch('listInfo/delCustomerTag', operIds.split(','));
                 this.getList(page);
                 this.getTagTotal();
                 this.msgSuccess('删除成功');
@@ -246,6 +260,7 @@ export default {
             groupTagApi.deleteGroupTag({
               delList: delList
             }).then(() => {
+              this.$store.dispatch('listInfo/delGroupTag', delList);
               this.getList(page);
               this.getTagTotal();
               this.msgSuccess('删除成功');

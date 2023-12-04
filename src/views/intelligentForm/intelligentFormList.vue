@@ -44,17 +44,23 @@
           </el-form-item>
           <el-form-item label=" ">
             <el-button
+              v-preventReClick="200"
               type="primary"
-              @click="onSearch(true)"
-            >
-              查询
-            </el-button>
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                onSearch(true)
+              }"
+            >查询</el-button>
             <el-button
+              v-preventReClick="200"
               class="btn-reset"
-              @click="resetQuery()"
-            >
-              重置
-            </el-button>
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -173,6 +179,7 @@
         <pagination
           v-show="list.length > 0"
           :total="total"
+          :disabled="loading"
           :limit.sync="query.pageSize"
           :page.sync="query.pageNum"
           :select-data-len="multiSelect.length"
@@ -199,6 +206,7 @@ import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import SpreadDialog from './spreadDialog.vue';
 import BatchUpdateGroup from './batchUpdateGroup.vue';
+import loadingMixin from '@/mixin/loadingMixin';
 import { getFormPageList, changeEnableState, removeFormList } from '@/api/form';
 import { INTELLIGENT_FORM_TYPE, PAGE_LIMIT, TREE_ALL_GROUP_ID } from '@/utils/constant/index';
 export default {
@@ -209,6 +217,7 @@ export default {
     SpreadDialog,
     BatchUpdateGroup
   },
+  mixins: [loadingMixin],
   inject: ['getDepartmentId'],
   props: {
     // 表单类型
@@ -417,6 +426,7 @@ export default {
       }).catch(() => {
         this.clearFormData();
       }).finally(() => {
+        this.modifyButtonStatus();
         this.loading = false;
       });
     },

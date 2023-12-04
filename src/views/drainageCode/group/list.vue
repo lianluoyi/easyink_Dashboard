@@ -12,9 +12,10 @@ import { PAGE_LIMIT } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
 import { CREATE_TYPE } from '@/utils/constant/index';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   components: { RealCode, EmptyDefaultIcon, RightContainer },
+  mixins: [loadingMixin],
   data() {
     return {
       query: {
@@ -84,9 +85,9 @@ export default {
         .then((res) => {
           this.groupCodes = res.rows;
           this.total = parseInt(res.total);
-          this.loading = false;
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
@@ -212,7 +213,6 @@ export default {
       }
       this.loading = true;
       getApplink({ id: row.id }).then(resp => {
-        this.loading = false;
         if (resp.data) {
           this.groupCodes.forEach(item => {
             if (item.id === row.id) {
@@ -220,9 +220,8 @@ export default {
             }
           });
           copyText(resp.data);
-          this.loading = false;
         }
-      }).catch(() => {
+      }).finally(() => {
         this.loading = false;
       });
     }
@@ -265,8 +264,24 @@ export default {
             />
           </el-form-item>
           <el-form-item label=" ">
-            <el-button type="primary" @click="handleSearch">查询</el-button>
-            <el-button class="btn-reset" @click="resetQuery">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                handleSearch()
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -428,6 +443,7 @@ export default {
         <pagination
           v-show="total > 0"
           :total="total"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           :select-data-len="multiGroupCode.length"

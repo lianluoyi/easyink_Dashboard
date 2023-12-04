@@ -158,13 +158,14 @@ export default {
             changeButtonLoading(this.$store, 'submit');
             return;
           }
-          api[form.groupId ? 'update' : 'add'](form).then(() => {
+          api[form.groupId ? 'update' : 'add'](form).then((res) => {
             changeButtonLoading(this.$store, 'submit');
             this.msgSuccess('操作成功');
             this.Pvisible = false;
             const addTags = form.weTags
               .filter((ele) => !ele.tagId)
               .map((ele) => ({ ...ele, groupName: form.groupName }));
+            this.$store.dispatch('listInfo/updateTagListById', res.data);
             this.$emit('success', addTags);
           });
         } else {
@@ -202,6 +203,7 @@ export default {
               const addTags = weTags
                 .filter((ele) => !ele.id)
                 .map((ele) => ({ ...ele, groupName: groupName }));
+              this.$store.dispatch('listInfo/updateGroupTagListById', res.data);
               this.$emit('success', addTags);
             }
           );

@@ -1,14 +1,13 @@
 <!--
  * @Description: 在职继承-分配记录
  * @Author: 佚名
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div>
     <RightContainer>
       <template v-slot:search>
         <ReturnPage class="mb10" />
-
         <el-form
           ref="queryForm"
           :inline="true"
@@ -48,8 +47,24 @@
           </el-form-item>
 
           <el-form-item label=" ">
-            <el-button type="primary" @click="handleQuery">查询</el-button>
-            <el-button @click="resetForm">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                handleQuery()
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetForm()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -57,6 +72,7 @@
       <template v-slot:data>
         <el-table
           ref="table"
+          v-loading="loading"
           :data="list"
           tooltip-effect="dark"
           align="left"
@@ -114,6 +130,7 @@
         <pagination
           v-show="total > 0"
           :total="total"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           @pagination="getList()"
@@ -128,9 +145,8 @@ import { dealAtInfo } from '@/utils/common';
 import { PAGE_LIMIT, WX_TYPE, INHERIT_STATUS_INHERITED, INHERIT_STATUS_INHERITING, INHERIT_STATUS_REFUSE,
   INHERIT_STATUS_FAIL, INHERIT_STATUS_USER_REACHED_UPPER_LIMIT } from '@/utils/constant/index';
 import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
-
+import loadingMixin from '@/mixin/loadingMixin';
 import { getRecordList } from '@/api/transfer';
-
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import ReturnPage from '@/components/ReturnPage';
@@ -157,11 +173,13 @@ const INHERIT_STATUS_MAP = {
 export default {
   name: '',
   components: { RightContainer, EmptyDefaultIcon, ReturnPage },
+  mixins: [loadingMixin],
   props: {},
   data() {
     return {
       query: { ...defaultQuery },
       total: 1,
+      loading: false,
       list: [],
       dateRange: [],
       inheritStatusOption: Object.entries(INHERIT_STATUS_OPTIONS)
@@ -190,9 +208,13 @@ export default {
         beginTime: this.dateRange[0],
         endTime: this.dateRange[1]
       };
+      this.loading = true;
       getRecordList(params).then(({ rows, total }) => {
         this.list = rows;
         this.total = +total;
+      }).finally(() => {
+        this.modifyButtonStatus();
+        this.loading = false;
       });
     },
     getInheritStatus(status) {

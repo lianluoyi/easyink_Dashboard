@@ -21,6 +21,7 @@
     </el-table>
     <pagination
       :total="total"
+      :disabled="loading"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
       @pagination="getList()"
@@ -42,6 +43,10 @@ export default {
   components: { EmptyDefaultIcon },
   props: {
     getSearchPayload: {
+      type: Function,
+      default: null
+    },
+    modifyButtonStatus: {
       type: Function,
       default: null
     }
@@ -84,6 +89,7 @@ export default {
         this.msgError('服务异常，请联系管理员');
       }).finally(() => {
         this.loading = false;
+        this.modifyButtonStatus();
       });
     },
     /**
