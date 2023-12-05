@@ -68,8 +68,13 @@
           </el-form-item>
           <el-form-item>
             <el-button
+              v-preventReClick="200"
               type="primary"
-              @click="onSearch"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                onSearch()
+              }"
             >查询</el-button>
             <el-button
               class="btn-reset"
@@ -179,6 +184,7 @@
             :total="total * 1"
             :page.sync="pageQuery.pageNum"
             :limit.sync="pageQuery.pageSize"
+            :disabled="loading"
             @pagination="handleChangePage()"
           />
         </div>
@@ -205,9 +211,11 @@ import {
   emplecodeByStaff,
   emplecodeByCode
 } from '@/api/statistics';
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: '',
   components: { RightContainer, Statistics, EmptyDefaultIcon, UserItem, TagUserShow, SelectUser, SelectChannel },
+  mixins: [loadingMixin],
   data() {
     return {
       DATE_DIMENSION,
@@ -364,6 +372,7 @@ export default {
       }).catch(() => {
         this.list = [];
       }).finally(() => {
+        this.modifyButtonStatus();
         this.loading = false;
       });
     },
@@ -378,6 +387,7 @@ export default {
     // 查询
     onSearch() {
       if (!this.channelList.length) {
+        this.modifyButtonStatus();
         return this.msgWarn('请先选择渠道');
       }
       this.showChooseCodeTips = false;

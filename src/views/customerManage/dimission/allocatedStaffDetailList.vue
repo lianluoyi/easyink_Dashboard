@@ -22,6 +22,10 @@ export default {
     type: {
       type: String,
       default: 'customer'
+    },
+    modifyButtonStatus: {
+      type: Function,
+      default: null
     }
   },
   data() {
@@ -70,9 +74,9 @@ export default {
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
-          this.loading = false;
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
@@ -122,6 +126,7 @@ export default {
   <div class="page">
     <el-table
       ref="multipleTable"
+      v-loading="loading"
       :data="list"
       tooltip-effect="dark"
       style="width: 100%"
@@ -199,6 +204,7 @@ export default {
       v-show="total > 0"
       :total="total"
       :page.sync="query.pageNum"
+      :disabled="loading"
       :limit.sync="query.pageSize"
       @pagination="getList()"
     />

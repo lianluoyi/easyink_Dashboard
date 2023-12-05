@@ -2,9 +2,10 @@
 import { getList } from '@/api/customer/group';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   components: { EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {
     customerGroupId: {
       type: String,
@@ -103,15 +104,13 @@ export default {
           this.customerGroups = res.rows;
           this.dealCustomerGroupSelect(this.customerGroupList);
           this.total = parseInt(res.total);
-
           for (const group of this.customerGroups) {
             if (group.chatId === this.customerGroupId) this.currentRow = group;
           }
-
-          this.loading = false;
         })
-        .catch(() => {
+        .finally(() => {
           this.loading = false;
+          this.modifyButtonStatus();
         });
     },
     // 单选变更
@@ -192,8 +191,24 @@ export default {
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSearch">查询</el-button>
-          <el-button class="btn-reset" @click="resetQuery">重置</el-button>
+          <el-button
+            v-preventReClick="200"
+            type="primary"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              onSearch()
+            }"
+          >查询</el-button>
+          <el-button
+            v-preventReClick="200"
+            class="btn-reset"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetQuery()
+            }"
+          >重置</el-button>
         </el-form-item>
       </el-form>
       <div style="border: 1px solid #eee">
@@ -282,6 +297,7 @@ export default {
         v-show="total > 0"
         :total="total"
         :page.sync="query.pageNum"
+        :disabled="loading"
         :limit.sync="query.pageSize"
         :pager-count="5"
         class="footer-left"

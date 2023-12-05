@@ -9,12 +9,14 @@ import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { PAGE_LIMIT, WX_TYPE, AUTOLABEL_TYPE } from '@/utils/constant/index';
 import { goRouteWithQuery } from '@/utils';
+import loadingMixin from '@/mixin/loadingMixin';
 import { dealAtInfo } from '@/utils/common';
 import { getTriggerDetail, getKeyWordRecordList, getGroupRecordList, getCustomerRecordList, getKeyWordCount, getCustomerCount, getGroupCount } from '@/api/customer/auto';
 const ACTIVENAME = '1'; // 从客户详情跳转回来后规则详情tab值
 export default {
   name: 'LabelDetail',
   components: { SelectUser, RightContainer, EmptyDefaultIcon },
+  mixins: [loadingMixin],
   props: {},
   inject: ['labelRuleInfo'],
   data() {
@@ -61,7 +63,8 @@ export default {
       triggerList: {
         customerId: '',
         userId: ''
-      }
+      },
+      triggerLoading: false
     };
   },
   computed: {
@@ -181,9 +184,12 @@ export default {
         ruleId: this.ruleId,
         keyword: this.triggerKeywords
       };
+      this.triggerLoading = true;
       getTriggerDetail(newParams).then(res => {
         this.triggerKeywordsList = res.rows;
         this.triggerTotal = res.total;
+      }).finally(() => {
+        this.triggerLoading = false;
       });
     },
     // 设置触发详情查询的员工客户参数
@@ -202,27 +208,35 @@ export default {
     },
     // 获取客户记录列表
     async getRecordList(params = {}) {
-      const query = this.query;
-      const newParams = {
-        ...query,
-        ruleId: this.ruleId,
-        ...params
-      };
-      let listRes;
-      switch (this.labelType) {
-        case AUTOLABEL_TYPE['keyWords']:
+      try {
+        const query = this.query;
+        const newParams = {
+          ...query,
+          ruleId: this.ruleId,
+          ...params
+        };
+        let listRes;
+        this.loading = true;
+        switch (this.labelType) {
+          case AUTOLABEL_TYPE['keyWords']:
           // 获取关键词客户记录
-          listRes = await getKeyWordRecordList(newParams);
-          break;
-        case AUTOLABEL_TYPE['intoGroup']:
-          listRes = await getGroupRecordList(newParams);
-          break;
-        case AUTOLABEL_TYPE['newCustomer']:
-          listRes = await getCustomerRecordList(newParams);
-          break;
+            listRes = await getKeyWordRecordList(newParams);
+            break;
+          case AUTOLABEL_TYPE['intoGroup']:
+            listRes = await getGroupRecordList(newParams);
+            break;
+          case AUTOLABEL_TYPE['newCustomer']:
+            listRes = await getCustomerRecordList(newParams);
+            break;
+        }
+        this.total = listRes?.total || 0;
+        this.list = listRes?.rows || [];
+        this.loading = false;
+        this.modifyButtonStatus();
+      } catch (error) {
+        this.loading = false;
+        this.modifyButtonStatus();
       }
-      this.total = listRes?.total || 0;
-      this.list = listRes?.rows || [];
     },
     // 处理名字
     renderUserInfo(item) {
@@ -277,8 +291,24 @@ export default {
           />
         </el-form-item>
         <el-form-item label=" ">
-          <el-button type="primary" @click="onSearch">查询</el-button>
-          <el-button class="btn-reset" @click="resetForm">重置</el-button>
+          <el-button
+            v-preventReClick="200"
+            type="primary"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              onSearch()
+            }"
+          >查询</el-button>
+          <el-button
+            v-preventReClick="200"
+            class="btn-reset"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetForm()
+            }"
+          >重置</el-button>
         </el-form-item>
       </el-form>
     </template>
@@ -436,6 +466,7 @@ export default {
       </el-table>
       <pagination
         v-show="total > 0"
+        :disabled="loading"
         :total="total"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"
@@ -459,7 +490,7 @@ export default {
             @keydown.enter.native="getTriggerDetail({ pageNum: 1 })"
           />
           <el-table
-            v-loading="loading"
+            v-loading="triggerLoading"
             height="300px"
             style="font-size: 14px"
             :data="triggerKeywordsList"
@@ -491,6 +522,7 @@ export default {
             v-show="triggerTotal > 0"
             class="page"
             :total="triggerTotal"
+            :disabled="triggerLoading"
             :page.sync="triggerDetailQuery.pageNum"
             :limit.sync="triggerDetailQuery.pageSize"
             @pagination="getTriggerDetail()"

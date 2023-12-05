@@ -111,7 +111,8 @@ export default {
       MEDIA_TYPE_SMARTFORM,
       filterUsers: [],
       filterGroupUsers: [],
-      selectUserType: undefined
+      selectUserType: undefined,
+      sendSizeLoading: false
     };
   },
   computed: {
@@ -507,8 +508,11 @@ export default {
       params.staffId += '';
       params.filterUsers += '';
       params.filterDepartments += '';
+      this.sendSizeLoading = true;
       getSendSize(params).then((res) => {
         this.sendSize = res.data;
+      }).finally(() => {
+        this.sendSizeLoading = false;
       });
     },
     selectUser(type) {
@@ -718,9 +722,9 @@ export default {
             <div class="base-title">发送统计</div>
             <div class="base-content stat-content" style="color: #999">
               预计收到群发的客户{{ form.pushType === GROUP_MESSAGE_PUSH_TYPE_GROUP ? '群' : '数' }}：
-              <el-button v-if="sendSize === undefined" type="text" @click="previewSendSize">统计</el-button>
+              <el-button v-if="sendSize === undefined" :disabled="sendSizeLoading" type="text" @click="previewSendSize">统计</el-button>
               <span v-if="sendSize !== undefined" class="theme-text-color">{{ sendSize }}</span>
-              <el-button v-if="sendSize !== undefined" type="text" icon="el-icon-refresh" @click="previewSendSize" />
+              <el-button v-if="sendSize !== undefined" :disabled="sendSizeLoading" type="text" icon="el-icon-refresh" @click="previewSendSize" />
             </div>
           </div>
         </el-form>

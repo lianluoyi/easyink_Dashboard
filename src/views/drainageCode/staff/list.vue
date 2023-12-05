@@ -11,10 +11,11 @@ import { goRouteWithQuery, copyText } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import ListUserShow from '@/components/ListUserShow';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'CodeStaff',
   components: { EmptyDefaultIcon, RightContainer, ListUserShow },
+  mixins: [loadingMixin],
   data() {
     return {
       // 查询参数
@@ -73,8 +74,9 @@ export default {
           this.loading = false;
           this.ids = [];
         })
-        .catch(() => {
+        .finally(() => {
           this.loading = false;
+          this.modifyButtonStatus();
         });
     },
     /** 重置按钮操作 */
@@ -248,11 +250,23 @@ export default {
           </el-form-item>
           <el-form-item label=" ">
             <el-button
+              v-preventReClick="200"
               type="primary"
-              @click="getList(1)"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                getList(1)
+              }"
             >查询</el-button>
-            <el-button class="btn-reset" @click="resetQuery">重置</el-button>
-            <!-- <el-button @click="resetQuery">导出</el-button> -->
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -392,6 +406,7 @@ export default {
         </el-table>
         <pagination
           v-show="total > 0"
+          :disabled="loading"
           :total="total"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"

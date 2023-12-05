@@ -693,17 +693,17 @@ export const checkContent = (rule, value, callback) => {
         return false;
       }
       case MEDIA_TYPE_MINIAPP: {
-        if (!item.accountOriginalId) {
-          return callback(new Error('请填写小程序帐号原始ID'));
-        }
-        if (!item.appid) {
-          return callback(new Error('请填写小程序appid'));
-        }
-        if (!item.url) {
-          return callback(new Error('请填写小程序访问地址'));
-        }
-        if (!item.title) {
-          return callback(new Error('请填写小程序标题'));
+        const requiredFields = [
+          { field: 'accountOriginalId', message: '请填写小程序帐号原始ID' },
+          { field: 'appid', message: '请填写小程序appid' },
+          { field: 'url', message: '请填写小程序访问地址' },
+          { field: 'title', message: '请填写小程序标题' },
+          { field: 'coverUrl', message: '请上传封面' }
+        ];
+        for (const fieldInfo of requiredFields) {
+          if (!item[fieldInfo.field]) {
+            return callback(new Error(fieldInfo.message));
+          }
         }
         return false;
       }

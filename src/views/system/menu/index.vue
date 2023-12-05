@@ -23,8 +23,24 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="small" @click="handleQuery">查询</el-button>
-            <el-button size="small" class="btn-reset" @click="resetQuery">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                handleQuery()
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -203,10 +219,11 @@ import Treeselect from '@riophae/vue-treeselect';
 import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 import IconSelect from '@/components/IconSelect';
 import RightContainer from '@/components/RightContainer';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'Menu',
   components: { Treeselect, IconSelect, RightContainer, RequestButton },
+  mixins: [loadingMixin],
   data() {
     return {
       // 遮罩层
@@ -258,9 +275,9 @@ export default {
     getList() {
       this.loading = true;
       listMenu(this.queryParams).then((response) => {
-        console.log('1', this.handleTree(response.data, 'menuId'));
         this.menuList = this.handleTree(response.data, 'menuId');
-        console.log('2', this.menuList);
+      }).finally(() => {
+        this.modifyButtonStatus();
         this.loading = false;
       });
     },

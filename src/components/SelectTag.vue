@@ -1,6 +1,5 @@
 <script>
 import AddTag from '@/components/AddTag';
-import { EventBus } from '@/event-bus.js';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 /**
  * 选择标签弹窗
@@ -81,7 +80,6 @@ export default {
   computed: {
     Pvisible: {
       get() {
-        // this.getTree();
         return this.visible;
       },
       set(val) {
@@ -98,7 +96,7 @@ export default {
     selected(val) {
       this.dealSelectTag(val);
     },
-    list(val) {
+    list() {
       if (this.type === 'add') {
         this.selected.forEach((element) => {
           const find = this.listOneArray.find((tag) => {
@@ -124,9 +122,6 @@ export default {
     this.getList();
   },
   mounted() {
-    EventBus.$on('resetTag', () => {
-      this.Pselected = [];
-    });
     this.dealSelectTag(this.selected);
   },
   methods: {
@@ -150,7 +145,6 @@ export default {
     },
     getList(addTags) {
       this.$store.dispatch('listInfo/' + (this.tagType === 'customer' ? 'getTagList' : 'getGroupTagList')).then(({ rows, data }) => {
-      // this.list = Object.freeze(rows)
         if (this.tagType === 'customer') {
           this.list = rows;
         } else {
@@ -185,7 +179,6 @@ export default {
       this.$emit('success', this.Pselected);
     },
     isChecked(unit) {
-      // debugger
       return this.Pselected.some((el) => {
         return unit.tagId === el.tagId;
       });
@@ -242,7 +235,7 @@ export default {
 <template>
   <el-dialog class="tag-dialog" :title="title" :visible.sync="Pvisible" :close-on-click-modal="false" append-to-body @closed="closed">
     <el-alert
-      v-show="infoMsg"
+      v-if="infoMsg"
       class="theme-el-alert"
       :title="infoMsg"
       type="info"
@@ -252,7 +245,6 @@ export default {
     <div>
       <div class="search-area">
         <el-select v-model="selectedGroup" clearable filterable placeholder="所有标签组">
-          <!-- <el-option label="所有标签" value /> -->
           <el-option
             v-for="(item, index) in list.filter(removeGroupFilterFn)"
             :key="index"

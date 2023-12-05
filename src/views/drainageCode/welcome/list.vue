@@ -117,6 +117,7 @@
         <pagination
           v-show="total > 0"
           :total="total"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           @pagination="getList()"

@@ -43,12 +43,22 @@
           </el-form-item>
           <el-form-item>
             <el-button
+              v-preventReClick="200"
               type="primary"
-              @click="onSearch"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                onSearch()
+              }"
             >查询</el-button>
             <el-button
+              v-preventReClick="200"
               class="btn-reset"
-              @click="resetForm"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetForm()
+              }"
             >重置</el-button>
           </el-form-item>
         </el-form>
@@ -155,6 +165,7 @@
           </el-table>
           <pagination
             :total="total"
+            :disabled="loading"
             :page.sync="query.pageNum"
             :limit.sync="query.pageSize"
             @pagination="getList()"
@@ -181,6 +192,7 @@ import RightContainer from '@/components/RightContainer';
 import UserItem from '@/components/UserItem.vue';
 import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION } from '@/utils/constant/index';
 import moment from 'moment';
+import loadingMixin from '@/mixin/loadingMixin';
 import { cloneDeep } from 'lodash';
 import { YESTERDAY_TIME, FIXED_DAYS_AGO_TIME, groupByScopeType } from '@/utils/common';
 import { getUserServiceOfTotal, getUserServiceOfUser, exportUserServiceOfUser, getUserServiceOfTime, exportUserServiceOfTime } from '@/api/statistics';
@@ -193,8 +205,9 @@ const SORT_TYPE = {
   'null': null
 };
 export default {
-  name: '',
+  name: 'EmployeeService',
   components: { RightContainer, EmptyDefaultIcon, Statistics, SelectUser, TagUserShow, UserItem },
+  mixins: [loadingMixin],
   data() {
     return {
       DATE_DIMENSION,
@@ -362,6 +375,7 @@ export default {
         this.total = res.total;
       }).finally(() => {
         this.loading = false;
+        this.modifyButtonStatus();
       });
     },
     /**

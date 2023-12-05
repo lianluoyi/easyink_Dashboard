@@ -66,13 +66,19 @@
               v-preventReClick="200"
               type="primary"
               :loading="searchButtonLoading"
-              @click="onSearch"
+              @click="()=>{
+                searchButtonLoading = true;
+                onSearch()
+              }"
             >查询</el-button>
             <el-button
               v-preventReClick="200"
               class="btn-reset"
               :loading="resetButtonLoading"
-              @click="resetForm"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetForm()
+              }"
             >重置</el-button>
           </el-form-item>
         </el-form>
@@ -235,10 +241,12 @@ import {
   exportCustomerActivityOfUser,
   exportCustomerActivityOfCustomer
 } from '@/api/statistics';
+import loadingMixin from '@/mixin/loadingMixin';
 import { goRouteWithQuery, getQueryObject, changeURLParams } from '@/utils/index';
 export default {
   name: '',
   components: { RightContainer, ClientDetailsDialog, Graphics, UserItem, EmptyDefaultIcon, TagUserShow, SelectUser },
+  mixins: [loadingMixin],
   data() {
     return {
       // 选择添加人弹窗显隐
@@ -300,9 +308,7 @@ export default {
         userSendMessageList: []
       },
       // 是否跳转到客户详情页
-      isSkipToCustomerDetail: false,
-      searchButtonLoading: false,
-      resetButtonLoading: false
+      isSkipToCustomerDetail: false
     };
   },
   watch: {
@@ -403,8 +409,7 @@ export default {
         this.total = res.total || 0;
       }).finally(() => {
         this.loading = false;
-        this.searchButtonLoading = false;
-        this.resetButtonLoading = false;
+        this.modifyButtonStatus();
       });
     },
     // 得到不同的获取维度数据详情的函数
@@ -442,13 +447,11 @@ export default {
     },
     // 查询
     onSearch() {
-      this.searchButtonLoading = true;
       this.getList(true);
       this.getChartData();
     },
     // 重置
     resetForm() {
-      this.resetButtonLoading = true;
       this.userAndDepartmentList = [];
       this.query = this.$options.data().query;
       this.pickerMinDate = '';

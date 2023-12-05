@@ -402,7 +402,7 @@ export default {
       return form;
     },
     // 获取素材列表
-    getMaterialList(params) {
+    getMaterialList(params, callback) {
       this.isLoadingMaterial = true;
       // if (params.mediaType !== MEDIA_TYPE_RADARLINK) {
       getList({
@@ -412,6 +412,8 @@ export default {
         this.materialList = res.rows;
         this.total = Number(res.total);
         this.isLoadingMaterial = false;
+      }).finally(() => {
+        callback && callback();
       });
       // } else {
       // getRadaList(this.radarQuery).then(res => {

@@ -1,7 +1,7 @@
 <!--
  * @Description: 规则执行记录
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="rule-record">
@@ -27,6 +27,7 @@
     </div>
     <div>
       <el-table
+        v-loading="loading"
         :data="list"
       >
         <template slot="empty">
@@ -130,6 +131,7 @@
       <pagination
         v-show="type === 'rule' && total > 0"
         :total="total"
+        :disabled="loading"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"
         @pagination="() => dealGetList()"
@@ -137,6 +139,7 @@
       <pagination
         v-show="type === 'employee' && total > 0"
         :total="total"
+        :disabled="loading"
         :page.sync="employeeQuery.pageNum"
         :limit.sync="employeeQuery.pageSize"
         @pagination="() => dealGetList()"
@@ -228,7 +231,8 @@ export default {
       calendarRecordModalVisible: false,
       SOP_TYPE,
       currentRuleId: null,
-      currentUserId: null
+      currentUserId: null,
+      loading: false
     };
   },
   computed: {
@@ -282,6 +286,7 @@ export default {
     getRulesRecordList(pageNum = this.query.pageNum) {
       this.query.pageNum = pageNum;
       const query = this.query;
+      this.loading = true;
       getSopRulesRecordList({
         sopId: this.sopId,
         pageNum: pageNum,
@@ -292,11 +297,14 @@ export default {
           this.list = res.rows?.length ? [...res.rows] : [];
           this.total = res.total;
         }
+      }).finally(() => {
+        this.loading = false;
       });
     },
     getSopEmployeeRecordList(pageNum = this.employeeQuery.pageNum) {
       this.employeeQuery.pageNum = pageNum;
       const employeeQuery = this.employeeQuery;
+      this.loading = true;
       getSopEmployeeRecordList({
         sopId: this.sopId,
         pageNum: pageNum,
@@ -307,6 +315,8 @@ export default {
           this.list = res?.rows?.length ? [...res.rows] : [];
           this.total = res?.total;
         }
+      }).finally(() => {
+        this.loading = false;
       });
     },
     onDetail(row) {

@@ -11,6 +11,7 @@ import RightContainer from '@/components/RightContainer';
 import { getFriendsList, deleteMoment } from '@/api/friends';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import Content from './Content';
+import loadingMixin from '@/mixin/loadingMixin';
 // 发布类型（0：企业 1：个人）
 const type = 1;
 // 任务类型（0：立即发送 1：定时发送）
@@ -26,6 +27,7 @@ export default {
       return `已发布员工 ${data.publishNum}人\n待发布员工 ${data.notPublishNum}人`;
     }
   },
+  mixins: [loadingMixin],
   data() {
     return {
       // 遮罩层
@@ -83,9 +85,9 @@ export default {
       getFriendsList(this.query).then(({ rows, total }) => {
         this.list = rows;
         this.total = +total;
+      }).finally(() => {
         this.loading = false;
-      }).catch(() => {
-        this.loading = false;
+        this.modifyButtonStatus();
       });
     },
     // 多选框选中数据
@@ -189,8 +191,24 @@ export default {
             />
           </el-form-item>
           <el-form-item label=" ">
-            <el-button type="primary" @click="getFriendsCircleList(1)">查询</el-button>
-            <el-button class="btn-reset" @click="resetQuery">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                getFriendsCircleList(1)
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -274,6 +292,7 @@ export default {
         <pagination
           v-show="total > 0"
           :total="total"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           @pagination="getFriendsCircleList()"

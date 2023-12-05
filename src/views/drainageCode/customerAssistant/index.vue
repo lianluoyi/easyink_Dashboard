@@ -65,8 +65,24 @@
               />
             </el-form-item>
             <el-form-item class="last-btn">
-              <el-button type="primary" @click="onSearch">查询</el-button>
-              <el-button class="btn-reset" @click="onReset">重置</el-button>
+              <el-button
+                v-preventReClick="200"
+                type="primary"
+                :loading="searchButtonLoading"
+                @click="()=>{
+                  searchButtonLoading = true;
+                  getList(1)
+                }"
+              >查询</el-button>
+              <el-button
+                v-preventReClick="200"
+                class="btn-reset"
+                :loading="resetButtonLoading"
+                @click="()=>{
+                  resetButtonLoading = true;
+                  onReset()
+                }"
+              >重置</el-button>
             </el-form-item>
             <el-form-item class="fix-right-operate-btn">
               <el-button v-hasPermi="['customer:assistant:add']" type="primary" @click="goRoute('customerAssistantAdd', {})">新增链接</el-button>
@@ -137,6 +153,7 @@
           <pagination
             v-show="total > 0"
             :total="total * 1"
+            :disabled="loading"
             :page.sync="query.pageNum"
             :limit.sync="query.pageSize"
             :select-data-len="ids.length"
@@ -160,9 +177,10 @@ import CustomerAssistantSituation from './components/CustomerAssistantSituation.
 import CustomChannel from './components/CustomChannel.vue';
 import ListUserShow from '@/components/ListUserShow';
 import { checkPermi } from '@/utils/permission';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   components: { CustomChannel, RightContainer, EmptyDefaultIcon, UseTip, ListUserShow, CustomerAssistantSituation },
+  mixins: [loadingMixin],
   data() {
     return {
       loading: false,
@@ -247,9 +265,6 @@ export default {
         }
       );
     },
-    onSearch() {
-      this.getList(1);
-    },
     onReset() {
       this.dateRange = [];
       this.query = this.$options.data().query;
@@ -275,6 +290,7 @@ export default {
           this.list = [];
           this.total = 0;
         }).finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },

@@ -80,6 +80,7 @@
               <pagination
                 v-show="list.length > 0"
                 :total="total"
+                :disabled="loading"
                 :limit.sync="query.pageSize"
                 :page.sync="query.pageNum"
                 @pagination="getList()"

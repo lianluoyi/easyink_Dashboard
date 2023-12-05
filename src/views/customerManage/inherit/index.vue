@@ -51,8 +51,24 @@
           </el-form-item>
 
           <el-form-item label=" ">
-            <el-button type="primary" @click="handleQuery">查询</el-button>
-            <el-button @click="resetForm">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                handleQuery()
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetForm()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -95,6 +111,7 @@
       <template v-slot:data>
         <el-table
           ref="table"
+          v-loading="loading"
           :data="list"
           tooltip-effect="dark"
           align="left"
@@ -159,6 +176,7 @@
         <pagination
           v-show="total > 0"
           :total="total"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           :select-data-len="selectedCustomers.length"
@@ -226,7 +244,7 @@ import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import InheritFailDrawer from './InheritFailDrawer';
-
+import loadingMixin from '@/mixin/loadingMixin';
 const defaultQuery = {
   pageNum: 1,
   pageSize: PAGE_LIMIT
@@ -235,6 +253,7 @@ const defaultQuery = {
 export default {
   name: '',
   components: { RightContainer, EmptyDefaultIcon, SelectUser, SelectTag, InheritFailDrawer },
+  mixins: [loadingMixin],
   props: {},
   data() {
     return {
@@ -260,7 +279,8 @@ export default {
       inheritFailDrawerVisible: false,
       inheritFail: false,
       wxType: WX_TYPE,
-      remotetransferConfig: null
+      remotetransferConfig: null,
+      loading: false
     };
   },
   watch: {
@@ -291,9 +311,13 @@ export default {
         beginTime: this.dateRange[0],
         endTime: this.dateRange[1]
       };
+      this.loading = true;
       getCustomerList(params).then(({ rows, total }) => {
         this.list = rows;
         this.total = +total;
+      }).finally(() => {
+        this.modifyButtonStatus();
+        this.loading = false;
       });
     },
     goRoute(row) {

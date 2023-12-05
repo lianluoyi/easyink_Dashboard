@@ -5,6 +5,7 @@ import RightContainer from '@/components/RightContainer';
 import SelectTag from '@/components/SelectTag';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { goRouteWithQuery } from '@/utils';
+import loadingMixin from '@/mixin/loadingMixin';
 import {
   PAGE_LIMIT, MILI_SECOND_OF_ONE_WEEK, MILI_SECOND_OF_ONE_MONTH, MILI_SECOND_OF_ONE_SEASON,
   GROUP_STATUS_MAP, GROUP_STATUS_ORDER
@@ -12,6 +13,7 @@ import {
 export default {
   name: 'Group',
   components: { RightContainer, EmptyDefaultIcon, SelectTag },
+  mixins: [loadingMixin],
   data() {
     return {
       // 查询参数
@@ -96,12 +98,11 @@ export default {
       if (beginTime && endTime) {
         this.dateRange = [beginTime, endTime];
       }
-      this.queryTag = searchQuery.queryTag;
+      this.queryTag = searchQuery.queryTag || [];
       delete searchQuery.queryTag;
       this.query = searchQuery;
     }
     this.getList();
-    this.getListTag();
   },
   methods: {
     /**
@@ -150,9 +151,9 @@ export default {
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
-          this.loading = false;
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
@@ -210,7 +211,14 @@ export default {
           if (isRepeat) {
             return;
           }
-          const filter = this.listTagOneArray.find((tag) => {
+          const listTagOneArray = [];
+          this.$store.state.listInfo.groupTagList.forEach((element) => {
+            element.tagList.forEach((tag) => {
+              const newTag = { ...tag, tagId: tag.id, groupName: element.groupName || element.name };
+              listTagOneArray.push(newTag);
+            });
+          });
+          const filter = listTagOneArray.find((tag) => {
             return tag.id === child.tagId;
           });
           // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
@@ -256,17 +264,6 @@ export default {
       this.queryTag.splice(index, 1);
       this.query.tagIds = this.queryTag.map((item) => item.tagId) + '';
     },
-    getListTag() {
-      tagApi.getGroupTagList().then(({ data }) => {
-        this.listTagOneArray = [];
-        data.forEach((element) => {
-          element.tagList.forEach((tag) => {
-            const newTag = { ...tag, tagId: tag.id, groupName: element.groupName || element.name };
-            this.listTagOneArray.push(newTag);
-          });
-        });
-      });
-    },
     submitSelectTag(selected) {
       if (this.tagDialogType.type === 'query') {
         this.query.tagIds = selected.map(tag => tag.tagId) + '';
@@ -283,7 +280,6 @@ export default {
           this.msgSuccess('操作成功');
           this.dialogVisible = false;
           this.getList();
-          this.getListTag();
         }).catch(() => {
           this.tagDialogLoading = false;
         });
@@ -354,12 +350,22 @@ export default {
         </el-form-item>
         <el-form-item label=" ">
           <el-button
+            v-preventReClick="200"
             type="primary"
-            @click="getList(1)"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              getList(1)
+            }"
           >查询</el-button>
           <el-button
+            v-preventReClick="200"
             class="btn-reset"
-            @click="resetQuery"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetQuery()
+            }"
           >重置</el-button>
         </el-form-item>
       </el-form>
@@ -471,6 +477,7 @@ export default {
       <pagination
         v-show="total > 0"
         :total="total"
+        :disabled="loading"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"
         @pagination="getList()"

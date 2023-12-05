@@ -59,6 +59,7 @@
             v-show="customerClickRecordList.length > 0"
             :total="total"
             :limit.sync="query.pageSize"
+            :disabled="loading"
             :page.sync="query.pageNum"
             @pagination="getCustomerClickRecord()"
           />

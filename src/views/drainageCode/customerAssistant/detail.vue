@@ -201,8 +201,24 @@
             />
           </el-form-item>
           <el-form-item label=" ">
-            <el-button type="primary" @click="onSearch">查询</el-button>
-            <el-button class="btn-reset" @click="resetSearch">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                getStatisticByCustomer(1)
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetSearch()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -313,6 +329,7 @@
         <pagination
           v-show="total > 0"
           :total="total * 1"
+          :disabled="loading"
           :page.sync="pageQuery.pageNum"
           :limit.sync="pageQuery.pageSize"
           @pagination="handleChangePage()"
@@ -361,7 +378,7 @@ import { getFirstMsg } from '@/utils/drainageCode';
 import DetailCustomerCnt from './components/DetailCustomerCnt.vue';
 import UserItem from '@/components/UserItem.vue';
 import { goRouteWithQuery } from '@/utils/index';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   components: {
     Statistics,
@@ -373,6 +390,7 @@ export default {
     DetailCustomerCnt,
     UserItem
   },
+  mixins: [loadingMixin],
   data() {
     return {
       detailLoading: false,
@@ -479,6 +497,7 @@ export default {
         this.list = [...rows];
         this.total = total;
       }).finally(() => {
+        this.modifyButtonStatus();
         this.loading = false;
       });
     },
@@ -513,9 +532,6 @@ export default {
         case DATE_DIMENSION:
           return statisticByDate;
       }
-    },
-    onSearch() {
-      this.getStatisticByCustomer(1);
     },
     /**
      * 重置查询条件

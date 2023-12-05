@@ -92,6 +92,10 @@ export default {
     getSearchPayload: {
       type: Function,
       default: null
+    },
+    modifyButtonStatus: {
+      type: Function,
+      default: null
     }
   },
   inject: ['tagType'],
@@ -225,6 +229,7 @@ export default {
       }).finally(() => {
         this.loading = false;
         this.pageLoading = false;
+        this.modifyButtonStatus();
         // 当没有加载过下一页的时候不显示没有更多
         if (this.query.pageNum !== DEFAULT_PAGE_NUM) {
           this.noMore = this.list.length === this.total;

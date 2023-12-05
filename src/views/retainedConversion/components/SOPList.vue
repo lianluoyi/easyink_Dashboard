@@ -33,12 +33,22 @@
           </el-form-item>
           <el-form-item>
             <el-button
+              v-preventReClick="200"
               type="primary"
-              @click="onSearch"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                onSearch()
+              }"
             >查询</el-button>
             <el-button
+              v-preventReClick="200"
               class="btn-reset"
-              @click="resetForm"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetForm()
+              }"
             >重置</el-button>
           </el-form-item>
         </el-form>
@@ -137,6 +147,7 @@
           v-show="total > 0"
           :total="total * 1"
           :page.sync="query.pageNum"
+          :disabled="loading"
           :limit.sync="query.pageSize"
           :select-data-len="multipleSelection.length"
           @pagination="getSopList()"
@@ -165,10 +176,11 @@ import { checkPermi } from '@/utils/permission';
 import { getSopList, batchSwitchSop, deleteSop, editUser } from '@/api/sop';
 import ListUserShow from '@/components/ListUserShow';
 import { groupByScopeType } from '@/utils/common';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: '',
   components: { RightContainer, EmptyDefaultIcon, SelectUser, ListUserShow },
+  mixins: [loadingMixin],
   props: {
     sopType: {
       type: Number,
@@ -388,25 +400,30 @@ export default {
       this.selectUserList = row.scopeList.map(item => { return { ...item, [item.type === SCOPELIST_TYPE['USER'] ? 'userId' : 'id']: item.targetId, name: item.type === SCOPELIST_TYPE['USER'] ? item.userName : item.departmentName }; });
     },
     async getSopList(params = {}) {
-      const query = this.query;
-      const newParams = {
-        sopType: this.sopType,
-        ...query,
-        isOpen: query.isOpen === -1 ? null : query.isOpen,
-        ...params
-      };
-      this.loading = true;
-      const listRes = await getSopList(newParams);
-      this.query = {
-        ...query,
-        pageNum: newParams.pageNum
-      };
-      if (listRes) {
+      try {
+        const query = this.query;
+        const newParams = {
+          sopType: this.sopType,
+          ...query,
+          isOpen: query.isOpen === -1 ? null : query.isOpen,
+          ...params
+        };
+        this.loading = true;
+        const listRes = await getSopList(newParams);
+        this.query = {
+          ...query,
+          pageNum: newParams.pageNum
+        };
+        if (listRes) {
+          this.loading = false;
+          const list = [...listRes.rows];
+          this.list = list;
+          this.modifyButtonStatus();
+          this.total = listRes.total;
+        }
+      } catch (error) {
+        this.modifyButtonStatus();
         this.loading = false;
-        const list = [...listRes.rows];
-        this.list = list;
-
-        this.total = listRes.total;
       }
     },
     /**

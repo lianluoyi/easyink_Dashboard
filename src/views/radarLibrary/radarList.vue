@@ -154,6 +154,7 @@
           v-show="list.length > 0"
           :total="total"
           :limit.sync="query.pageSize"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :select-data-len="ids.length"
           @pagination="getRadaList()"

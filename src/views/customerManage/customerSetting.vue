@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户设置
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="customer-setting">
@@ -40,12 +40,22 @@
           </el-form-item>
           <el-form-item label=" ">
             <el-button
+              v-preventReClick="200"
               type="primary"
-              @click="onSearch"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                onSearch()
+              }"
             >查询</el-button>
             <el-button
+              v-preventReClick="200"
               class="btn-reset"
-              @click="resetForm"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetForm()
+              }"
             >重置</el-button>
           </el-form-item>
         </el-form>
@@ -61,6 +71,7 @@
       <template v-slot:data>
         <el-table
           ref="table"
+          v-loading="loading"
           :data="list"
           class="property-list-table"
           tooltip-effect="dark"
@@ -175,12 +186,13 @@ import { CUSTOMER_PROPERTY_MAP, CUSTOMER_PROPERTY_VALUE } from '@/utils/constant
 import Sortable from 'sortablejs';
 import { editBatchExtendProperty } from '@/api/extendProperty';
 import { checkPermi } from '@/utils/permission';
-
+import loadingMixin from '@/mixin/loadingMixin';
 const findMaxPropertySort = (prev, current) => current.propertySort > prev.propertySort ? current : prev;
 
 export default {
   name: '',
   components: { RightContainer, EmptyDefaultIcon, AddPropertyModal },
+  mixins: [loadingMixin],
   props: {},
   data() {
     return {
@@ -214,7 +226,8 @@ export default {
       // 当前鼠标移入的表格行id
       rowId: null,
       // 是否已经创建拖拽组件
-      rowSortCreated: false
+      rowSortCreated: false,
+      loading: false
     };
   },
   created() {
@@ -279,6 +292,7 @@ export default {
      * 获取客户扩展属性列表
      */
     async getPropertyList(params = {}) {
+      this.loading = true;
       const listRes = await this.$store.dispatch('GetCustomerProperty', {
         name: this.query.name,
         required: this.query.required,
@@ -288,6 +302,8 @@ export default {
       if (listRes) {
         this.list = listRes.data;
       }
+      this.loading = false;
+      this.modifyButtonStatus();
     },
     /**
      * 鼠标移入表格行

@@ -37,11 +37,26 @@
                 end-placeholder="结束日期"
               />
             </el-popover>
-
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="getList(1)">查询</el-button>
-            <el-button class="btn-reset" @click="resetQuery">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                getList(1)
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -135,6 +150,7 @@
         <pagination
           v-show="total > 0"
           :total="total"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           @pagination="getList()"
@@ -152,10 +168,12 @@ import HowToUse from '../components/HowToUse.vue';
 import RightContainer from '@/components/RightContainer';
 import { getConversionCodeActiveList, deleteConversionCodeActive } from '@/api/redeem';
 import { PAGE_LIMIT } from '@/utils/constant/index';
+import loadingMixin from '@/mixin/loadingMixin';
 const DEFAULT_PAGE_NUM = 1;
 export default {
   name: 'List',
   components: { RightContainer, EmptyDefaultIcon, HowToUse },
+  mixins: [loadingMixin],
   data() {
     return {
       // 遮罩层
@@ -205,8 +223,8 @@ export default {
       getConversionCodeActiveList(this.query).then(({ rows, total }) => {
         this.list = rows;
         this.total = total;
-        this.loading = false;
-      }).catch(() => {
+      }).finally(() => {
+        this.modifyButtonStatus();
         this.loading = false;
       });
     },

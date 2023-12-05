@@ -1,6 +1,6 @@
 <!-- 敏感词设置页面 -->
 <template>
-  <div class="add-sensitive-word">
+  <div v-loading="loading" class="add-sensitive-word">
     <el-form :inline="true" :model="form" class="demo-form-inline" @submit.native.prevent>
       <el-button
         v-hasPermi="['wecom:sensitive:add']"
@@ -184,6 +184,7 @@ export default {
           { required: true, message: '敏感词不能为空', trigger: 'blur' }
         ]
       },
+      loading: false,
       // 使用员工类型
       SCOPELIST_TYPE
     };
@@ -194,9 +195,12 @@ export default {
   methods: {
     // 获取敏感词设置列表
     getSettingList() {
+      this.loading = true;
       sensitiveApis.getSettingSensitiveList(this.form).then((res) => {
         this.tableData = res.rows;
         this.total = Number(res.total);
+      }).finally(() => {
+        this.loading = false;
       });
     },
     // 提交敏感词表单
@@ -371,7 +375,8 @@ export default {
     // 63px为敏感消息记录tabs的高度
     height: calc(100% - 63px);
     overflow: auto;
-    padding: 15px 20px 0 20px;
+    padding: 0px 20px;
+    margin-top: 20px;
   }
 }
 .demo-form-inline {

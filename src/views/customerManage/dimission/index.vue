@@ -5,10 +5,11 @@ import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import AllocateModal from './allocateModal.vue';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'Dimission',
   components: { RightContainer, EmptyDefaultIcon, AllocateModal },
+  mixins: [loadingMixin],
   props: {},
   data() {
     return {
@@ -69,13 +70,13 @@ export default {
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
-          this.loading = false;
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
-    resetForm(formName) {
+    resetForm() {
       this.dateRange = [];
       this.$refs['queryForm'].resetFields();
     },
@@ -134,12 +135,22 @@ export default {
 
         <el-form-item label>
           <el-button
+            v-preventReClick="200"
             type="primary"
-            @click="getList(1)"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              getList(1)
+            }"
           >查询</el-button>
           <el-button
+            v-preventReClick="200"
             class="btn-reset"
-            @click="resetSearch"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetSearch()
+            }"
           >重置</el-button>
         </el-form-item>
       </el-form>
@@ -199,6 +210,7 @@ export default {
       <pagination
         v-show="total > 0"
         :total="total"
+        :disabled="loading"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"
         :select-data-len="currentRows.length"

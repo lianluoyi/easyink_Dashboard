@@ -21,8 +21,24 @@
               <el-input v-model="query.activityName" placeholder="请输入活动名称" />
             </el-form-item>
             <el-form-item label=" ">
-              <el-button type="primary" @click="onSearch">查询</el-button>
-              <el-button class="btn-reset" @click="resetForm">重置</el-button>
+              <el-button
+                v-preventReClick="200"
+                type="primary"
+                :loading="searchButtonLoading"
+                @click="()=>{
+                  searchButtonLoading = true;
+                  onSearch()
+                }"
+              >查询</el-button>
+              <el-button
+                v-preventReClick="200"
+                class="btn-reset"
+                :loading="resetButtonLoading"
+                @click="()=>{
+                  resetButtonLoading = true;
+                  resetForm()
+                }"
+              >重置</el-button>
             </el-form-item>
           </el-form>
         </template>
@@ -93,6 +109,7 @@
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           :pager-count="7"
+          :disabled="loading"
           @pagination="getList()"
         />
         <div v-else class="footer-text">
@@ -120,10 +137,12 @@ import RightContainer from '@/components/RightContainer';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import { getConversionCodeActiveList } from '@/api/redeem';
 import { checkPermi } from '@/utils/permission';
+import loadingMixin from '@/mixin/loadingMixin';
 import HowToUse from '@/views/marketingActivities/components/HowToUse.vue';
 const DEFAULT_PAGE_NUM = 1;
 export default {
   components: { EmptyDefaultIcon, RightContainer, HowToUse },
+  mixins: [loadingMixin],
   props: {
     visible: {
       type: Boolean,
@@ -200,11 +219,11 @@ export default {
       this.loading = true;
       pageNum && (this.query.pageNum = pageNum);
       getConversionCodeActiveList(this.query).then(({ rows, total }) => {
-        this.loading = false;
         this.list = rows;
         this.total = total;
-      }).catch(() => {
+      }).finally(() => {
         this.loading = false;
+        this.modifyButtonStatus();
       });
     },
     /**

@@ -57,14 +57,17 @@
               :loading="searchButtonLoading"
               @click="()=>{
                 searchButtonLoading = true;
-                onSearch()
+                onSearch();
               }"
             >查询</el-button>
             <el-button
               v-preventReClick="200"
               class="btn-reset"
               :loading="resetButtonLoading"
-              @click="resetForm"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetForm();
+              }"
             >重置</el-button>
           </el-form-item>
         </el-form>
@@ -194,6 +197,7 @@ import {
   getCustomerOverViewOfDate,
   exportCustomerOverViewOfDate
 } from '@/api/statistics';
+import loadingMixin from '@/mixin/loadingMixin';
 // 排序字段
 const SORT = {
   'ascending': 'ASC',
@@ -202,6 +206,7 @@ const SORT = {
 export default {
   name: '',
   components: { RightContainer, Statistics, EmptyDefaultIcon, UserItem, TagUserShow, SelectUser },
+  mixins: [loadingMixin],
   data() {
     return {
       DATE_DIMENSION,
@@ -258,9 +263,7 @@ export default {
       loading: false,
       // 数据总览
       colList: [],
-      dimensionType: STAFF_DIMENSION,
-      searchButtonLoading: false,
-      resetButtonLoading: false
+      dimensionType: STAFF_DIMENSION
     };
   },
   created() {
@@ -344,8 +347,7 @@ export default {
         this.total = res.total || 0;
       }).finally(() => {
         this.loading = false;
-        this.searchButtonLoading = false;
-        this.resetButtonLoading = false;
+        this.modifyButtonStatus();
       });
     },
     /**
@@ -366,7 +368,6 @@ export default {
     },
     // 重置
     resetForm() {
-      this.resetButtonLoading = true;
       this.userAndDepartmentList = [];
       this.query = this.$options.data().query;
       this.pickerMinDate = '';

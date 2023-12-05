@@ -9,23 +9,23 @@ import {
   addLossTag,
   selectLossTag
 } from '@/api/customer/lossTags';
-import { getList as getListTag } from '@/api/customer/tag';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import RequestButton from '@/components/Button/RequestButton.vue';
-import { EventBus } from '@/event-bus.js';
 import { goRouteWithQuery } from '@/utils';
 import differenceBy from 'lodash/differenceBy';
 import { dealAtInfo, changeButtonLoading } from '@/utils/common';
 import { PAGE_LIMIT, WX_TYPE, TASK_STATUS } from '@/utils/constant/index';
 import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
+import loadingMixin from '@/mixin/loadingMixin';
 const IS_OPEN = '1'; // 切换开关
 
 export default {
   name: 'LossRemind',
   components: { SelectUser, SelectTag, RightContainer, EmptyDefaultIcon, RequestButton },
+  mixins: [loadingMixin],
   props: {},
   data() {
     return {
@@ -44,7 +44,6 @@ export default {
         customerChurnNoticeSwitch: '',
         customerLossTagSwitch: ''
       },
-      dialogVisibleSelectTag: false,
       IS_OPEN,
       removeTagList: [],
       customerTags: [], // 为流失打上标签
@@ -57,14 +56,17 @@ export default {
       list: [], // 客户列表
       listOrganization: [], // 组织架构列表
       multipleSelection: [], // 多选数组
-      dialogVisible: false, // 选择标签弹窗显隐
+      dialogVisibleSelectTag: false, // 选择标签弹窗显隐
       dialogVisibleSelectUser: false, // 选择添加人弹窗显隐
       selectedGroup: '', // 选择的标签分组
-      selectedTag: [], // 选择的标签
       removeTag: [], // 可移除的标签
       tagDialogType: {
         title: '', // 选择标签弹窗标题
-        type: '' // 弹窗类型
+        type: '', // 弹窗类型
+        selected: [],
+        isShowAdd: false,
+        infoMsg: '',
+        successFn: () => {}
       },
       isNotice: '0',
       wxType: WX_TYPE
@@ -86,7 +88,6 @@ export default {
       this.query = searchQuery;
     }
     this.getList();
-    this.getListTag();
     this.getLossRemindStatus();
 
     this.$store.dispatch(
@@ -113,22 +114,12 @@ export default {
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
-          this.loading = false;
           this.multipleSelection = [];
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
-    },
-    getListTag() {
-      getListTag().then(({ rows }) => {
-        this.listTagOneArray = [];
-        rows.forEach((element) => {
-          element.weTags.forEach((d) => {
-            this.listTagOneArray.push(d);
-          });
-        });
-      });
     },
     /**
      * 初始化流失提醒信息
@@ -141,13 +132,25 @@ export default {
         this.customerTags = data.weTags;
       });
     },
-    showTagDialog() {
-      this.selectedTag = this.queryTag;
-      this.tagDialogType = {
-        title: '选择标签',
-        type: 'query'
-      };
-      this.dialogVisible = true;
+    showTagDialog(type) {
+      if (type === 'customerTags') {
+        this.tagDialogType = {
+          title: '客户标签',
+          type: 'search',
+          infoMsg: '请选择要为流失客户打上的标签',
+          isShowAdd: true,
+          selected: this.customerTags,
+          successFn: this.submitSelectcustomerTag
+        };
+      } else {
+        this.tagDialogType = {
+          title: '选择标签',
+          type: 'query',
+          selected: this.queryTag,
+          successFn: this.submitSelectTag
+        };
+      }
+      this.dialogVisibleSelectTag = true;
     },
     /**
      * 导出按钮操作
@@ -183,20 +186,15 @@ export default {
       this.query.userIds = list.map((d) => d.userId) + '';
     },
     submitSelectTag(selected) {
-      if (this.tagDialogType.type === 'query') {
-        this.query.tagIds = selected.map((d) => d.tagId) + '';
-        this.queryTag = selected;
-        this.dialogVisible = false;
-      }
+      this.query.tagIds = selected.map((d) => d.tagId) + '';
+      this.queryTag = selected;
+      this.dialogVisibleSelectTag = false;
     },
     resetForm() {
       this.dateRange = [];
       this.queryTag = [];
       this.queryUser = [];
-      this.selectedTag = [];
       this.query = this.$options.data().query;
-      EventBus.$emit('resetTag');
-      EventBus.$emit('resetUser');
       this.$nextTick(() => {
         this.getList(1);
       });
@@ -290,7 +288,7 @@ export default {
           </div>
         </el-form-item>
         <el-form-item>
-          <div class="tag-input" @click="showTagDialog">
+          <div class="tag-input" @click="showTagDialog('queryTag')">
             <span v-if="!queryTag.length" class="tag-place">请选择标签</span>
             <template v-else>
               <el-tag
@@ -315,12 +313,22 @@ export default {
         </el-form-item>
         <el-form-item label=" ">
           <el-button
+            v-preventReClick="200"
             type="primary"
-            @click="getList(1)"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              getList(1)
+            }"
           >查询</el-button>
           <el-button
+            v-preventReClick="200"
             class="btn-reset"
-            @click="resetForm()"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetForm()
+            }"
           >重置</el-button>
         </el-form-item>
       </el-form>
@@ -369,7 +377,7 @@ export default {
                   class="mr10"
                   icon="el-icon-plus"
                   size="mini"
-                  @click="dialogVisibleSelectTag = true"
+                  @click="showTagDialog('customerTags')"
                 >添加标签</el-button>
                 <el-tag
                   v-for="(item, index) in customerTags"
@@ -476,6 +484,7 @@ export default {
       <pagination
         v-show="total > 0"
         :total="total"
+        :disabled="loading"
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"
         @pagination="getList()"
@@ -483,29 +492,20 @@ export default {
 
       <!-- 选择标签弹窗 -->
       <SelectTag
-        :visible.sync="dialogVisible"
+        :visible.sync="dialogVisibleSelectTag"
+        :selected="tagDialogType.selected"
         :title="tagDialogType.title"
-        :selected="selectedTag"
         :type="tagDialogType.type"
-        @success="submitSelectTag"
+        :info-msg="tagDialogType.infoMsg"
+        :is-show-add="tagDialogType.isShowAdd"
+        @success="tagDialogType.successFn"
       />
-
       <!-- 选择添加人弹窗 -->
       <SelectUser
         :visible.sync="dialogVisibleSelectUser"
         title="选择添加人"
         :selected-user-list="queryUser"
         @success="selectedUser"
-      />
-      <!-- 选择标签弹窗 -->
-      <SelectTag
-        :visible.sync="dialogVisibleSelectTag"
-        :selected="customerTags"
-        title="客户标签"
-        type="search"
-        info-msg="请选择要为流失客户打上的标签"
-        :is-show-add="true"
-        @success="submitSelectcustomerTag"
       />
     </template>
   </RightContainer>

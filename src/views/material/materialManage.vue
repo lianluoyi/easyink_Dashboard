@@ -114,7 +114,7 @@ export default {
     /**
      * 获取过期素材列表
      */
-    getExpireMaterialList(params) {
+    getExpireMaterialList(params, callback) {
       this.isLoading = true;
       getList({
         ...this.query,
@@ -123,6 +123,8 @@ export default {
         this.isLoading = false;
         this.expireList = res.rows;
         this.total = res.total && Number(res.total);
+      }).finally(() => {
+        callback && callback();
       });
     },
     /**

@@ -22,8 +22,24 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="small" @click="handleQuery">查询</el-button>
-            <el-button size="small" class="btn-reset" @click="resetQuery">重置</el-button>
+            <el-button
+              v-preventReClick="200"
+              type="primary"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                handleQuery()
+              }"
+            >查询</el-button>
+            <el-button
+              v-preventReClick="200"
+              class="btn-reset"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetQuery()
+              }"
+            >重置</el-button>
           </el-form-item>
 
         </el-form>
@@ -67,7 +83,7 @@
             </template>
           </el-table-column>
         </el-table>
-        <pagination v-show="total>0" :total="total" :page.sync="pageNum" :limit.sync="pageSize" />
+        <pagination v-show="total>0" :disabled="loading" :total="total" :page.sync="pageNum" :limit.sync="pageSize" @pagination="getList" />
       </template>
 
     </RightContainer>
@@ -78,10 +94,11 @@
 import { list, forceLogout } from '@/api/monitor/online';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'Online',
   components: { RightContainer },
+  mixins: [loadingMixin],
   data() {
     return {
       // 遮罩层
@@ -106,10 +123,12 @@ export default {
     /** 查询登录日志列表 */
     getList() {
       this.loading = true;
-      list(this.queryParams).then(response => {
+      list({ ...this.queryParams, pageNum: this.pageNum, pageSize: this.pageSize }).then(response => {
         this.list = response.rows;
         this.total = response.total;
+      }).finally(() => {
         this.loading = false;
+        this.modifyButtonStatus();
       });
     },
     /** 搜索按钮操作 */

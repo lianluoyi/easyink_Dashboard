@@ -10,6 +10,7 @@
         <RightContainer>
           <template v-slot:data>
             <el-table
+              v-loading="loading"
               :data="recordSensitive"
               size="medium"
               style="width: 100%"
@@ -42,6 +43,7 @@
             </el-table>
             <pagination
               v-show="total > 0"
+              :disabled="loading"
               :total="recordPageTotal"
               :page.sync="recordPageConfig.pageNum"
               :limit.sync="recordPageConfig.pageSize"
@@ -86,7 +88,8 @@ export default {
         pageSize: PAGE_LIMIT
       },
       defaultUserImg: DEFAULT_AVATAR,
-      wxType: WX_TYPE
+      wxType: WX_TYPE,
+      loading: false
     };
   },
   mounted() {
@@ -106,6 +109,7 @@ export default {
       return obj;
     },
     getSensiveRecordList() {
+      this.loading = true;
       sensitiveApis.getSensitiveRecord(this.recordPageConfig).then(res => {
         const resData = [...res.rows];
         resData.forEach((item) => {
@@ -116,6 +120,8 @@ export default {
         });
         this.recordSensitive = resData;
         this.recordPageTotal = Number(res.total);
+      }).finally(() => {
+        this.loading = false;
       });
     },
     getSensitiveManagementList() {

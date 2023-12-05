@@ -143,8 +143,25 @@
           </el-select>
         </template>
         <el-input v-if="activeRecord === CLICK_RECORD['staff']" v-model="searchForm.userName" clearable style="width:240px" class="ml10 mr10" placeholder="请输入员工姓名" />
-        <el-button type="primary" class="ml10" @click="search">查询</el-button>
-        <el-button class="btn-reset" @click="reset">重置</el-button>
+        <el-button
+          v-preventReClick="200"
+          type="primary"
+          class="ml10"
+          :loading="searchButtonLoading"
+          @click="()=>{
+            searchButtonLoading = true;
+            search()
+          }"
+        >查询</el-button>
+        <el-button
+          v-preventReClick="200"
+          class="btn-reset"
+          :loading="resetButtonLoading"
+          @click="()=>{
+            resetButtonLoading = true;
+            reset()
+          }"
+        >重置</el-button>
       </div>
       <div class="search-table">
         <RightContainer>
@@ -201,6 +218,7 @@
             <pagination
               v-show="recordList.length > 0"
               :total="total"
+              :disabled="loading"
               :limit.sync="searchForm.pageSize"
               :page.sync="searchForm.pageNum"
               @pagination="search"
@@ -351,9 +369,11 @@ import RightContainer from '@/components/RightContainer';
 import PhoneDialog from '@/components/PhoneDialog.vue';
 import { formDetail, formDetailTotalView, getCustomerRecord, getStaffRecord, getFormResult, exportCustomerRecord, exportUserSendRecord } from '@/api/form';
 import { goRouteWithQuery } from '@/utils';
+import loadingMixin from '@/mixin/loadingMixin';
 import { find } from 'lodash';
 export default {
   components: { Statistics, EmptyDefaultIcon, RightContainer, PhoneDialog },
+  mixins: [loadingMixin],
   data() {
     return {
       // 提交时间类型选项
@@ -554,6 +574,7 @@ export default {
         this.recordList = res.rows;
         this.total = res.total;
       }).finally(() => {
+        this.modifyButtonStatus();
         this.loading = false;
       });
     },

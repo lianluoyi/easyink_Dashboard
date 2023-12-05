@@ -56,8 +56,24 @@
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">查询</el-button>
-        <el-button icon="el-icon-refresh" size="mini" class="btn-reset" @click="resetQuery">重置</el-button>
+        <el-button
+          v-preventReClick="200"
+          type="primary"
+          :loading="searchButtonLoading"
+          @click="()=>{
+            searchButtonLoading = true;
+            handleQuery()
+          }"
+        >查询</el-button>
+        <el-button
+          v-preventReClick="200"
+          class="btn-reset"
+          :loading="resetButtonLoading"
+          @click="()=>{
+            resetButtonLoading = true;
+            resetQuery()
+          }"
+        >重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -125,6 +141,7 @@
       v-show="total>0"
       :total="total"
       :page.sync="queryParams.pageNum"
+      :disabled="loading"
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
@@ -168,9 +185,10 @@
 <script>
 import { listJobLog, delJobLog, exportJobLog, cleanJobLog } from '@/api/monitor/jobLog';
 import { PAGE_LIMIT } from '@/utils/constant/index';
-
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: 'JobLog',
+  mixins: [loadingMixin],
   data() {
     return {
       // 遮罩层
@@ -221,9 +239,10 @@ export default {
       listJobLog(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.jobLogList = response.rows;
         this.total = response.total;
+      }).finally(() => {
         this.loading = false;
-      }
-      );
+        this.modifyButtonStatus();
+      });
     },
     // 执行状态字典翻译
     statusFormat(row, column) {

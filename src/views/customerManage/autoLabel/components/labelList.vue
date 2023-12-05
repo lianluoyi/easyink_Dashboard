@@ -49,12 +49,22 @@
           </el-form-item>
           <el-form-item>
             <el-button
+              v-preventReClick="200"
               type="primary"
-              @click="onSearch"
+              :loading="searchButtonLoading"
+              @click="()=>{
+                searchButtonLoading = true;
+                onSearch()
+              }"
             >查询</el-button>
             <el-button
+              v-preventReClick="200"
               class="btn-reset"
-              @click="resetForm"
+              :loading="resetButtonLoading"
+              @click="()=>{
+                resetButtonLoading = true;
+                resetForm()
+              }"
             >重置</el-button>
           </el-form-item>
         </el-form>
@@ -158,6 +168,7 @@
         </el-table>
         <pagination
           :total="total * 1"
+          :disabled="loading"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
           :select-data-len="multipleSelection.length"
@@ -185,9 +196,11 @@ import { AUTOLABEL_TYPE, PAGE_LIMIT } from '@/utils/constant/index';
 import { goRouteWithQuery } from '@/utils';
 import { checkPermi } from '@/utils/permission';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
+import loadingMixin from '@/mixin/loadingMixin';
 export default {
   name: '',
   components: { RightContainer, EmptyDefaultIcon, SelectTag },
+  mixins: [loadingMixin],
   props: {
     labelType: {
       type: Number,
@@ -306,6 +319,7 @@ export default {
         this.total = listRes?.total || 0;
         this.list = listRes?.rows || [];
       }).finally(() => {
+        this.modifyButtonStatus();
         this.loading = false;
       });
     },

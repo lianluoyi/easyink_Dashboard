@@ -185,10 +185,10 @@ export default {
     /**
      * 获取素材列表
      * @param params 额外传参
+     * @param callback 回调函数
      */
-    getMaterialList(params) {
+    getMaterialList(params, callback) {
       this.isLoadingMaterial = true;
-
       switch (params.mediaType) {
         case MEDIA_TYPE_SMARTFORM: {
           // 表单sourceType 对应的值
@@ -228,6 +228,8 @@ export default {
               return payload;
             });
             this.materialList = newArr;
+          }).finally(() => {
+            callback && callback();
           });
           break;
         }
@@ -257,6 +259,8 @@ export default {
             this.materialList = newArr;
             this.total = Number(res.total);
             this.isLoadingMaterial = false;
+          }).finally(() => {
+            callback && callback();
           });
           break;
         default:
@@ -267,6 +271,8 @@ export default {
             this.materialList = res.rows;
             this.total = Number(res.total);
             this.isLoadingMaterial = false;
+          }).finally(() => {
+            callback && callback();
           });
           break;
       }

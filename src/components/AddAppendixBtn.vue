@@ -324,7 +324,7 @@ export default {
       this.$emit('update:appendixList', list);
       if (appendix.saveToMaterial) {
         this.query.mediaType = appendix.mediaType;
-        this.getMaterialList();
+        this.getMaterialList({ mediaType: this.query.mediaType });
       }
     },
     /**
@@ -344,12 +344,12 @@ export default {
         this.$refs['saveToMaterial']?.$refs?.form?.clearValidate();
       });
     },
+    // TODO 重构素材库相关功能 素材库素材添加弹窗由素材库抽屉组件实现，不在各个子组件中实现 素材库的搜索参数放到素材库抽屉中
     /**
      * 获取素材列表
      */
-    getMaterialList(params) {
+    getMaterialList(params, callback) {
       this.isLoadingMaterial = true;
-
       switch (params.mediaType) {
         case MEDIA_TYPE_SMARTFORM: {
           // 表单sourceType 对应的值
@@ -389,6 +389,8 @@ export default {
               return payload;
             });
             this.materialList = newArr;
+          }).finally(() => {
+            callback && callback();
           });
           break;
         }
@@ -418,6 +420,8 @@ export default {
             this.materialList = newArr;
             this.total = Number(res.total);
             this.isLoadingMaterial = false;
+          }).finally(() => {
+            callback && callback();
           });
           break;
         default:
@@ -428,6 +432,8 @@ export default {
             this.materialList = res.rows;
             this.total = Number(res.total);
             this.isLoadingMaterial = false;
+          }).finally(() => {
+            callback && callback();
           });
           break;
       }

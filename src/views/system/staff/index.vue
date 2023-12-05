@@ -15,6 +15,7 @@ import BatchUpdateUser from './BatchUpdateUser';
 import { getFMdate, changeButtonLoading } from '@/utils/common';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import SyncMemberInfo from './SyncMemberInfo.vue';
+import loadingMixin from '@/mixin/loadingMixin';
 const EMAIL_LENGTH = 200;
 const EXPIRATION_NUMBER = 7;
 const WAIT_TIME = 8000;
@@ -37,6 +38,7 @@ export default {
     RequestButton,
     SyncMemberInfo
   },
+  mixins: [loadingMixin],
   props: {},
 
   data() {
@@ -214,7 +216,8 @@ export default {
           this.total = +total;
           this.loading = false;
         })
-        .catch(() => {
+        .finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
@@ -502,8 +505,24 @@ export default {
           </el-select>
         </el-form-item>
         <el-form-item class="new-form-item">
-          <el-button type="primary" @click="getList(1)">查询</el-button>
-          <el-button class="btn-reset" @click="resetQuery()">重置</el-button>
+          <el-button
+            v-preventReClick="200"
+            type="primary"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              getList(1)
+            }"
+          >查询</el-button>
+          <el-button
+            v-preventReClick="200"
+            class="btn-reset"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetQuery()
+            }"
+          >重置</el-button>
         </el-form-item>
       </el-form>
       <el-row type="flex" justify="space-between" class="staff-body">
@@ -694,6 +713,7 @@ export default {
               <pagination
                 v-show="total > 0"
                 :total="total"
+                :disabled="loading"
                 :page.sync="query.pageNum"
                 :limit.sync="query.pageSize"
                 :select-data-len="multipleSelection.length"

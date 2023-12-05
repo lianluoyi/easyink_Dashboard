@@ -1,13 +1,11 @@
 <script>
 import * as api from '@/api/customer';
 import store from '@/store';
-import { getList as getListTag } from '@/api/customer/tag';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import AddTag from '@/components/AddTag';
 import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
-import { EventBus } from '@/event-bus.js';
 import { goRouteWithQuery } from '@/utils';
 import { ADD_WAY_MAP, SCREENING_GENDER_TYPE, PAGE_LIMIT, CUSTOMER_PROPERTY_VALUE, WX_TYPE, CUSTOMER_STATUS, COMMON_TYPE, LOSS_TYPE, TO_INHERIT_TYPE, TRANSFER_TYPE, ALL_TYPE } from '@/utils/constant/index';
 import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
@@ -17,6 +15,7 @@ import ExportCustomerModal from './components/exportCustomerModal.vue';
 import { download } from '@/utils/download';
 import AdvancedScreening from './components/advancedScreening.vue';
 import { cloneDeep, find } from 'lodash';
+import loadingMixin from '@/mixin/loadingMixin';
 
 const fieldObj = {
   '邮箱': 'email',
@@ -34,6 +33,7 @@ const CUSTOMER_SET_SYS_FIELD_NAME = ['birthday', 'phone', 'email', 'address', 'd
 export default {
   name: 'Customer',
   components: { AddTag, SelectUser, SelectTag, RightContainer, EmptyDefaultIcon, PropertySetting, ExportCustomerModal, AdvancedScreening },
+  mixins: [loadingMixin],
   props: {},
   data() {
     return {
@@ -193,13 +193,11 @@ export default {
       `
     );
   },
-  mounted() {},
   methods: {
     init() {
       this.getPropertyList();
       this.getList();
       this.getCount();
-      this.getListTag();
     },
     /**
      * 获取客户自定义字段
@@ -251,29 +249,18 @@ export default {
           this.total = +total;
           this.multipleSelection = [];
         }).finally(() => {
+          this.modifyButtonStatus();
           this.loading = false;
         });
     },
-    getListTag(refresh, selectedTagFn) {
-      getListTag().then(({ rows }) => {
-        this.$store.dispatch('listInfo/setTagList', { list: rows });
-        this.listTagOneArray = [];
-        rows.forEach((element) => {
-          element.weTags.forEach((tag) => {
-            const newTag = { ...tag, groupName: element.groupName };
-            this.listTagOneArray.push(newTag);
-            if (selectedTagFn && selectedTagFn(newTag)) {
-              this.selectedTags.push(newTag);
-            }
-          });
+    getListTag(selectedTagFn) {
+      this.$store.state.listInfo.tagList.forEach((element) => {
+        element.weTags.forEach((tag) => {
+          const newTag = { ...tag, groupName: element.groupName };
+          if (selectedTagFn && selectedTagFn(newTag)) {
+            this.selectedTags.push(newTag);
+          }
         });
-        if (refresh) {
-          this.$refs.selectTag.getList();
-          this.form = {
-            groupName: '',
-            weTags: []
-          };
-        }
       });
     },
     showTagDialog() {
@@ -292,43 +279,24 @@ export default {
         this.msgWarn(msg);
         return;
       }
-      this.selectedTags = [];
-      const hasErrorTag = [];
-      const repeat = [];
+      this.removeTags = [];
       this.multipleSelection.forEach((element) => {
         element.weFlowerCustomerTagRels.forEach((grandchild) => {
           // 判断是否有重复标签
-          const isRepeat = this.selectedTags.some((tag) => {
+          const isRepeat = this.removeTags.some((tag) => {
             return tag.tagId === grandchild.tagId;
           });
           // 去重
           if (isRepeat) {
-            repeat.push(grandchild.tagName);
             return;
           }
-
-          const filter = this.listTagOneArray.find((tag) => {
-            return tag.tagId === grandchild.tagId;
-          });
-          // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
-          if (!filter) {
-            hasErrorTag.push(grandchild.tagName);
-            // isError = true
-            return;
-          }
-
-          type !== 'add' && this.selectedTags.push(filter);
+          type !== 'add' && this.removeTags.push(grandchild);
         });
       });
-      if (type === 'remove' && this.selectedTags.length === 0) {
+      if (type === 'remove' && this.removeTags.length === 0) {
         this.msgError('该客户没有标签，不可进行移除');
         return;
       }
-      if (type === 'remove') {
-        this.removeTags = [...this.selectedTags];
-        this.selectedTags = [];
-      }
-
       this.tagDialogType = {
         title:
           (type === 'add' ? '批量打标签' : '批量移除标签'),
@@ -337,7 +305,6 @@ export default {
         type: type
       };
       this.dialogVisible = true;
-      // this.$refs.selectTag.$forceUpdate()
     },
     sync() {
       const syncLoading = this.$loading({
@@ -407,7 +374,7 @@ export default {
         }
       }
     },
-    resetForm(formName) {
+    resetForm() {
       this.dateRange = [];
       this.queryTag = [];
       this.queryUser = [];
@@ -417,8 +384,6 @@ export default {
       this.resetAdvanced();
       this.getList(1);
       this.getCount();
-      EventBus.$emit('resetTag');
-      EventBus.$emit('resetUser');
     },
 
     resetAdvanced() {
@@ -458,7 +423,11 @@ export default {
     },
     addTagFn(addTags) {
       const addTagFilterFn = (tag) => addTags.find(addTag => addTag.groupName === tag.groupName && addTag.name === tag.name);
-      this.getListTag(true, addTagFilterFn);
+      this.getListTag(addTagFilterFn);
+      this.form = {
+        groupName: '',
+        weTags: []
+      };
     },
     /**
      * 打开字段显示设置弹窗
@@ -727,12 +696,22 @@ export default {
         </el-form-item>
         <el-form-item label=" ">
           <el-button
+            v-preventReClick="200"
             type="primary"
-            @click="onSearch"
+            :loading="searchButtonLoading"
+            @click="()=>{
+              searchButtonLoading = true;
+              onSearch()
+            }"
           >查询</el-button>
           <el-button
+            v-preventReClick="200"
             class="btn-reset"
-            @click="resetForm()"
+            :loading="resetButtonLoading"
+            @click="()=>{
+              resetButtonLoading = true;
+              resetForm()
+            }"
           >重置</el-button>
           <el-button
             class="btn-reset"
