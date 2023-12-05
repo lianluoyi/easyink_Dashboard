@@ -114,6 +114,13 @@ export default {
     isOnlyClick: {
       type: Boolean,
       default: false
+    },
+    /**
+     * 点击的节点详情
+     */
+    clickNode: {
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -418,7 +425,7 @@ export default {
     async nodeExpand(data, node) {
       if (data.loaded) return;
       if (this.isSearching) return;
-      this.updateUserList(data[this.departmentIdKey], data);
+      await this.updateUserList(data[this.departmentIdKey], data);
     },
     async updateUserList(departId, data, params) {
       const res = await this.getUserList(departId, params);
@@ -465,9 +472,16 @@ export default {
       // 如果没有填写要搜索的员工姓名则不进行调用接口搜索，走原先的逻辑
       if (!this.filterText) {
         this.searchTreeData = [];
+        this.defaultExpandNode = [];
         this.isSearching = false;
+        const depInfo = this.getDepItem(this.treeData[0]).find((item) => item.id === this.clickNode.mainDepartment);
+        if (depInfo.parentId !== DEFAULT_ROOT_PARENTID) {
+          await this.nodeExpand(depInfo);
+        }
+        const findNodeKeyByIdItem = this.getNodeItemByUserId(this.treeData).find((item) => item.userId === this.clickNode.userId);
+        this.defaultExpandNode = findNodeKeyByIdItem ? [findNodeKeyByIdItem.key] : [this.treeData[0]?.key];
         this.$nextTick(() => {
-          this.$refs.tree.filter(this.filterText);
+          this.$refs.tree.$refs.commonTree.setCurrentKey(findNodeKeyByIdItem?.key || this.clickNode.key);
         });
         return;
       }
@@ -492,7 +506,24 @@ export default {
       // 由于接口只能筛选员工数据，无法筛选部门，所以需要在页面更新后调用树的过滤方法
       this.$nextTick(() => {
         this.$refs.tree.filter(this.filterText);
+        const findNodeKeyByIdItem = this.getNodeItemByUserId(this.searchTreeData).find((item) => item.userId === this.clickNode.userId);
+        this.$refs.tree.$refs.commonTree.setCurrentKey(findNodeKeyByIdItem);
       });
+    },
+    /**
+     * @description 根据userId获取当前点击的节点
+     */
+    getNodeItemByUserId(list) {
+      const result = [];
+      list.forEach(item => {
+        if (item.userId) {
+          result.push(item);
+        }
+        if (item.children && item.children.length > 0) {
+          result.push(...this.getNodeItemByUserId(item.children));
+        }
+      });
+      return result;
     },
     /**
      * 将员工列表塞到treeData中对应的部门

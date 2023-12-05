@@ -436,7 +436,7 @@ export default {
                   <el-radio :label="REMARK_TYPE['after']">在昵称后</el-radio>
                 </el-radio-group>
                 <el-form-item prop="remarkName">
-                  <el-input v-model="form.remarkName" placeholder="请输入备注" :maxlength="12" show-word-limit>
+                  <el-input v-model="form.remarkName" placeholder="请输入备注" :maxlength="20" show-word-limit>
                     <template v-if="form.remarkType === REMARK_TYPE['after']" slot="prepend">客户昵称-</template>
                     <template v-if="form.remarkType === REMARK_TYPE['previous']" slot="append">-客户昵称</template>
                   </el-input>

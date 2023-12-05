@@ -504,6 +504,7 @@ export default {
               <span :class="customer.type === wxType ? 'wx-type-flag' : 'corp-type-name'">
                 {{ renderUserInfo(customer, 'type') }}
               </span>
+              <span v-if="customer.type === wxType" class="corp-type-name">{{ customer.remarkCorpName }}</span>
             </div>
             <div class="customer-proper">
               <div class="proper-item-div">

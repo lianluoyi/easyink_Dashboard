@@ -251,7 +251,7 @@ export default {
   },
   watch: {
     activeRadar() {
-      this.getRadaList();
+      this.getRadaList(true);
     },
     roleKey(val) {
       this.hasRole = val;

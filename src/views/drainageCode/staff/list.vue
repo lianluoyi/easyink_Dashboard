@@ -197,7 +197,7 @@ export default {
 
 <template>
   <div>
-    <RightContainer :config-keys="['contactSecret', 'customSecret']" page-title="正常使用员工活码">
+    <RightContainer :config-keys="['contactSecret']" page-title="正常使用员工活码">
       <template v-slot:search>
         <el-form
           ref="queryForm"
@@ -304,7 +304,7 @@ export default {
               :length="list.length"
               :btn-click="goToStaffAdd"
               :btn-show-condition="getQueryObj()"
-              :btn-config="['customSecret', 'contactSecret']"
+              :btn-config="['contactSecret']"
               :btn-permi-key="['wecom:code:add']"
             />
           </template>

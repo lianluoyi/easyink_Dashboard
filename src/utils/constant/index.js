@@ -219,15 +219,14 @@ export const TYPE_OF_WELCOME = {
   [INTO_GROUP]: '入群'
 };
 
-const FIRST_STEP = 0;
-const SECOND_STEP = 1;
+export const FIRST_STEP = 0;
+export const SECOND_STEP = 1;
 const THIRD_STEP = 2;
 const FORTH_STEP = 3;
 // 企微配置步骤条
 export const ENTERPRISE_WECHAT_CONFIG_STEP_TEXT = {
-  [FIRST_STEP]: '已复制，下一步',
-  [SECOND_STEP]: '已开通，下一步',
-  [THIRD_STEP]: '已复制，回到表单填写'
+  [FIRST_STEP]: '已开通，下一步',
+  [SECOND_STEP]: '已复制，回到表单填写'
 };
 export const ENTERPRISE_WECHAT_AUTH_STEP_TEXT = {
   [FIRST_STEP]: '已复制，下一步',
@@ -887,3 +886,8 @@ export const OR = 0;
 export const ALL_GENGER = 3;
 /** 所有来源 */
 export const ALL_SOURCE = '17';
+
+/** 朋友圈上传图片的最大长边分辨率 */
+export const MAX_LONG_SIDE = 10800;
+/** 朋友圈上传图片的最大短边分辨率 */
+export const MAX_SHORT_SIDE = 1080;

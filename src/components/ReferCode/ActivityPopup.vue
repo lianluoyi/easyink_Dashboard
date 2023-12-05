@@ -49,7 +49,7 @@
             height="300"
             style="font-size: 14px"
             :data="list"
-            @selection-change="handleSelectionChange"
+            @select="select"
           >
             <template slot="empty">
               <empty-default-icon
@@ -178,23 +178,17 @@ export default {
     }
   },
   watch: {
-    /**
-     * 监听原先已被选择的活动列表变化
-     */
-    selectedActiveList: {
-      // 深度监听变化
-      handler(curVal, oldVal) {
-        this.activeList = curVal;
-      },
-      deep: true,
-      immediate: true
+    Pvisible(val) {
+      if (val) {
+        this.activeList = this.selectedActiveList;
+        this.dealSelectActive();
+      } else {
+        this.$refs.multipleTable.clearSelection();
+      }
     }
   },
   created() {
     this.getList();
-  },
-  updated() {
-    this.dealSelectActive();
   },
   methods: {
     checkPermi(key) {
@@ -221,6 +215,7 @@ export default {
       getConversionCodeActiveList(this.query).then(({ rows, total }) => {
         this.list = rows;
         this.total = total;
+        this.dealSelectActive();
       }).finally(() => {
         this.loading = false;
         this.modifyButtonStatus();
@@ -229,7 +224,11 @@ export default {
     /**
      * 多选框选中数据
      */
-    handleSelectionChange(selection) {
+    select(selection) {
+      if (!selection.length) {
+        this.activeList = [];
+        return;
+      }
       this.list.forEach(item => {
         if (selection[selection.length - 1] === item) {
           this.$refs.multipleTable.toggleRowSelection(item, true);
@@ -257,6 +256,9 @@ export default {
       this.getList();
     },
     submit() {
+      if (!this.activeList.length) {
+        return this.msgWarn('请选择兑换码活动');
+      }
       this.$emit('success', [...this.activeList]);
       this.Pvisible = false;
     },
@@ -271,6 +273,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  // 隐藏全选按钮
+  /deep/ .el-table th.el-table__cell:nth-child(1) .cell {
+      visibility: hidden;
+  }
 .exchange-activities {
   /deep/ .el-dialog {
    width: auto;

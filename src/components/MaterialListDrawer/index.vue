@@ -266,7 +266,7 @@ export default {
       this.query.pageNum = 1;
       // TODO 考虑如何合并雷达和智能表单 后续添加其他类型不需要在重复定义搜索参数对象
       if (this.radarQuery) {
-        this.radarQuery.type = '';
+        this.radarQuery.type = this.$store.state.user.isSuperAdmin ? RADAR_TYPE['enterprise'] : '';
         this.radarQuery.pageNum = 1;
         this.radarQuery.searchTitle = '';
       }
@@ -465,7 +465,7 @@ export default {
           <div v-show="activeName === MEDIA_TYPE_RADARLINK">
             <el-select
               v-model="radarQuery.type"
-              clearable
+              :clearable="!this.$store.state.user.isSuperAdmin"
               placeholder="请选择雷达类型"
               style="width: 240px"
             >

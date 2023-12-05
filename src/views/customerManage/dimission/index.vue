@@ -6,6 +6,7 @@ import { goRouteWithQuery } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import AllocateModal from './allocateModal.vue';
 import loadingMixin from '@/mixin/loadingMixin';
+const MAX_PAGE_LIMIT = 1000;
 export default {
   name: 'Dimission',
   components: { RightContainer, EmptyDefaultIcon, AllocateModal },
@@ -31,7 +32,8 @@ export default {
       list: [],
       currentRows: [],
       dialogVisibleSelectUser: false,
-      dateRange: [] // 离职日期
+      dateRange: [], // 离职日期
+      allList: []
     };
   },
   computed: {},
@@ -55,7 +57,11 @@ export default {
   mounted() {},
   methods: {
     /** 查询 */
-    getList(page) {
+    getList(page, localPage) {
+      if (localPage) {
+        this.list = this.dealPaging(this.allList);
+        return;
+      }
       if (this.dateRange) {
         this.query.beginTime = this.dateRange[0];
         this.query.endTime = this.dateRange[1];
@@ -66,15 +72,23 @@ export default {
       page && (this.query.pageNum = page);
       this.loading = true;
       api
-        .getNoAllocateList(this.query)
+        .getNoAllocateList({ ...this.query, pageSize: MAX_PAGE_LIMIT })
         .then(({ rows, total }) => {
-          this.list = rows;
+          this.allList = rows;
+          this.list = this.dealPaging(this.allList);
           this.total = +total;
         })
         .finally(() => {
           this.modifyButtonStatus();
           this.loading = false;
         });
+    },
+    /**
+     * @description 处理数据分页
+     */
+    dealPaging(list) {
+      const { pageNum, pageSize } = this.query;
+      return list.slice((pageNum - 1) * pageSize, pageNum * pageSize);
     },
     resetForm() {
       this.dateRange = [];
@@ -108,7 +122,7 @@ export default {
 </script>
 
 <template>
-  <RightContainer :config-keys="['customSecret', 'contactSecret']" page-title="管理离职员工">
+  <RightContainer :config-keys="['contactSecret']" page-title="管理离职员工">
     <template v-slot:search>
       <el-form
         ref="queryForm"
@@ -214,7 +228,7 @@ export default {
         :page.sync="query.pageNum"
         :limit.sync="query.pageSize"
         :select-data-len="currentRows.length"
-        @pagination="getList()"
+        @pagination="getList(_,true)"
       />
       <!-- 选择添加人弹窗 -->
       <AllocateModal :dialog-visible-select-user.sync="dialogVisibleSelectUser" :current-rows="currentRows" :get-list="getList" />

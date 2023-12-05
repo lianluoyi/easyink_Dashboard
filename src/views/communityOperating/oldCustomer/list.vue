@@ -251,7 +251,7 @@ export default {
 
 <template>
   <div>
-    <RightContainer :config-keys="['contactSecret', 'customSecret']" page-title="正常使用老客进群">
+    <RightContainer :config-keys="['contactSecret']" page-title="正常使用老客进群">
       <template v-slot:search>
         <el-form
           ref="queryForm"
@@ -328,7 +328,6 @@ export default {
               :length="list.length"
               :btn-click="goRoute"
               :btn-show-condition="getQueryObj()"
-              :btn-config="['customSecret']"
               :btn-permi-key="['wecom:communitytagGroup:add']"
             />
           </template>

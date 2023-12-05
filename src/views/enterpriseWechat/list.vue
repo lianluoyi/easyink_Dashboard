@@ -254,14 +254,6 @@ export default {
           <ConfigItemComponent
             :params="[
               {
-                label: '客户联系Secret',
-                type: 'input',
-                btnText: '保存',
-                btnType: 'save',
-                required: true,
-                field: 'customSecret',
-              },
-              {
                 label: '会话存档Secret',
                 type: 'input',
                 btnText: '保存',

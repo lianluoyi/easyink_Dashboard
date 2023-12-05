@@ -5,16 +5,13 @@
 -->
 <script>
 import { uploadFile2Cos } from '@/api/common';
-import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK } from '@/utils/constant/index';
-import { dealUploadSize, dealFormat } from '@/utils/common';
+import { MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MAX_LONG_SIDE, MAX_SHORT_SIDE } from '@/utils/constant/index';
+import { dealUploadSize, dealFormat, judgeDetermineResolution } from '@/utils/common';
 const IMAGELENGTH = 1;
 // 上传图片的大小
 const IMG_BYTE = 10;
 // 上传图片名字的限制
 const FILE_NAME_LENGTH = 32;
-// 上传图片的分辨率
-const MAX_HEIGHT = 1080;
-const MAX_WIDTH = 1440;
 /**
  * 上传按钮(上传按钮样式根据图片/视频类型区分，且上传按钮是较大的矩形)
  */
@@ -29,8 +26,8 @@ export default {
   },
   data() {
     return {
-      MAX_HEIGHT,
-      MAX_WIDTH,
+      MAX_LONG_SIDE,
+      MAX_SHORT_SIDE,
       showIcon: false,
       showBtnDealImg: true,
       noneBtnImg: false,
@@ -140,6 +137,7 @@ export default {
           this.onError();
         });
     },
+
     beforeUpload(file) {
       return new Promise((resolve, reject) => {
         const flag = this.handleBeforeUpload(file);
@@ -150,9 +148,9 @@ export default {
           const img = new Image();
           img.src = reader.result;
           img.onload = () => {
-            if (img.width > MAX_WIDTH || img.height > MAX_HEIGHT) {
+            if (!judgeDetermineResolution(img.width, img.height)) {
               reject(false);
-              this.msgWarn(`上传图片分辨率不能超过1440 x 1080 ,当前文件${img.width}×${img.height}`);
+              this.msgWarn(`图片尺寸超过限制，长边≤${MAX_LONG_SIDE}px，短边≤${MAX_SHORT_SIDE}px,请重新上传`);
             } else {
               if (!flag) {
                 reject(false);

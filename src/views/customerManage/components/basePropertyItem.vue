@@ -10,7 +10,7 @@
         v-if="editStatus"
         v-model="item.value"
         placeholder="请填写备注"
-        maxlength="12"
+        maxlength="20"
         show-word-limit
       />
       <span v-else>{{ item.value }}</span>

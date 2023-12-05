@@ -25,7 +25,7 @@
             :length="CList.length"
           >
             <ul class="customer-list">
-              <li v-for="(i,t) in CList" :key="t" :class="{'liActive':t==personIndex}" @click="personCheck(i,t)">
+              <li v-for="i in CList" :key="i.externalUserid" :class="{'liActive': i.externalUserid === employId}" @click="personCheck(i)">
                 <div class="customer-item">
                   <img :src="i.avatar || require('@/assets/image/card-avatar.svg')" alt="头像">
                   <div class="toe">{{ i.name }}</div>
@@ -333,7 +333,6 @@ export default {
       employName: '',
       talkName: '',
       chatContent: '',
-      personIndex: '-1',
       activeName: PRIVATE_CHAT,
       activeNameThree: '0',
       takeTime: '',
@@ -421,8 +420,7 @@ export default {
       }
       this.activeNameThreeClick(true);
     },
-    personCheck(data, e) {
-      this.personIndex = e;
+    personCheck(data) {
       this.talkName = data.name;
       this.employId = data.externalUserid;
       this.query.pageNum = DEFAULT_PAGE_NUM;

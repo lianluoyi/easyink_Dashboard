@@ -70,15 +70,11 @@ export default {
         ],
         contactSecret: [
           { required: true, message: '请输入通讯录Secret', trigger: 'blur' }
-        ],
-        customSecret: [
-          { required: true, message: '请输入客户联系Secret', trigger: 'blur' }
         ]
       },
       secretConfig: {
         agentSecret: '',
-        contactSecret: '',
-        customSecret: ''
+        contactSecret: ''
       },
       configLoad: false,
       checkTimeStart: true,
@@ -448,8 +444,8 @@ export default {
      * 显示保存按钮
      */
     renderSave(secretConfig) {
-      const { agentSecret, contactSecret, customSecret } = secretConfig;
-      if (!agentSecret || !contactSecret || !customSecret) {
+      const { agentSecret, contactSecret } = secretConfig;
+      if (!agentSecret || !contactSecret) {
         return false;
       }
       return true;
@@ -595,9 +591,6 @@ export default {
                   </el-form-item>
                   <el-form-item label="通讯录Secret" prop="contactSecret">
                     <el-input v-model="secretConfig.contactSecret" placeholder="请输入通讯录Secret" />
-                  </el-form-item>
-                  <el-form-item label="客户联系Secret" prop="customSecret">
-                    <el-input v-model="secretConfig.customSecret" placeholder="请输入客户联系Secret" />
                   </el-form-item>
                 </el-form>
                 <el-button v-if="renderSave(secretConfig)" type="primary" @click="saveSecret">保存</el-button>

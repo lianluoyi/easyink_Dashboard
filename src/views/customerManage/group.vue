@@ -290,7 +290,7 @@ export default {
 </script>
 
 <template>
-  <RightContainer :config-keys="['customSecret', 'contactSecret']" page-title="查看客户群信息">
+  <RightContainer :config-keys="['contactSecret']" page-title="查看客户群信息">
     <template v-slot:search>
       <el-form
         ref="queryForm"
@@ -404,7 +404,6 @@ export default {
             text="暂无数据"
             desc="若首次加载，请耐心等待后台数据同步，稍后回来"
             :desc-show-condition="{ groupName: query.groupName, groupLeader: query.groupLeader, beginTime: query.beginTime, endTime: query.endTime }"
-            :desc-config="['customSecret']"
           />
         </template>
         <el-table-column type="selection" width="55" align="center" />

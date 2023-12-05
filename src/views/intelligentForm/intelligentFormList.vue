@@ -58,7 +58,8 @@
               :loading="resetButtonLoading"
               @click="()=>{
                 resetButtonLoading = true;
-                resetQuery()
+                resetQuery();
+                getFormList();
               }"
             >重置</el-button>
           </el-form-item>
@@ -321,7 +322,6 @@ export default {
       this.query = this.$options.data().query;
       // 置空日期范围
       this.timeSection = undefined;
-      this.getFormList();
     },
     /**
      * @description: 推广

@@ -238,7 +238,7 @@ export default {
 标签管理右侧容器:（PS: 为节省篇幅，部分组件直接使用自闭合标签。(如el-table、pagination)）
 
 ```jsx
-<RightContainer :config-keys="['customSecret']" page-title="管理企业标签">
+<RightContainer :config-keys="['contactSecret']" page-title="管理企业标签">
     <template v-slot:search>
       <el-form>
         <el-form-item>
@@ -250,7 +250,7 @@ export default {
       </el-form>
     </template>
     <template v-slot:data-stat>
-      <span>当前企业标签已创建<span class="data-count-num">{{ total }}/3000</span></span>
+      <span>当前企业标签已创建<span class="data-count-num">{{ total }}/10000</span></span>
     </template>
     <template v-slot:operate-btn>
       <el-button>新建标签组</el-button>

@@ -1,17 +1,11 @@
 <script>
 import store from '@/store';
 const NO_CONFIG_CONTACT_SECRET = '当前企业尚未配置“通讯录”功能';
-const NO_CONFIG_CUSTOM_SECRET = '当前企业尚未配置“客户联系”功能';
 const NO_CONFIG_SESSION_ARCHIVE_SECRET = '当前企业尚未配置“会话存档”功能';
-const NO_CONFIG_CUSTOM_SECRET_AND_CONTACT_SECRET = '当前企业尚未配置“通讯录”和“客户联系”功能';
 const NO_CONFIG_INFO_TAIL = '，无法[pageTitle]，请联系系统管理员前往【系统设置】完成企微配置';
 function getMessageByOneConfigKeys(configKeys) {
   if (configKeys.indexOf('contactSecret') >= 0) {
     return NO_CONFIG_CONTACT_SECRET + NO_CONFIG_INFO_TAIL;
-  }
-  // 如果只判断客户联系
-  if (configKeys.indexOf('customSecret') >= 0) {
-    return NO_CONFIG_CUSTOM_SECRET + NO_CONFIG_INFO_TAIL;
   }
   // 如果只判断会话存档
   if (configKeys.indexOf('chatSecret') >= 0) {
@@ -19,17 +13,8 @@ function getMessageByOneConfigKeys(configKeys) {
   }
 }
 function getMessageByTowEnterPriseWechatConfig(enterPriseWechatConfig) {
-  // 如果只存在通讯录
-  if (enterPriseWechatConfig['contactSecret'] && !enterPriseWechatConfig['customSecret']) {
-    return NO_CONFIG_CUSTOM_SECRET + NO_CONFIG_INFO_TAIL;
-  }
-  // 如果只存在客户联系
-  if (!enterPriseWechatConfig['contactSecret'] && enterPriseWechatConfig['customSecret']) {
+  if (!enterPriseWechatConfig['contactSecret']) {
     return NO_CONFIG_CONTACT_SECRET + NO_CONFIG_INFO_TAIL;
-  }
-  // 如果都不存在
-  if (!enterPriseWechatConfig['contactSecret'] && !enterPriseWechatConfig['customSecret']) {
-    return NO_CONFIG_CUSTOM_SECRET_AND_CONTACT_SECRET + NO_CONFIG_INFO_TAIL;
   }
 }
 export default {
@@ -109,7 +94,7 @@ export default {
 数据概览配置提醒:
 
 ```jsx
-<NoConfigInfo :config-keys="['contactSecret', 'customSecret']" page-title="统计数据" />
+<NoConfigInfo :config-keys="['contactSecret']" page-title="统计数据" />
 ```
 
 </docs>
