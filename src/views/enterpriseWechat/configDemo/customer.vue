@@ -1,5 +1,5 @@
 <script>
-import { ENTERPRISE_WECHAT_CONFIG_STEP_TEXT, PUBLIC_KEY_BEGIN, PUBLIC_KEY_END } from '@/utils/constant/index';
+import { FIRST_STEP, SECOND_STEP, ENTERPRISE_WECHAT_CONFIG_STEP_TEXT, PUBLIC_KEY_BEGIN, PUBLIC_KEY_END } from '@/utils/constant/index';
 import { handleGetChatPublicKey } from '@/utils/enterpriseWechat';
 
 export default {
@@ -7,11 +7,13 @@ export default {
   props: {},
   data() {
     return {
-      active: 0,
+      active: FIRST_STEP,
       STEP_TEXT: ENTERPRISE_WECHAT_CONFIG_STEP_TEXT,
       PUBLIC_KEY: '',
       PUBLIC_KEY_END,
-      PUBLIC_KEY_BEGIN
+      PUBLIC_KEY_BEGIN,
+      FIRST_STEP,
+      SECOND_STEP
     };
   },
   computed: {
@@ -24,16 +26,14 @@ export default {
   mounted() {},
   methods: {
     next() {
-      // eslint-disable-next-line no-magic-numbers
-      if (this.active !== 2) {
-        this.active = this.active + 1;
+      if (this.active === FIRST_STEP) {
+        this.active = SECOND_STEP;
       } else {
         this.$emit('closeDrawer');
       }
     },
     previousStep() {
-      // eslint-disable-next-line no-magic-numbers
-      if (this.active-- < 0) this.active = 2;
+      this.active = FIRST_STEP;
     },
     async getPublicKey() {
       const data = await handleGetChatPublicKey();
@@ -47,38 +47,11 @@ export default {
   <div class="contact-demo enterprise-wechat-demo">
     <div>
       <el-steps class="step-div" :active="active" align-center>
-        <el-step title="获取客户联系Secret" description="配置外部联系人相关功能" />
         <el-step title="申请会话存档" description="上传开通确认函" />
         <el-step title="获取会话存档Secret" description="完成会话存档配置" />
       </el-steps>
     </div>
-    <div v-if="active === 0" class="content-div">
-      <div class="part">
-        <div class="content-title">（1）权限配置。</div>
-        <div class="content-text">企业管理员扫码登录
-          <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/loginpage_wx" target="_blank">企业微信后台</el-link>，进入
-          <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#customer/group" target="_blank">【客户联系】-【权限配置】</el-link>，修改客户联系的使用范围，范围下的员工可以在EasyInk下使用客户相关功能。
-        </div>
-        <el-image
-          class="part-img"
-          :src="require('@/assets/example/demo/customer-step1-1.jpg')"
-          :preview-src-list="[require('@/assets/example/demo/customer-step1-1.jpg')]"
-        />
-      </div>
-      <div class="part">
-        <div class="content-title">（2）获取客户管理Secret。</div>
-        <div class="content-text">进入
-          <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#customer/analysis" target="_blank">【客户联系】 -【客户】</el-link>，点击“API”展开按钮，点击Secret旁“查看”按钮，即可收到“企业微信团队”发出的消息，查看并复制客户联系Secret。
-        </div>
-        <div class="content-text">点击“可调用应用”的设置按钮，勾选应用“联络易”即可。</div>
-        <el-image
-          class="part-img"
-          :src="require('@/assets/example/demo/customer-step1-2.jpg')"
-          :preview-src-list="[require('@/assets/example/demo/customer-step1-2.jpg')]"
-        />
-      </div>
-    </div>
-    <div v-if="active === 1" class="content-div">
+    <div v-if="active === FIRST_STEP" class="content-div">
       <div class="part">
         <div class="content-text">会话存档功能为企业微信的收费功能，可免费试用30天，进入
           <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#financial/corpEncryptData" target="_blank">【管理工具】-【会话内容存档】</el-link>，上传《企业微信会话内容存档开通确认函》开启。
@@ -90,7 +63,7 @@ export default {
         />
       </div>
     </div>
-    <div v-if="active === 2" class="content-div">
+    <div v-if="active === SECOND_STEP" class="content-div">
       <div class="part">
         <div class="content-title">
           （1）设置可信IP地址。
@@ -133,7 +106,7 @@ export default {
       </div>
     </div>
     <div class="btn-div">
-      <el-button v-if="active != 0" style="margin-top: 12px;" @click="previousStep">上一步</el-button>
+      <el-button v-if="active != FIRST_STEP" style="margin-top: 12px;" @click="previousStep">上一步</el-button>
       <el-button type="primary" style="margin-top: 12px;" @click="next">{{ STEP_TEXT[active] }}</el-button>
     </div>
   </div>

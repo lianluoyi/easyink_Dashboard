@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    <NoConfigInfo style="margin-bottom: 15px;" :config-keys="['contactSecret', 'customSecret']" page-title="统计数据" />
+    <NoConfigInfo style="margin-bottom: 15px;" :config-keys="['contactSecret']" page-title="统计数据" />
     <Statistics
       :col-list="colList"
       title="数据总览"

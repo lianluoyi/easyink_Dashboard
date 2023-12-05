@@ -61,7 +61,7 @@ export default {
       isLoading: true,
       // 需要写radarQuery 避免为null报错
       radarQuery: {
-        type: '',
+        type: this.$store.state.user.isSuperAdmin ? RADAR_TYPE['enterprise'] : '',
         searchTitle: '',
         pageNum: 1,
         pageSize: PAGE_LIMIT

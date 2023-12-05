@@ -107,7 +107,7 @@ export default {
 应用中心:
 
 ```jsx
-<NoConfigInfo :config-keys="['contactSecret', 'customSecret']" page-title="统计数据" />
+<NoConfigInfo :config-keys="['contactSecret']" page-title="统计数据" />
 ```
 
 </docs>

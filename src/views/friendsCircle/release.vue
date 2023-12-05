@@ -9,7 +9,9 @@ import SelectUser from '@/components/SelectUser/index.vue';
 import SelectTag from '@/components/SelectTag';
 import TagUserShow from '@/components/TagUserShow';
 import {
-  PAGE_LIMIT, MEDIA_TYPE, RADAR_TYPE, MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, DEFAULT_IMG, CUSTOM_LINK, DEFAULT_LINK, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH, MEDIA_TYPE_RADARLINK
+  PAGE_LIMIT, MEDIA_TYPE, RADAR_TYPE, MEDIA_TYPE_POSTER, MEDIA_TYPE_IMGLINK, MEDIA_TYPE_VIDEO, DEFAULT_IMG,
+  CUSTOM_LINK, DEFAULT_LINK, LINK_TITLE_MAXLENGTH, LINK_CONTENT_MAXLENGTH, MEDIA_TYPE_RADARLINK, MAX_LONG_SIDE,
+  MAX_SHORT_SIDE
 } from '@/utils/constant/index';
 import MaterialListDrawer from '@/components/MaterialListDrawer';
 import VerbalTrickImgLink from './Link.vue';
@@ -20,7 +22,7 @@ import Uploadimg from './Uploadimg.vue';
 import FriendsUpload from './friendsUpload.vue';
 import { getWordsUrlContent } from '@/api/wordsGroup';
 import { createFriendsCircle, updateMoment, getMomentTaskBasicInfo } from '@/api/friends';
-import { changeButtonLoading, groupByScopeType, checkChange } from '@/utils/common';
+import { changeButtonLoading, groupByScopeType, checkChange, judgeDetermineResolution } from '@/utils/common';
 // import { getRadaList } from '@/api/radar';
 import moment from 'moment';
 // 朋友圈为图片时，素材库显示的title最大选取数量
@@ -442,8 +444,20 @@ export default {
       // });
       // }
     },
+    /**
+     * 获取素材库图片长宽像素
+     */
+    async dealGetImageInfo(imgSrc) {
+      const img = new Image();
+      img.src = imgSrc;
+      return new Promise((resolve) => {
+        img.onload = () => {
+          resolve({ width: img.width, height: img.height });
+        };
+      });
+    },
     // 选择素材
-    handleAddApendixList(list) {
+    async handleAddApendixList(list) {
       // 上传的最大图片和视频的数量 图片为9 视频为1 链接封面为1 雷达为1
       let MAX = 9;
       if (this.momentsContent !== MEDIA_TYPE_POSTER) {
@@ -451,7 +465,7 @@ export default {
       }
       if (list.length + this.form.attachments.length <= MAX) {
         // 将素材选择的照片视频处理后
-        const newArr = list.map((item) => {
+        const newArr = await Promise.all(list.map(async(item) => {
           const itemList = {};
           itemList.url = item.materialUrl;
           if (this.momentsContent === MEDIA_TYPE_VIDEO) {
@@ -460,6 +474,13 @@ export default {
             itemList.size = item.content;
           } else if (this.momentsContent === MEDIA_TYPE_IMGLINK) {
             this.link.mediaType = this.isDefined === FROM_MATERIAL ? Number(MEDIA_TYPE_RADARLINK) : Number(MEDIA_TYPE_IMGLINK);
+            const imageInfo = await this.dealGetImageInfo(item.materialUrl);
+            itemList.width = imageInfo.width;
+            itemList.height = imageInfo.height;
+            if (judgeDetermineResolution(imageInfo.width, imageInfo.height)) {
+              this.link.coverUrl = item.materialUrl;
+              this.link.url = item.materialUrl;
+            }
             if (this.isDefined === FROM_MATERIAL) {
               this.link.coverUrl = item.coverUrl;
               this.link.url = item.url || item.materialUrl;
@@ -470,15 +491,20 @@ export default {
               }
               return;
             }
-            this.link.coverUrl = item.materialUrl;
-            this.link.url = item.materialUrl;
           } else {
+            const imageInfo = await this.dealGetImageInfo(item.materialUrl);
             itemList.title = item.materialName;
             itemList.mediaType = item.mediaType;
+            itemList.width = imageInfo.width;
+            itemList.height = imageInfo.height;
           }
           return itemList;
-        });
-        this.form.attachments.push(...newArr);
+        }));
+        const filterNewArrByPx = newArr.filter((item) => judgeDetermineResolution(item.width, item.height));
+        if (filterNewArrByPx.length !== newArr.length) {
+          this.msgWarn(`图片尺寸超过限制，长边≤${MAX_LONG_SIDE}px，短边≤${MAX_SHORT_SIDE}px,请重新上传`);
+        }
+        this.form.attachments.push(...filterNewArrByPx);
       } else {
         if (this.momentsContent === MEDIA_TYPE_POSTER) {
           this.msgWarn(`上传海报不能超过${MAX}个！请重新选择`);
@@ -634,7 +660,7 @@ export default {
                         @deleteFileList="deleteFileList"
                       />
                     </div>
-                    <div class="momentsContent-tip">只能上传jpg/png文件，且大小不超过10M，尺寸不超过1440×1080</div>
+                    <div class="momentsContent-tip">只能上传jpg/png文件，且大小不超过10M，长边≤10800px，短边≤1080px</div>
                   </div>
                   <div v-if="momentsContent === MEDIA_TYPE_VIDEO">
                     <UploadVideo
@@ -681,7 +707,7 @@ export default {
                           @getType="getType"
                           @deleteFileList="deleteFileList"
                         />
-                        <div class="momentsContent-tip">只能上传jpg/png文件，且大小不超过10M，尺寸不超过1440×1080</div>
+                        <div class="momentsContent-tip">只能上传jpg/png文件，且大小不超过10M，长边≤10800px，短边≤1080px</div>
                         <VerbalTrickImgLink :title="link.title" :cover-url="link.coverUrl" />
                       </div>
                       <div v-if="isDefined === DEFAULT_LINK">

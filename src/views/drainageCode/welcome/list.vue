@@ -182,6 +182,7 @@ export default {
     activeName(val) {
       var url = window.location.href;
       url = removeUrlParams(url);
+      this.query = this.$options.data().query;
       window.history.pushState({}, 0, `${url}?welcomeMsgTplType=${val}`);
       // 先清空欢迎语列表
       this.list = [];

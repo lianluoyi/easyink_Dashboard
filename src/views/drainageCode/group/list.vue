@@ -231,7 +231,7 @@ export default {
 
 <template>
   <div class="page">
-    <RightContainer :config-keys="['contactSecret', 'customSecret']" page-title="正常使用群活码">
+    <RightContainer :config-keys="['contactSecret']" page-title="正常使用群活码">
       <template v-slot:search>
         <el-form
           ref="queryForm"
@@ -314,7 +314,6 @@ export default {
               :length="groupCodes.length"
               :btn-click="goToGroupAdd"
               :btn-show-condition="getQueryObj()"
-              :btn-config="['customSecret']"
               :btn-permi-key="['wecom:groupCode:add']"
             />
           </template>

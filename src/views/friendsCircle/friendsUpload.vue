@@ -5,16 +5,13 @@
 -->
 <script>
 import { uploadFile2Cos } from '@/api/common';
-import { MEDIA_TYPE_POSTER } from '@/utils/constant/index';
-import { dealUploadSize, dealFormat } from '@/utils/common';
+import { MEDIA_TYPE_POSTER, MAX_LONG_SIDE, MAX_SHORT_SIDE } from '@/utils/constant/index';
+import { dealUploadSize, dealFormat, judgeDetermineResolution } from '@/utils/common';
 import draggable from 'vuedraggable';
 const FILE_NAME_LENGTH = 32;
 const IMAGELENGTH = 9;
 // 上传图片的大小
 const IMG_BYTE = 10;
-// 上传图片的分辨率
-const MAX_HEIGHT = 1080;
-const MAX_WIDTH = 1440;
 export default {
   name: 'Upload',
   components: { draggable },
@@ -27,10 +24,10 @@ export default {
   },
   data() {
     return {
+      MAX_LONG_SIDE,
+      MAX_SHORT_SIDE,
       // 定义一个数组来存储临时上传的图片文件，用来解决图片未渲染成功的问题
       temporary: [],
-      MAX_HEIGHT,
-      MAX_WIDTH,
       drag: false,
       showIcon: false,
       // 上传成功的次数
@@ -147,14 +144,14 @@ export default {
           const img = new Image();
           img.src = reader.result;
           img.onload = () => {
-            if (img.width > MAX_WIDTH || img.height > MAX_HEIGHT) {
+            if (!judgeDetermineResolution(img.width, img.height)) {
               reject();
               // 遍历数组，将不符合条件的数组项删除
               this.temporary = this.temporary.filter(item => item.uid !== file.uid);
               this.fileList = this.temporary;
               // 判断按钮状态
               this.noneBtnImg = this.fileList.length >= this.limitNum;
-              this.msgWarn(`上传图片分辨率不能超过1440 x 1080 ,当前文件${img.width}×${img.height}`);
+              this.msgWarn(`图片尺寸超过限制，长边≤${MAX_LONG_SIDE}px，短边≤${MAX_SHORT_SIDE}px,请重新上传`);
             } else {
               if (!flag) {
                 reject();

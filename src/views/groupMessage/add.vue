@@ -530,7 +530,7 @@ export default {
   <div v-loading="loading">
     <NoConfigInfo
       :alert-style="'margin-bottom: 15px;'"
-      :config-keys="['contactSecret', 'customSecret']"
+      :config-keys="['contactSecret']"
       page-title="进行企业群发"
     />
     <div class="content-wrap">

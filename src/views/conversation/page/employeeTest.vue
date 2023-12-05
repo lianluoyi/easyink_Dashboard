@@ -14,6 +14,7 @@
             class="filter-tree conversation-user-tree"
             v-bind="$attrs"
             :filter-text="employName"
+            :click-node="clickNode"
             is-only-click
             @updateUserList="handleNodeClick"
           />
@@ -387,7 +388,8 @@ export default {
         pageNum: DEFAULT_PAGE_NUM,
         pageSize: PAGE_LIMIT_TWENTY,
         chatName: ''
-      }
+      },
+      clickNode: {}
     };
   },
   computed: {
@@ -543,8 +545,10 @@ export default {
      * 点击员工节点的回调：移除之前选中元素样式，同时修改当前元素样式，并修改data
      */
     handleNodeClick(data) {
+      this.clickNode = data;
       // 点击部门不做处理
       if (!data.userId) {
+        this.clickNode = {};
         this.$refs['employTree'].classList.remove('ct_box_color');
         return;
       }

@@ -374,7 +374,7 @@ export default {
                   <el-radio :label="REMARK_TYPE['after']">在昵称后</el-radio>
                 </el-radio-group>
                 <el-form-item prop="remarkName">
-                  <el-input v-model="form.remarkName" placeholder="请输入备注" :maxlength="12" show-word-limit>
+                  <el-input v-model="form.remarkName" placeholder="请输入备注" :maxlength="20" show-word-limit>
                     <template v-if="form.remarkType === REMARK_TYPE['after']" slot="prepend">客户昵称-</template>
                     <template v-if="form.remarkType === REMARK_TYPE['previous']" slot="append">-客户昵称</template>
                   </el-input>
@@ -504,7 +504,7 @@ export default {
       :visible.sync="dialogVisibleSelectUser"
       title="选择使用员工"
       alert-type=""
-      alert-text="每个获客链接最多可关联100个员工，若所选部门超出100人，只有前100个员工参与分配"
+      alert-text="每个获客链接最多可关联500个员工，若所选部门超出500人，只有前500个员工参与分配"
       alert-class="theme-el-alert"
       :selected-user-list="form.weEmpleCodeUseScops || []"
       :department-id-key="DEPARTMENT_ID_KEY"

@@ -262,7 +262,7 @@ export default {
 </script>
 
 <template>
-  <RightContainer :config-keys="['contactSecret', 'customSecret']" page-title="管理离职员工">
+  <RightContainer :config-keys="['contactSecret']" page-title="管理离职员工">
     <template v-slot:search>
       <el-form
         ref="queryForm"

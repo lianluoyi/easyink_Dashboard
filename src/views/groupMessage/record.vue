@@ -265,7 +265,6 @@ export default {
               :length="list.length"
               :btn-click="goToGroupMessageAdd"
               :btn-show-condition="getQueryObj()"
-              :btn-config="['customSecret']"
             />
           </template>
           <!-- <el-table-column type="selection" width="55" align="center" /> -->

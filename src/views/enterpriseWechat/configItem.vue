@@ -137,7 +137,7 @@ export default {
     },
     // 保存单个配置
     onSaveSingle(btnType, field) {
-      if (['customSecret'].includes(field) && !this.form[field]) {
+      if (!this.form[field]) {
         this.msgInfo('请输入要保存的内容');
         return;
       }

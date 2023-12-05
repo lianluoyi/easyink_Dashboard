@@ -499,19 +499,21 @@ export default {
           >添加{{ MEDIA_TYPE[type] }}</el-button>
         </div>
       </div>
-      <empty-default-icon
-        class="mt10 material-list-div"
-        :length="list.length"
-        text="暂无素材"
-        :btn-text="`${total === 0 && query.showMaterial !== null ? '' : '添加' + MEDIA_TYPE[type]}`"
-        :btn-click="() => edit(null, ~~type)"
-        :btn-show-condition="{ search: query.search, tagIds: query.tagIds, tagIdList }"
-        :btn-permi-key="['wechat:material:add']"
-      >
-        <div v-loading="loading" class="material-list">
-          <slot :list="list" :getList="getList" :changeList="changeList" :edit="edit" />
-        </div>
-      </empty-default-icon>
+      <div v-loading="loading" class="h100">
+        <empty-default-icon
+          class="mt10 material-list-div"
+          :length="list.length || Number(loading)"
+          text="暂无素材"
+          :btn-text="`${total === 0 && query.showMaterial !== null ? '' : '添加' + MEDIA_TYPE[type]}`"
+          :btn-click="() => edit(null, ~~type)"
+          :btn-show-condition="{ search: query.search, tagIds: query.tagIds, tagIdList }"
+          :btn-permi-key="['wechat:material:add']"
+        >
+          <div class="material-list">
+            <slot :list="list" :getList="getList" :changeList="changeList" :edit="edit" />
+          </div>
+        </empty-default-icon>
+      </div>
       <pagination
         v-show="total > 0"
         :total="total"

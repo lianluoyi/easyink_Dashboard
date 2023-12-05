@@ -4,7 +4,7 @@
 import { successCode } from '@/utils/httpCode';
 import {
   MS_TO_SECONDS, WX_TYPE, CORP_TYPE, ICON_LIST, MEDIA_TYPE_POSTER, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO,
-  MEDIA_TYPE_FILE, FILE_EXCEL_TYPE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK,
+  MEDIA_TYPE_FILE, FILE_EXCEL_TYPE, MEDIA_TYPE_TEXT, MEDIA_TYPE_IMGLINK, MAX_LONG_SIDE, MAX_SHORT_SIDE,
   MEDIA_TYPE_MINIAPP, SCOPELIST_TYPE, MEDIA_TYPE_SMARTFORM, MEDIA_TYPE_RADARLINK, ADD_WAY_MAP
 } from '@/utils/constant/index';
 import { getUserInfo } from '@/api/system/staff';
@@ -859,4 +859,14 @@ export const getSourceLabel = (options) => {
 export const removeSearchKey = (key) => {
   const allNeedClearSessionKey = Object.values(key);
   allNeedClearSessionKey.map(item => sessionStorage.removeItem(item));
+};
+/** 判断长短边限制
+ * @param {number} width
+ * @param {number} height
+ * @return {Boolean}
+ */
+export const judgeDetermineResolution = (width, height) => {
+  const longEdge = Math.max(width, height);
+  const shortEdge = Math.min(width, height);
+  return longEdge <= MAX_LONG_SIDE && shortEdge <= MAX_SHORT_SIDE;
 };

@@ -1,5 +1,5 @@
 <script>
-import { ENTERPRISE_WECHAT_CONFIG_STEP_TEXT, PUBLIC_KEY_BEGIN, PUBLIC_KEY_END } from '@/utils/constant/index';
+import { FIRST_STEP, SECOND_STEP, ENTERPRISE_WECHAT_CONFIG_STEP_TEXT, PUBLIC_KEY_BEGIN, PUBLIC_KEY_END } from '@/utils/constant/index';
 import { handleGetChatPublicKey } from '@/utils/enterpriseWechat';
 
 export default {
@@ -7,11 +7,13 @@ export default {
   props: {},
   data() {
     return {
-      active: 0,
+      active: FIRST_STEP,
       STEP_TEXT: ENTERPRISE_WECHAT_CONFIG_STEP_TEXT,
       PUBLIC_KEY: '',
       PUBLIC_KEY_BEGIN,
-      PUBLIC_KEY_END
+      PUBLIC_KEY_END,
+      FIRST_STEP,
+      SECOND_STEP
     };
   },
   computed: {
@@ -23,16 +25,14 @@ export default {
   created() {},
   methods: {
     next() {
-      // eslint-disable-next-line no-magic-numbers
-      if (this.active !== 1) {
-        this.active = this.active + 1;
+      if (this.active === FIRST_STEP) {
+        this.active = SECOND_STEP;
       } else {
         this.$emit('closeDrawer');
       }
     },
     previousStep() {
-      // eslint-disable-next-line no-magic-numbers
-      if (this.active-- < 0) this.active = 1;
+      this.active = FIRST_STEP;
     },
     async getPublicKey() {
       const data = await handleGetChatPublicKey();
@@ -50,7 +50,7 @@ export default {
         <el-step title="获取会话存档Secret" description="完成会话存档配置" />
       </el-steps>
     </div>
-    <div v-if="active === 0" class="content-div">
+    <div v-if="active === FIRST_STEP" class="content-div">
       <div class="part">
         <div class="content-text">会话存档功能为企业微信的收费功能，可免费试用30天，进入
           <el-link type="primary" href="https://work.weixin.qq.com/wework_admin/frame#financial/corpEncryptData" target="_blank">【管理工具】-【会话内容存档】</el-link>，上传《企业微信会话内容存档开通确认函》开启。
@@ -62,7 +62,7 @@ export default {
         />
       </div>
     </div>
-    <div v-if="active === 1" class="content-div">
+    <div v-if="active === SECOND_STEP" class="content-div">
       <div class="part">
         <div class="content-title">
           （1）设置可信IP地址。
@@ -104,7 +104,7 @@ export default {
       </div>
     </div>
     <div class="btn-div">
-      <el-button v-if="active != 0" style="margin-top: 12px;" @click="previousStep">上一步</el-button>
+      <el-button v-if="active != FIRST_STEP" style="margin-top: 12px;" @click="previousStep">上一步</el-button>
       <el-button type="primary" style="margin-top: 12px;" @click="next">{{ STEP_TEXT[active] }}</el-button>
     </div>
   </div>

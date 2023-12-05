@@ -172,6 +172,7 @@ export default {
     // 切换话术类型
     type(val) {
       if (val !== undefined) {
+        this.$refs?.intelligentFormListRef.resetQuery();
         this.roleKey = this.formHandlePermission(val);
         // 如果之前有选择分组的话，则不需要另外进行表单列表组件的重新搜索(watch已监听)
         if (val === INTELLIGENT_FORM_TYPE['department']) {

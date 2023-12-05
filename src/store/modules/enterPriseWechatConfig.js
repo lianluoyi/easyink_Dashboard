@@ -7,7 +7,6 @@ import { getNowConfig } from '@/api/enterpriseId';
 import Vue from 'vue';
 const enterPriseWechatConfig = {
   // 通讯录secret: contactSecret
-  // 客户联系Secret: customSecret
   // 会话存档Secret: chatSecret
   state: {
     // 公司名

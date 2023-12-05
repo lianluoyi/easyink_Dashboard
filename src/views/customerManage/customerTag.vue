@@ -4,7 +4,7 @@
  * @LastEditors: wJiaaa
 -->
 <template>
-  <RightContainer :config-keys="['customSecret']" page-title="管理企业标签">
+  <RightContainer page-title="管理企业标签">
     <template v-slot:search>
       <el-form :inline="true" :model="query" class="demo-form-inline">
         <el-form-item>
@@ -34,7 +34,7 @@
     </template>
     <template v-slot:data-stat>
       <div :class="`desc-div${type === 'group' ? ' group-desc-div' : ''}`">
-        <div>当前{{ type === 'group' ? '客户群' : '企业' }}标签已创建<span class="data-count-num">{{ tagTotal }}/3000</span></div>
+        <div>当前{{ type === 'group' ? '客户群' : '企业' }}标签已创建<span class="data-count-num">{{ tagTotal }}/10000</span></div>
         <div v-if="type === 'group'" class="gray-desc">群标签为系统标签，不可同步到企业微信</div>
       </div>
     </template>
@@ -65,7 +65,6 @@
             text="暂无数据"
             :desc="type === 'customer' ? '若首次加载，请耐心等待后台数据同步，稍后回来' : ''"
             :desc-show-condition="{ searchName: query.searchName }"
-            :desc-config="['customSecret']"
           />
         </template>
         <el-table-column type="selection" width="55" align="center" />

@@ -322,6 +322,7 @@ export default {
       this.beginTime = val ? val[0] : '';
       this.endTime = val ? val[1] : '';
       this.getTimeRangeAnalyseCount();
+      this.getChannelSort();
     },
     /**
      * 获取折线图数据
@@ -345,7 +346,11 @@ export default {
      * 获取点击人数排行
      */
     getChannelSort() {
-      getChannelSort({ radarId: this.radarId }).then((res) => {
+      getChannelSort({
+        radarId: this.radarId,
+        beginTime: this.beginTime,
+        endTime: this.endTime
+      }).then((res) => {
         this.channelList = res.data;
       });
     }
