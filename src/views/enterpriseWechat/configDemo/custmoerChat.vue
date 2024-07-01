@@ -23,6 +23,9 @@ export default {
   },
   watch: {},
   created() {},
+  mounted() {
+    this.getPublicKey();
+  },
   methods: {
     next() {
       if (this.active === FIRST_STEP) {
