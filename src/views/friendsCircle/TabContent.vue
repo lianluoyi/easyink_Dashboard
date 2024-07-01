@@ -25,8 +25,8 @@ export default {
   components: { RightContainer, EmptyDefaultIcon },
   props: {
     usersId: {
-      type: String,
-      default: ''
+      type: Array,
+      default: () => []
     },
     momentTaskId: {
       type: String,
@@ -55,7 +55,6 @@ export default {
         publishStatus: '',
         userName: ''
       },
-      AllUsersIds: [],
       total: 0,
       loading: false,
       list: [],
@@ -66,7 +65,6 @@ export default {
   computed: {},
   watch: {},
   created() {
-    this.AllUsersIds = this.usersId.split(',');
     this.listOfMomentPublishDetail();
   },
   mounted() {},
@@ -117,7 +115,7 @@ export default {
           this.msgSuccess('提醒成功');
         });
       } else {
-        userIds = this.AllUsersIds;
+        userIds = this.usersId;
         this.$confirm('向未发布朋友圈的员工发出任务提醒，是否继续？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

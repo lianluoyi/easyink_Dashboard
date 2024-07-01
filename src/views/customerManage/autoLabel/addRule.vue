@@ -484,6 +484,7 @@ export default {
           break;
         }
       }
+      this.msgSuccess('操作成功');
       changeButtonLoading(this.$store, 'submit');
       this.$router.go(-1);
       return newParams;
@@ -574,6 +575,7 @@ export default {
           break;
         }
       }
+      this.msgSuccess('操作成功');
       changeButtonLoading(this.$store, 'submit');
       this.$router.go(-1);
     },

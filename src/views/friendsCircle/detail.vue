@@ -174,7 +174,7 @@ export default {
       </template>
     </Statistics>
     <el-tabs v-if="data.momentTaskId" class="group-message-detail-page-table mt15">
-      <TabContent :users-id="data.users" :moment-task-id="data.momentTaskId" :send-time="data.sendTime" :type="data.type" @refshTime="refshTime" />
+      <TabContent :users-id="data.remindUserIdList" :moment-task-id="data.momentTaskId" :send-time="data.sendTime" :type="data.type" @refshTime="refshTime" />
     </el-tabs>
   </div>
 </template>

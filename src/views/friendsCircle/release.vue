@@ -23,6 +23,7 @@ import FriendsUpload from './friendsUpload.vue';
 import { getWordsUrlContent } from '@/api/wordsGroup';
 import { createFriendsCircle, updateMoment, getMomentTaskBasicInfo } from '@/api/friends';
 import { changeButtonLoading, groupByScopeType, checkChange, judgeDetermineResolution } from '@/utils/common';
+import { v4 as uuidv4 } from 'uuid';
 // import { getRadaList } from '@/api/radar';
 import moment from 'moment';
 // 朋友圈为图片时，素材库显示的title最大选取数量
@@ -377,7 +378,7 @@ export default {
               item.url = item.addressUrl;
             }
           });
-          form = this.dealUserDepAndTag(form);
+          form = { ...this.dealUserDepAndTag(form), tokenId: uuidv4() };
           return form.momentTaskId ? updateMoment(form) : createFriendsCircle(form);
         }).then(() => {
           changeButtonLoading(this.$store, 'submit');

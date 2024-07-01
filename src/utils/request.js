@@ -6,7 +6,6 @@ import { getToken } from '@/utils/auth';
 import { errorCode, successCode, otherCode } from '@/utils/httpCode';
 const ERR_MSG_DURATION = 2000;
 const SUCCESS_MSG_DURATION = 2000;
-const AXIOS_TIMEOUT = 60000;
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8';
 // 创建axios实例
@@ -15,9 +14,7 @@ const request = axios.create({
   baseURL:
     process.env.NODE_ENV === 'development'
       ? '/api'
-      : process.env.VUE_APP_BASE_API,
-  // 超时
-  timeout: AXIOS_TIMEOUT
+      : process.env.VUE_APP_BASE_API
 });
 // request拦截器
 request.interceptors.request.use(
