@@ -154,7 +154,8 @@ export default {
       const list = [
         ...defaultList,
         ...filterExtraList,
-        ...customList
+        ...customList,
+        { id: 'unionId', name: '客户unionId' }
       ];
       return list;
     }

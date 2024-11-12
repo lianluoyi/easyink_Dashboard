@@ -77,7 +77,7 @@ export default {
       }
       // 过滤掉未启用的字段
       defaultPropertyList = defaultPropertyList.filter(item => [
-        'customer', 'remark', 'source', 'createTime', 'userName', 'department', 'tag', 'status',
+        'customer', 'remark', 'source', 'createTime', 'userName', 'department', 'tag', 'status', 'unionId',
         ...this.allCustomerPropertyIds
       ].includes(item.id));
       this.selected = defaultPropertyList || [];

@@ -41,8 +41,20 @@ export default {
   },
   data() {
     return {
-      calendarVal: new Date()
+      calendarVal: new Date(),
+      isFirstWatch: true
     };
+  },
+  watch: {
+    ruleList: {
+      handler(val) {
+        if (this.isFirstWatch && val && val.length) {
+          this.calendarVal = new Date(val[0].alertData2);
+          this.isFirstWatch = false;
+        }
+      },
+      immediate: true
+    }
   },
   created() {},
   mounted() {},

@@ -100,7 +100,7 @@
         <div class="config-title">SOP规则</div>
         <div>
           <el-radio-group
-            v-if="sopType === SOP_TYPE['groupCalendar']"
+            v-if="[SOP_TYPE['groupCalendar'], SOP_TYPE['activity']].includes(sopType)"
             v-model="ruleListType"
             class="rule-type"
             size="medium"
@@ -110,14 +110,28 @@
           </el-radio-group>
         </div>
       </div>
-      <SOPRuleList
+      <div
         v-if="ruleListType === 'timeline'"
-        :rule-list="ruleList"
-        :sop-type="sopType"
-      />
-      <div v-if="ruleListType === 'calendar'" class="calendar-div">
+        class="flex"
+      >
+        <SOPRuleList
+          :rule-list="ruleList"
+          :sop-type="sopType"
+        />
+        <TimeLinePreviewCard
+          v-if="
+            [SOP_TYPE['newCustomer'], SOP_TYPE['timing']].includes(sopType) &&
+              ruleList &&
+              ruleList.length > 0
+          "
+          :rule-list="ruleList"
+          class="preview-card"
+          @handleShowDetail="handleEditCalendarItem"
+        />
+      </div>
+
+      <div v-if="['calendar', 'activity'].includes(ruleListType)" class="calendar-div">
         <SopCalendar
-          ref="sopCalendarRef"
           :rule-list="ruleList"
           @handleEditCalendarItem="handleEditCalendarItem"
         />
@@ -146,6 +160,7 @@ import SOPRuleList from '../components/SOPRuleList.vue';
 import { RULE_PERFORM_TYPE, SOP_TYPE } from '@/utils/constant/index';
 import UseEmployeeModal from '../components/UseEmployeeModal.vue';
 import SopCalendar from './sopCalendar.vue';
+import TimeLinePreviewCard from './timeLinePreviewCard.vue';
 import AddRuleDrawer from '../components/AddRuleDrawer.vue';
 import ByLengthUserShow from '@/components/ByLengthUserShow';
 import CustomerScopeModel from '../components/CustomerScopeModel.vue';
@@ -157,6 +172,7 @@ export default {
     SOPRuleList,
     UseEmployeeModal,
     SopCalendar,
+    TimeLinePreviewCard,
     AddRuleDrawer,
     ByLengthUserShow,
     CustomerScopeModel
@@ -269,13 +285,6 @@ export default {
       return (list && [...list]) || [];
     }
   },
-  watch: {
-    ruleList(val) {
-      if (val && val.length && this.$refs?.sopCalendarRef) {
-        this.$refs.sopCalendarRef.calendarVal = new Date(val[0].alertData2);
-      }
-    }
-  },
   created() {
     // 群日历规则展示类型默认为日历形式
     if (this.sopType === SOP_TYPE['groupCalendar']) {
@@ -359,6 +368,8 @@ export default {
     background-color: #fff;
     flex: 1;
     padding: 20px;
+    overflow-x: auto;
+    max-height: calc(100vh - 380px);
     .rule-list-header {
       justify-content: space-between;
       .config-title {
@@ -374,6 +385,12 @@ export default {
     /deep/ .sop-rule-list {
       padding-left: 24px;
     }
+  }
+  .preview-card {
+    margin-left: 42px;
+    margin-top: 24px;
+    margin-right: 42px;
+    min-width: 552px;
   }
 }
 </style>
