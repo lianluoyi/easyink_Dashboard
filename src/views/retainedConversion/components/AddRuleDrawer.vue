@@ -35,7 +35,7 @@
           />
         </el-form-item>
         <el-form-item label="提醒时间" prop="alertInfo">
-          <AlertTimeEditItem :form-data.sync="formData" :sop-type="sopType" />
+          <AlertTimeEditItem :form-data.sync="formData" :sop-type="sopType" :disable-edit="disableEdit" />
         </el-form-item>
         <el-form-item label="发送内容" prop="materialList">
           <template v-for="(item, contentIndex) in formData.materialList">

@@ -143,7 +143,7 @@
             SOP规则<span>{{ dealDescription().tip }}</span>
           </p>
           <el-radio-group
-            v-if="sopType === SOP_TYPE['groupCalendar']"
+            v-if="[SOP_TYPE['groupCalendar'], SOP_TYPE['activity']].includes(sopType)"
             v-model="ruleListType"
             class="rule-type mb15"
             size="medium"
@@ -153,15 +153,28 @@
           </el-radio-group>
           <div v-if="ruleListType === 'timeline'" class="rule-list">
             <el-button type="primary" icon="el-icon-plus" @click="addRule">添加规则</el-button>
-            <SOPRuleList
-              :rule-list="sopForm.ruleList"
-              :show-tool="true"
-              :sop-type="sopType"
-              @handleEdit="handleEdit"
-              @handleDelRule="handleDelRule"
-            />
+            <div class="flex">
+              <SOPRuleList
+                :rule-list="sopForm.ruleList"
+                :show-tool="true"
+                :sop-type="sopType"
+                @handleEdit="handleEdit"
+                @handleDelRule="handleDelRule"
+              />
+              <TimeLinePreviewCard
+                v-if="
+                  [SOP_TYPE['newCustomer'], SOP_TYPE['timing']].includes(sopType) &&
+                    sopForm.ruleList &&
+                    sopForm.ruleList.length > 0
+                "
+                :rule-list="sopForm.ruleList"
+                :is-edit="true"
+                class="preview-card"
+                @handleEdit="handleEdit"
+              />
+            </div>
           </div>
-          <div v-if="ruleListType === 'calendar'" class="calendar-div">
+          <div v-if="['calendar', 'activity'].includes(ruleListType)" class="calendar-div">
             <SopCalendar
               :rule-list="sopForm.ruleList"
               @handleClickCalendar="handleClickCalendar"
@@ -232,6 +245,7 @@ import ReturnPage from '@/components/ReturnPage.vue';
 import SelectUser from '@/components/SelectUser/index.vue';
 import AddRuleDrawer from '../components/AddRuleDrawer.vue';
 import SOPRuleList from '../components/SOPRuleList.vue';
+import TimeLinePreviewCard from './timeLinePreviewCard.vue';
 import {
   SOP_TYPE,
   CUSTOMER_PROPERTY_VALUE,
@@ -263,6 +277,7 @@ export default {
     SelectUser,
     AddRuleDrawer,
     SOPRuleList,
+    TimeLinePreviewCard,
     CustomerGroupModal,
     SelectTag,
     SopCalendar,
@@ -916,6 +931,12 @@ export default {
     .range-item-tip {
       color: $grayColor;
     }
+  }
+  .preview-card {
+    margin-left: 42px;
+    margin-top: 24px;
+    margin-right: 42px;
+    min-width: 552px;
   }
 }
 </style>

@@ -6,7 +6,7 @@
 <template>
   <div class="alert-time-edit-item-div">
     <el-radio-group v-if="sopType === SOP_TYPE['newCustomer']" v-model="formData.alertType" class="remind-time-radio">
-      <el-radio :label="RULE_PERFORM_TYPE['hourMinute']">客户添加员工
+      <el-radio v-if="!(disableEdit && formData.alertType !== RULE_PERFORM_TYPE['hourMinute'])" :label="RULE_PERFORM_TYPE['hourMinute']">客户添加员工
         <el-input-number
           v-model="formData.alertInfo.hourMinute.hour"
           style="width: 70px;"
@@ -24,7 +24,7 @@
           :controls="false"
         /> 分钟后提醒员工发送内容
       </el-radio>
-      <el-radio :label="RULE_PERFORM_TYPE['dayTime']">客户添加员工第
+      <el-radio v-if="!(disableEdit && formData.alertType !== RULE_PERFORM_TYPE['dayTime'])" :label="RULE_PERFORM_TYPE['dayTime']">客户添加员工第
         <el-input-number
           v-model="formData.alertInfo.dayTime.day"
           style="width: 70px;"
@@ -90,7 +90,7 @@
       </el-radio>
     </el-radio-group>
     <el-radio-group v-if="sopType === SOP_TYPE['timing']" v-model="formData.alertType" class="remind-time-radio">
-      <el-radio :label="RULE_PERFORM_TYPE['hourMinute']">群聊加入SOP
+      <el-radio v-if="!(disableEdit && formData.alertType !== RULE_PERFORM_TYPE['hourMinute'])" :label="RULE_PERFORM_TYPE['hourMinute']">群聊加入SOP
         <el-input-number
           v-model="formData.alertInfo.hourMinute.hour"
           style="width: 70px;"
@@ -108,7 +108,7 @@
           :controls="false"
         /> 分钟后提醒员工发送内容
       </el-radio>
-      <el-radio :label="RULE_PERFORM_TYPE['dayTime']">群聊加入SOP第
+      <el-radio v-if="!(disableEdit && formData.alertType !== RULE_PERFORM_TYPE['dayTime'])" :label="RULE_PERFORM_TYPE['dayTime']">群聊加入SOP第
         <el-input-number
           v-model="formData.alertInfo.dayTime.day"
           style="width: 70px;"
@@ -198,6 +198,10 @@ export default {
     formData: {
       type: Object,
       default: () => {}
+    },
+    disableEdit: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

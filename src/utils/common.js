@@ -23,7 +23,7 @@ export const WEEK_TIME = moment().subtract(ONE_WEEK_DAY, 'days').format('YYYY-MM
 export const ONE_HUNDRED_AND_EIGHTY = 180;
 export const FIXED_DAYS_AGO_TIME = moment().subtract(ONE_HUNDRED_AND_EIGHTY, 'days').format('YYYY-MM-DD');
 // 一个月之前
-export const ONE_MOUNTH_AGO = (time) => {
+export const ONE_MOUNTH_AGO = (time = new Date()) => {
   return moment(time).subtract(1, 'month').format('YYYY-MM-DD');
 };
 // 一个月之后

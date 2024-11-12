@@ -5,6 +5,10 @@ import { PAGE_LIMIT, GROUP_MESSAGE_PUSH_TYPE_GROUP, MESSAGE_MEDIA_TYPE, MEDIA_TY
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import RightContainer from '@/components/RightContainer';
 import loadingMixin from '@/mixin/loadingMixin';
+import { ONE_MOUNTH_AGO, TODAY_TIME } from '@/utils/common';
+
+// eslint-disable-next-line no-magic-numbers
+const ONE_MONTH = 30 * 24 * 3600 * 1000;
 export default {
   name: 'Operlog',
   components: { EmptyDefaultIcon, RightContainer },
@@ -26,7 +30,7 @@ export default {
       // 表格数据
       list: [],
       // 日期范围
-      dateRange: [],
+      dateRange: [ONE_MOUNTH_AGO(), TODAY_TIME],
       // 查询参数
       query: {
         pageNum: 1,
@@ -41,9 +45,20 @@ export default {
         0: '发给客户',
         1: '发给客户群'
       },
+      // 日期范围选择限定
       pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now(); // 选当前时间之前的时间
+        disabledDate: (v) => {
+          if (this.selectDate !== '') {
+            const minTime = this.selectDate - ONE_MONTH;
+            const maxTime = this.selectDate + ONE_MONTH;
+            return v.getTime() < minTime || v.getTime() > maxTime;
+          }
+        },
+        onPick: ({ maxDate, minDate }) => {
+          this.selectDate = minDate.getTime();
+          if (maxDate) {
+            this.selectDate = '';
+          }
         }
       },
       GROUP_MESSAG_STATUS_SENDED
@@ -87,7 +102,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
+      this.dateRange = this.$options.data().dateRange;
       this.query = this.$options.data().query;
       this.getList(1);
     },
@@ -228,6 +243,7 @@ export default {
               type="daterange"
               range-separator="-"
               start-placeholder="开始日期"
+              :clearable="false"
               end-placeholder="结束日期"
             />
           </el-form-item>
