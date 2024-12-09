@@ -1,7 +1,7 @@
 <!--
  * @Description: 导出客户弹窗
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: chenchengjie
 -->
 <template>
   <el-dialog v-bind="$attrs" title="导出客户" class="export-customer-modal" v-on="$listeners" @close="onClose">
@@ -37,6 +37,16 @@ export default {
     query: {
       type: Object,
       default: () => {}
+    },
+    // 是否为代开发应用，即多租户版本
+    isDKCorp: {
+      type: Boolean,
+      default: false
+    },
+    // 是否有配置自建应用服务接口
+    isConfigSelfBuildUrl: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -70,16 +80,41 @@ export default {
     dealSelected(list) {
       const defaultProperty = window.localStorage.getItem(`exportProperty-${this.loginUserId}-${store.getters.corpId}`);
       let defaultPropertyList;
-      if (defaultProperty || defaultProperty === '') {
-        defaultPropertyList = JSON.parse(defaultProperty)?.list;
+      if (defaultProperty && defaultProperty !== '') {
+        // 将local缓存的name字段与最新的name做一次map
+        defaultPropertyList = JSON.parse(defaultProperty)?.list.map((item) => {
+          const current = list.find(p => {
+            return p.id === item.id;
+          });
+          if (current) {
+            return { ...item, name: current.name };
+          }
+          return item;
+        });
       } else {
         defaultPropertyList = [...list];
       }
       // 过滤掉未启用的字段
-      defaultPropertyList = defaultPropertyList.filter(item => [
-        'customer', 'remark', 'source', 'createTime', 'userName', 'department', 'tag', 'status', 'unionId',
-        ...this.allCustomerPropertyIds
-      ].includes(item.id));
+      defaultPropertyList = defaultPropertyList.filter((item) => {
+        const property = [
+          'customer',
+          'remark',
+          'source',
+          'createTime',
+          'userName',
+          'department',
+          'tag',
+          'status',
+          'unionId',
+          'externalUserId',
+          ...this.allCustomerPropertyIds
+        ];
+        if (this.isDKCorp && this.isConfigSelfBuildUrl) {
+          property.push('originExternalUserId');
+        }
+        return property.includes(item.id);
+      }
+      );
       this.selected = defaultPropertyList || [];
     },
     /**

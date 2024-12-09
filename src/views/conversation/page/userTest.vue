@@ -102,14 +102,12 @@
             <el-tab-pane class="tabthree-tab-pane" label="全部" :name="MSG_TYPE_ALL">
               <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
+                  <DatePicker
                     align="right"
+                    :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter"
+                    type="daterange"
+                    :time.sync="takeTime"
+                    value-format="yyyy-MM-dd"
                     @change="activeNameThreeClick"
                   />
                 </div>
@@ -128,14 +126,12 @@
             <el-tab-pane class="tabthree-tab-pane" label="图片" :name="MSG_TYPE_IMG">
               <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
+                  <DatePicker
                     align="right"
+                    :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter"
+                    type="daterange"
+                    :time.sync="takeTime"
+                    value-format="yyyy-MM-dd"
                     @change="activeNameThreeClick"
                   />
                 </div>
@@ -154,14 +150,12 @@
             <el-tab-pane class="tabthree-tab-pane" label="视频" :name="MSG_TYPE_VIDEO">
               <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
+                  <DatePicker
                     align="right"
+                    :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter"
+                    type="daterange"
+                    :time.sync="takeTime"
+                    value-format="yyyy-MM-dd"
                     @change="activeNameThreeClick"
                   />
                 </div>
@@ -180,14 +174,12 @@
             <el-tab-pane class="tabthree-tab-pane" label="文件" :name="MSG_TYPE_FILE">
               <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
+                  <DatePicker
                     align="right"
+                    :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter"
+                    type="daterange"
+                    :time.sync="takeTime"
+                    value-format="yyyy-MM-dd"
                     @change="activeNameThreeClick"
                   />
                 </div>
@@ -229,14 +221,12 @@
             <el-tab-pane class="tabthree-tab-pane" label="图文链接" :name="MSG_TYPE_LINK">
               <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
+                  <DatePicker
                     align="right"
+                    :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter"
+                    type="daterange"
+                    :time.sync="takeTime"
+                    value-format="yyyy-MM-dd"
                     @change="activeNameThreeClick"
                   />
                 </div>
@@ -255,14 +245,12 @@
             <el-tab-pane class="tabthree-tab-pane" label="语音通话" :name="MSG_TYPE_VOICE">
               <div v-loading="contentLoading" class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
+                  <DatePicker
                     align="right"
+                    :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter"
+                    type="daterange"
+                    :time.sync="takeTime"
+                    value-format="yyyy-MM-dd"
                     @change="activeNameThreeClick"
                   />
                 </div>
@@ -303,6 +291,8 @@
   </div>
 </template>
 <script>
+import DatePicker from '@/components/DatePicker';
+import moment from 'moment';
 import list from '../component/customerList.vue';
 import chats from '../component/chat.vue';
 import grouplist from '../component/groupList.vue';
@@ -317,7 +307,7 @@ import {
   downloadAMR
 } from '@/utils/common.js';
 import { listDistinct, listDistinctCount } from '@/api/customer/index';
-import { DEFAULT_PAGE_NUM, PAGE_LIMIT_TWENTY, MSG_TYPE, MSG_TYPE_VIDEO, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_ALL } from '@/utils/constant/index';
+import { DATE_DISABLED_TYPE, DEFAULT_PAGE_NUM, PAGE_LIMIT_TWENTY, MSG_TYPE, MSG_TYPE_VIDEO, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_ALL } from '@/utils/constant/index';
 const GROUP_CHAT = '2';
 const PRIVATE_CHAT = '0'; // 单聊
 export default {
@@ -325,17 +315,19 @@ export default {
     list,
     chats,
     grouplist,
-    EmptyDefaultIcon
+    EmptyDefaultIcon,
+    DatePicker
   },
   data() {
     return {
+      DATE_DISABLED_TYPE,
       employAmount: 0,
       employName: '',
       talkName: '',
       chatContent: '',
       activeName: PRIVATE_CHAT,
       activeNameThree: '0',
-      takeTime: '',
+      takeTime: [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
       fileData: [],
       CList: [],
       personList: [],
@@ -382,6 +374,7 @@ export default {
   methods: {
     filterSize,
     chatFn(data) {
+      this.takeTime = [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')];
       this.chatData = data;
       this.activeNameThreeClick();
     },
@@ -410,6 +403,7 @@ export default {
       this.customerList();
     },
     groupFn(data) {
+      this.takeTime = [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')];
       this.chatData = data;
       this.activeNameThreeClick('', true);
     },

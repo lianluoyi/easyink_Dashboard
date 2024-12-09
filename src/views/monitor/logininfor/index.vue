@@ -40,15 +40,12 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-date-picker
-              v-model="dateRange"
-              size="small"
-              style="width: 240px"
-              value-format="yyyy-MM-dd"
+            <DatePicker
+              style="width:240px"
+              align="right"
               type="daterange"
-              range-separator="-"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
+              :time.sync="dateRange"
+              value-format="yyyy-MM-dd"
             />
           </el-form-item>
           <el-form-item>
@@ -133,13 +130,15 @@
 </template>
 
 <script>
+import DatePicker from '@/components/DatePicker';
 import { list, delLogininfor, cleanLogininfor, exportLogininfor } from '@/api/monitor/logininfor';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import loadingMixin from '@/mixin/loadingMixin';
+import moment from 'moment';
 export default {
   name: 'Logininfor',
-  components: { RightContainer },
+  components: { RightContainer, DatePicker },
   mixins: [loadingMixin],
   data() {
     return {
@@ -158,7 +157,7 @@ export default {
       // 状态数据字典
       statusOptions: [],
       // 日期范围
-      dateRange: [],
+      dateRange: [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -198,7 +197,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
+      this.dateRange = [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')];
       this.resetForm('queryForm');
       this.handleQuery();
     },
