@@ -24,6 +24,16 @@
               />
             </el-form-item>
             <el-form-item>
+              <DatePicker
+                :default-time="['00:00:00', '23:59:59']"
+                style="width:240px"
+                align="right"
+                type="datetimerange"
+                :time.sync="form.dateRange"
+                value-format="yyyy-MM-dd HH:mm:ss"
+              />
+            </el-form-item>
+            <el-form-item>
               <el-button
                 v-preventReClick="200"
                 type="primary"
@@ -145,6 +155,8 @@
   </el-tabs>
 </template>
 <script>
+import DatePicker from '@/components/DatePicker';
+import moment from 'moment';
 import * as sensitiveApis from '@/api/conversation/security';
 import SelectUser from '@/components/SelectUser/index.vue';
 import { PAGE_LIMIT, SCOPE_TYPE, WX_TYPE } from '@/utils/constant/index';
@@ -160,7 +172,8 @@ export default {
     setSensitiveWord,
     RightContainer,
     EmptyDefaultIcon,
-    CheckContext
+    CheckContext,
+    DatePicker
   },
   mixins: [loadingMixin],
   data() {
@@ -171,6 +184,7 @@ export default {
         pageNum: 1,
         scopeType: '',
         auditScopeId: '',
+        dateRange: [moment().subtract(1, 'month').format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD 23:59:59')],
         keyword: '' // 关键词
       },
       selectDate: '',
@@ -248,8 +262,14 @@ export default {
     getSensitiveList(pageNum) {
       if (pageNum) this.form.pageNum = pageNum;
       this.form.scopeType = SCOPE_TYPE['personal'];
+      const payload = {
+        ...this.form,
+        beginTime: this.form.dateRange[0],
+        endTime: this.form.dateRange[1]
+      };
+      delete payload.dateRange;
       this.loading = true;
-      sensitiveApis.getSecurityList(this.form).then((res) => {
+      sensitiveApis.getSecurityList(payload).then((res) => {
         this.tableData = res.rows;
         this.total = Number(res.total);
       }).finally(() => {
@@ -286,6 +306,7 @@ export default {
         pageNum: 1,
         scopeType: '',
         auditScopeId: '',
+        dateRange: [moment().subtract(1, 'month').format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD 23:59:59')],
         keyword: '' // 关键词
       };
       // 选择的员工

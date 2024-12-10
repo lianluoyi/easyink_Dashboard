@@ -1,7 +1,7 @@
 <!--
  * @Description: sop任务列表公共样式
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: chenchengjie
 -->
 <template>
   <div class="sop-list-page">
@@ -106,6 +106,7 @@
           <el-table-column v-if="showUseEmployees" key="row-3" label="使用员工" prop="scopeList" align="left" :show-overflow-tooltip="true">
             <template slot-scope="{ row }">
               <ListUserShow
+                v-if="row.scopeList"
                 :use-user-name="getUseUserName(row.scopeList.map(item => item.type === SCOPELIST_TYPE.USER ? item.userName : undefined).filter(item => item && item.trim()))"
                 :department-name="getUseUserName(row.scopeList.map(item => item.type === SCOPELIST_TYPE.DEPARTMENT ? item.departmentName : undefined).filter(item => item && item.trim()))"
               />

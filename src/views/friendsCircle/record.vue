@@ -11,7 +11,10 @@ import RightContainer from '@/components/RightContainer';
 import { getFriendsList, deleteMoment } from '@/api/friends';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import Content from './Content';
+import DatePicker from '@/components/DatePicker';
 import loadingMixin from '@/mixin/loadingMixin';
+import { DATE_DISABLED_TYPE } from '@/utils/constant/index';
+import moment from 'moment';
 // 发布类型（0：企业 1：个人）
 const type = 1;
 // 任务类型（0：立即发送 1：定时发送）
@@ -21,7 +24,7 @@ const HAS_SEND = 3;
 const NOT_SEND = 0;
 export default {
   name: 'Operlog',
-  components: { RightContainer, Content, EmptyDefaultIcon },
+  components: { RightContainer, Content, EmptyDefaultIcon, DatePicker },
   filters: {
     sendInfo(data) {
       return `已发布员工 ${data.publishNum}人\n待发布员工 ${data.notPublishNum}人`;
@@ -30,6 +33,7 @@ export default {
   mixins: [loadingMixin],
   data() {
     return {
+      DATE_DISABLED_TYPE,
       // 遮罩层
       loading: false,
       // 选中数组
@@ -41,7 +45,7 @@ export default {
       // 表格数据
       list: [],
       // 日期范围
-      dateRange: [],
+      dateRange: [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
       type,
       taskType,
       // 查询参数
@@ -52,11 +56,6 @@ export default {
         content: undefined,
         endTime: undefined,
         type: undefined
-      },
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now(); // 选当前时间之前的时间
-        }
       },
       // 发布类型 发布类型（-1全部 0：企业 1：个人）
       options: [{ label: '全部', value: -1 }, { label: '个人', value: 1 }, { label: '企业', value: 0 }]
@@ -96,7 +95,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
+      this.dateRange = [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')];
       this.query = this.$options.data().query;
       this.getFriendsCircleList(1);
     },
@@ -180,15 +179,7 @@ export default {
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-date-picker
-              v-model="dateRange"
-              :picker-options="pickerOptions"
-              value-format="yyyy-MM-dd"
-              type="daterange"
-              range-separator="-"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-            />
+            <DatePicker :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter" type="daterange" :time.sync="dateRange" value-format="yyyy-MM-dd" />
           </el-form-item>
           <el-form-item label=" ">
             <el-button

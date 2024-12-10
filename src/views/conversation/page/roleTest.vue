@@ -14,15 +14,13 @@
               <el-input v-model="form.Scontent" placeholder="请输入聊天内容" style="width:240px" />
             </el-form-item>
             <el-form-item>
-              <el-date-picker
-                v-model="form.Stime"
-                style="width:240px"
-                type="datetimerange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                align="right"
+              <DatePicker
                 :default-time="['00:00:00', '23:59:59']"
+                style="width:240px"
+                align="right"
+                type="datetimerange"
+                :time.sync="form.Stime"
+                value-format="yyyy-MM-dd HH:mm:ss"
               />
             </el-form-item>
             <el-form-item>
@@ -137,6 +135,7 @@
   </div>
 </template>
 <script>
+import DatePicker from '@/components/DatePicker';
 import {
   content
 } from '@/api/content.js';
@@ -148,8 +147,9 @@ import { PAGE_LIMIT, CORP_TYPE } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import CheckContext from '../component/CheckContext.vue';
 import loadingMixin from '@/mixin/loadingMixin';
+import moment from 'moment';
 export default {
-  components: { RightContainer, chat, EmptyDefaultIcon, CheckContext },
+  components: { RightContainer, chat, EmptyDefaultIcon, CheckContext, DatePicker },
   mixins: [loadingMixin],
   data() {
     return {
@@ -159,7 +159,7 @@ export default {
         Ename: '',
         Cname: '',
         Scontent: '',
-        Stime: ''
+        Stime: [moment().subtract(1, 'month').format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD 23:59:59')]
       },
       currentPage: 1,
       total: 0,
@@ -320,7 +320,7 @@ export default {
         Ename: '',
         Cname: '',
         Scontent: '',
-        Stime: ''
+        Stime: [moment().subtract(1, 'month').format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD 23:59:59')]
       };
       this.searchList();
     },

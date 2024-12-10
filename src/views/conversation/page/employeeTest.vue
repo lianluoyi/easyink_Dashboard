@@ -93,16 +93,13 @@
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
                   </el-date-picker> -->
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    align="right"
+                  <DatePicker
                     unlink-panels
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    :picker-options="pickerOptions"
+                    align="right"
+                    :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter"
+                    type="daterange"
+                    :time.sync="takeTime"
+                    value-format="yyyy-MM-dd"
                     @change="loadMessageList"
                   />
                 </div>
@@ -124,18 +121,7 @@
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
                   </el-date-picker> -->
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    align="right"
-                    unlink-panels
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    :picker-options="pickerOptions"
-                    @change="loadMessageList"
-                  />
+                  <DatePicker unlink-panels align="right" :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter" type="daterange" :time.sync="takeTime" value-format="yyyy-MM-dd" @change="loadMessageList" />
                 </div>
                 <chat :all-chat="allChat" :chat-data="chat" chat-type="employee" />
                 <el-pagination
@@ -155,18 +141,7 @@
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
                   </el-date-picker> -->
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    align="right"
-                    unlink-panels
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    :picker-options="pickerOptions"
-                    @change="loadMessageList"
-                  />
+                  <DatePicker unlink-panels align="right" :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter" type="daterange" :time.sync="takeTime" value-format="yyyy-MM-dd" @change="loadMessageList" />
                 </div>
                 <chat :all-chat="allChat" :chat-data="chat" chat-type="employee" />
                 <el-pagination
@@ -186,18 +161,7 @@
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
                   </el-date-picker> -->
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    align="right"
-                    unlink-panels
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    :picker-options="pickerOptions"
-                    @change="loadMessageList"
-                  />
+                  <DatePicker unlink-panels align="right" :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter" type="daterange" :time.sync="takeTime" value-format="yyyy-MM-dd" @change="loadMessageList" />
                 </div>
                 <el-table :data="allChat" style="width: 100%">
                   <template slot="empty">
@@ -240,18 +204,7 @@
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
                   </el-date-picker> -->
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    align="right"
-                    unlink-panels
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    :picker-options="pickerOptions"
-                    @change="loadMessageList"
-                  />
+                  <DatePicker unlink-panels align="right" :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter" type="daterange" :time.sync="takeTime" value-format="yyyy-MM-dd" @change="loadMessageList" />
                 </div>
                 <chat :all-chat="allChat" :chat-data="chat" chat-type="employee" />
                 <el-pagination
@@ -271,18 +224,7 @@
                   <!-- <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="loadMessageList">
                   </el-date-picker> -->
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="daterange"
-                    format="yyyy-MM-dd"
-                    align="right"
-                    unlink-panels
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    :picker-options="pickerOptions"
-                    @change="loadMessageList"
-                  />
+                  <DatePicker unlink-panels align="right" :disabled-type="DATE_DISABLED_TYPE.acrossMonthAndAfter" type="daterange" :time.sync="takeTime" value-format="yyyy-MM-dd" @change="loadMessageList" />
                 </div>
                 <el-table :data="allChat" style="width: 100%">
                   <template slot="empty">
@@ -320,18 +262,20 @@
   </div>
 </template>
 <script>
+import DatePicker from '@/components/DatePicker';
 import list from '../component/list.vue';
 import chat from '../component/chat.vue';
 import insideList from '../component/insideList.vue';
 import grouplist from '../component/groupList.vue';
 import UserTree from '@/components/SelectUser/UserTree.vue';
+import moment from 'moment';
 import {
   content
 } from '@/api/content.js';
 import {
   yearMouthDay, downloadFile, filterSize, downloadAMR
 } from '@/utils/common.js';
-import { PAGE_LIMIT_TWENTY, DEFAULT_PAGE_NUM, PAGE_LIMIT, MSG_TYPE, MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO } from '@/utils/constant/index';
+import { DATE_DISABLED_TYPE, PAGE_LIMIT_TWENTY, DEFAULT_PAGE_NUM, PAGE_LIMIT, MSG_TYPE, MSG_TYPE_ALL, MSG_TYPE_IMG, MSG_TYPE_FILE, MSG_TYPE_LINK, MSG_TYPE_VOICE, MSG_TYPE_VIDEO } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 const CONTACT_TYPE_INNER = '0';
 const CONTACT_TYPE_EXTERNAL = '1';
@@ -364,17 +308,19 @@ export default {
     insideList,
     chat,
     UserTree,
-    EmptyDefaultIcon
+    EmptyDefaultIcon,
+    DatePicker
   },
   data() {
     return {
+      DATE_DISABLED_TYPE,
       employId: '',
       employName: '',
       talkName: '',
       contactTypeTabs: Object.entries(CONTACT_TAB_TYPE).map(arr => ({ value: arr[0], label: arr[1] })),
       contactTabType: CONTACT_TYPE_EXTERNAL,
       msgTabType: MSG_TYPE_ALL,
-      takeTime: '',
+      takeTime: [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
       chat: {},
       personList: [],
       loading: false,
@@ -506,6 +452,7 @@ export default {
       }
     },
     chatFn(data) {
+      this.takeTime = [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')];
       this.chat = data;
       if (data) {
         this.chat.receiveName = data.receiveWeCustomer ? data.receiveWeCustomer.name : data.receiveWeUser?.name || '';
@@ -516,6 +463,7 @@ export default {
      * 点击群聊
      */
     groupFn(data) {
+      this.takeTime = [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')];
       this.chat = data;
       if (data.roomId) this.chat.receiveName = data.roomInfo.groupName;
       this.loadMessageList('');

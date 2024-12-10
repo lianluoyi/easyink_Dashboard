@@ -121,15 +121,12 @@
             :value="item.value"
           />
         </el-select>
-        <el-date-picker
-          v-model="searchForm.dateRange"
+        <DatePicker
           style="border-top-left-radius:0px;border-bottom-left-radius:0px;width:280px;"
           type="datetimerange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
           :default-time="['00:00:00', '23:59:59']"
           value-format="yyyy-MM-dd HH:mm:ss"
+          :time.sync="searchForm.dateRange"
         />
         <template v-if="activeRecord === CLICK_RECORD['customer']">
           <el-input v-model="searchForm.customerName" clearable style="width:240px" class="ml10 mr10" placeholder="请输入客户名称" />
@@ -345,6 +342,8 @@ const SUBMIT_NUMS = {
   [NOT_LIMIT]: '不限制次数',
   [ONE_TIME]: '每个客户限提交一次'
 };
+import DatePicker from '@/components/DatePicker';
+import moment from 'moment';
 import { FORVER_EFFECT,
   NOT_LIMIT,
   ONE_TIME,
@@ -360,7 +359,8 @@ import { FORVER_EFFECT,
   MANY_LINE_TEXT_COMPONENT,
   DATE_TIME_COMPONENT,
   SCORE_COMPONENT,
-  NPS_COMPONENT
+  NPS_COMPONENT,
+  DATE_DISABLED_TYPE
 } from '@/utils/constant/index';
 import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import Statistics from '@/components/Statistics';
@@ -372,7 +372,7 @@ import { goRouteWithQuery } from '@/utils';
 import loadingMixin from '@/mixin/loadingMixin';
 import { find } from 'lodash';
 export default {
-  components: { Statistics, EmptyDefaultIcon, RightContainer, PhoneDialog },
+  components: { Statistics, EmptyDefaultIcon, RightContainer, PhoneDialog, DatePicker },
   mixins: [loadingMixin],
   data() {
     return {
@@ -387,6 +387,7 @@ export default {
           label: '提交时间' }
       ]),
       FORVER_EFFECT,
+      DATE_DISABLED_TYPE,
       SUBMIT_NUMS,
       NOT_JUMP,
       JUMP_RESULT_PAGE,
@@ -439,7 +440,8 @@ export default {
       searchForm: {
         pageSize: PAGE_LIMIT,
         pageNum: 1,
-        timeType: CLICK_TIME
+        timeType: CLICK_TIME,
+        dateRange: [moment().subtract(1, 'month').format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD 23:59:59')]
       },
       // 是否显示满意度调查弹窗
       drawerVisible: false,

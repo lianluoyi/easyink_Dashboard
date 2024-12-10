@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户范围详情弹窗
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: chenchengjie
 -->
 <template>
   <el-dialog
@@ -30,9 +30,14 @@
 
 <script>
 import { initGetCustomerProper } from '@/utils/common';
-import { GROUP_MESSAGE_GENDER_TYPE, ADD_WAY_MAP, ADD_WAY, CUSTOMER_PROPERTY_VALUE, SOP_TYPE } from '@/utils/constant/index';
+import { GROUP_MESSAGE_GENDER_TYPE, ADD_WAY_MAP, ADD_WAY, CUSTOMER_PROPERTY_VALUE, SOP_TYPE, RELATION_TYPE } from '@/utils/constant/index';
 import moment from 'moment';
 import TagUserShow from '@/components/TagUserShow';
+
+const TYPE_MAP = {
+  [RELATION_TYPE.containsAll]: '包含全部',
+  [RELATION_TYPE.containsAny]: '包含任一'
+};
 export default {
   components: {
     TagUserShow
@@ -70,12 +75,12 @@ export default {
   methods: {
     dealCustomerScopeInfo() {
       // 定义每个字段的 label  value
-      const { gender, userInfoList, departmentInfoList, tagList, filterTagList, startTime, endTime, columnList
+      const { gender, userInfoList, departmentInfoList, tagList, filterTagList, startTime, endTime, columnList, includeTagMode, filterTagMode
       } = this.sopDetail.sopCustomerFilter;
       const matchList = [
         { key: 'userInfoList', label: '所属员工', value: [...(userInfoList || []), ...(departmentInfoList || [])] },
         { key: 'gender', label: '性别', value: GROUP_MESSAGE_GENDER_TYPE[gender] },
-        { key: 'tagList', label: '客户标签', value: ((tagList || []).map((item) => item.name)).join('、') },
+        { key: 'tagList', label: '客户标签', value: (tagList && tagList.length > 0) ? `【${TYPE_MAP[includeTagMode]}】 ${((tagList || []).map((item) => item.name)).join('、')}` : '' },
         { key: 'addTime', label: '添加时间', value: startTime && endTime ? moment(startTime).format('YYYY-MM-DD') + ' ~ ' + moment(endTime).format('YYYY-MM-DD') : undefined }
       ];
       this.customerDetail = matchList.filter((item) => Array.isArray(item.value) ? item.value.length : item.value);
@@ -101,8 +106,8 @@ export default {
       });
       this.customerDetail.push(...newcolumnList);
       // 判断是否有过滤标签
-      const filterTagValue = ((filterTagList || []).map((item) => item.name)).join('、');
-      if (filterTagValue) {
+      if (filterTagList.length > 0) {
+        const filterTagValue = `【${TYPE_MAP[filterTagMode]}】 ${((filterTagList || []).map((item) => item.name)).join('、')}`;
         this.customerDetail.push({ key: 'filterTagList', label: '过滤标签', value: filterTagValue });
       }
     }

@@ -2,6 +2,7 @@ import { parseTime } from './common';
 import { MEDIA_TO_WELCOME_TYPE, WELCOME_APPENDIX_TYPE, WELCOME_TO_MEDIA_TYPE } from '@/utils/constant/index';
 import moment from 'moment';
 import { Notification } from 'element-ui';
+import { v4 as uuidv4 } from 'uuid';
 const MS_TO_SECONDS = 1000;
 const ONE_HOUR = 3600;
 const ONE_DAY = 24;
@@ -342,11 +343,7 @@ export function uniqueArr(arr) {
  * @returns {string}
  */
 export function createUniqueString() {
-  const timestamp = +new Date() + '';
-  const RANDOM_NUM = 65536;
-  const STRING_RADIX = 32;
-  const randomNum = parseInt((1 + Math.random()) * RANDOM_NUM) + '';
-  return (+(randomNum + timestamp)).toString(STRING_RADIX);
+  return uuidv4();
 }
 
 /**

@@ -1,4 +1,5 @@
 <script>
+import { getNowConfig } from '@/api/enterpriseId';
 import * as api from '@/api/customer';
 import store from '@/store';
 import RightContainer from '@/components/RightContainer';
@@ -48,7 +49,8 @@ export default {
         status: null,
         gender: '',
         addWay: '',
-        corpFullName: ''
+        corpFullName: '',
+        duplicate: false // 客户是否去重，true去重，false不去重
       },
       queryTag: [], // 搜索框选择的标签
       queryUser: [], // 搜索框选择的添加人
@@ -114,6 +116,8 @@ export default {
       showSearchValueList: [],
       // 传递给高级筛选弹窗的值
       searchValue: [],
+      // 当前登录企业是否有配置自建应用服务接口
+      isConfigSelfBuildUrl: false,
       ADD_WAY,
       GENDER,
       ADD_WAY_MAP,
@@ -155,9 +159,17 @@ export default {
         ...defaultList,
         ...filterExtraList,
         ...customList,
-        { id: 'unionId', name: '客户unionId' }
+        { id: 'unionId', name: 'unionId' },
+        { id: 'externalUserId', name: 'externalUserId' }
       ];
+      if (this.isDKCorp && this.isConfigSelfBuildUrl) {
+        list.push({ id: 'originExternalUserId', name: 'externalUserId（明文）' });
+      }
       return list;
+    },
+    // 是否为代开发应用
+    isDKCorp() {
+      return this.$store.state.serverInfo.dkCorp;
     }
   },
   watch: {
@@ -177,7 +189,7 @@ export default {
   activated() {
     if (!this.fromOther) this.init();
   },
-  created() {
+  async created() {
     if (this.$route.query) {
       Object.keys(this.query).forEach(key => {
         if (this.$route.query[key]) {
@@ -193,6 +205,9 @@ export default {
         <div>查看当前企业下所有客户信息，可对客户批量添加标签</div>
       `
     );
+    // 判断当前登录企业是否有配置自建应用服务接口
+    const res = await getNowConfig();
+    this.isConfigSelfBuildUrl = res?.data?.isConfigSelfBuildUrl;
   },
   methods: {
     init() {
@@ -566,6 +581,13 @@ export default {
       this.onSearch();
     },
     /**
+     * @description 点击客户去重事件
+     */
+    handleDuplicateChange() {
+      this.searchButtonLoading = true;
+      this.onSearch();
+    },
+    /**
      * @description 高级搜索弹窗搜索的值
      * @param baseField
      * @param systemAndSetField
@@ -743,20 +765,33 @@ export default {
     <template v-slot:data-stat>
       <div class="total-text">
         <div>
-          共 <span class="theme-text-color">{{ total }}</span> 个客户
-        </div>
-        <div>
-          去重后 <span class="theme-text-color">{{ ignoreDuplicateCount }}</span> 个客户
+          <el-checkbox v-model="query.duplicate" @change="handleDuplicateChange">客户去重</el-checkbox>
           <el-popover
             placement="top-start"
             trigger="hover"
             popper-class="tip-popover"
           >
             <div>
-              若客户添加多个员工，不重复计数
+              若客户同时添加多个员工，只查出添加时间较早的客户数据
             </div>
             <i slot="reference" class="iconfont icon-question" style="font-size: 14px;" />
           </el-popover>
+        </div>
+        <div>
+          共 <span class="theme-text-color">{{ query.duplicate ? ignoreDuplicateCount : total }}</span> 个客户
+          <template v-if="!query.duplicate">
+            ，去重后 <span class="theme-text-color">{{ ignoreDuplicateCount }}</span> 个客户
+            <el-popover
+              placement="top-start"
+              trigger="hover"
+              popper-class="tip-popover"
+            >
+              <div>
+                若客户添加多个员工，不重复计数
+              </div>
+              <i slot="reference" class="iconfont icon-question" style="font-size: 14px;" />
+            </el-popover>
+          </template>
         </div>
       </div>
     </template>
@@ -1005,7 +1040,7 @@ export default {
         @success="addTagFn"
       />
       <PropertySetting :visible.sync="properSettingVisible" :data.sync="showCustomerPropertyList" @getList="getColumnList" />
-      <ExportCustomerModal :visible.sync="exportVisible" :list="exportPropertyList" :query="query" />
+      <ExportCustomerModal :visible.sync="exportVisible" :list="exportPropertyList" :query="query" :is-d-k-corp="isDKCorp" :is-config-self-build-url="isConfigSelfBuildUrl" />
       <AdvancedScreening ref="advancedScreening" :visible.sync="advancedScreeningVisible" :search-value="searchValue" @searchByAdvanced="searchByAdvanced" />
     </template>
   </RightContainer>

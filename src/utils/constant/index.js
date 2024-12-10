@@ -891,3 +891,14 @@ export const ALL_SOURCE = '17';
 export const MAX_LONG_SIDE = 10800;
 /** 朋友圈上传图片的最大短边分辨率 */
 export const MAX_SHORT_SIDE = 1080;
+
+export const DATE_DISABLED_TYPE = {
+  acrossMonth: 1, // 不允许跨月
+  acrossMonthAndAfter: 2 // 不允许跨月且不允许选择今天之后的日期
+};
+
+/** 关系枚举 */
+export const RELATION_TYPE = {
+  containsAll: 1, // 包含全部
+  containsAny: 2 // 包含任一
+};

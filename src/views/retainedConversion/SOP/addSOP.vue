@@ -1,7 +1,7 @@
 <!--
  * @Description: 新增sop
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: chenchengjie
 -->
 <template>
   <div class="add-sop-page wrap">
@@ -71,7 +71,7 @@
             label="使用群聊"
             prop="useGroup"
           >
-            <el-radio-group v-model="sopForm.filterType">
+            <el-radio-group v-model="sopForm.filterType" @change="handleFilterTypeChange">
               <el-radio :label="SPECIFIED_GROUP">指定群聊</el-radio>
               <el-radio :label="FILTER_GROUP">筛选群聊</el-radio>
             </el-radio-group>
@@ -97,6 +97,17 @@
                 }}</el-tag>
               </el-form-item>
               <el-form-item label="群标签" label-width="68px" style="padding: 8px 0">
+                <el-select v-model="sopForm.sopFilter.includeTagMode" style="width: 100px;margin-right: 10px;">
+                  <el-option
+                    v-for="{ label, value } in [
+                      { label: '包含全部', value: RELATION_TYPE.containsAll },
+                      { label: '包含任一', value: RELATION_TYPE.containsAny }
+                    ]"
+                    :key="value"
+                    :label="label"
+                    :value="value"
+                  />
+                </el-select>
                 <el-button icon="el-icon-plus" @click="dialogVisibleSelectTag = true">添加标签</el-button>
                 <el-tag
                   v-for="(unit, unique) in tagList"
@@ -255,7 +266,8 @@ import {
   DEFAULT_ALERTINFO,
   RULE_PERFORM_TYPE,
   ONE_DAY_MSECOND,
-  ADD_WAY
+  ADD_WAY,
+  RELATION_TYPE
 } from '@/utils/constant/index';
 import CustomerGroupModal from '@/views/drainageCode/group/customer.vue';
 import SelectTag from '@/components/SelectTag';
@@ -341,14 +353,19 @@ export default {
       },
       SPECIFIED_GROUP,
       FILTER_GROUP,
+      RELATION_TYPE,
       sopForm: {
         name: '',
         ruleList: [],
         filterType: SPECIFIED_GROUP,
         genderType: '-1',
-        sopFilter: {},
+        sopFilter: {
+          includeTagMode: RELATION_TYPE.containsAll
+        },
         sopCustomerFilter: {
-          gender: null
+          gender: null,
+          includeTagMode: RELATION_TYPE.containsAll,
+          filterTagMode: RELATION_TYPE.containsAll
         }
       },
       tagList: [],
@@ -499,7 +516,8 @@ export default {
             owner: this.dealIds(this.groupOwner, 'userId'),
             tagId: this.dealIds(this.tagList, 'tagId'),
             cycleStart: cycleTime && this.parseTime(cycleTime[0]),
-            cycleEnd: cycleTime && this.parseTime(cycleTime[1])
+            cycleEnd: cycleTime && this.parseTime(cycleTime[1]),
+            includeTagMode: sopForm.sopFilter?.includeTagMode
           };
           break;
         }
@@ -507,7 +525,7 @@ export default {
         case SOP_TYPE['newCustomer']:
         case SOP_TYPE['birthday']:
         {
-          const { gender, tagList, filterTagList, addTime, useStaff, customPropertyList } = this.customerScopeInfo;
+          const { gender, tagList, filterTagList, addTime, useStaff, customPropertyList, includeTagMode, filterTagMode } = this.customerScopeInfo;
           const groupByList = groupByScopeType(useStaff);
           newSopForm.sopCustomerFilter = {
             tagId: this.dealIds(tagList, 'tagId'),
@@ -517,6 +535,8 @@ export default {
             users: this.dealIds(groupByList.useEmployeesList, 'userId'),
             departments: this.dealIds(groupByList.useDepartmentList, 'id'),
             gender,
+            includeTagMode,
+            filterTagMode,
             columnList: customPropertyList.map((item) => {
               if (item.id === ADD_WAY) {
                 return {
@@ -698,6 +718,7 @@ export default {
         this.groupOwner = resData.sopFilter.ownerList ? [...resData.sopFilter.ownerList] : [];
         this.tagList = resData.sopFilter.tagList ? [...resData.sopFilter.tagList] : [];
         if (resData.sopFilter.createTime && resData.sopFilter.endTime) { newSopForm.sopFilter.addTime = [resData.sopFilter.createTime, resData.sopFilter.endTime]; }
+        newSopForm.sopFilter.includeTagMode = resData.sopFilter.tagList.length > 0 ? resData.sopFilter.includeTagMode : RELATION_TYPE.containsAll;
       }
       return newSopForm;
     },
@@ -717,6 +738,8 @@ export default {
       this.customerScopeInfo.filterTagList = resData.sopCustomerFilter.filterTagList
         ? [...resData.sopCustomerFilter.filterTagList]
         : [];
+      this.customerScopeInfo.includeTagMode = resData.sopCustomerFilter.tagList.length > 0 ? resData.sopCustomerFilter.includeTagMode : RELATION_TYPE.containsAll;
+      this.customerScopeInfo.filterTagMode = resData.sopCustomerFilter.filterTagList.length > 0 ? resData.sopCustomerFilter.filterTagMode : RELATION_TYPE.containsAll;
       const newCustomPropertyList = [];
       const columnList = [...resData.sopCustomerFilter.columnList];
       const customPropertyObj = this.$store.state.customerProperty.customPropertyObj;
@@ -887,6 +910,12 @@ export default {
     },
     handleClose(target, index) {
       target.splice(index, 1);
+    },
+    handleFilterTypeChange(value) {
+      // 切换到筛选群聊，并且includeTagMode值为空时，默认选择包含全部
+      if (value === FILTER_GROUP && this.sopForm.sopFilter.includeTagMode === null) {
+        this.sopForm.sopFilter.includeTagMode = RELATION_TYPE.containsAll;
+      }
     }
   }
 };

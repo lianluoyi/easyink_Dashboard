@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户范围
  * @Author: wJiaaa
- * @LastEditors: wJiaaa
+ * @LastEditors: chenchengjie
 -->
 <template>
   <div>
@@ -20,6 +20,17 @@
       </el-radio-group>
     </el-form-item>
     <el-form-item label="客户标签" label-width="68px" style="padding: 10px 0">
+      <el-select v-model="customerInfo.includeTagMode" style="width: 100px;margin-right: 10px;">
+        <el-option
+          v-for="{ label, value } in [
+            { label: '包含全部', value: RELATION_TYPE.containsAll },
+            { label: '包含任一', value: RELATION_TYPE.containsAny }
+          ]"
+          :key="value"
+          :label="label"
+          :value="value"
+        />
+      </el-select>
       <el-button icon="el-icon-plus" @click="openAddTag">添加标签</el-button>
       <el-tag
         v-for="(unit, unique) in customerInfo.tagList"
@@ -77,6 +88,17 @@
       <div class="add-other-property" @click="selectPropertyVisible = true"><i class="el-icon-plus" /></div>
     </el-form-item>
     <el-form-item label="过滤标签" label-width="68px" style="padding: 10px 0 0">
+      <el-select v-model="customerInfo.filterTagMode" style="width: 100px;margin-right: 10px;">
+        <el-option
+          v-for="{ label, value } in [
+            { label: '包含全部', value: RELATION_TYPE.containsAll },
+            { label: '包含任一', value: RELATION_TYPE.containsAny }
+          ]"
+          :key="value"
+          :label="label"
+          :value="value"
+        />
+      </el-select>
       <el-button icon="el-icon-plus" @click="openFilterTag">添加标签</el-button>
       <el-tag
         v-for="(unit, unique) in customerInfo.filterTagList"
@@ -115,7 +137,7 @@ import SelectUser from '@/components/SelectUser/index.vue';
 import CustomPropertyItem from '@/views/customerManage/components/customPropertyItem.vue';
 import BasePropertyItem from '@/views/customerManage/components/basePropertyItem.vue';
 import { groupByScopeType, checkChange } from '@/utils/common';
-import { SOP_TYPE, GENDER_TYPE_OF_ALL, GENDER_OF_MALE, GENDER_OF_FEMALE, GENDER_TYPE_OF_UNKNOWN } from '@/utils/constant/index';
+import { SOP_TYPE, GENDER_TYPE_OF_ALL, GENDER_OF_MALE, GENDER_OF_FEMALE, GENDER_TYPE_OF_UNKNOWN, RELATION_TYPE } from '@/utils/constant/index';
 import TagUserShow from '@/components/TagUserShow';
 import SelectProperty from './SelectProperty.vue';
 import SelectTag from '@/components/SelectTag';
@@ -147,6 +169,7 @@ export default {
     return {
       GENDER_TYPE: Object.freeze(GENDER_TYPE),
       SOP_TYPE: Object.freeze(SOP_TYPE),
+      RELATION_TYPE,
       dialogVisibleSelectTag: false,
       // 过滤标签
       dialogVisibleSelectUser: false,
@@ -156,6 +179,8 @@ export default {
       tagType: 'tag',
       customerInfo: {
         gender: null,
+        includeTagMode: RELATION_TYPE.containsAll,
+        filterTagMode: RELATION_TYPE.containsAll,
         tagList: [], // 客户标签
         // 添加时间:
         addTime: [],
