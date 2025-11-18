@@ -187,7 +187,6 @@
 
     <!-- 搜索框 -->
     <SelectUser
-      is-sigle-select
       :visible="selectUserType === 'query'"
       title="选择查询员工"
       :selected-user-list="queryUser"
@@ -230,6 +229,50 @@
     />
 
     <InheritFailDrawer :visible.sync="inheritFailDrawerVisible" />
+
+    <!-- 发起继承弹窗 -->
+    <el-dialog
+      title="发起继承"
+      :visible.sync="inheritDialogVisible"
+      width="500px"
+      :close-on-click-modal="false"
+      :before-close="handleBeforeClose"
+      append-to-body
+    >
+      <div class="inherit-dialog-subtitle">
+        将分配 {{ selectedCustomers.length }} 位客户给
+        <span class="inherit-dialog-subtitle-name">{{ selectedInheritUser.name }}</span>
+      </div>
+      <div class="inherit-content">
+        <div class="inherit-label">客户将收到以下提示</div>
+        <div class="inherit-input-container">
+          <el-input
+            ref="inheritMsgInput"
+            v-model="inheritMessage"
+            type="textarea"
+            :maxlength="200"
+            show-word-limit
+            :autosize="false"
+            rows="4"
+            placeholder="请输入继承话术"
+            class="inherit-textarea"
+          />
+          <div class="quick-actions">
+            <span
+              class="inherit-tag-btn"
+              @click="insertInheritTag"
+            >
+              #接替者昵称#
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="inheritSubmitLoading" @click="cancelInherit">取 消</el-button>
+        <el-button type="primary" :loading="inheritSubmitLoading" @click="submitInherit">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -249,7 +292,8 @@ const defaultQuery = {
   pageNum: 1,
   pageSize: PAGE_LIMIT
 };
-
+const DEFAULT_WORD = '您好，您的服务已升级，后续将由我的同事#接替者昵称#接替我的工作，继续为您服务。';
+const MAX_MESSAGE_LENGTH = 200;
 export default {
   name: '',
   components: { RightContainer, EmptyDefaultIcon, SelectUser, SelectTag, InheritFailDrawer },
@@ -280,7 +324,12 @@ export default {
       inheritFail: false,
       wxType: WX_TYPE,
       remotetransferConfig: null,
-      loading: false
+      loading: false,
+      // 发起继承弹窗相关
+      inheritDialogVisible: false,
+      inheritMessage: '',
+      selectedInheritUser: {},
+      inheritSubmitLoading: false
     };
   },
   watch: {
@@ -331,33 +380,19 @@ export default {
       if (this.selectUserType === 'inherit') {
         const list = this.$refs.selectUser.userList;
         if (list.length) {
-          this.selectUserLoading = true;
-          const params = {
-            customerList: this.selectedCustomers.map((customer) => ({
-              externalUserid: customer.externalUserid,
-              handoverUserid: customer.userId
-            })),
-            takeoverUserid: this.$refs.selectUser.userList[0].userId
-          };
-          transfer(params)
-            .then(() => {
-              this.msgSuccess('分配成功，等待接替');
-              this.selectUserType = '';
-              this.selectUserLoading = false;
-              this.getList();
-            })
-            .catch(() => {
-              this.inheritFail = true;
-              this.selectUserLoading = false;
-              this.getList();
-            });
+          // 保存选中的接替员工信息
+          this.selectedInheritUser = list[0];
+          // 设置默认继承话术
+          this.inheritMessage = DEFAULT_WORD;
+          // 打开发起继承弹窗，但不关闭选择员工弹窗
+          this.inheritDialogVisible = true;
         } else {
           this.msgWarn('请选择接替员工');
         }
       }
       if (this.selectUserType === 'query') {
         this.queryUser = userList;
-        this.query.userIds = userList[0]?.userId;
+        this.query.userIds = userList.map(user => user.userId).toString();
         this.selectUserType = '';
       }
     },
@@ -409,6 +444,80 @@ export default {
     },
     renderUserInfo(item) {
       return dealAtInfo(item);
+    },
+    // 插入接替者昵称标签
+    insertInheritTag() {
+      const textarea = this.$refs.inheritMsgInput.$refs.textarea;
+      const cursorPosition = textarea.selectionStart;
+      const textBefore = this.inheritMessage.substring(0, cursorPosition);
+      const textAfter = this.inheritMessage.substring(cursorPosition);
+      this.inheritMessage = textBefore + '#接替者昵称#' + textAfter;
+
+      // 设置光标位置到插入文本之后
+      this.$nextTick(() => {
+        const newPosition = cursorPosition + '#接替者昵称#'.length;
+        textarea.setSelectionRange(newPosition, newPosition);
+        textarea.focus();
+      });
+    },
+    // 提交继承
+    submitInherit() {
+      const word = this.inheritMessage || DEFAULT_WORD;
+
+      // 检查字符长度
+      if (word.length > MAX_MESSAGE_LENGTH) {
+        this.msgWarn(`最多可设置${MAX_MESSAGE_LENGTH}个字`);
+        return;
+      }
+
+      this.inheritSubmitLoading = true;
+      // 将话术中的占位符替换为实际员工名
+      const processedMessage = word?.replace(/#接替者昵称#/g, this.selectedInheritUser.name);
+      const params = {
+        customerList: this.selectedCustomers.map((customer) => ({
+          externalUserid: customer.externalUserid,
+          handoverUserid: customer.userId
+        })),
+        takeoverUserid: this.selectedInheritUser.userId,
+        transferSuccessMsg: processedMessage
+      };
+      transfer(params)
+        .then(() => {
+          this.msgSuccess('分配成功，等待接替');
+          this.getList();
+          this.closeAllDialogs();
+        })
+        .catch(() => {
+          this.inheritFail = true;
+        }).finally(() => {
+          this.inheritSubmitLoading = false;
+        });
+    },
+    // 处理弹窗关闭前的逻辑
+    handleBeforeClose(done) {
+      if (this.inheritSubmitLoading) {
+        return;
+      }
+      done();
+    },
+    // 取消继承
+    cancelInherit() {
+      if (this.inheritSubmitLoading) {
+        return;
+      }
+      this.inheritDialogVisible = false;
+      this.resetInheritDialog();
+    },
+    // 关闭所有弹窗
+    closeAllDialogs() {
+      this.inheritDialogVisible = false;
+      this.selectUserType = '';
+      this.resetInheritDialog();
+    },
+    // 重置继承弹窗数据
+    resetInheritDialog() {
+      this.inheritMessage = '';
+      this.selectedInheritUser = {};
     }
   }
 };
@@ -444,5 +553,55 @@ export default {
 .inheritFail {
   float: left;
   color: #f56c6c;
+}
+
+.inherit-dialog-subtitle {
+  font-size: 14px;
+  color: #101010;
+  .inherit-dialog-subtitle-name {
+    font-weight: bold;
+  }
+}
+
+.inherit-content {
+  padding: 20px 0;
+}
+
+.inherit-label {
+  font-size: 12px;
+  color: #999999;
+  margin-bottom: 10px;
+}
+
+.inherit-input-container {
+  position: relative;
+}
+
+.inherit-textarea {
+  /deep/ .el-textarea__inner {
+    height: 100px !important;
+    resize: none;
+    border-radius: 4px 4px 0 0;
+  }
+}
+
+.quick-actions {
+  border-radius: 0 0 4px 4px;
+  border: 1px solid #dcdfe6;
+  border-top: 0;
+  padding: 8px 12px;
+  background-color: #fafafa;
+
+  .inherit-tag-btn {
+    display: inline-block;
+    padding: 4px 8px;
+    margin-right: 8px;
+    color: #606266;
+    font-size: 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+    user-select: none;
+  }
 }
 </style>

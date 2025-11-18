@@ -56,7 +56,7 @@
       </template>
       <template v-slot:operate-btn>
         <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
+          <!-- <el-col :span="1.5">
             <el-button
               v-hasPermi="['monitor:job:add']"
               type="primary"
@@ -75,7 +75,7 @@
           </el-col>
           <el-col :span="1.5">
             <el-button v-hasPermi="['monitor:job:remove']" size="mini" @click="handleDelete">批量删除</el-button>
-          </el-col>
+          </el-col> -->
           <el-col :span="1.5">
             <el-button size="mini" @click="handleJobLog">执行日志</el-button>
           </el-col>
@@ -86,7 +86,7 @@
       </template>
       <template v-slot:data>
         <el-table v-loading="loading" :data="jobList" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="55" align="center" />
+          <!-- <el-table-column type="selection" width="55" align="center" /> -->
           <el-table-column label="任务编号" align="center" prop="jobId" />
           <el-table-column label="任务名称" align="center" prop="jobName" :show-overflow-tooltip="true" />
           <el-table-column label="任务组名" align="center" prop="jobGroup" :formatter="jobGroupFormat" />

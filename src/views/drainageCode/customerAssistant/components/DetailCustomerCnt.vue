@@ -66,7 +66,7 @@
   </div>
 </template>
 <script>
-import echarts from 'echarts';
+import * as echarts from 'echarts';
 import { getNewAndLossCustomerCnt, getRangeByChannel } from '@/api/drainageCode/customerAssistant';
 import { WEEK_TIME, TODAY_TIME } from '@/utils/common';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';

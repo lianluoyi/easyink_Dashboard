@@ -741,6 +741,7 @@ export default {
         :title="selectUserType === 'groupOwner' ? '选择群主' : '选择员工'"
         :is-only-leaf="false"
         :selected-user-list="selectUserList"
+        is-dep-linkage
         @success="selectedUser"
       />
 

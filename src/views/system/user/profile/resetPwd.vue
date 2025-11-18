@@ -28,6 +28,42 @@ export default {
         callback();
       }
     };
+
+    // 密码强度校验函数
+    const validatePasswordStrength = (rule, value, callback) => {
+      if (!value) {
+        callback();
+        return;
+      }
+
+      // 密码规则常量
+      const MIN_PASSWORD_LENGTH = 8;
+      const MAX_PASSWORD_LENGTH = 20;
+      const MIN_CHAR_TYPES = 3;
+
+      // 检查长度
+      if (value.length < MIN_PASSWORD_LENGTH || value.length > MAX_PASSWORD_LENGTH) {
+        callback(new Error('新密码长度必须为8～20位，且为字母大写、小写、数字、特殊字符中任意三种组合，请重新设置！'));
+        return;
+      }
+
+      // 检查字符类型
+      const hasUppercase = /[A-Z]/.test(value); // 大写字母
+      const hasLowercase = /[a-z]/.test(value); // 小写字母
+      const hasNumber = /[0-9]/.test(value); // 数字
+      const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?]/.test(value); // 特殊字符
+
+      // 计算满足的字符类型数量
+      const typeCount = [hasUppercase, hasLowercase, hasNumber, hasSpecialChar].filter(Boolean).length;
+
+      if (typeCount < MIN_CHAR_TYPES) {
+        callback(new Error('新密码长度必须为8～20位，且为字母大写、小写、数字、特殊字符中任意三种组合，请重新设置！'));
+        return;
+      }
+
+      callback();
+    };
+
     return {
       test: '1test',
       user: {
@@ -42,8 +78,7 @@ export default {
         ],
         newPassword: [
           { required: true, message: '新密码不能为空', trigger: 'blur' },
-          // eslint-disable-next-line no-magic-numbers
-          { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+          { validator: validatePasswordStrength, trigger: 'blur' }
         ],
         confirmPassword: [
           { required: true, message: '确认密码不能为空', trigger: 'blur' },

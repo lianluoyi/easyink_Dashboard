@@ -1,6 +1,6 @@
 <script>
 import { updateCustomerDetail, getDetail, getEmployeesList } from '@/api/customer';
-import { ADD_WAY_MAP, CUSTOMER_PROPERTY_VALUE, GENDER_TYPE, WX_TYPE, ADD_BY_CHANNEL, CUSTOMER_DETAIL } from '@/utils/constant/index';
+import { ADD_WAY_MAP, CUSTOMER_PROPERTY_VALUE, GENDER_TYPE, WX_TYPE, ADD_BY_CHANNEL, CUSTOMER_DETAIL, MUNICIPAL } from '@/utils/constant/index';
 import ReturnPage from '@/components/ReturnPage.vue';
 import { dealShowText, initGetCustomerProper, dealAtInfo } from '@/utils/common';
 import BasePropertyItem from './components/basePropertyItem.vue';
@@ -10,6 +10,7 @@ import SelectTag from '@/components/SelectTag';
 import { deepClone } from '@/utils/index';
 import { isEqual } from 'lodash';
 import CustomerOrGroupInfo from './components/CustomerOrGroupInfo.vue';
+import { getDistrictList } from '@/api/map';
 const fieldObj = {
   '出生日期': 'birthday',
   '邮箱': 'email',
@@ -59,21 +60,24 @@ export default {
       // 是否有数据权限编辑客户信息
       permission: true,
       activeTabName: CUSTOMER_DETAIL['customerInfo'],
-      CUSTOMER_DETAIL
+      CUSTOMER_DETAIL,
+      addressOptions: []
     };
   },
   computed: {
     // 系统字段
     sysPropertyList() {
       let list = [...this.$store.state.customerProperty.customerProperList];
+      const tagProperty = list.find(item => item.name === '客户标签') || {};
       list = list.filter(item => {
-        return item.type === CUSTOMER_PROPERTY_VALUE['sysField'];
+        return item.type === CUSTOMER_PROPERTY_VALUE['sysField'] && item.name !== '客户标签'; // 客户标签不需要显示
       });
       const extraList = [{ id: 'remark', name: '备注' },
         { id: 'gender', name: '性别' },
-        { id: 'tag', name: '标签' }];
+        { ...tagProperty, id: 'tag', name: '标签' }]; // 继承客户标签的必填和启用属性
       if (list.find(listItem => listItem.name === '出生日期')) extraList.push({ id: 'age', name: '年龄' });
-      list = [...extraList,
+      // 若客户标签未启用，需要去除
+      list = [...(tagProperty?.status ? extraList : extraList.filter(item => item.id !== 'tag')),
         ...list];
       return list;
     },
@@ -247,10 +251,12 @@ export default {
           }
           case '地址': {
             newItem.value = customerInfo?.address;
+            newItem.addressEncrypt = customerInfo.addressEncrypt;
             break;
           }
           case '电话': {
             newItem.value = customerInfo.remarkMobiles;
+            newItem.remarkMobilesEncrypt = customerInfo.remarkMobilesEncrypt;
             break;
           }
           case '描述': {
@@ -300,10 +306,26 @@ export default {
             ...dealObj
           };
         }
+        if (customItem.type === CUSTOMER_PROPERTY_VALUE['address']) {
+          const dealObj = this.dealShowText(customItem, customerInfo, 'addressType');
+          newItem = {
+            ...newItem,
+            value: {},
+            ...dealObj
+          };
+        }
         customList.push(newItem);
       });
       this.oldCustomList = deepClone([...customList]);
       this.customList = [...customList];
+      // 如果自定义字段中包含地址，则获取地址列表
+      if (this.customList.find(item => item.type === CUSTOMER_PROPERTY_VALUE['address'])) {
+        getDistrictList({
+          corpId: this.$store.state.enterPriseWechatConfig.corpId
+        }).then(res => {
+          this.addressOptions = res.data.result || [];
+        });
+      }
     },
     /**
      * 处理自定义字段显示内容
@@ -356,6 +378,9 @@ export default {
       if (this.editStatus) {
         const allList = [...this.baseList, ...this.customList];
         const requiredIndex = allList.findIndex(item => {
+          if (item.id === 'tag') {
+            return item.required && !item.value?.length;
+          }
           switch (item.type) {
             case CUSTOMER_PROPERTY_VALUE['img']:
             case CUSTOMER_PROPERTY_VALUE['file']: {
@@ -366,6 +391,9 @@ export default {
             case CUSTOMER_PROPERTY_VALUE['singleRadio']: {
               return item.required && !item?.optionValue?.length;
             }
+            case CUSTOMER_PROPERTY_VALUE['address']: {
+              return item.required && !item?.value?.province;
+            }
             default: {
               return item.required && (!item.value && !item.optionValue);
             }
@@ -373,6 +401,19 @@ export default {
         });
         if (requiredIndex > -1) {
           this.msgWarn(`请填写${allList[requiredIndex].name}`);
+          return;
+        }
+        const phoneValue = allList.find(item => item.name === '电话')?.value;
+        const phoneReg = /^[0-9+-]{5,32}$/;
+        let phoneValid = true;
+        phoneValue?.split(',').forEach((phone) => {
+          if (phone && !phoneReg.test(phone)) {
+            phoneValid = false;
+            return;
+          }
+        });
+        if (!phoneValid) {
+          this.msgWarn('手机号格式不正确');
           return;
         }
         const params = {};
@@ -431,6 +472,21 @@ export default {
               extendProperties.push({
                 extendPropertyId: item.id,
                 propertyValue: item.optionValue || null
+              });
+              break;
+            }
+            case CUSTOMER_PROPERTY_VALUE['address']: {
+              if (item.value.town === '暂不选择') {
+                item.value.town = '';
+              }
+              // 香港、澳门、直辖市，城市为空
+              if (['香港特别行政区', '澳门特别行政区', ...MUNICIPAL].includes(item.value.province)) {
+                item.value.city = '';
+              }
+              extendProperties.push({
+                extendPropertyId: item.id,
+                propertyType: item.type,
+                propertyValue: JSON.stringify(item.value) || ''
               });
               break;
             }
@@ -566,7 +622,7 @@ export default {
                   <span v-if="customItem.required" class="required-mark">*</span>
                   {{ customItem.name }}
                 </template>
-                <CustomPropertyItem :item="customItem" :list.sync="customList" :index="customIndex" :edit-status="editStatus" />
+                <CustomPropertyItem :item="customItem" :list.sync="customList" :index="customIndex" :edit-status="editStatus" :address-options="addressOptions" />
               </el-descriptions-item>
             </el-descriptions>
           </el-tab-pane>
@@ -582,7 +638,7 @@ export default {
         />
       </div>
       <div v-if="activeTabName === CUSTOMER_DETAIL['customerInfo']" class="bottom-tool">
-        <el-button v-if="permission" type="primary" @click="handleSubmit">{{ editStatus ? '保存' : '编辑' }}</el-button>
+        <el-button v-if="permission" v-hasPermi="['customerManage:customer:edit']" type="primary" @click="handleSubmit">{{ editStatus ? '保存' : '编辑' }}</el-button>
       </div>
       <!-- 选择标签弹窗 -->
       <SelectTag
@@ -773,6 +829,9 @@ export default {
       /deep/ .el-descriptions__header {
         @include border_style($direction: left, $width: 3px);
         padding-left: 10px;
+      }
+      /deep/ .el-descriptions__table.is-bordered {
+        table-layout: fixed;
       }
     }
   }

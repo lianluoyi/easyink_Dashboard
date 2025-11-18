@@ -16,6 +16,7 @@
     <!-- 下面这个组件用来展示文字 图片 轮播图的字段设置 -->
     <ShowComponent v-if="item.type === TEXT_COMPONENT || item.type === IMAGE_COMPONENT || item.type === CAROUSEL_COMPONENT" :key="item.id" :component="item" />
     <DisplayCondition :component="item" @updateComponentItem="updateComponentItem" />
+    <PushTypeComponent :component="item" @updateComponentItem="updateComponentItem" />
   </div>
 </template>
 
@@ -43,8 +44,10 @@ import ScoreComponent from '../filedComponents/ScoreComponent.vue';
 import NpsComponent from '../filedComponents/NpsComponent.vue';
 import ShowComponent from '../filedComponents/ShowComponent.vue';
 import DisplayCondition from '../filedComponents/components/DisplayCondition.vue';
+import PushTypeComponent from '../filedComponents/components/PushTypeComponent.vue';
+
 export default {
-  components: { DisplayCondition, RadioComponent, CheckBoxComponent, SelectComponent, OneLineTextComponent, DataTimeComponent, ScoreComponent, NpsComponent, ShowComponent },
+  components: { DisplayCondition, RadioComponent, CheckBoxComponent, SelectComponent, OneLineTextComponent, DataTimeComponent, ScoreComponent, NpsComponent, ShowComponent, PushTypeComponent },
   data() {
     return {
       item: {},
@@ -77,7 +80,7 @@ export default {
   },
   methods: {
     updateComponentItem(payload) {
-      this.item = { ...this.item, ruleList: payload };
+      this.item = { ...this.item, ...payload };
     }
   }
 };

@@ -1,7 +1,7 @@
 <!--
  * @Description: 添加附件按钮组件
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: chenchengjie 753186926@qq.com
 -->
 <template>
   <div>
@@ -485,6 +485,7 @@ export default {
     .appendix-title {
       flex: 1;
       padding-left: 5px;
+      max-width: 310px;
     }
   }
 }

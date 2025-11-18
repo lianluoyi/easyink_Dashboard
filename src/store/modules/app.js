@@ -9,7 +9,8 @@ const state = {
   },
   device: 'desktop',
   size: Cookies.get('size') || 'medium',
-  busininessDesc: undefined
+  busininessDesc: undefined,
+  systemSetting: null
 };
 
 const mutations = {
@@ -36,6 +37,9 @@ const mutations = {
   },
   SET_busininessDesc: (_state, busininessDesc) => {
     _state.busininessDesc = busininessDesc;
+  },
+  SET_SYSTEM_SETTING: (_state, systemSetting) => {
+    _state.systemSetting = systemSetting;
   }
 };
 
@@ -54,6 +58,9 @@ const actions = {
   },
   setBusininessDesc({ commit }, busininessDesc) {
     commit('SET_busininessDesc', busininessDesc);
+  },
+  setSystemSetting({ commit }, systemSetting) {
+    commit('SET_SYSTEM_SETTING', systemSetting);
   }
 };
 

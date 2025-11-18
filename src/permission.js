@@ -4,6 +4,7 @@ import { Message } from 'element-ui';
 import { getToken } from '@/utils/auth';
 import { GET_INFO_ERROR } from '@/utils/constant/index';
 import { getNowTheme } from '@/utils/common';
+import { getSetting } from '@/api/system/setting';
 
 const whiteList = ['/login', '/bind', '/register', '/test'];
 const MSG_DURATION = 2000;
@@ -65,6 +66,13 @@ router.beforeEach((to, from, next) => {
                 checkLogin(from, response.data, next);
               }).catch(() => {
                 checkLogin(from, null, next);
+              });
+
+              // 获取系统设置
+              getSetting().then(settingResponse => {
+                store.dispatch('app/setSystemSetting', settingResponse.data || settingResponse);
+              }).catch(error => {
+                console.error('获取系统设置失败:', error);
               });
             });
           })

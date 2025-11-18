@@ -1,17 +1,38 @@
 <template>
   <div id="app">
     <router-view />
+    <!-- 修改密码弹窗 -->
+    <ResetPwdModal
+      :visible.sync="showResetPwdModal"
+      :current-user="currentUser"
+      @close="handleResetPwdClose"
+    />
   </div>
 </template>
 
 <script>
 import { SERVER_TYPE_INTERNAL } from '@/utils/constant/index';
 import { PAGE_FROM_PATH } from '@/utils/constant/routePath';
+import ResetPwdModal from '@/components/ResetPwdModal.vue';
+
 export default {
   name: 'App',
+  components: {
+    ResetPwdModal
+  },
+  data() {
+    return {
+      showResetPwdModal: false
+    };
+  },
   computed: {
     serverType() {
       return this.$store.state.serverInfo.serverType;
+    },
+    currentUser() {
+      // 从store中获取当前用户信息
+      const userInfo = this.$store.state.user || {};
+      return userInfo.userName || userInfo.username;
     }
   },
   watch: {
@@ -46,6 +67,10 @@ export default {
     // 获取RSA私钥
     getPublicKey() {
       this.$store.dispatch('GetPublicKey');
+    },
+    // 处理密码重置弹窗关闭
+    handleResetPwdClose() {
+      this.showResetPwdModal = false;
     }
   }
 };

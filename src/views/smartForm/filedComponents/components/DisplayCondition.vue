@@ -127,7 +127,7 @@ export default {
       this.dialogVisible = false;
       EventBus.$emit('changeFiledSettingValue', { ruleList: this.ruleList, id: this.component.id });
       // 更新父组件的ruleList,避免点击取消的时候ruleList全部都重置为空
-      this.$emit('updateComponentItem', this.ruleList);
+      this.$emit('updateComponentItem', { ruleList: this.ruleList });
     },
     /**
      * @description 删除显示条件

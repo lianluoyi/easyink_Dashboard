@@ -88,6 +88,15 @@ export function getCustomerActivityOfCustomer(data) {
   });
 }
 
+// 部门维度
+export function getCustomerOverViewOfDepartment(data) {
+  return request({
+    url: service + '/getCustomerOverViewOfDepartment',
+    method: 'post',
+    data
+  });
+}
+
 /** 员工服务数据总览 */
 export function getUserServiceOfTotal(data) {
   return request({
@@ -164,6 +173,15 @@ export function getCustomerOverViewOfDate(data) {
 export function exportCustomerOverViewOfDate(data) {
   return request({
     url: service + '/exportCustomerOverViewOfDate',
+    method: 'post',
+    data
+  });
+}
+
+/** 客户联系部门维度导出 */
+export function exportCustomerOverViewOfDepartment(data) {
+  return request({
+    url: service + '/exportCustomerOverViewOfDepartment',
     method: 'post',
     data
   });

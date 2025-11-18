@@ -38,6 +38,16 @@
               />
             </el-select>
           </el-form-item>
+          <el-form-item>
+            <el-select v-model="query.liveCodeRequired" placeholder="请选择专属活码是否必填" clearable>
+              <el-option
+                v-for="item in mandatoryOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item label=" ">
             <el-button
               v-preventReClick="200"
@@ -143,6 +153,26 @@
             <template slot-scope="{ row }">
               <el-switch
                 v-model="row.required"
+                :disabled="!checkPermi(['customer:extendProp:edit'])"
+                @change="(value) => changeStatus(value, row)"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column label="专属活码必填" prop="liveCodeRequired">
+            <template #header>
+              <span>专属活码必填</span>
+              <el-popover
+                placement="top-start"
+                content="开启后，员工在专属活码中预设客户资料时该字段不能为空"
+                trigger="hover"
+                popper-class="tip-popover"
+              >
+                <i slot="reference" class="iconfont icon-question" style="font-size: 14px;" />
+              </el-popover>
+            </template>
+            <template slot-scope="{ row }">
+              <el-switch
+                v-model="row.liveCodeRequired"
                 :disabled="!checkPermi(['customer:extendProp:edit'])"
                 @change="(value) => changeStatus(value, row)"
               />
@@ -271,7 +301,8 @@ export default {
      * 编辑
      */
     onEdit(row) {
-      this.$refs.addPropertyModal.formData = { ...row };
+      const extra = row.extra ? JSON.parse(row.extra) : {};
+      this.$refs.addPropertyModal.formData = { ...row, ...extra };
       this.$refs.addPropertyModal.activeName = row.type.toString();
       this.propertyVisible = true;
     },
@@ -296,6 +327,7 @@ export default {
       const listRes = await this.$store.dispatch('GetCustomerProperty', {
         name: this.query.name,
         required: this.query.required,
+        liveCodeRequired: this.query.liveCodeRequired,
         status: this.query.status,
         ...params
       });

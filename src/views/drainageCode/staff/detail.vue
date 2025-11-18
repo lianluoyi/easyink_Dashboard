@@ -5,7 +5,7 @@ import {
   download,
   exportTimeRangeAnalyseCount
 } from '@/api/drainageCode/staff';
-import echarts from 'echarts';
+import * as echarts from 'echarts';
 import { DRAINAGE_CODE_TYPE, SKIP_VERIFY, MESSAGE_MEDIA_TYPE, SCOPELIST_TYPE, MEDIA_TYPE_SMARTFORM, MEDIA_TO_WELCOME_TYPE } from '@/utils/constant/index';
 import { getFirstMsg } from '@/utils/drainageCode';
 import PhoneDialog from '@/components/PhoneDialog';

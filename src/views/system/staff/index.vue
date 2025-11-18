@@ -15,6 +15,8 @@ import BatchUpdateUser from './BatchUpdateUser';
 import { getFMdate, changeButtonLoading } from '@/utils/common';
 import RequestButton from '@/components/Button/RequestButton.vue';
 import SyncMemberInfo from './SyncMemberInfo.vue';
+import SensitiveInput from '@/components/SensitiveInput/index.vue';
+import SensitiveText from '@/components/SensitiveText/index.vue';
 import loadingMixin from '@/mixin/loadingMixin';
 const EMAIL_LENGTH = 200;
 const EXPIRATION_NUMBER = 7;
@@ -36,7 +38,9 @@ export default {
     AddMemberTip,
     BatchUpdateUser,
     RequestButton,
-    SyncMemberInfo
+    SyncMemberInfo,
+    SensitiveInput,
+    SensitiveText
   },
   mixins: [loadingMixin],
   props: {},
@@ -655,7 +659,16 @@ export default {
                     </div>
                   </template>
                 </el-table-column>
-                <el-table-column label="手机号" align="left" prop="mobile" width="120" />
+                <el-table-column label="手机号" align="left" prop="mobile" width="160">
+                  <template slot-scope="scope">
+                    <SensitiveText
+                      :key="scope.row.mobileEncrypt"
+                      permission-key="securityConfig:view:phone"
+                      :text="scope.row.mobile"
+                      :api-params="{ encryptValue: scope.row.mobileEncrypt }"
+                    />
+                  </template>
+                </el-table-column>
                 <el-table-column label="所属部门" align="left" :show-overflow-tooltip="true">
                   <template slot-scope="scope">
                     {{ treeMap[scope.row.mainDepartment] }}
@@ -791,7 +804,13 @@ export default {
                 />
               </el-form-item>
               <el-form-item label="手机号" prop="mobile">
-                <el-input v-model="form.mobile" disabled />
+                <SensitiveInput
+                  :key="form.mobileEncrypt"
+                  v-model="form.mobile"
+                  permission-key="securityConfig:view:phone"
+                  :api-params="{ encryptValue: form.mobileEncrypt }"
+                  disabled
+                />
               </el-form-item>
               <el-form-item label="生日">
                 <el-date-picker v-model="form.birthday" value-format="yyyy-MM-dd" type="date" placeholder />

@@ -59,7 +59,16 @@
           </template>
           <el-table-column label="external_userid" prop="importExternalUserid" align="left" />
           <el-table-column label="unionid" prop="importUnionId" align="left" />
-          <el-table-column label="手机号" prop="importMobile" align="left" />
+          <el-table-column label="手机号" prop="importMobile" align="left">
+            <template slot-scope="scope">
+              <SensitiveText
+                :key="scope.row.importMobileEncrypt"
+                permission-key="securityConfig:view:phone"
+                :text="scope.row.importMobile"
+                :api-params="{ encryptValue: scope.row.importMobileEncrypt }"
+              />
+            </template>
+          </el-table-column>
           <el-table-column label="打标状态" prop="status" align="left">
             <template slot-scope="{ row }">
               <div :class="TAG_STATUS[row.status].className">
@@ -92,6 +101,7 @@
 </template>
 
 <script>
+import SensitiveText from '@/components/SensitiveText/index.vue';
 import ReturnPage from '@/components/ReturnPage.vue';
 import RightContainer from '@/components/RightContainer';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
@@ -109,7 +119,7 @@ const TAG_STATUS = {
 };
 export default {
   name: 'TaskDetail',
-  components: { RightContainer, EmptyDefaultIcon, ReturnPage },
+  components: { RightContainer, EmptyDefaultIcon, ReturnPage, SensitiveText },
   data() {
     return {
       query: {

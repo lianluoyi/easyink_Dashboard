@@ -42,6 +42,9 @@
             />
           </el-form-item>
           <el-form-item>
+            <el-input v-model="query.position" placeholder="请输入员工职务" />
+          </el-form-item>
+          <el-form-item>
             <el-button
               v-preventReClick="200"
               type="primary"
@@ -120,6 +123,7 @@
 
           <el-table
             ref="table"
+            :key="dimensionType"
             v-loading="loading"
             :data="list"
             :default-sort="{ prop: 'chatTotal', order: 'descending' }"
@@ -128,11 +132,19 @@
             <template slot="empty">
               <empty-default-icon :length="list.length" />
             </template>
-            <el-table-column v-if="dimensionType === STAFF_DIMENSION" label="员工" align="center" width="180">
-              <template #default="{ row }">
-                <UserItem :data="row" :is-staff="true" />
-              </template>
-            </el-table-column>
+            <template v-if="dimensionType === STAFF_DIMENSION">
+              <el-table-column label="员工" align="center" width="180">
+                <template #default="{ row }">
+                  <UserItem :data="row" :is-staff="true" />
+                </template>
+              </el-table-column>
+              <el-table-column prop="position" label="员工职务" min-width="180" />
+              <el-table-column prop="parentDepartmentName" label="所属上级部门" min-width="180">
+                <template #default="{ row }">
+                  {{ row.parentDepartmentName || '-' }}
+                </template>
+              </el-table-column>
+            </template>
             <el-table-column v-else label="日期" align="center" prop="time" width="180">
               <template #default="{ row }">
                 {{ row.time }}
@@ -197,8 +209,6 @@ import { cloneDeep } from 'lodash';
 import { YESTERDAY_TIME, FIXED_DAYS_AGO_TIME, groupByScopeType } from '@/utils/common';
 import { getUserServiceOfTotal, getUserServiceOfUser, exportUserServiceOfUser, getUserServiceOfTime, exportUserServiceOfTime } from '@/api/statistics';
 // TODO 合并客户联系相同字段
-// eslint-disable-next-line no-magic-numbers
-const ONE_MONTH = 30 * 24 * 3600 * 1000;
 const SORT_TYPE = {
   'ascending': 'ASC',
   'descending': 'DESC',
@@ -213,17 +223,30 @@ export default {
       DATE_DIMENSION,
       STAFF_DIMENSION,
       selectDate: '',
-      // TODO 合并客户联系相同方法
+      selectMonthLimit: 1,
       // 日期范围选择限定
       pickerOptions: {
         disabledDate: (v) => {
           if (this.selectDate !== '') {
-            const minTime = this.selectDate - ONE_MONTH;
-            const maxTime = this.selectDate + ONE_MONTH;
-            return v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date().getTime() || moment(v).isSame(new Date(), 'day') ||
-             v.getTime() < minTime || v.getTime() > maxTime;
+            // 根据 selectMonthLimit 计算时间范围
+            const selectedDate = new Date(this.selectDate);
+            const minDate = new Date(selectedDate);
+            const maxDate = new Date(selectedDate);
+
+            // 设置最小日期为选中日期减去 selectMonthLimit 个月
+            minDate.setMonth(selectedDate.getMonth() - this.selectMonthLimit);
+            // 设置最大日期为选中日期加上 selectMonthLimit 个月
+            maxDate.setMonth(selectedDate.getMonth() + this.selectMonthLimit);
+
+            return v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() ||
+                   v.getTime() > new Date().getTime() ||
+                   moment(v).isSame(new Date(), 'day') ||
+                   v.getTime() < minDate.getTime() ||
+                   v.getTime() > maxDate.getTime();
           }
-          return v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date().getTime() || moment(v).isSame(new Date(), 'day');
+          return v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() ||
+                 v.getTime() > new Date().getTime() ||
+                 moment(v).isSame(new Date(), 'day');
         },
         onPick: ({ maxDate, minDate }) => {
           this.selectDate = minDate.getTime();
@@ -299,6 +322,10 @@ export default {
     }
   },
   created() {
+    // 获取系统设置中的 selectMonthLimit
+    const { selectMonthLimit } = this.$store.state.app.systemSetting;
+    this.selectMonthLimit = selectMonthLimit || 1;
+
     this.onSearch();
   },
   methods: {
