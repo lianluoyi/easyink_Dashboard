@@ -89,3 +89,13 @@ export function putLockSideBar(data) {
     data
   });
 }
+/**
+ * @description 解密
+ */
+export function decrypt(data) {
+  return request({
+    url: service + '/decrypt',
+    method: 'POST',
+    data
+  });
+}

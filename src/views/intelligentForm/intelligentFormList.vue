@@ -66,11 +66,31 @@
         </el-form>
       </template>
       <template v-slot:operate-btn>
-        <div v-if="roleKey" class="operate-btn">
+        <el-popover
+          v-model="popVisible"
+          placement="bottom"
+          width="400"
+          trigger="manual"
+        >
+          <div class="tips">
+            若表单启用了表单提交后的推送功能，系统会将表单内容自动发送到您指定的地址
+          </div>
+          <el-form ref="pushSettingForm" :model="pushSetting" :rules="pushRules" label-width="80px">
+            <el-form-item label="推送地址" prop="pushUrl">
+              <el-input v-model="pushSetting.pushUrl" placeholder="请输入推送地址" clearable style="width: 276px" />
+            </el-form-item>
+            <el-form-item class="form-footer">
+              <el-button type="text" @click="()=> {popVisible = false}">取消</el-button>
+              <el-button type="primary" @click="handelConfirm">确定</el-button>
+            </el-form-item>
+          </el-form>
+          <el-button v-if="checkPermi(['intelligentForm:manage:push'])" slot="reference" class="btn-reset" @click="()=>{popVisible = true}">推送设置</el-button>
+        </el-popover>
+        <template v-if="roleKey">
           <el-button class="btn-reset" @click="batchUpdateGroup">批量修改分组</el-button>
           <el-button class="btn-reset" @click="batchDelete">批量删除</el-button>
           <el-button type="primary" @click="addForm">新增表单</el-button>
-        </div>
+        </template>
       </template>
       <template v-slot:data>
         <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
@@ -210,6 +230,10 @@ import BatchUpdateGroup from './batchUpdateGroup.vue';
 import loadingMixin from '@/mixin/loadingMixin';
 import { getFormPageList, changeEnableState, removeFormList } from '@/api/form';
 import { INTELLIGENT_FORM_TYPE, PAGE_LIMIT, TREE_ALL_GROUP_ID } from '@/utils/constant/index';
+import { editThirdPartyConfig, getThirdPartyConfig } from '@/api/thirdPartyConfig';
+import { successCode } from '@/utils/httpCode';
+import { checkPermi } from '@/utils/permission';
+
 export default {
   name: 'VerbalTrickList',
   components: {
@@ -268,6 +292,26 @@ export default {
         beginTime: undefined,
         endTime: undefined
       },
+      // 推送设置弹窗显示
+      popVisible: false,
+      // 推送设置
+      pushSetting: {
+        pushUrl: ''
+      },
+      pushRules: {
+        pushUrl: [
+          {
+            trigger: 'blur',
+            validator: (rule, value, callback) => {
+              if (value && !/^https?:\/\//.test(value)) {
+                callback(new Error('推送地址需要以http://或https://开头'));
+              } else {
+                callback();
+              }
+            }
+          }
+        ]
+      },
       // 表单总数
       total: 0,
       // 表单数据
@@ -315,8 +359,21 @@ export default {
       this.query = this.$store.getters.searchQuery[this.$route.name].query;
     }
   },
-  mounted() {},
+  mounted() {
+    // 若有权限则获取推送地址
+    if (checkPermi(['intelligentForm:manage:push'])) {
+      getThirdPartyConfig().then(res => {
+        if (res.code === successCode) {
+          this.pushSetting.pushUrl = res.data?.pushUrl || '';
+          window.sessionStorage.setItem('pushUrl', res.data?.pushUrl || '');
+        }
+      });
+    } else {
+      window.sessionStorage.removeItem('pushUrl');
+    }
+  },
   methods: {
+    checkPermi,
     // 重置查询条件
     resetQuery() {
       this.query = this.$options.data().query;
@@ -361,6 +418,25 @@ export default {
         departmentId: this.departmentId
       };
       this.goRouterToForm('editForm', payload);
+    },
+    /**
+     * @description 推送设置确认
+     * @return {*}
+     */
+    async handelConfirm() {
+      const valid = await this.$refs.pushSettingForm.validate();
+      if (valid) {
+        editThirdPartyConfig({
+          pushUrl: this.pushSetting.pushUrl
+        }).then(res => {
+          this.$message({
+            message: '配置成功',
+            type: 'success'
+          });
+          window.sessionStorage.setItem('pushUrl', this.pushSetting.pushUrl);
+          this.popVisible = false;
+        });
+      }
     },
     /**
      * @description 前往表单 新增、编辑、详情页
@@ -537,5 +613,18 @@ export default {
     color: red;
     font-size: 14px;
   }
+}
+.tips {
+  font-size: 12px;
+  background: #F2F2F3;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+.el-form-item:hover {
+  background: none;
+}
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

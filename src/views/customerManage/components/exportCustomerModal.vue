@@ -92,7 +92,10 @@ export default {
           return item;
         });
       } else {
-        defaultPropertyList = [...list];
+        // local缓存为空，默认选中所有字段(不包含externalUserId(明文))
+        defaultPropertyList = [...list].filter(
+          (item) => item.id !== 'originExternalUserId'
+        );
       }
       // 过滤掉未启用的字段
       defaultPropertyList = defaultPropertyList.filter((item) => {

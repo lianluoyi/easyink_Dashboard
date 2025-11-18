@@ -3,18 +3,31 @@ import {
   getList,
   remove,
   downloadBatch,
-  download,
-  getApplink
+  getApplink,
+  getCustomerLink,
+  editCustomerEmployCodeTag,
+  getCustomerEmployCodeTag,
+  getTagGroupValid,
+  editTagGroupValid
 } from '@/api/drainageCode/staff';
+import TagUserShow from '@/components/TagUserShow';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import { goRouteWithQuery, copyText } from '@/utils';
 import { PAGE_LIMIT } from '@/utils/constant/index';
 import RightContainer from '@/components/RightContainer';
 import ListUserShow from '@/components/ListUserShow';
 import loadingMixin from '@/mixin/loadingMixin';
+import AddTag from './AddTag';
+
+/** 专属活码标签必填校验类型 */
+const TAG_GROUP_VALID_TYPE = {
+  ALL: 0, // 全部标签组
+  ANY: 1 // 任一标签组
+};
+
 export default {
   name: 'CodeStaff',
-  components: { EmptyDefaultIcon, RightContainer, ListUserShow },
+  components: { EmptyDefaultIcon, RightContainer, ListUserShow, AddTag, TagUserShow },
   mixins: [loadingMixin],
   data() {
     return {
@@ -28,6 +41,8 @@ export default {
         beginTime: undefined,
         endTime: undefined
       },
+      dialogVisible: false,
+      currentRow: undefined,
       // 日期范围
       dateRange: [],
       // 遮罩层
@@ -37,8 +52,24 @@ export default {
       // 总条数
       total: 0,
       // 表格数据
-      list: []
+      list: [],
+      // 活码链接
+      qrCodeLink: '',
+      // 可用标签
+      availableTags: [],
+      // 添加标签弹窗显隐
+      dialogVisibleAddTag: false,
+      pageLoading: false,
+      TAG_GROUP_VALID_TYPE,
+      tagGroupValid: TAG_GROUP_VALID_TYPE.ALL,
+      // 活码标签是否必填
+      tagLiveCodeRequired: false
     };
+  },
+  computed: {
+    corpId() {
+      return this.$store.state.enterPriseWechatConfig.corpId;
+    }
   },
   created() {
     if (this.$store.getters.saveCondition && Object.keys(this.$store.getters.searchQuery[this.$route.name] || {}).length) {
@@ -55,6 +86,10 @@ export default {
         <div>支持单人、批量单人及多人方式新建员工活码，客户可以通过扫描员工活码添加员工为好友，并支持自动给客户打标签和发送欢迎语。</div>
       `
     );
+    // 获取活码标签是否必填
+    this.$store.dispatch('GetCustomerProperty').then(({ data }) => {
+      this.tagLiveCodeRequired = data.find(item => item.name === '客户标签')?.liveCodeRequired || false;
+    });
   },
   methods: {
     getList(page) {
@@ -116,20 +151,6 @@ export default {
           });
       });
     },
-    download(id, userName, scenario) {
-      const name = userName + '-' + scenario + '.png';
-      download(id).then((res) => {
-        if (res != null) {
-          const blob = new Blob([res], { type: 'application/zip' });
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a'); // 创建a标签
-          link.href = url;
-          link.download = name; // 重命名文件
-          link.click();
-          URL.revokeObjectURL(url); // 释放内存
-        }
-      });
-    },
     /** 下载 */
     downloadBatch(qrCode) {
       if (!this.ids.length) {
@@ -189,6 +210,109 @@ export default {
         this.loading = false;
       }).catch(() => {
         this.loading = false;
+      });
+    },
+    handleCommand(command, row) {
+      if (command === 'getLink') {
+        this.getLink(row);
+      }
+    },
+    handleCopyCustomLink() {
+      copyText(this.qrCodeLink);
+    },
+    /**
+     * @description 查看专属活码
+     */
+    checkCustomLink(row) {
+      this.pageLoading = true;
+      const promiseList = [
+        getCustomerLink({ id: row.id })
+          .then((res) => {
+            this.qrCodeLink = res.data;
+          }),
+        getCustomerEmployCodeTag({
+          empleCodeId: row.id
+        }).then((res) => {
+          const { selectGroupList, selectTagList } = res.data;
+          const list = [];
+        selectGroupList?.forEach(item => {
+          list.push({
+            groupId: item.groupId,
+            name: item.tagName,
+            groupName: item.groupName,
+            tagId: null
+          });
+        });
+        selectTagList?.forEach(item => {
+          list.push({
+            tagId: item.tagId,
+            name: item.tagName
+          });
+        });
+        this.availableTags = list;
+        })
+      ];
+      if (this.tagLiveCodeRequired) {
+        promiseList.push(getTagGroupValid(row.id).then((res) => {
+          this.tagGroupValid = res.data || TAG_GROUP_VALID_TYPE.ALL;
+        }));
+      }
+      Promise.all(promiseList).finally(() => {
+        this.pageLoading = false;
+      });
+      this.dialogVisible = true;
+      this.currentRow = row;
+    },
+    handleCloseTag(tag) {
+      this.$confirm(
+        `即将移除所选可用标签，是否继续？`,
+        '操作须知',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.availableTags = this.availableTags.filter(item => item !== tag);
+          this.handleEditTag();
+        });
+    },
+    handleAddTagSuccess(tags) {
+      this.dialogVisibleAddTag = false;
+      this.availableTags = tags;
+    },
+    handleEditTag() {
+      // 构造请求参数
+      const params = {
+        selectGroupIdList: [],
+        selectTagIdList: []
+      };
+      this.availableTags.forEach(tag => {
+        if (!tag.tagId) {
+          params.selectGroupIdList.push(tag.groupId);
+        } else {
+          params.selectTagIdList.push(tag.tagId);
+        }
+      });
+      editCustomerEmployCodeTag({
+        originEmpleId: this.currentRow.id,
+        ...params
+      }).then(() => {
+        this.msgSuccess('删除成功');
+      }).finally(() => {
+      });
+    },
+    handleDialogClosed() {
+      this.availableTags = [];
+    },
+    handleTagGroupValidChange(val) {
+      editTagGroupValid({
+        empleCodeId: this.currentRow.id,
+        corpId: this.corpId,
+        tagGroupValid: val
+      }).then(() => {
+        this.msgSuccess('设置成功');
       });
     }
   }
@@ -322,20 +446,21 @@ export default {
                 </el-popover>
               </div>
               <div class="code-right">
+                <el-dropdown @command="(command) => handleCommand(command, row)">
+                  <div class="dropdown-link">
+                    复制链接
+                    <i class="el-icon-arrow-down el-icon--right" />
+                  </div>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item v-copy="row.qrCode" class="copy-btn">复制图片链接</el-dropdown-item>
+                    <el-dropdown-item class="copy-btn" command="getLink">复制小程序链接</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
                 <el-button
-                  type="text"
-                  @click="download(row.id, row.useUserName, row.scenario)"
-                >下载</el-button>
-                <el-button
-                  v-copy="row.qrCode"
                   type="text"
                   class="copy-btn"
-                >复制图片链接</el-button>
-                <el-button
-                  type="text"
-                  class="copy-btn"
-                  @click="getLink(row)"
-                >复制小程序链接</el-button>
+                  @click="()=>checkCustomLink(row)"
+                >专属活码</el-button>
               </div>
             </template>
           </el-table-column>
@@ -415,6 +540,60 @@ export default {
         />
       </template>
     </RightContainer>
+    <el-dialog
+      title="定制专属活码"
+      :visible.sync="dialogVisible"
+      width="700px"
+      @closed="handleDialogClosed"
+    >
+      <div v-loading="pageLoading" class="customize-qrcode">
+        <el-alert
+          title="专属活码，即由现场人员打开链接后为客户填入预设信息，一对一生成定制活码，客户扫码添加员工后，将自动录入预设信息"
+          type="warning"
+          class="theme-el-alert"
+          close-text=" "
+          show-icon
+        />
+        <div class="qrcode-box">
+          <div class="qrcode-link-title">活码链接</div>
+          <el-input v-model="qrCodeLink" disabled class="qrcode-link" />
+          <el-button type="text" @click="handleCopyCustomLink()">复制</el-button>
+        </div>
+        <el-divider content-position="left">链接设置</el-divider>
+        <div class="flex">
+          <div class="mr10 use-tag mt5">可用标签</div>
+          <div>
+            <el-button class="mr5" icon="el-icon-plus" type="primary" plain size="mini" @click="dialogVisibleAddTag = true">标签</el-button>
+            <el-tag
+              v-for="tag in availableTags"
+              :key="tag.tagId"
+              type="primary"
+              class="use-tag-item"
+              closable
+              size="medium"
+              @close="handleCloseTag(tag)"
+            >
+              <TagUserShow :name="tag.name||tag.groupName" :show-icon="!tag.tagId" />
+            </el-tag>
+            <div v-if="!availableTags.length && !pageLoading" class="use-tag-desc">未设置则默认所有</div>
+          </div>
+        </div>
+        <div v-if="tagLiveCodeRequired" class="tag-required">
+          <div class="mr10 use-tag">标签必填校验</div>
+          <el-radio-group v-model="tagGroupValid" size="mini" @change="handleTagGroupValidChange">
+            <el-radio :label="TAG_GROUP_VALID_TYPE.ALL">全部标签组</el-radio>
+            <el-radio :label="TAG_GROUP_VALID_TYPE.ANY">任一标签组</el-radio>
+          </el-radio-group>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer" />
+    </el-dialog>
+    <AddTag
+      :visible.sync="dialogVisibleAddTag"
+      :selected="availableTags"
+      :current-row="currentRow"
+      @success="handleAddTagSuccess"
+    />
   </div>
 </template>
 
@@ -432,6 +611,7 @@ export default {
     display: inline-block;
     width: 60px;
     position: absolute;
+    bottom: 14px;
     margin-top: 3px;
     /deep/ .el-button--small{
       padding: 3px 0px;
@@ -442,5 +622,51 @@ export default {
 }
 .copy-btn {
   margin: 0;
+  font-size: 12px;
+}
+.dropdown-link {
+  width: 80px;
+  font-size: 12px;
+  margin-left: 1px;
+  color: #3AB2A6;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.customize-qrcode {
+  margin-bottom: 20px;
+  .qrcode-box {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    .qrcode-link-title {
+      color: #101010;
+      text-align: right;
+      width: 84px;
+    }
+  }
+  .qrcode-link {
+    width: 310px;
+    margin: 0 10px;
+  }
+  .use-tag {
+    color: #101010;
+    text-align: right;
+    width: 84px;
+  }
+  .use-tag-desc {
+    color: #999999;
+    font-size: 14px;
+    line-height: 32px;
+  }
+  .use-tag-item {
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+}
+.tag-required {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
 }
 </style>

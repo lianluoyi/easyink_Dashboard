@@ -118,9 +118,8 @@ export default {
       goRouteWithQuery(this.$router, path, {}, { id });
     },
     syncMsg(data) {
-      const { msgid, messageId } = data;
-      const magArr = msgid.split(',');
-      syncMsg({ msgids: magArr, messageId })
+      const { messageIdDTOList } = data;
+      syncMsg({ messageIdDTOList })
         .then(() => {
           this.msgSuccess('同步成功');
           this.getList();

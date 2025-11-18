@@ -51,21 +51,40 @@
       </template>
       <span v-else>{{ item.value }}</span>
     </div>
-    <div v-if="['邮箱', '电话'].includes(item.name)">
+    <div v-if="['邮箱'].includes(item.name)">
       <el-input
         v-if="editStatus"
         v-model="item.value"
       />
       <span v-else>{{ item.value }}</span>
     </div>
+    <div v-if="['电话'].includes(item.name)">
+      <SensitiveText
+        v-if="!editStatus"
+        :key="item.remarkMobilesEncrypt"
+        permission-key="securityConfig:view:phone"
+        :text="item.value"
+        :api-params="{ encryptValue: item.remarkMobilesEncrypt}"
+      />
+      <SensitiveInput v-else :key="item.remarkMobilesEncrypt" v-model="item.value" :auto-fetch="true" :api-params="{ encryptValue: item.remarkMobilesEncrypt}" />
+    </div>
     <div v-if="item.name === '地址'">
-      <el-input
-        v-if="editStatus"
+      <SensitiveText
+        v-if="!editStatus"
+        :key="item.addressEncrypt"
+        permission-key="securityConfig:view:address"
+        :text="item.value"
+        :api-params="{ encryptValue: item.addressEncrypt}"
+      />
+      <SensitiveInput
+        v-else
+        :key="item.addressEncrypt"
         v-model="item.value"
+        :auto-fetch="true"
         maxlength="64"
         show-word-limit
+        :api-params="{ encryptValue: item.addressEncrypt}"
       />
-      <span v-else>{{ item.value }}</span>
     </div>
     <div v-if="item.name === '描述'">
       <el-input
@@ -78,13 +97,14 @@
       />
       <span v-else>{{ item.value }}</span>
     </div>
-
   </div>
 </template>
 <script>
+import SensitiveText from '@/components/SensitiveText/index.vue';
+import SensitiveInput from '@/components/SensitiveInput/index.vue';
 export default {
   name: '',
-  components: { },
+  components: { SensitiveText, SensitiveInput },
   props: {
     item: {
       type: Object,
@@ -110,7 +130,6 @@ export default {
           return time.getTime() > Date.now();
         }
       }
-
     };
   },
   created() {},

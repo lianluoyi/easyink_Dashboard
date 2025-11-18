@@ -121,12 +121,13 @@
           {{ checkItem.multipleValue }}
         </el-checkbox>
       </el-checkbox-group>
-      <el-tag
-        v-for="(unit, unique) in item.value"
-        v-else
-        :key="unique"
-        type="info"
-      >{{ unit }}</el-tag>
+      <template v-else>
+        <el-tag
+          v-for="(unit, unique) in item.value"
+          :key="unique"
+          type="info"
+        >{{ unit }}</el-tag>
+      </template>
     </div>
 
     <div v-else-if="item.type === CUSTOMER_PROPERTY_VALUE['dateField']">
@@ -154,6 +155,23 @@
       </template>
       <span v-else>{{ item.value }}</span>
     </div>
+    <div v-else-if="item.type === CUSTOMER_PROPERTY_VALUE['address']">
+      <template v-if="editStatus">
+        <AddressSelector is-edit :form-item="item" :corp-id="corpId" :address-options="addressOptions" width="230px" />
+      </template>
+      <template v-else>
+        <div class="flex-row">
+          <span class="address-text">{{ addressText.address }}</span>
+          <SensitiveText
+            :key="item.detailAddressEncrypt"
+            permission-key="securityConfig:view:address"
+            :text="addressText.detailAddress"
+            :api-params="{ encryptValue: addressText.detailAddressEncrypt }"
+          />
+        </div>
+        <p style="font-size: 12px">{{ addressText.location }}</p>
+      </template>
+    </div>
     <div v-else>{{ item.value }}</div>
   </div>
 </template>
@@ -161,10 +179,13 @@
 import { CUSTOMER_PROPERTY_VALUE, MEDIA_TYPE_FILE } from '@/utils/constant/index';
 import { download } from '@/utils/download';
 import { deepClone } from '@/utils/index';
+import { dealAddressText } from '@/utils/common';
+import AddressSelector from '@/components/AddressSelector';
+import SensitiveText from '@/components/SensitiveText';
 const MAX_UPLOAD_COUNT = 9;
 export default {
   name: '',
-  components: {},
+  components: { AddressSelector, SensitiveText },
   props: {
     item: {
       type: Object,
@@ -192,6 +213,10 @@ export default {
     isCustomerScoped: {
       type: Boolean,
       default: false
+    },
+    addressOptions: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -202,6 +227,17 @@ export default {
       fileList: [],
       maxUploadCount: MAX_UPLOAD_COUNT
     };
+  },
+  computed: {
+    addressText() {
+      if (this.item.type === CUSTOMER_PROPERTY_VALUE['address'] && this.item.value) {
+        return dealAddressText(this.item.value);
+      }
+      return {};
+    },
+    corpId() {
+      return this.$store.state.enterPriseWechatConfig.corpId;
+    }
   },
   watch: {
     fileUrl(val) {
@@ -219,8 +255,8 @@ export default {
   },
   created() {
   },
-  mounted() {},
   methods: {
+    dealAddressText,
     /**
      * 移除已上传的图片
      */
@@ -262,6 +298,13 @@ export default {
 };
 </script>
 <style scoped lang='scss'>
+.flex-row {
+  display: flex;
+  align-items: center;
+  .address-text {
+    margin-right: 5px;
+  }
+}
 .custom-property-item {
     min-height: 21px;
     .img-preview {

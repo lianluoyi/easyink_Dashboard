@@ -181,6 +181,38 @@
               </div>
             </div>
           </el-form-item>
+          <el-form-item v-if="pushUrl" label="推送内容" prop="pushContentFlag">
+            <div class="advanced-setting-item">
+              <el-switch
+                v-model="formSetting.pushContentFlag"
+                :active-value="true"
+                :inactive-value="false"
+              />
+              <span class="we-emple-code-tags-tip">开启后，当客户提交表单时，将表单内容和用户信息推送到指定地址</span>
+            </div>
+          </el-form-item>
+          <el-form-item v-show="pushUrl && formSetting.pushContentFlag" label="">
+            <div class="item-div" style="width: 730px">
+              <div class="item-content">
+                <div class="label">用户信息</div>
+                <el-select v-model="formSetting.customerPropertyIdList" multiple placeholder="请选择用户信息" style="width: 605px">
+                  <el-option
+                    v-for="item in customerProperList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  />
+                </el-select>
+              </div>
+              <div class="tips">系统将固定推送用户昵称，你还可以设置推送其他用户信息</div>
+              <div class="item-content" style="margin-top: 10px">
+                <div class="label">超时自动推送</div>
+                <el-input-number ref="timeoutInput" v-model="formSetting.timeoutHours" placeholder="请输入" :controls="false" :min="1" :max="999" step-strictly style="width: 100px" />
+                小时
+              </div>
+              <div class="tips">当用户未在规定时间内填写表单，系统会自动推送用户信息。若未设置超时时间，则不会触发自动推送。</div>
+            </div>
+          </el-form-item>
         </el-form>
         <PhoneDialog
           :form-setting="formSetting"
@@ -225,6 +257,8 @@ import {
 } from '@/utils/constant/index';
 import { EventBus } from '@/event-bus.js';
 import { getGroupTree, addForm, editForm } from '@/api/form';
+import { initGetCustomerProper } from '@/utils/common';
+
 const UPLOAD_NUMS_LIMIT = 1;
 export default {
   components: { SelectTag, RequestButton, UploadFile, PhoneDialog },
@@ -291,16 +325,21 @@ export default {
             callback();
           }, trigger: 'blur' }
         ]
-      })
+      }),
+      pushUrl: window.sessionStorage.getItem('pushUrl') || ''
     };
   },
   computed: {
     // 是否是三方
     isThirdApplication() {
       return this.$store.state.serverInfo && this.$store.state.serverInfo.serverType === SERVER_TYPE_THIRD;
+    },
+    customerProperList() {
+      return this.$store.state.customerProperty.customerProperList;
     }
   },
   created() {
+    initGetCustomerProper(this.$store);
     this.getFormGoup();
     this.formInitValue.id && this.initFrom();
     this.isThirdApplication && this.getWechatOpenConfig();
@@ -315,6 +354,10 @@ export default {
         ...formSetArg
       };
     });
+    if (this.$refs.timeoutInput) {
+      // 若timeoutHours值为空，强制设置为undefined，否则会被最小值1所限制
+      this.$refs.timeoutInput.setCurrentValue(this.formInitValue.timeoutHours || undefined);
+    }
   },
   beforeDestroy() {
     EventBus.$off('formFieldListJson');
@@ -340,6 +383,7 @@ export default {
       // TODO修改
       if (this.formSetting.submitActionType === JUMP_RESULT_PAGE) {
         const { iconUrl, document, url } = JSON.parse(this.formInitValue.actionInfoParamJson);
+        const customerPropertyIdList = JSON.parse(this.formInitValue.customerPropertyIdJson);
         this.formSetting = {
           ...this.formSetting,
           actionInfoParam: {
@@ -349,7 +393,8 @@ export default {
           },
           labelSetting: {
             ...JSON.parse(this.formInitValue.labelSettingJson)
-          }
+          },
+          customerPropertyIdList
         };
       }
       this.formSetting = {
@@ -508,6 +553,33 @@ export default {
     width: 430px;
     .el-form-item {
       padding: 0;
+    }
+    .item-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      .label {
+        width: 84px;
+        text-align: right;
+      }
+      /deep/ .el-tag {
+        background-color: #f0f8f7;
+        border-color: #e1f0ee;
+        color: #6bb4ab;
+        .el-icon-close {
+          color: #6bb4ab;
+          background-color: #f0f8f7;
+          &:hover {
+            color: #ffffff;
+            background-color: #6bb4ab;
+          }
+        }
+      }
+    }
+    .tips {
+      font-size: 12px;
+      color: #999999;
+      margin-left: 95px;
     }
   }
   .weChatPublicPlatform-info {

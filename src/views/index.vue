@@ -149,7 +149,7 @@ import {
 import {
   content
 } from '@/api/content.js';
-import echarts from 'echarts';
+import * as echarts from 'echarts';
 import NoConfigInfo from '@/components/NoConfigInfo';
 import DiffItem from './dataStatistics/diffItem.vue';
 import CntItem from './dataStatistics/cntItem.vue';

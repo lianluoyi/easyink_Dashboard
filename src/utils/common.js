@@ -662,7 +662,31 @@ export function dealShowText(colunmItem, row, type) {
       if (proIndex < 0) return;
       return { value: row.extendProperties[proIndex].propertyValue };
     }
+    case 'addressType': {
+      const proIndex = row.extendProperties.findIndex(item => item.extendPropertyId.toString() === colunmItem.id);
+      if (proIndex < 0) return;
+      const propertyValue = JSON.parse(row.extendProperties[proIndex].propertyValue);
+      return { value: propertyValue };
+    }
   }
+}
+export function dealAddressText(colunmItem, row) {
+  let data;
+  if (!row) {
+    data = colunmItem;
+  } else {
+    data = dealShowText(colunmItem, row, 'addressType')?.value;
+  }
+  if (!data || !Object.keys(data).length) {
+    return {};
+  }
+  const { province, city, area, town, detailAddress, location, detailAddressEncrypt } = data;
+  return {
+    address: [...new Set([province, city, area, town])].filter(item => item !== '暂不选择').filter(Boolean).join('-'),
+    detailAddress,
+    detailAddressEncrypt,
+    location: location ? `(经纬度：${location.lat}，${location.lng})` : ''
+  };
 }
 
 function filterValueList(row, colunmItem) {

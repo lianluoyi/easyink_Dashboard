@@ -371,6 +371,7 @@ const SELECT_SINGLE = 6;
 const DATE_FIELD = 7;
 const IMG_FIELD = 8;
 const FILE_FIELD = 9;
+const ADDRESS_FIELD = 10;
 
 // 客户字段类型值
 export const CUSTOMER_PROPERTY_VALUE = {
@@ -382,7 +383,8 @@ export const CUSTOMER_PROPERTY_VALUE = {
   'selectSingle': SELECT_SINGLE,
   'dateField': DATE_FIELD,
   'img': IMG_FIELD,
-  'file': FILE_FIELD
+  'file': FILE_FIELD,
+  'address': ADDRESS_FIELD
 };
 
 // 客户字段类型名
@@ -395,7 +397,8 @@ export const CUSTOMER_PROPERTY_MAP = {
   [SELECT_SINGLE]: '下拉框',
   [DATE_FIELD]: '日期',
   [IMG_FIELD]: '图片',
-  [FILE_FIELD]: '文件'
+  [FILE_FIELD]: '文件',
+  [ADDRESS_FIELD]: '位置'
 };
 
 export const GROUP_MESSAGE_SEND_STATUS_UNEXEC = '0';
@@ -597,8 +600,8 @@ export const DEFAULT_IMG = {
 };
 
 // 链接标题摘要最大限制的长度
-export const LINK_TITLE_MAXLENGTH = 16; // 标题最大长度16
-export const LINK_CONTENT_MAXLENGTH = 64; // 摘要最大长度64
+export const LINK_TITLE_MAXLENGTH = 42; // 标题最大长度42
+export const LINK_CONTENT_MAXLENGTH = 170; // 摘要最大长度170
 
 // 进群方式
 const CREATE_TYPE_GROUP = 1;
@@ -792,6 +795,8 @@ export const CLIENT_DIMENSION = 3;
 export const CODE_DIMENSION = 4;
 /** 渠道维度 */
 export const CHANNEL_DIMENSION = 5;
+/** 部门维度 */
+export const DEPARTMENT_DIMENSION = 6;
 /** 数据维度*/
 export const DATA_DIMENSION = {
   'date': DATE_DIMENSION,
@@ -902,3 +907,10 @@ export const RELATION_TYPE = {
   containsAll: 1, // 包含全部
   containsAny: 2 // 包含任一
 };
+
+/** 港澳台 */
+export const SPECIAL_REGION = ['香港特别行政区', '澳门特别行政区', '台湾省'];
+/** 直辖市 */
+export const MUNICIPAL = ['北京市', '天津市', '上海市', '重庆市'];
+/** 不设区县的城市 */
+export const NO_AREA_CITY = ['东莞市', '中山市', '儋州市', '嘉峪关市'];

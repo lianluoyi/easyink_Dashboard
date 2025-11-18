@@ -207,3 +207,53 @@ export function getCodeList(params) {
     params
   });
 }
+
+/**
+ * 获取专属活码链接
+ * @param {*} params
+ */
+export function getCustomerLink(params) {
+  return request({
+    url: service + '/customerLink',
+    params
+  });
+}
+
+/**
+ * 编辑专属活码标签选择范围
+ */
+export function editCustomerEmployCodeTag(params) {
+  return request({
+    url: service + '/editCustomerEmployCodeTagSelectScope',
+    method: 'post',
+    data: params
+  });
+}
+
+/**
+ * 获取专属活码标签选择范围
+ */
+export function getCustomerEmployCodeTag(params) {
+  return request({
+    url: service + '/customerEmployCodeTagSelectScopeDetail',
+    params
+  });
+}
+/**
+ * 获取专属活码标签必填校验配置
+ */
+export function getTagGroupValid(empleCodeId) {
+  return request({
+    url: service + '/tagGroupValid/' + empleCodeId
+  });
+}
+/**
+ * 编辑专属活码标签必填校验
+ */
+export function editTagGroupValid(params) {
+  return request({
+    url: service + '/tagGroupValid',
+    method: 'put',
+    data: params
+  });
+}

@@ -11,10 +11,11 @@ import { goRouteWithQuery } from '@/utils';
 import { ADD_WAY_MAP, SCREENING_GENDER_TYPE, PAGE_LIMIT, CUSTOMER_PROPERTY_VALUE, WX_TYPE, CUSTOMER_STATUS, COMMON_TYPE, LOSS_TYPE, TO_INHERIT_TYPE, TRANSFER_TYPE, ALL_TYPE } from '@/utils/constant/index';
 import { CUSTOMER_DEATIL_PATH } from '@/utils/constant/routePath';
 import PropertySetting from './components/propertySetting.vue';
-import { dealShowText, dealAtInfo } from '@/utils/common';
+import { dealShowText, dealAtInfo, dealAddressText } from '@/utils/common';
 import ExportCustomerModal from './components/exportCustomerModal.vue';
 import { download } from '@/utils/download';
 import AdvancedScreening from './components/advancedScreening.vue';
+import SensitiveText from '@/components/SensitiveText/index.vue';
 import { cloneDeep, find } from 'lodash';
 import loadingMixin from '@/mixin/loadingMixin';
 
@@ -33,7 +34,7 @@ const GENDER = '性别';
 const CUSTOMER_SET_SYS_FIELD_NAME = ['birthday', 'phone', 'email', 'address', 'desc'];
 export default {
   name: 'Customer',
-  components: { AddTag, SelectUser, SelectTag, RightContainer, EmptyDefaultIcon, PropertySetting, ExportCustomerModal, AdvancedScreening },
+  components: { AddTag, SelectUser, SelectTag, RightContainer, EmptyDefaultIcon, PropertySetting, ExportCustomerModal, AdvancedScreening, SensitiveText },
   mixins: [loadingMixin],
   props: {},
   data() {
@@ -126,6 +127,12 @@ export default {
   },
   computed: {
     /**
+     * 客户标签是否启用
+     */
+    tagEnable() {
+      return this.$store.state.customerProperty.customerProperList?.find(item => item.name === '客户标签')?.status || false;
+    },
+    /**
      * 导出客户显示的字段
      */
     exportPropertyList() {
@@ -156,7 +163,7 @@ export default {
         }
       });
       const list = [
-        ...defaultList,
+        ...(this.tagEnable ? defaultList : defaultList.filter(item => item.id !== 'tag')),
         ...filterExtraList,
         ...customList,
         { id: 'unionId', name: 'unionId' },
@@ -460,8 +467,9 @@ export default {
         { id: 'gender', name: '性别' }
       ];
       this.showCustomerPropertyList = [
-        ...extraList,
-        ...list.filter(customerProperItem => customerProperItem.status)];
+        // 若客户标签未启用，需要去除
+        ...(this.tagEnable ? extraList : extraList.filter(item => item.id !== 'tag')),
+        ...list.filter(customerProperItem => customerProperItem.status && customerProperItem.name !== '客户标签')];
       const columnList = [];
       let newIdList = [];
       // 是否展示默认字段（用户未自定义设置展示字段则显示默认字段）
@@ -493,6 +501,7 @@ export default {
     dealShowText(colunmItem, row, type) {
       return dealShowText(colunmItem, row, type)?.value;
     },
+    dealAddressText,
     /**
      * 点击查询
      */
@@ -507,6 +516,27 @@ export default {
             propertyValue: arg.value.join(','),
             propertyType: arg.type
           });
+        } else if (arg.type === CUSTOMER_PROPERTY_VALUE['address']) {
+          const { province, city, area, town } = arg.value || {};
+          const propertyValue = JSON.stringify({
+            province,
+            city,
+            area,
+            town,
+            detailAddress: arg.detailValue
+          });
+          extendProperties.push({
+            extendPropertyId: arg.field,
+            propertyValue,
+            propertyType: arg.type
+          });
+          Object.assign(this.query, {
+            province,
+            city,
+            area,
+            town,
+            detailAddress: arg.detailValue
+          });
         } else {
           extendProperties.push({
             extendPropertyId: arg.field,
@@ -515,6 +545,13 @@ export default {
           });
         }
       });
+      if (!this.showSearchValueList.some(item => item.type === CUSTOMER_PROPERTY_VALUE['address'])) {
+        // 当没有地址类型的条件时，清除地址相关查询参数
+        const addressFields = ['province', 'city', 'area', 'town', 'detailAddress'];
+        addressFields.forEach(field => {
+          this.query[field] = undefined;
+        });
+      }
       this.query = { ...this.query, extendProperties };
       this.getList(1);
       this.getCount();
@@ -627,7 +664,10 @@ export default {
         if (systemAndSetFieldItem.type === CUSTOMER_PROPERTY_VALUE['selectSingle']) {
           newLabel = this.dealMultipleOption(systemAndSetFieldItem.value, systemAndSetFieldItem.options);
         }
-
+        if (systemAndSetFieldItem.type === CUSTOMER_PROPERTY_VALUE['address']) {
+          const arr = [...new Set([newLabel?.province, newLabel?.city, newLabel?.area, newLabel?.town].filter(Boolean))];
+          newLabel = arr.join('-') + ' ' + (systemAndSetFieldItem.detailValue || '');
+        }
         return {
           ...systemAndSetFieldItem,
           showLabel: systemAndSetFieldItem.label + ': ' + newLabel
@@ -691,7 +731,7 @@ export default {
             </template>
           </div>
         </el-form-item>
-        <el-form-item>
+        <el-form-item v-if="tagEnable">
           <div class="tag-input" @click="showTagDialog">
             <span v-if="!queryTag.length" class="tag-place">请选择标签</span>
             <template v-else>
@@ -861,6 +901,7 @@ export default {
           prop="name"
           align="left"
           min-width="200"
+          :width="colunmItem.type === CUSTOMER_PROPERTY_VALUE['address']? '250px': ''"
         >
           <template #header>
             <div v-if="colunmItem.id === 'status'">
@@ -918,6 +959,22 @@ export default {
             <div v-else-if="colunmItem.name === ADD_WAY">
               {{ ADD_WAY_MAP[row.addWay] }}
             </div>
+            <div v-else-if="colunmItem.name === '电话'">
+              <SensitiveText
+                :key="row.remarkMobilesEncrypt"
+                permission-key="securityConfig:view:phone"
+                :text="row[fieldObj[colunmItem.name]]"
+                :api-params="{ encryptValue: row.remarkMobilesEncrypt }"
+              />
+            </div>
+            <div v-else-if="colunmItem.name === '地址'">
+              <SensitiveText
+                :key="row.addressEncrypt"
+                permission-key="securityConfig:view:address"
+                :text="row[fieldObj[colunmItem.name]]"
+                :api-params="{ encryptValue: row.addressEncrypt }"
+              />
+            </div>
             <div v-else-if="colunmItem.name === GENDER">
               {{ SCREENING_GENDER_TYPE[row.gender] }}
             </div>
@@ -966,6 +1023,16 @@ export default {
                   :key="fileIndex"
                   @click="downloadFile(fileItem.url)"
                 >{{ fileItem.name }}</div>
+              </div>
+              <div v-if="colunmItem.type === CUSTOMER_PROPERTY_VALUE['address']">
+                <p style="font-size: 14px">{{ dealAddressText(colunmItem, row).address }}</p>
+                <SensitiveText
+                  :key="dealAddressText(colunmItem, row).detailAddressEncrypt"
+                  permission-key="securityConfig:view:address"
+                  :text="dealAddressText(colunmItem, row).detailAddress"
+                  :api-params="{ encryptValue: dealAddressText(colunmItem, row).detailAddressEncrypt }"
+                />
+                <p>{{ dealAddressText(colunmItem, row).location }}</p>
               </div>
             </div>
           </template>
@@ -1041,7 +1108,7 @@ export default {
       />
       <PropertySetting :visible.sync="properSettingVisible" :data.sync="showCustomerPropertyList" @getList="getColumnList" />
       <ExportCustomerModal :visible.sync="exportVisible" :list="exportPropertyList" :query="query" :is-d-k-corp="isDKCorp" :is-config-self-build-url="isConfigSelfBuildUrl" />
-      <AdvancedScreening ref="advancedScreening" :visible.sync="advancedScreeningVisible" :search-value="searchValue" @searchByAdvanced="searchByAdvanced" />
+      <AdvancedScreening ref="advancedScreening" :visible.sync="advancedScreeningVisible" :search-value="searchValue" :tag-enable="tagEnable" @searchByAdvanced="searchByAdvanced" />
     </template>
   </RightContainer>
 

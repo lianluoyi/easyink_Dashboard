@@ -67,6 +67,9 @@
             />
           </el-form-item>
           <el-form-item>
+            <el-input v-model="query.position" placeholder="请输入员工职务" />
+          </el-form-item>
+          <el-form-item>
             <el-button
               v-preventReClick="200"
               type="primary"
@@ -136,16 +139,23 @@
             <template slot="empty">
               <empty-default-icon :length="list.length" :text="showChooseCodeTips ? '请先选择渠道' : '暂无数据'" />
             </template>
-            <el-table-column
-              v-if="dimensionType === STAFF_DIMENSION"
-              prop="userName"
-              label="员工"
-              min-width="200"
-            >
-              <template #default="{ row }">
-                <UserItem :data="row" :is-staff="true" />
-              </template>
-            </el-table-column>
+            <template v-if="dimensionType === STAFF_DIMENSION">
+              <el-table-column
+                prop="userName"
+                label="员工"
+                min-width="200"
+              >
+                <template #default="{ row }">
+                  <UserItem :data="row" :is-staff="true" />
+                </template>
+              </el-table-column>
+              <el-table-column prop="position" label="员工职务" min-width="180" />
+              <el-table-column prop="parentDepartmentName" label="所属上级部门" min-width="180">
+                <template #default="{ row }">
+                  {{ row.parentDepartmentName || '-' }}
+                </template>
+              </el-table-column>
+            </template>
             <el-table-column
               v-if="dimensionType === DATE_DIMENSION"
               prop="time"
@@ -201,7 +211,7 @@ import UserItem from '@/components/UserItem.vue';
 import TagUserShow from '@/components/TagUserShow';
 import SelectChannel from './components/SelectChannel.vue';
 import SelectUser from '@/components/SelectUser/index.vue';
-import { TODAY_TIME, FIXED_DAYS_AGO_TIME, ONE_MOUNTH_AGO, ONE_MOUNTH_LATER, groupByScopeType } from '@/utils/common';
+import { TODAY_TIME, FIXED_DAYS_AGO_TIME, groupByScopeType } from '@/utils/common';
 import {
   exportStatisticsByDate,
   exportStatisticsByStaff,
@@ -228,6 +238,7 @@ export default {
       userAndDepartmentList: [],
       // 日期选择器第一次选中的时间
       pickerMinDate: '',
+      selectMonthLimit: 1,
       // 日期范围选择限定
       pickerOptions: {
         onPick: obj => {
@@ -235,11 +246,23 @@ export default {
         },
         disabledDate: v => {
           if (this.pickerMinDate) {
-            const minTime = new Date(ONE_MOUNTH_AGO(this.pickerMinDate)).getTime();
-            const maxTime = new Date(ONE_MOUNTH_LATER(this.pickerMinDate)).getTime();
-            return v.getTime() > maxTime || v.getTime() < minTime || v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date(TODAY_TIME).getTime();
+            // 根据 selectMonthLimit 计算时间范围
+            const selectedDate = new Date(this.pickerMinDate);
+            const minDate = new Date(selectedDate);
+            const maxDate = new Date(selectedDate);
+
+            // 设置最小日期为选中日期减去 selectMonthLimit 个月
+            minDate.setMonth(selectedDate.getMonth() - this.selectMonthLimit);
+            // 设置最大日期为选中日期加上 selectMonthLimit 个月
+            maxDate.setMonth(selectedDate.getMonth() + this.selectMonthLimit);
+
+            return v.getTime() > maxDate.getTime() ||
+                   v.getTime() < minDate.getTime() ||
+                   v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() ||
+                   v.getTime() > new Date(TODAY_TIME).getTime();
           } else {
-            return v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date(TODAY_TIME).getTime();
+            return v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() ||
+                   v.getTime() > new Date(TODAY_TIME).getTime();
           }
         }
       },
@@ -300,6 +323,11 @@ export default {
       channelList: [],
       showChooseCodeTips: true
     };
+  },
+  created() {
+    // 获取系统设置中的 selectMonthLimit
+    const { selectMonthLimit } = this.$store.state.app.systemSetting;
+    this.selectMonthLimit = selectMonthLimit || 1;
   },
   methods: {
     /**

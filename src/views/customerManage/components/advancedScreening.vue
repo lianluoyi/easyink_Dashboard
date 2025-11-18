@@ -56,6 +56,9 @@
             </template>
           </div>
         </div>
+        <div v-if="formItem.type === CUSTOMER_PROPERTY_VALUE['address']">
+          <AddressSelector :form-item="formItem" :corp-id="corpId" :address-options="addressOptions" />
+        </div>
       </el-form-item>
       <div class="drawer-footer">
         <el-button @click="reset()">重 置</el-button>
@@ -88,6 +91,8 @@ import SelectTag from '@/components/SelectTag';
 import { findIndex } from 'lodash';
 import moment from 'moment';
 import { getSourceLabel } from '@/utils/common';
+import { getDistrictList } from '@/api/map';
+import AddressSelector from '@/components/AddressSelector';
 const SELECT_USER_TYPE = 11;
 const SELECT_TAG_TYPE = 12;
 /** 客户自定义中系统字段名*/
@@ -109,7 +114,7 @@ const SYS_FIELD = {
 };
 
 export default {
-  components: { SelectUser, SelectTag },
+  components: { SelectUser, SelectTag, AddressSelector },
   props: {
     // 弹窗显示隐藏
     visible: {
@@ -120,6 +125,11 @@ export default {
     searchValue: {
       type: Array,
       default: () => []
+    },
+    // 是否启用标签
+    tagEnable: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -179,7 +189,8 @@ export default {
       dialogVisibleSelectTag: false,
       queryUser: [],
       queryTag: [],
-      selectedTagList: []
+      selectedTagList: [],
+      addressOptions: []
     };
   },
   computed: {
@@ -190,6 +201,9 @@ export default {
       set(val) {
         this.$emit('update:visible', val);
       }
+    },
+    corpId() {
+      return this.$store.state.enterPriseWechatConfig.corpId;
     }
   },
   watch: {
@@ -235,6 +249,9 @@ export default {
             this.queryTag = item.value;
           }
           this.$set(this.formItemData[formIndex], 'value', item.value);
+          if (item.type === CUSTOMER_PROPERTY_VALUE['address']) {
+            this.$set(this.formItemData[formIndex], 'detailValue', item.detailValue);
+          }
         }
       });
     },
@@ -262,7 +279,8 @@ export default {
         CUSTOMER_PROPERTY_VALUE['mulRadio'],
         CUSTOMER_PROPERTY_VALUE['selectSingle'],
         CUSTOMER_PROPERTY_VALUE['dateField'],
-        CUSTOMER_PROPERTY_VALUE['sysField']
+        CUSTOMER_PROPERTY_VALUE['sysField'],
+        CUSTOMER_PROPERTY_VALUE['address']
       ];
       const newList = list.filter((item) => item.status && FILTER_TYPE.includes(item.type)).map((arg) => {
         // 出生日期
@@ -303,8 +321,21 @@ export default {
             field: arg.id, customDateField: true, label: arg.name, value: undefined, type: CUSTOMER_PROPERTY_VALUE['dateField']
           };
         }
-      });
-      this.formItemData = [...this.formItemData, ...newList];
+        if (arg.type === CUSTOMER_PROPERTY_VALUE['address']) {
+          return {
+            field: arg.id, label: arg.name, value: undefined, detailValue: undefined, placeholder: '请输入' + arg.name, type: CUSTOMER_PROPERTY_VALUE['address']
+          };
+        }
+      }).filter(Boolean);
+      if (newList.some(item => item.type === CUSTOMER_PROPERTY_VALUE['address'])) {
+        getDistrictList({
+          corpId: this.corpId
+        }).then(res => {
+          this.addressOptions = res.data.result || [];
+        });
+      }
+      // 若未开启标签，需要去除客户标签的筛选项
+      this.formItemData = [...(this.tagEnable ? this.formItemData : this.formItemData.filter(item => item.field !== 'tagIds')), ...newList];
     },
 
     showTagDialog() {
@@ -373,6 +404,8 @@ export default {
         // 除去系统字段(性别)的多选框
         if (arg.type === CUSTOMER_PROPERTY_VALUE['selectSingle']) {
           return arg.value !== undefined && arg.value.length;
+        } else if (arg.type === CUSTOMER_PROPERTY_VALUE['address']) {
+          return arg.value || arg.detailValue;
         } else {
           return arg.value !== undefined && arg.value !== '' && arg.value !== null;
         }
@@ -386,6 +419,13 @@ export default {
       this.queryUser = [];
       this.queryTag = [];
       this.formItemData = this.formItemData.map((item) => {
+        if (item.type === CUSTOMER_PROPERTY_VALUE['address']) {
+          return {
+            ...item,
+            value: undefined,
+            detailValue: undefined
+          };
+        }
         return {
           ...item,
           value: undefined

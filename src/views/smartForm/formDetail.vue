@@ -51,7 +51,7 @@
               <div class="submit-result-image">
                 <span class="mr10">图标</span>
                 <el-image
-                  :src="submitResult.iconUrl"
+                  :src="submitResult.iconUrl || ''"
                 />
               </div>
               <div class="submit-result-text">
@@ -90,7 +90,26 @@
               </div>
             </div>
           </div>
-
+        </div>
+        <div v-if="pushContentFlag" class="header-right">
+          <div class="header-right-item mb10">
+            <span class="label">推送内容：</span>
+            <div class="item-div">
+              <div class="item-flex">
+                <div class="item-label">用户信息</div>
+                <el-tag
+                  v-for="(item, index) in customerPropertyIdVOList"
+                  :key="index"
+                  class="tag"
+                >{{ item.name }}</el-tag>
+              </div>
+              <div class="item-flex" style="margin-top: 20px">
+                <div class="item-label">超时自动推送</div>
+                {{ formDetail.timeoutHours }}
+                <span v-if="formDetail.timeoutHours">小时</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -436,6 +455,8 @@ export default {
         clickLabelIdList: [],
         submitLabelIdList: []
       },
+      customerPropertyIdVOList: [],
+      pushContentFlag: false,
       submitResult: {},
       searchForm: {
         pageSize: PAGE_LIMIT,
@@ -497,6 +518,8 @@ export default {
         }
         this.labelSetting.clickLabelIdList = res.data.labelSetting.clickLabelIdList || [];
         this.labelSetting.submitLabelIdList = res.data.labelSetting.submitLabelIdList || [];
+        this.customerPropertyIdVOList = res.data.customerPropertyIdVOList || [];
+        this.pushContentFlag = res.data.pushContentFlag;
         this.formSetting = {
           actionInfoParam: JSON.parse(this.formDetail.actionInfoParamJson),
           submitActionType: this.formDetail.submitActionType
@@ -632,6 +655,15 @@ export default {
   border: 1px solid $borderColor;
   padding: 10px;
   width: 430px;
+  .item-flex {
+    display: flex;
+    align-items: center;
+    .item-label {
+      width: 84px;
+      text-align: right;
+      margin-right: 10px;
+    }
+  }
 }
 .customer-tag {
   display: flex;
@@ -651,13 +683,14 @@ export default {
       padding: 15px;
       background-color: #fff;
       display: flex;
+      gap: 10px;
       .label {
         color: #999999;
         min-width: 70px;
         text-align: right;
       }
       .header-left {
-        width: 320px;
+        flex: 1;
         .header-left-item {
           display: flex;
           margin-bottom: 15px;
@@ -707,7 +740,6 @@ export default {
         flex: 1;
         display: flex;
         flex-direction: column;
-        margin-left: 20%;
         .header-right-item {
           display: flex;
         }

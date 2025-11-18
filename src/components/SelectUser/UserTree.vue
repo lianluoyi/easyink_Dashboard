@@ -203,6 +203,9 @@ export default {
      * @description 获取当前部门和当前部门下的部门数据
      */
     getDepItem(depInfo, arr = []) {
+      if (!depInfo || !depInfo.children) {
+        return arr;
+      }
       depInfo.children.forEach((item) => {
         if (!item.userId && (item.id)) {
           arr.push(item);
@@ -423,7 +426,7 @@ export default {
      * 展开某节点
      */
     async nodeExpand(data, node) {
-      if (data.loaded) return;
+      if (!data || data?.loaded) return;
       if (this.isSearching) return;
       await this.updateUserList(data[this.departmentIdKey], data);
     },
@@ -474,14 +477,14 @@ export default {
         this.searchTreeData = [];
         this.defaultExpandNode = [];
         this.isSearching = false;
-        const depInfo = this.getDepItem(this.treeData[0]).find((item) => item.id === this.clickNode.mainDepartment);
-        if (depInfo.parentId !== DEFAULT_ROOT_PARENTID) {
+        const depInfo = this.treeData[0] ? this.getDepItem(this.treeData[0]).find((item) => item.id === this.clickNode?.mainDepartment) : null;
+        if (depInfo?.parentId !== DEFAULT_ROOT_PARENTID) {
           await this.nodeExpand(depInfo);
         }
-        const findNodeKeyByIdItem = this.getNodeItemByUserId(this.treeData).find((item) => item.userId === this.clickNode.userId);
+        const findNodeKeyByIdItem = this.getNodeItemByUserId(this.treeData).find((item) => item.userId === this.clickNode?.userId);
         this.defaultExpandNode = findNodeKeyByIdItem ? [findNodeKeyByIdItem.key] : [this.treeData[0]?.key];
         this.$nextTick(() => {
-          this.$refs.tree.$refs.commonTree.setCurrentKey(findNodeKeyByIdItem?.key || this.clickNode.key);
+          this.$refs.tree.$refs.commonTree.setCurrentKey(findNodeKeyByIdItem?.key || this.clickNode?.key);
         });
         return;
       }
@@ -506,7 +509,7 @@ export default {
       // 由于接口只能筛选员工数据，无法筛选部门，所以需要在页面更新后调用树的过滤方法
       this.$nextTick(() => {
         this.$refs.tree.filter(this.filterText);
-        const findNodeKeyByIdItem = this.getNodeItemByUserId(this.searchTreeData).find((item) => item.userId === this.clickNode.userId);
+        const findNodeKeyByIdItem = this.getNodeItemByUserId(this.searchTreeData).find((item) => item.userId === this.clickNode?.userId);
         this.$refs.tree.$refs.commonTree.setCurrentKey(findNodeKeyByIdItem);
       });
     },

@@ -11,7 +11,7 @@
     v-on="$listeners"
     @close="onClose"
   >
-    <el-form ref="elForm" :model="formData" :rules="rules" size="medium" label-width="80px">
+    <el-form ref="elForm" :model="formData" :rules="rules" size="medium" label-width="96px">
       <el-tabs v-model="activeName" tab-position="left">
         <el-tab-pane
           v-for="(item, index) in customerProperty"
@@ -29,9 +29,17 @@
             <el-switch v-model="formData.required" />
             <span class="form-item-tip">开启后，员工为客户编辑资料时该字段不能为空</span>
           </el-form-item>
+          <el-form-item label="专属活码必填">
+            <el-switch v-model="formData.liveCodeRequired" />
+            <span class="form-item-tip">开启后，员工在专属活码中预设客户资料时该字段不能为空</span>
+          </el-form-item>
           <el-form-item label="是否启用">
             <el-switch v-model="formData.status" />
             <span class="form-item-tip">开启后，员工可为客户编辑该字段信息，后台可读取</span>
+          </el-form-item>
+          <el-form-item v-if="showManual" label="允许手动选择">
+            <el-switch v-model="formData.allowManual" />
+            <span class="form-item-tip">若开启，则移动端中位置信息支持手动选择</span>
           </el-form-item>
           <el-form-item
             v-if="showEditSelect"
@@ -97,6 +105,7 @@ export default {
       formData: {
         name: null,
         required: 0,
+        liveCodeRequired: 0,
         status: 0,
         optionList: [{ multipleValue: '' }]
       },
@@ -118,6 +127,9 @@ export default {
         CUSTOMER_PROPERTY_VALUE['mulRadio'],
         CUSTOMER_PROPERTY_VALUE['selectSingle']
       ].includes(Number(this.activeName));
+    },
+    showManual() {
+      return Number(this.activeName) === CUSTOMER_PROPERTY_VALUE['address'];
     }
   },
   created() {},
@@ -169,6 +181,8 @@ export default {
           return '适用于保存客户的图片信息等，最多可上传9张，图片大小不能超过2M。';
         case CUSTOMER_PROPERTY_VALUE['file']:
           return '适用于保存发票等文件信息，最多可上传9个，文件大小不能超过20M。';
+        case CUSTOMER_PROPERTY_VALUE['address']:
+          return '适用于位置信息设置，可设置省、市、区/县、街道/镇+详细地址。详细地址不超过48字。';
         default:
           return '';
       }
@@ -195,8 +209,12 @@ export default {
               name: formData.name,
               optionList: newOptionList,
               required: formData.required,
+              liveCodeRequired: formData.liveCodeRequired,
               status: formData.status,
-              type: formData.type
+              type: formData.type,
+              extra: JSON.stringify({
+                allowManual: formData.allowManual
+              })
             }
           ]
         });
@@ -222,9 +240,13 @@ export default {
           name: formData.name,
           optionList: formData.optionList,
           required: formData.required,
+          liveCodeRequired: formData.liveCodeRequired,
           status: formData.status,
           propertySort: formData.propertySort,
-          type: this.activeName
+          type: this.activeName,
+          extra: JSON.stringify({
+            allowManual: formData.allowManual
+          })
         });
         this.loading = false;
         changeButtonLoading(this.$store, 'handelConfirm');
@@ -246,6 +268,7 @@ export default {
   .tip-alert {
     background-color: $bgLightBaseColor;
     color: rgba(127, 127, 127, 100);
+    padding: 8px 12px;
   }
   .el-form-item {
     /deep/ .el-form-item__content {

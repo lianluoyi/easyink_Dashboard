@@ -51,6 +51,9 @@
             />
           </el-form-item>
           <el-form-item>
+            <el-input v-model="query.position" placeholder="请输入员工职务" />
+          </el-form-item>
+          <el-form-item>
             <el-button
               v-preventReClick="200"
               type="primary"
@@ -111,6 +114,7 @@
             <el-radio-group v-model="dimensionType" class="radio-group-div" size="medium" @input="dimensionTypeChange">
               <el-radio-button :label="STAFF_DIMENSION">员工维度</el-radio-button>
               <el-radio-button :label="DATE_DIMENSION">日期维度</el-radio-button>
+              <el-radio-button :label="DEPARTMENT_DIMENSION">部门维度</el-radio-button>
             </el-radio-group>
             <el-button
               v-hasPermi="['statistic:customerContact:export']"
@@ -118,8 +122,10 @@
               @click="exportForms"
             >导出报表</el-button>
           </div>
+          <p v-if="dimensionType === DEPARTMENT_DIMENSION" class="department-notice">只统计单部门数据，若部门下存在子部门，则不会计入子部门的数据</p>
           <el-table
             ref="showTable"
+            :key="dimensionType"
             v-loading="loading"
             :data="list"
             :default-sort="{prop: 'totalAllContactCnt', order: 'descending'}"
@@ -128,18 +134,25 @@
             <template slot="empty">
               <empty-default-icon :length="list.length" />
             </template>
+            <template v-if="dimensionType === STAFF_DIMENSION">
+              <el-table-column
+                prop=""
+                label="员工"
+                min-width="200"
+              >
+                <template #default="{ row }">
+                  <UserItem :data="row" :is-staff="true" />
+                </template>
+              </el-table-column>
+              <el-table-column prop="position" label="员工职务" min-width="180" />
+              <el-table-column prop="parentDepartmentName" label="所属上级部门" min-width="180">
+                <template #default="{ row }">
+                  {{ row.parentDepartmentName || '-' }}
+                </template>
+              </el-table-column>
+            </template>
             <el-table-column
-              v-if="dimensionType === STAFF_DIMENSION"
-              prop=""
-              label="员工"
-              min-width="200"
-            >
-              <template #default="{ row }">
-                <UserItem :data="row" :is-staff="true" />
-              </template>
-            </el-table-column>
-            <el-table-column
-              v-else
+              v-else-if="dimensionType === DATE_DIMENSION"
               prop="xtime"
               label="日期"
               min-width="200"
@@ -148,10 +161,27 @@
                 {{ row.xtime }}
               </template>
             </el-table-column>
+            <template v-else-if="dimensionType === DEPARTMENT_DIMENSION">
+              <el-table-column
+                label="部门名"
+                min-width="200"
+              >
+                <template #default="{ row }">
+                  <p style="font-size: 14px;">{{ row.departmentName }}</p>
+                  <p style="color: #999; font-size: 12px;">{{ row.parentDepartmentName || '-' }}</p>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="userCount"
+                label="员工数"
+                min-width="150"
+              />
+            </template>
             <el-table-column sortable="custom" prop="totalAllContactCnt" label="客户总数" min-width="180" />
             <el-table-column sortable="custom" prop="totalContactCnt" label="留存客户总数" min-width="180" />
             <el-table-column sortable="custom" prop="contactLossCnt" label="流失客户数" min-width="180" />
             <el-table-column sortable="custom" prop="newContactCnt" label="新增客户数" min-width="180" />
+            <el-table-column v-if="dimensionType === DEPARTMENT_DIMENSION" sortable="custom" prop="newCustomerRetentionCnt" label="新增留存数" min-width="180" />
             <el-table-column sortable="custom" prop="newContactRetentionRate" label="新客留存率" min-width="180">
               <template #default="{ row }">
                 {{ row.newContactRetentionRate === DATA_STATISTICS_DEFAULT_SHOW ? DATA_STATISTICS_DEFAULT_SHOW : row.newContactRetentionRate + '%' }}
@@ -183,19 +213,21 @@
 <script>
 import RightContainer from '@/components/RightContainer';
 import Statistics from '@/components/Statistics.vue';
-import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION, DATA_STATISTICS_DEFAULT_SHOW } from '@/utils/constant/index';
+import { PAGE_LIMIT, DATE_DIMENSION, STAFF_DIMENSION, DATA_STATISTICS_DEFAULT_SHOW, DEPARTMENT_DIMENSION } from '@/utils/constant/index';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon';
 import UserItem from '@/components/UserItem.vue';
 import TagUserShow from '@/components/TagUserShow';
 import SelectUser from '@/components/SelectUser/index.vue';
 import { groupByScopeType } from '@/utils/common';
-import { YESTERDAY_TIME, FIXED_DAYS_AGO_TIME, ONE_MOUNTH_AGO, ONE_MOUNTH_LATER } from '@/utils/common';
+import { YESTERDAY_TIME, FIXED_DAYS_AGO_TIME } from '@/utils/common';
 import {
   getCustomerOverView,
   getCustomerOverViewOfUser,
   exportCustomerOverViewOfUser,
   getCustomerOverViewOfDate,
-  exportCustomerOverViewOfDate
+  exportCustomerOverViewOfDate,
+  exportCustomerOverViewOfDepartment,
+  getCustomerOverViewOfDepartment
 } from '@/api/statistics';
 import loadingMixin from '@/mixin/loadingMixin';
 // 排序字段
@@ -211,6 +243,7 @@ export default {
     return {
       DATE_DIMENSION,
       STAFF_DIMENSION,
+      DEPARTMENT_DIMENSION,
       DATA_STATISTICS_DEFAULT_SHOW,
       // 选择添加人弹窗显隐
       dialogVisibleSelectUser: false,
@@ -225,9 +258,17 @@ export default {
         },
         disabledDate: v => {
           if (this.pickerMinDate) {
-            const minTime = new Date(ONE_MOUNTH_AGO(this.pickerMinDate)).getTime();
-            const maxTime = new Date(ONE_MOUNTH_LATER(this.pickerMinDate)).getTime();
-            return v.getTime() > maxTime || v.getTime() < minTime || v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date(YESTERDAY_TIME).getTime();
+            // 根据 selectMonthLimit 计算时间范围
+            const selectedDate = new Date(this.pickerMinDate);
+            const minDate = new Date(selectedDate);
+            const maxDate = new Date(selectedDate);
+
+            // 设置最小日期为选中日期减去 selectMonthLimit 个月
+            minDate.setMonth(selectedDate.getMonth() - this.selectMonthLimit);
+            // 设置最大日期为选中日期加上 selectMonthLimit 个月
+            maxDate.setMonth(selectedDate.getMonth() + this.selectMonthLimit);
+
+            return v.getTime() > maxDate.getTime() || v.getTime() < minDate.getTime() || v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date(YESTERDAY_TIME).getTime();
           } else {
             return v.getTime() < new Date(FIXED_DAYS_AGO_TIME).getTime() || v.getTime() > new Date(YESTERDAY_TIME).getTime();
           }
@@ -253,7 +294,8 @@ export default {
         dateSort: {
           sortName: 'totalAllContactCnt', // 默认降序
           sortType: null
-        }
+        },
+        departmentSort: {}
       },
       // 总条数
       total: 0,
@@ -263,11 +305,14 @@ export default {
       loading: false,
       // 数据总览
       colList: [],
-      dimensionType: STAFF_DIMENSION
+      dimensionType: STAFF_DIMENSION,
+      selectMonthLimit: 1
     };
   },
   created() {
     this.onSearch();
+    const { selectMonthLimit } = this.$store.state.app.systemSetting;
+    this.selectMonthLimit = selectMonthLimit;
   },
   methods: {
     dimensionTypeChange() {
@@ -275,9 +320,16 @@ export default {
         Object.keys(this.sortParams.staffSort).forEach((key) => {
           this.$refs?.showTable?.sort(key, this.sortParams.staffSort[key]);
         });
-      } else {
+      } else if (this.dimensionType === DATE_DIMENSION) {
         const { sortName, sortType } = this.sortParams.dateSort;
         this.$refs?.showTable?.sort(sortName, sortType);
+      } else if (this.dimensionType === DEPARTMENT_DIMENSION) {
+        const keys = Object.keys(this.sortParams.departmentSort);
+        if (keys.length) {
+          this.$refs?.showTable?.sort(keys[0], this.sortParams.departmentSort[keys[0]]);
+        } else {
+          this.getList(true);
+        }
       }
     },
     /**
@@ -341,7 +393,12 @@ export default {
     getList(initPage) {
       initPage ? this.query.pageNum = 1 : null;
       this.loading = true;
-      const getListFn = this.dimensionType === STAFF_DIMENSION ? getCustomerOverViewOfUser : getCustomerOverViewOfDate;
+      const api = {
+        [STAFF_DIMENSION]: getCustomerOverViewOfUser,
+        [DATE_DIMENSION]: getCustomerOverViewOfDate,
+        [DEPARTMENT_DIMENSION]: getCustomerOverViewOfDepartment
+      };
+      const getListFn = api[this.dimensionType];
       getListFn(this.getSearchPayload()).then((res) => {
         this.list = this.dimensionType === STAFF_DIMENSION ? res.rows : this.dealPaging(res.rows);
         this.total = res.total || 0;
@@ -375,9 +432,12 @@ export default {
       if (this.dimensionType === STAFF_DIMENSION) {
         this.sortParams.staffSort = this.$options.data().sortParams.staffSort;
         this.$refs?.showTable?.sort('totalAllContactCnt', 'descending'); // 重置为默认排序(此处自行进行请求表单数据)
-      } else {
+      } else if (this.dimensionType === DATE_DIMENSION) {
         this.sortParams.dateSort = this.$options.data().sortParams.dateSort;
         this.$refs?.showTable?.sort('totalAllContactCnt', null);
+      } else if (this.dimensionType === DEPARTMENT_DIMENSION) {
+        this.sortParams.departmentSort = this.$options.data().sortParams.departmentSort;
+        this.getList(true);
       }
       this.getDataOverview();
     },
@@ -405,18 +465,26 @@ export default {
         Object.keys(this.sortParams.staffSort).forEach((key) => {
           sortPayload[`${key}Sort`] = SORT[this.sortParams.staffSort[key]];
         });
-      } else {
+      } else if (this.dimensionType === DATE_DIMENSION) {
         const { sortName, sortType } = this.sortParams.dateSort;
         sortPayload = {
           sortName: sortName + 'Sort',
           sortType: SORT[sortType]
         };
+      } else if (this.dimensionType === DEPARTMENT_DIMENSION) {
+        Object.keys(this.sortParams.departmentSort).forEach((key) => {
+          sortPayload[`${key}Sort`] = SORT[this.sortParams.departmentSort[key]];
+        });
       }
       return { ...this.query, ...sortPayload };
     },
     // 导出报表
     exportForms() {
-      const exportFn = this.dimensionType === STAFF_DIMENSION ? exportCustomerOverViewOfUser : exportCustomerOverViewOfDate;
+      const exportFn = {
+        [STAFF_DIMENSION]: exportCustomerOverViewOfUser,
+        [DATE_DIMENSION]: exportCustomerOverViewOfDate,
+        [DEPARTMENT_DIMENSION]: exportCustomerOverViewOfDepartment
+      }[this.dimensionType];
       exportFn(this.getSearchPayload()).then((res) => {
         this.download(res.data.msg, true);
       }).catch(() => {
@@ -429,10 +497,14 @@ export default {
         this.sortParams.staffSort = {
           [prop]: order
         };
-      } else {
+      } else if (this.dimensionType === DATE_DIMENSION) {
         this.sortParams.dateSort = {
           sortName: prop,
           sortType: order
+        };
+      } else if (this.dimensionType === DEPARTMENT_DIMENSION) {
+        this.sortParams.departmentSort = {
+          [prop]: order
         };
       }
       this.getList(true);
@@ -462,7 +534,12 @@ export default {
       justify-content: space-between;
       margin-bottom: 15px;
     }
-
+    .department-notice {
+      font-size: 12px;
+      color: #999;
+      margin-top: -5px;
+      margin-bottom: 10px;
+    }
   }
   /deep/ .show-data-wrapper {
     background-color: transparent;
